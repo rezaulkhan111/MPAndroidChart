@@ -1,136 +1,135 @@
+package com.github.mikephil.charting.matrix
 
-package com.github.mikephil.charting.matrix;
+import com.github.mikephil.charting.matrix.Vector3
 
 /**
  * Simple 3D vector class. Handles basic vector math for 3D vectors.
  */
-public final class Vector3 {
-    public float x;
-    public float y;
-    public float z;
+class Vector3 {
+    var x = 0f
+    var y = 0f
+    var z = 0f
 
-    public static final Vector3 ZERO = new Vector3(0, 0, 0);
-    public static final Vector3 UNIT_X = new Vector3(1, 0, 0);
-    public static final Vector3 UNIT_Y = new Vector3(0, 1, 0);
-    public static final Vector3 UNIT_Z = new Vector3(0, 0, 1);
-
-    public Vector3() {
+    constructor() {}
+    constructor(array: FloatArray) {
+        set(array[0], array[1], array[2])
     }
 
-    public Vector3(float[] array)
-    {
-        set(array[0], array[1], array[2]);
+    constructor(xValue: Float, yValue: Float, zValue: Float) {
+        set(xValue, yValue, zValue)
     }
 
-    public Vector3(float xValue, float yValue, float zValue) {
-        set(xValue, yValue, zValue);
+    constructor(other: Vector3) {
+        set(other)
     }
 
-    public Vector3(Vector3 other) {
-        set(other);
+    fun add(other: Vector3) {
+        x += other.x
+        y += other.y
+        z += other.z
     }
 
-    public final void add(Vector3 other) {
-        x += other.x;
-        y += other.y;
-        z += other.z;
+    fun add(otherX: Float, otherY: Float, otherZ: Float) {
+        x += otherX
+        y += otherY
+        z += otherZ
     }
 
-    public final void add(float otherX, float otherY, float otherZ) {
-        x += otherX;
-        y += otherY;
-        z += otherZ;
+    fun subtract(other: Vector3) {
+        x -= other.x
+        y -= other.y
+        z -= other.z
     }
 
-    public final void subtract(Vector3 other) {
-        x -= other.x;
-        y -= other.y;
-        z -= other.z;
+    fun subtractMultiple(other: Vector3, multiplicator: Float) {
+        x -= other.x * multiplicator
+        y -= other.y * multiplicator
+        z -= other.z * multiplicator
     }
 
-    public final void subtractMultiple(Vector3 other, float multiplicator)
-    {
-        x -= other.x * multiplicator;
-        y -= other.y * multiplicator;
-        z -= other.z * multiplicator;
+    fun multiply(magnitude: Float) {
+        x *= magnitude
+        y *= magnitude
+        z *= magnitude
     }
 
-    public final void multiply(float magnitude) {
-        x *= magnitude;
-        y *= magnitude;
-        z *= magnitude;
+    fun multiply(other: Vector3) {
+        x *= other.x
+        y *= other.y
+        z *= other.z
     }
 
-    public final void multiply(Vector3 other) {
-        x *= other.x;
-        y *= other.y;
-        z *= other.z;
-    }
-
-    public final void divide(float magnitude) {
+    fun divide(magnitude: Float) {
         if (magnitude != 0.0f) {
-            x /= magnitude;
-            y /= magnitude;
-            z /= magnitude;
+            x /= magnitude
+            y /= magnitude
+            z /= magnitude
         }
     }
 
-    public final void set(Vector3 other) {
-        x = other.x;
-        y = other.y;
-        z = other.z;
+    fun set(other: Vector3) {
+        x = other.x
+        y = other.y
+        z = other.z
     }
 
-    public final void set(float xValue, float yValue, float zValue) {
-        x = xValue;
-        y = yValue;
-        z = zValue;
+    operator fun set(xValue: Float, yValue: Float, zValue: Float) {
+        x = xValue
+        y = yValue
+        z = zValue
     }
 
-    public final float dot(Vector3 other) {
-        return (x * other.x) + (y * other.y) + (z * other.z);
+    fun dot(other: Vector3): Float {
+        return x * other.x + y * other.y + z * other.z
     }
 
-    public final Vector3 cross(Vector3 other) {
-        return new Vector3(y * other.z - z * other.y,
-                z * other.x - x * other.z,
-                x * other.y - y * other.x);
+    fun cross(other: Vector3): Vector3 {
+        return Vector3(
+            y * other.z - z * other.y,
+            z * other.x - x * other.z,
+            x * other.y - y * other.x
+        )
     }
 
-    public final float length() {
-        return (float) Math.sqrt(length2());
+    fun length(): Float {
+        return Math.sqrt(length2().toDouble()).toFloat()
     }
 
-    public final float length2() {
-        return (x * x) + (y * y) + (z * z);
+    fun length2(): Float {
+        return x * x + y * y + z * z
     }
 
-    public final float distance2(Vector3 other) {
-        float dx = x - other.x;
-        float dy = y - other.y;
-        float dz = z - other.z;
-        return (dx * dx) + (dy * dy) + (dz * dz);
+    fun distance2(other: Vector3): Float {
+        val dx = x - other.x
+        val dy = y - other.y
+        val dz = z - other.z
+        return dx * dx + dy * dy + dz * dz
     }
 
-    public final float normalize() {
-        final float magnitude = length();
+    fun normalize(): Float {
+        val magnitude = length()
 
         // TODO: I'm choosing safety over speed here.
         if (magnitude != 0.0f) {
-            x /= magnitude;
-            y /= magnitude;
-            z /= magnitude;
+            x /= magnitude
+            y /= magnitude
+            z /= magnitude
         }
-
-        return magnitude;
+        return magnitude
     }
 
-    public final void zero() {
-        set(0.0f, 0.0f, 0.0f);
+    fun zero() {
+        set(0.0f, 0.0f, 0.0f)
     }
 
-    public final boolean pointsInSameDirection(Vector3 other) {
-        return this.dot(other) > 0;
+    fun pointsInSameDirection(other: Vector3): Boolean {
+        return dot(other) > 0
     }
 
+    companion object {
+        val ZERO = Vector3(0, 0, 0)
+        val UNIT_X = Vector3(1, 0, 0)
+        val UNIT_Y = Vector3(0, 1, 0)
+        val UNIT_Z = Vector3(0, 0, 1)
+    }
 }

@@ -1,69 +1,51 @@
-package com.github.mikephil.charting.model;
+package com.github.mikephil.charting.model
 
-import com.github.mikephil.charting.utils.Fill;
+import com.github.mikephil.charting.utils.Fill.gradientColors
+import com.github.mikephil.charting.utils.Fill
 
 /**
  * Deprecated. Use `Fill`
  */
-@Deprecated
-public class GradientColor extends Fill
-{
+@Deprecated("")
+class GradientColor : Fill() {
     /**
      * Deprecated. Use `Fill.getGradientColors()`
      */
-    @Deprecated
-    public int getStartColor()
-    {
-        return getGradientColors()[0];
-    }
-
     /**
      * Deprecated. Use `Fill.setGradientColors(...)`
      */
-    @Deprecated
-    public void setStartColor(int startColor)
-    {
-        if (getGradientColors() == null || getGradientColors().length != 2)
-        {
-            setGradientColors(new int[]{
+    @get:Deprecated("")
+    @set:Deprecated("")
+    var startColor: Int
+        get() = gradientColors!![0]
+        set(startColor) {
+            if (gradientColors == null || gradientColors!!.size != 2) {
+                gradientColors = intArrayOf(
                     startColor,
-                    getGradientColors() != null && getGradientColors().length > 1
-                            ? getGradientColors()[1]
-                            : 0
-            });
-        } else
-        {
-            getGradientColors()[0] = startColor;
+                    if (gradientColors != null && gradientColors!!.size > 1) gradientColors!![1] else 0
+                )
+            } else {
+                gradientColors!![0] = startColor
+            }
         }
-    }
-
     /**
      * Deprecated. Use `Fill.getGradientColors()`
      */
-    @Deprecated
-    public int getEndColor()
-    {
-        return getGradientColors()[1];
-    }
-
     /**
      * Deprecated. Use `Fill.setGradientColors(...)`
      */
-    @Deprecated
-    public void setEndColor(int endColor)
-    {
-        if (getGradientColors() == null || getGradientColors().length != 2)
-        {
-            setGradientColors(new int[]{
-                    getGradientColors() != null && getGradientColors().length > 0
-                            ? getGradientColors()[0]
-                            : 0,
+    @get:Deprecated("")
+    @set:Deprecated("")
+    var endColor: Int
+        get() = gradientColors!![1]
+        set(endColor) {
+            if (gradientColors == null || gradientColors!!.size != 2) {
+                gradientColors = intArrayOf(
+                    if (gradientColors != null && gradientColors!!.size > 0) gradientColors!![0] else 0,
                     endColor
-            });
-        } else
-        {
-            getGradientColors()[1] = endColor;
+                )
+            } else {
+                gradientColors!![1] = endColor
+            }
         }
-    }
-
 }
