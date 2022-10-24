@@ -1,64 +1,172 @@
+package com.github.mikephil.charting.data
 
-package com.github.mikephil.charting.data;
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.entryCount
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.getEntryForIndex
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.label
+import com.github.mikephil.charting.highlight.Highlight.x
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.calcMinMaxY
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.yMax
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.yMin
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.axisDependency
+import com.github.mikephil.charting.highlight.Highlight.dataSetIndex
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.getEntryForXValue
+import com.github.mikephil.charting.highlight.Highlight.y
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.addEntry
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.xMax
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.xMin
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.removeEntry
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.colors
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.valueFormatter
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.valueTextColor
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.setValueTextColors
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.valueTypeface
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.valueTextSize
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.setDrawValues
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.isHighlightEnabled
+import com.github.mikephil.charting.interfaces.datasets.IBubbleDataSet.highlightCircleWidth
+import com.github.mikephil.charting.utils.Utils.convertDpToPixel
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.calcMinMax
+import com.github.mikephil.charting.utils.ColorTemplate.createColors
+import com.github.mikephil.charting.utils.Utils.defaultValueFormatter
+import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet.scatterShapeSize
+import com.github.mikephil.charting.highlight.Highlight.dataIndex
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.getEntriesForXValue
+import android.annotation.TargetApi
+import android.os.Build
+import com.github.mikephil.charting.data.filter.ApproximatorN
+import android.os.Parcelable
+import android.graphics.drawable.Drawable
+import android.os.Parcel
+import android.os.ParcelFormatException
+import android.os.Parcelable.Creator
+import com.github.mikephil.charting.data.BarLineScatterCandleBubbleData
+import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.data.BaseDataSet
+import com.github.mikephil.charting.data.DataSet.Rounding
+import com.github.mikephil.charting.data.DataSet
+import com.github.mikephil.charting.data.ChartData
+import com.github.mikephil.charting.interfaces.datasets.IPieDataSet
+import android.annotation.SuppressLint
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
+import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.interfaces.datasets.IDataSet
+import com.github.mikephil.charting.components.YAxis.AxisDependency
+import com.github.mikephil.charting.formatter.IValueFormatter
+import android.graphics.Typeface
+import com.github.mikephil.charting.interfaces.datasets.IRadarDataSet
+import com.github.mikephil.charting.data.BarLineScatterCandleBubbleDataSet
+import com.github.mikephil.charting.utils.Fill
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.interfaces.datasets.IBubbleDataSet
+import com.github.mikephil.charting.interfaces.datasets.ICandleDataSet
+import com.github.mikephil.charting.data.PieDataSet.ValuePosition
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.RadarEntry
+import com.github.mikephil.charting.components.YAxis
+import com.github.mikephil.charting.components.Legend.LegendForm
+import com.github.mikephil.charting.components.Legend
+import android.graphics.DashPathEffect
+import com.github.mikephil.charting.utils.MPPointF
+import com.github.mikephil.charting.utils.ColorTemplate
+import com.github.mikephil.charting.data.BubbleEntry
+import com.github.mikephil.charting.data.CandleEntry
+import com.github.mikephil.charting.data.LineRadarDataSet
+import com.github.mikephil.charting.formatter.IFillFormatter
+import com.github.mikephil.charting.formatter.DefaultFillFormatter
+import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet
+import com.github.mikephil.charting.interfaces.datasets.IBarLineScatterCandleBubbleDataSet
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.ScatterData
+import com.github.mikephil.charting.data.CandleData
+import com.github.mikephil.charting.data.BubbleData
+import com.github.mikephil.charting.data.RadarDataSet
+import com.github.mikephil.charting.data.BubbleDataSet
+import com.github.mikephil.charting.data.LineScatterCandleRadarDataSet
+import com.github.mikephil.charting.data.CandleDataSet
+import com.github.mikephil.charting.data.ScatterDataSet
+import com.github.mikephil.charting.charts.ScatterChart.ScatterShape
+import com.github.mikephil.charting.renderer.scatter.TriangleShapeRenderer
+import com.github.mikephil.charting.interfaces.datasets.ILineRadarDataSet
+import com.github.mikephil.charting.interfaces.datasets.ILineScatterCandleRadarDataSet
+import java.util.ArrayList
 
-import com.github.mikephil.charting.interfaces.datasets.IPieDataSet;
-import com.github.mikephil.charting.utils.Utils;
-import androidx.annotation.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
-
-public class PieDataSet extends DataSet<PieEntry> implements IPieDataSet {
-
+class PieDataSet(yVals: MutableList<PieEntry?>?, label: String?) : DataSet<PieEntry?>(yVals, label),
+    IPieDataSet {
     /**
      * the space in pixels between the chart-slices, default 0f
      */
-    private float mSliceSpace = 0f;
-    private boolean mAutomaticallyDisableSliceSpacing;
+    private var mSliceSpace = 0f
+
+    /**
+     * When enabled, slice spacing will be 0.0 when the smallest value is going to be
+     * smaller than the slice spacing itself.
+     *
+     * @return
+     */
+    override var isAutomaticallyDisableSliceSpacingEnabled = false
+        private set
 
     /**
      * indicates the selection distance of a pie slice
      */
-    private float mShift = 18f;
+    private var mShift = 18f
+    override var xValuePosition = ValuePosition.INSIDE_SLICE
+    override var yValuePosition = ValuePosition.INSIDE_SLICE
 
-    private ValuePosition mXValuePosition = ValuePosition.INSIDE_SLICE;
-    private ValuePosition mYValuePosition = ValuePosition.INSIDE_SLICE;
-    private int mValueLineColor = 0xff000000;
-    private boolean mUseValueColorForLine = false;
-    private float mValueLineWidth = 1.0f;
-    private float mValueLinePart1OffsetPercentage = 75.f;
-    private float mValueLinePart1Length = 0.3f;
-    private float mValueLinePart2Length = 0.4f;
-    private boolean mValueLineVariableLength = true;
-    private Integer mHighlightColor = null;
+    /**
+     * When valuePosition is OutsideSlice, indicates line color
+     */
+    override var valueLineColor = -0x1000000
+    override var isUseValueColorForLineEnabled = false
+        private set
 
-    public PieDataSet(List<PieEntry> yVals, String label) {
-        super(yVals, label);
-//        mShift = Utils.convertDpToPixel(12f);
-    }
+    /**
+     * When valuePosition is OutsideSlice, indicates line width
+     */
+    override var valueLineWidth = 1.0f
 
-    @Override
-    public DataSet<PieEntry> copy() {
-        List<PieEntry> entries = new ArrayList<>();
-        for (int i = 0; i < mEntries.size(); i++) {
-            entries.add(mEntries.get(i).copy());
+    /**
+     * When valuePosition is OutsideSlice, indicates offset as percentage out of the slice size
+     */
+    override var valueLinePart1OffsetPercentage = 75f
+
+    /**
+     * When valuePosition is OutsideSlice, indicates length of first half of the line
+     */
+    override var valueLinePart1Length = 0.3f
+
+    /**
+     * When valuePosition is OutsideSlice, indicates length of second half of the line
+     */
+    override var valueLinePart2Length = 0.4f
+
+    /**
+     * When valuePosition is OutsideSlice, this allows variable line length
+     */
+    override var isValueLineVariableLength = true
+    /** Gets the color for the highlighted sector  */
+    /** Sets the color for the highlighted sector (null for using entry color)  */
+    override var highlightColor: Int? = null
+    override fun copy(): DataSet<PieEntry?> {
+        val entries: MutableList<PieEntry?> = ArrayList()
+        for (i in mEntries!!.indices) {
+            entries.add(mEntries!![i]!!.copy())
         }
-        PieDataSet copied = new PieDataSet(entries, getLabel());
-        copy(copied);
-        return copied;
+        val copied = PieDataSet(entries, getLabel())
+        copy(copied)
+        return copied
     }
 
-    protected void copy(PieDataSet pieDataSet) {
-        super.copy(pieDataSet);
+    protected fun copy(pieDataSet: PieDataSet?) {
+        super.copy(pieDataSet)
     }
 
-    @Override
-    protected void calcMinMax(PieEntry e) {
-
-        if (e == null)
-            return;
-
-        calcMinMaxY(e);
+    override fun calcMinMax(e: PieEntry?) {
+        if (e == null) return
+        calcMinMaxY(e)
     }
 
     /**
@@ -67,20 +175,14 @@ public class PieDataSet extends DataSet<PieEntry> implements IPieDataSet {
      *
      * @param spaceDp
      */
-    public void setSliceSpace(float spaceDp) {
-
-        if (spaceDp > 20)
-            spaceDp = 20f;
-        if (spaceDp < 0)
-            spaceDp = 0f;
-
-        mSliceSpace = Utils.convertDpToPixel(spaceDp);
-    }
-
-    @Override
-    public float getSliceSpace() {
-        return mSliceSpace;
-    }
+    override var sliceSpace: Float
+        get() = mSliceSpace
+        set(spaceDp) {
+            var spaceDp = spaceDp
+            if (spaceDp > 20) spaceDp = 20f
+            if (spaceDp < 0) spaceDp = 0f
+            mSliceSpace = convertDpToPixel(spaceDp)
+        }
 
     /**
      * When enabled, slice spacing will be 0.0 when the smallest value is going to be
@@ -88,19 +190,8 @@ public class PieDataSet extends DataSet<PieEntry> implements IPieDataSet {
      *
      * @param autoDisable
      */
-    public void setAutomaticallyDisableSliceSpacing(boolean autoDisable) {
-        mAutomaticallyDisableSliceSpacing = autoDisable;
-    }
-
-    /**
-     * When enabled, slice spacing will be 0.0 when the smallest value is going to be
-     * smaller than the slice spacing itself.
-     *
-     * @return
-     */
-    @Override
-    public boolean isAutomaticallyDisableSliceSpacingEnabled() {
-        return mAutomaticallyDisableSliceSpacing;
+    fun setAutomaticallyDisableSliceSpacing(autoDisable: Boolean) {
+        isAutomaticallyDisableSliceSpacingEnabled = autoDisable
     }
 
     /**
@@ -109,153 +200,34 @@ public class PieDataSet extends DataSet<PieEntry> implements IPieDataSet {
      *
      * @param shift
      */
-    public void setSelectionShift(float shift) {
-        mShift = Utils.convertDpToPixel(shift);
-    }
-
-    @Override
-    public float getSelectionShift() {
-        return mShift;
-    }
-
-    @Override
-    public ValuePosition getXValuePosition() {
-        return mXValuePosition;
-    }
-
-    public void setXValuePosition(ValuePosition xValuePosition) {
-        this.mXValuePosition = xValuePosition;
-    }
-
-    @Override
-    public ValuePosition getYValuePosition() {
-        return mYValuePosition;
-    }
-
-    public void setYValuePosition(ValuePosition yValuePosition) {
-        this.mYValuePosition = yValuePosition;
-    }
-
+    override var selectionShift: Float
+        get() = mShift
+        set(shift) {
+            mShift = convertDpToPixel(shift)
+        }
     /**
      * This method is deprecated.
      * Use isUseValueColorForLineEnabled() instead.
      */
-    @Deprecated
-    public boolean isUsingSliceColorAsValueLineColor() {
-        return isUseValueColorForLineEnabled();
-    }
-
     /**
      * This method is deprecated.
      * Use setUseValueColorForLine(...) instead.
      *
      * @param enabled
      */
-    @Deprecated
-    public void setUsingSliceColorAsValueLineColor(boolean enabled) {
-        setUseValueColorForLine(enabled);
+    @get:Deprecated("")
+    @set:Deprecated("")
+    var isUsingSliceColorAsValueLineColor: Boolean
+        get() = isUseValueColorForLineEnabled
+        set(enabled) {
+            setUseValueColorForLine(enabled)
+        }
+
+    fun setUseValueColorForLine(enabled: Boolean) {
+        isUseValueColorForLineEnabled = enabled
     }
 
-    /**
-     * When valuePosition is OutsideSlice, indicates line color
-     */
-    @Override
-    public int getValueLineColor() {
-        return mValueLineColor;
-    }
-
-    public void setValueLineColor(int valueLineColor) {
-        this.mValueLineColor = valueLineColor;
-    }
-
-    @Override
-    public boolean isUseValueColorForLineEnabled()
-    {
-        return mUseValueColorForLine;
-    }
-
-    public void setUseValueColorForLine(boolean enabled)
-    {
-        mUseValueColorForLine = enabled;
-    }
-
-    /**
-     * When valuePosition is OutsideSlice, indicates line width
-     */
-    @Override
-    public float getValueLineWidth() {
-        return mValueLineWidth;
-    }
-
-    public void setValueLineWidth(float valueLineWidth) {
-        this.mValueLineWidth = valueLineWidth;
-    }
-
-    /**
-     * When valuePosition is OutsideSlice, indicates offset as percentage out of the slice size
-     */
-    @Override
-    public float getValueLinePart1OffsetPercentage() {
-        return mValueLinePart1OffsetPercentage;
-    }
-
-    public void setValueLinePart1OffsetPercentage(float valueLinePart1OffsetPercentage) {
-        this.mValueLinePart1OffsetPercentage = valueLinePart1OffsetPercentage;
-    }
-
-    /**
-     * When valuePosition is OutsideSlice, indicates length of first half of the line
-     */
-    @Override
-    public float getValueLinePart1Length() {
-        return mValueLinePart1Length;
-    }
-
-    public void setValueLinePart1Length(float valueLinePart1Length) {
-        this.mValueLinePart1Length = valueLinePart1Length;
-    }
-
-    /**
-     * When valuePosition is OutsideSlice, indicates length of second half of the line
-     */
-    @Override
-    public float getValueLinePart2Length() {
-        return mValueLinePart2Length;
-    }
-
-    public void setValueLinePart2Length(float valueLinePart2Length) {
-        this.mValueLinePart2Length = valueLinePart2Length;
-    }
-
-    /**
-     * When valuePosition is OutsideSlice, this allows variable line length
-     */
-    @Override
-    public boolean isValueLineVariableLength() {
-        return mValueLineVariableLength;
-    }
-
-    public void setValueLineVariableLength(boolean valueLineVariableLength) {
-        this.mValueLineVariableLength = valueLineVariableLength;
-    }
-
-    /** Gets the color for the highlighted sector */
-    @Override
-    @Nullable
-    public Integer getHighlightColor()
-    {
-        return mHighlightColor;
-    }
-
-    /** Sets the color for the highlighted sector (null for using entry color) */
-    public void setHighlightColor(@Nullable Integer color)
-    {
-        this.mHighlightColor = color;
-    }
-
-
-    public enum ValuePosition {
-        INSIDE_SLICE,
-        OUTSIDE_SLICE
+    enum class ValuePosition {
+        INSIDE_SLICE, OUTSIDE_SLICE
     }
 }

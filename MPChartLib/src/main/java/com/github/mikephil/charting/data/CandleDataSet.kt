@@ -1,134 +1,198 @@
+package com.github.mikephil.charting.data
 
-package com.github.mikephil.charting.data;
-
-import android.graphics.Paint;
-
-import com.github.mikephil.charting.interfaces.datasets.ICandleDataSet;
-import com.github.mikephil.charting.utils.ColorTemplate;
-import com.github.mikephil.charting.utils.Utils;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.entryCount
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.getEntryForIndex
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.label
+import com.github.mikephil.charting.highlight.Highlight.x
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.calcMinMaxY
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.yMax
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.yMin
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.axisDependency
+import com.github.mikephil.charting.highlight.Highlight.dataSetIndex
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.getEntryForXValue
+import com.github.mikephil.charting.highlight.Highlight.y
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.addEntry
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.xMax
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.xMin
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.removeEntry
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.colors
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.valueFormatter
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.valueTextColor
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.setValueTextColors
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.valueTypeface
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.valueTextSize
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.setDrawValues
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.isHighlightEnabled
+import com.github.mikephil.charting.interfaces.datasets.IBubbleDataSet.highlightCircleWidth
+import com.github.mikephil.charting.utils.Utils.convertDpToPixel
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.calcMinMax
+import com.github.mikephil.charting.utils.ColorTemplate.createColors
+import com.github.mikephil.charting.utils.Utils.defaultValueFormatter
+import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet.scatterShapeSize
+import com.github.mikephil.charting.highlight.Highlight.dataIndex
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.getEntriesForXValue
+import android.annotation.TargetApi
+import android.os.Build
+import com.github.mikephil.charting.data.filter.ApproximatorN
+import android.os.Parcelable
+import android.graphics.drawable.Drawable
+import android.os.Parcel
+import android.os.ParcelFormatException
+import android.os.Parcelable.Creator
+import com.github.mikephil.charting.data.BarLineScatterCandleBubbleData
+import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.data.BaseDataSet
+import com.github.mikephil.charting.data.DataSet.Rounding
+import com.github.mikephil.charting.data.DataSet
+import com.github.mikephil.charting.data.ChartData
+import com.github.mikephil.charting.interfaces.datasets.IPieDataSet
+import android.annotation.SuppressLint
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
+import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.interfaces.datasets.IDataSet
+import com.github.mikephil.charting.components.YAxis.AxisDependency
+import com.github.mikephil.charting.formatter.IValueFormatter
+import android.graphics.Typeface
+import com.github.mikephil.charting.interfaces.datasets.IRadarDataSet
+import com.github.mikephil.charting.data.BarLineScatterCandleBubbleDataSet
+import com.github.mikephil.charting.utils.Fill
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.interfaces.datasets.IBubbleDataSet
+import com.github.mikephil.charting.interfaces.datasets.ICandleDataSet
+import com.github.mikephil.charting.data.PieDataSet.ValuePosition
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.RadarEntry
+import com.github.mikephil.charting.components.YAxis
+import com.github.mikephil.charting.components.Legend.LegendForm
+import com.github.mikephil.charting.components.Legend
+import android.graphics.DashPathEffect
+import android.graphics.Paint
+import com.github.mikephil.charting.utils.MPPointF
+import com.github.mikephil.charting.utils.ColorTemplate
+import com.github.mikephil.charting.data.BubbleEntry
+import com.github.mikephil.charting.data.CandleEntry
+import com.github.mikephil.charting.data.LineRadarDataSet
+import com.github.mikephil.charting.formatter.IFillFormatter
+import com.github.mikephil.charting.formatter.DefaultFillFormatter
+import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet
+import com.github.mikephil.charting.interfaces.datasets.IBarLineScatterCandleBubbleDataSet
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.ScatterData
+import com.github.mikephil.charting.data.CandleData
+import com.github.mikephil.charting.data.BubbleData
+import com.github.mikephil.charting.data.RadarDataSet
+import com.github.mikephil.charting.data.BubbleDataSet
+import com.github.mikephil.charting.data.LineScatterCandleRadarDataSet
+import com.github.mikephil.charting.data.CandleDataSet
+import com.github.mikephil.charting.data.ScatterDataSet
+import com.github.mikephil.charting.charts.ScatterChart.ScatterShape
+import com.github.mikephil.charting.renderer.scatter.TriangleShapeRenderer
+import com.github.mikephil.charting.interfaces.datasets.ILineRadarDataSet
+import com.github.mikephil.charting.interfaces.datasets.ILineScatterCandleRadarDataSet
+import java.util.ArrayList
 
 /**
  * DataSet for the CandleStickChart.
  *
  * @author Philipp Jahoda
  */
-public class CandleDataSet extends LineScatterCandleRadarDataSet<CandleEntry> implements ICandleDataSet {
-
+class CandleDataSet(yVals: MutableList<CandleEntry?>?, label: String?) :
+    LineScatterCandleRadarDataSet<CandleEntry?>(yVals, label), ICandleDataSet {
     /**
      * the width of the shadow of the candle
      */
-    private float mShadowWidth = 3f;
+    private var mShadowWidth = 3f
 
     /**
      * should the candle bars show?
      * when false, only "ticks" will show
-     * <p/>
+     *
+     *
      * - default: true
      */
-    private boolean mShowCandleBar = true;
+    private var mShowCandleBar = true
 
     /**
      * the space between the candle entries, default 0.1f (10%)
      */
-    private float mBarSpace = 0.1f;
+    private var mBarSpace = 0.1f
 
     /**
      * use candle color for the shadow
      */
-    private boolean mShadowColorSameAsCandle = false;
+    private var mShadowColorSameAsCandle = false
 
     /**
      * paint style when open < close
      * increasing candlesticks are traditionally hollow
      */
-    protected Paint.Style mIncreasingPaintStyle = Paint.Style.STROKE;
+    protected var mIncreasingPaintStyle = Paint.Style.STROKE
 
     /**
      * paint style when open > close
      * descreasing candlesticks are traditionally filled
      */
-    protected Paint.Style mDecreasingPaintStyle = Paint.Style.FILL;
+    protected var mDecreasingPaintStyle = Paint.Style.FILL
 
     /**
      * color for open == close
      */
-    protected int mNeutralColor = ColorTemplate.COLOR_SKIP;
+    protected var mNeutralColor = ColorTemplate.COLOR_SKIP
 
     /**
      * color for open < close
      */
-    protected int mIncreasingColor = ColorTemplate.COLOR_SKIP;
+    protected var mIncreasingColor = ColorTemplate.COLOR_SKIP
 
     /**
      * color for open > close
      */
-    protected int mDecreasingColor = ColorTemplate.COLOR_SKIP;
+    protected var mDecreasingColor = ColorTemplate.COLOR_SKIP
 
     /**
      * shadow line color, set -1 for backward compatibility and uses default
      * color
      */
-    protected int mShadowColor = ColorTemplate.COLOR_SKIP;
-
-    public CandleDataSet(List<CandleEntry> yVals, String label) {
-        super(yVals, label);
-    }
-
-    @Override
-    public DataSet<CandleEntry> copy() {
-        List<CandleEntry> entries = new ArrayList<CandleEntry>();
-        for (int i = 0; i < mEntries.size(); i++) {
-            entries.add(mEntries.get(i).copy());
+    protected var mShadowColor = ColorTemplate.COLOR_SKIP
+    override fun copy(): DataSet<CandleEntry?>? {
+        val entries: MutableList<CandleEntry?> = ArrayList()
+        for (i in mEntries!!.indices) {
+            entries.add(mEntries!![i]!!.copy())
         }
-        CandleDataSet copied = new CandleDataSet(entries, getLabel());
-        copy(copied);
-        return copied;
+        val copied = CandleDataSet(entries, getLabel())
+        copy(copied)
+        return copied
     }
 
-    protected void copy(CandleDataSet candleDataSet) {
-        super.copy(candleDataSet);
-        candleDataSet.mShadowWidth = mShadowWidth;
-        candleDataSet.mShowCandleBar = mShowCandleBar;
-        candleDataSet.mBarSpace = mBarSpace;
-        candleDataSet.mShadowColorSameAsCandle = mShadowColorSameAsCandle;
-        candleDataSet.mHighLightColor = mHighLightColor;
-        candleDataSet.mIncreasingPaintStyle = mIncreasingPaintStyle;
-        candleDataSet.mDecreasingPaintStyle = mDecreasingPaintStyle;
-        candleDataSet.mNeutralColor = mNeutralColor;
-        candleDataSet.mIncreasingColor = mIncreasingColor;
-        candleDataSet.mDecreasingColor = mDecreasingColor;
-        candleDataSet.mShadowColor = mShadowColor;
+    protected fun copy(candleDataSet: CandleDataSet) {
+        super.copy(candleDataSet)
+        candleDataSet.mShadowWidth = mShadowWidth
+        candleDataSet.mShowCandleBar = mShowCandleBar
+        candleDataSet.mBarSpace = mBarSpace
+        candleDataSet.mShadowColorSameAsCandle = mShadowColorSameAsCandle
+        candleDataSet.mHighLightColor = mHighLightColor
+        candleDataSet.mIncreasingPaintStyle = mIncreasingPaintStyle
+        candleDataSet.mDecreasingPaintStyle = mDecreasingPaintStyle
+        candleDataSet.mNeutralColor = mNeutralColor
+        candleDataSet.mIncreasingColor = mIncreasingColor
+        candleDataSet.mDecreasingColor = mDecreasingColor
+        candleDataSet.mShadowColor = mShadowColor
     }
 
-    @Override
-    protected void calcMinMax(CandleEntry e) {
-
-        if (e.getLow() < mYMin)
-            mYMin = e.getLow();
-
-        if (e.getHigh() > mYMax)
-            mYMax = e.getHigh();
-
-        calcMinMaxX(e);
+    override fun calcMinMax(e: CandleEntry?) {
+        if (e.getLow() < mYMin) mYMin = e.getLow()
+        if (e.getHigh() > mYMax) mYMax = e.getHigh()
+        calcMinMaxX(e)
     }
 
-    @Override
-    protected void calcMinMaxY(CandleEntry e) {
-
-        if (e.getHigh() < mYMin)
-            mYMin = e.getHigh();
-
-        if (e.getHigh() > mYMax)
-            mYMax = e.getHigh();
-
-        if (e.getLow() < mYMin)
-            mYMin = e.getLow();
-
-        if (e.getLow() > mYMax)
-            mYMax = e.getLow();
+    protected override fun calcMinMaxY(e: CandleEntry) {
+        if (e.high < mYMin) mYMin = e.high
+        if (e.high > mYMax) mYMax = e.high
+        if (e.low < mYMin) mYMin = e.low
+        if (e.low > mYMax) mYMax = e.low
     }
 
     /**
@@ -137,19 +201,15 @@ public class CandleDataSet extends LineScatterCandleRadarDataSet<CandleEntry> im
      *
      * @param space
      */
-    public void setBarSpace(float space) {
-
-        if (space < 0f)
-            space = 0f;
-        if (space > 0.45f)
-            space = 0.45f;
-
-        mBarSpace = space;
+    fun setBarSpace(space: Float) {
+        var space = space
+        if (space < 0f) space = 0f
+        if (space > 0.45f) space = 0.45f
+        mBarSpace = space
     }
 
-    @Override
-    public float getBarSpace() {
-        return mBarSpace;
+    override fun getBarSpace(): Float {
+        return mBarSpace
     }
 
     /**
@@ -157,13 +217,12 @@ public class CandleDataSet extends LineScatterCandleRadarDataSet<CandleEntry> im
      *
      * @param width
      */
-    public void setShadowWidth(float width) {
-        mShadowWidth = Utils.convertDpToPixel(width);
+    fun setShadowWidth(width: Float) {
+        mShadowWidth = convertDpToPixel(width)
     }
 
-    @Override
-    public float getShadowWidth() {
-        return mShadowWidth;
+    override fun getShadowWidth(): Float {
+        return mShadowWidth
     }
 
     /**
@@ -171,15 +230,13 @@ public class CandleDataSet extends LineScatterCandleRadarDataSet<CandleEntry> im
      *
      * @param showCandleBar
      */
-    public void setShowCandleBar(boolean showCandleBar) {
-        mShowCandleBar = showCandleBar;
+    fun setShowCandleBar(showCandleBar: Boolean) {
+        mShowCandleBar = showCandleBar
     }
 
-    @Override
-    public boolean getShowCandleBar() {
-        return mShowCandleBar;
+    override fun getShowCandleBar(): Boolean {
+        return mShowCandleBar
     }
-
     // TODO
     /**
      * It is necessary to implement ColorsList class that will encapsulate
@@ -189,22 +246,19 @@ public class CandleDataSet extends LineScatterCandleRadarDataSet<CandleEntry> im
      *
      * @author Mesrop
      */
-
-    /** BELOW THIS COLOR HANDLING */
-
+    /** BELOW THIS COLOR HANDLING  */
     /**
      * Sets the one and ONLY color that should be used for this DataSet when
      * open == close.
      *
      * @param color
      */
-    public void setNeutralColor(int color) {
-        mNeutralColor = color;
+    fun setNeutralColor(color: Int) {
+        mNeutralColor = color
     }
 
-    @Override
-    public int getNeutralColor() {
-        return mNeutralColor;
+    override fun getNeutralColor(): Int {
+        return mNeutralColor
     }
 
     /**
@@ -213,13 +267,12 @@ public class CandleDataSet extends LineScatterCandleRadarDataSet<CandleEntry> im
      *
      * @param color
      */
-    public void setIncreasingColor(int color) {
-        mIncreasingColor = color;
+    fun setIncreasingColor(color: Int) {
+        mIncreasingColor = color
     }
 
-    @Override
-    public int getIncreasingColor() {
-        return mIncreasingColor;
+    override fun getIncreasingColor(): Int {
+        return mIncreasingColor
     }
 
     /**
@@ -228,18 +281,16 @@ public class CandleDataSet extends LineScatterCandleRadarDataSet<CandleEntry> im
      *
      * @param color
      */
-    public void setDecreasingColor(int color) {
-        mDecreasingColor = color;
+    fun setDecreasingColor(color: Int) {
+        mDecreasingColor = color
     }
 
-    @Override
-    public int getDecreasingColor() {
-        return mDecreasingColor;
+    override fun getDecreasingColor(): Int {
+        return mDecreasingColor
     }
 
-    @Override
-    public Paint.Style getIncreasingPaintStyle() {
-        return mIncreasingPaintStyle;
+    override fun getIncreasingPaintStyle(): Paint.Style {
+        return mIncreasingPaintStyle
     }
 
     /**
@@ -247,13 +298,12 @@ public class CandleDataSet extends LineScatterCandleRadarDataSet<CandleEntry> im
      *
      * @param paintStyle
      */
-    public void setIncreasingPaintStyle(Paint.Style paintStyle) {
-        this.mIncreasingPaintStyle = paintStyle;
+    fun setIncreasingPaintStyle(paintStyle: Paint.Style) {
+        mIncreasingPaintStyle = paintStyle
     }
 
-    @Override
-    public Paint.Style getDecreasingPaintStyle() {
-        return mDecreasingPaintStyle;
+    override fun getDecreasingPaintStyle(): Paint.Style {
+        return mDecreasingPaintStyle
     }
 
     /**
@@ -261,13 +311,12 @@ public class CandleDataSet extends LineScatterCandleRadarDataSet<CandleEntry> im
      *
      * @param decreasingPaintStyle
      */
-    public void setDecreasingPaintStyle(Paint.Style decreasingPaintStyle) {
-        this.mDecreasingPaintStyle = decreasingPaintStyle;
+    fun setDecreasingPaintStyle(decreasingPaintStyle: Paint.Style) {
+        mDecreasingPaintStyle = decreasingPaintStyle
     }
 
-    @Override
-    public int getShadowColor() {
-        return mShadowColor;
+    override fun getShadowColor(): Int {
+        return mShadowColor
     }
 
     /**
@@ -275,13 +324,12 @@ public class CandleDataSet extends LineScatterCandleRadarDataSet<CandleEntry> im
      *
      * @param shadowColor
      */
-    public void setShadowColor(int shadowColor) {
-        this.mShadowColor = shadowColor;
+    fun setShadowColor(shadowColor: Int) {
+        mShadowColor = shadowColor
     }
 
-    @Override
-    public boolean getShadowColorSameAsCandle() {
-        return mShadowColorSameAsCandle;
+    override fun getShadowColorSameAsCandle(): Boolean {
+        return mShadowColorSameAsCandle
     }
 
     /**
@@ -289,7 +337,7 @@ public class CandleDataSet extends LineScatterCandleRadarDataSet<CandleEntry> im
      *
      * @param shadowColorSameAsCandle
      */
-    public void setShadowColorSameAsCandle(boolean shadowColorSameAsCandle) {
-        this.mShadowColorSameAsCandle = shadowColorSameAsCandle;
+    fun setShadowColorSameAsCandle(shadowColorSameAsCandle: Boolean) {
+        mShadowColorSameAsCandle = shadowColorSameAsCandle
     }
 }

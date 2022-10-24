@@ -1,14 +1,99 @@
+package com.github.mikephil.charting.data
 
-package com.github.mikephil.charting.data;
-
-import android.util.Log;
-
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.highlight.Highlight;
-import com.github.mikephil.charting.interfaces.datasets.IBarLineScatterCandleBubbleDataSet;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.entryCount
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.getEntryForIndex
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.label
+import com.github.mikephil.charting.highlight.Highlight.x
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.calcMinMaxY
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.yMax
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.yMin
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.axisDependency
+import com.github.mikephil.charting.highlight.Highlight.dataSetIndex
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.getEntryForXValue
+import com.github.mikephil.charting.highlight.Highlight.y
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.addEntry
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.xMax
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.xMin
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.removeEntry
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.colors
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.valueFormatter
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.valueTextColor
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.setValueTextColors
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.valueTypeface
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.valueTextSize
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.setDrawValues
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.isHighlightEnabled
+import com.github.mikephil.charting.interfaces.datasets.IBubbleDataSet.highlightCircleWidth
+import com.github.mikephil.charting.utils.Utils.convertDpToPixel
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.calcMinMax
+import com.github.mikephil.charting.utils.ColorTemplate.createColors
+import com.github.mikephil.charting.utils.Utils.defaultValueFormatter
+import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet.scatterShapeSize
+import com.github.mikephil.charting.highlight.Highlight.dataIndex
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.getEntriesForXValue
+import android.annotation.TargetApi
+import android.os.Build
+import com.github.mikephil.charting.data.filter.ApproximatorN
+import android.os.Parcelable
+import android.graphics.drawable.Drawable
+import android.os.Parcel
+import android.os.ParcelFormatException
+import android.os.Parcelable.Creator
+import com.github.mikephil.charting.data.BarLineScatterCandleBubbleData
+import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.data.BaseDataSet
+import com.github.mikephil.charting.data.DataSet.Rounding
+import com.github.mikephil.charting.data.DataSet
+import com.github.mikephil.charting.data.ChartData
+import com.github.mikephil.charting.interfaces.datasets.IPieDataSet
+import android.annotation.SuppressLint
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
+import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.interfaces.datasets.IDataSet
+import com.github.mikephil.charting.components.YAxis.AxisDependency
+import com.github.mikephil.charting.formatter.IValueFormatter
+import android.graphics.Typeface
+import com.github.mikephil.charting.interfaces.datasets.IRadarDataSet
+import com.github.mikephil.charting.data.BarLineScatterCandleBubbleDataSet
+import com.github.mikephil.charting.utils.Fill
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.interfaces.datasets.IBubbleDataSet
+import com.github.mikephil.charting.interfaces.datasets.ICandleDataSet
+import com.github.mikephil.charting.data.PieDataSet.ValuePosition
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.RadarEntry
+import com.github.mikephil.charting.components.YAxis
+import com.github.mikephil.charting.components.Legend.LegendForm
+import com.github.mikephil.charting.components.Legend
+import android.graphics.DashPathEffect
+import android.util.Log
+import com.github.mikephil.charting.utils.MPPointF
+import com.github.mikephil.charting.utils.ColorTemplate
+import com.github.mikephil.charting.data.BubbleEntry
+import com.github.mikephil.charting.data.CandleEntry
+import com.github.mikephil.charting.data.LineRadarDataSet
+import com.github.mikephil.charting.formatter.IFillFormatter
+import com.github.mikephil.charting.formatter.DefaultFillFormatter
+import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet
+import com.github.mikephil.charting.interfaces.datasets.IBarLineScatterCandleBubbleDataSet
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.ScatterData
+import com.github.mikephil.charting.data.CandleData
+import com.github.mikephil.charting.data.BubbleData
+import com.github.mikephil.charting.data.RadarDataSet
+import com.github.mikephil.charting.data.BubbleDataSet
+import com.github.mikephil.charting.data.LineScatterCandleRadarDataSet
+import com.github.mikephil.charting.data.CandleDataSet
+import com.github.mikephil.charting.data.ScatterDataSet
+import com.github.mikephil.charting.charts.ScatterChart.ScatterShape
+import com.github.mikephil.charting.highlight.Highlight
+import com.github.mikephil.charting.renderer.scatter.TriangleShapeRenderer
+import com.github.mikephil.charting.interfaces.datasets.ILineRadarDataSet
+import com.github.mikephil.charting.interfaces.datasets.ILineScatterCandleRadarDataSet
+import java.util.ArrayList
 
 /**
  * Data object that allows the combination of Line-, Bar-, Scatter-, Bubble- and
@@ -16,123 +101,98 @@ import java.util.List;
  *
  * @author Philipp Jahoda
  */
-public class CombinedData extends BarLineScatterCandleBubbleData<IBarLineScatterCandleBubbleDataSet<? extends Entry>> {
-
-    private LineData mLineData;
-    private BarData mBarData;
-    private ScatterData mScatterData;
-    private CandleData mCandleData;
-    private BubbleData mBubbleData;
-
-    public CombinedData() {
-        super();
+class CombinedData :
+    BarLineScatterCandleBubbleData<IBarLineScatterCandleBubbleDataSet<out Entry?>?>() {
+    private var mLineData: LineData? = null
+    private var mBarData: BarData? = null
+    private var mScatterData: ScatterData? = null
+    private var mCandleData: CandleData? = null
+    private var mBubbleData: BubbleData? = null
+    fun setData(data: LineData?) {
+        mLineData = data
+        notifyDataChanged()
     }
 
-    public void setData(LineData data) {
-        mLineData = data;
-        notifyDataChanged();
+    fun setData(data: BarData?) {
+        mBarData = data
+        notifyDataChanged()
     }
 
-    public void setData(BarData data) {
-        mBarData = data;
-        notifyDataChanged();
+    fun setData(data: ScatterData?) {
+        mScatterData = data
+        notifyDataChanged()
     }
 
-    public void setData(ScatterData data) {
-        mScatterData = data;
-        notifyDataChanged();
+    fun setData(data: CandleData?) {
+        mCandleData = data
+        notifyDataChanged()
     }
 
-    public void setData(CandleData data) {
-        mCandleData = data;
-        notifyDataChanged();
+    fun setData(data: BubbleData?) {
+        mBubbleData = data
+        notifyDataChanged()
     }
 
-    public void setData(BubbleData data) {
-        mBubbleData = data;
-        notifyDataChanged();
-    }
-
-    @Override
-    public void calcMinMax() {
-
-        if(mDataSets == null){
-            mDataSets = new ArrayList<>();
+    public override fun calcMinMax() {
+        if (mDataSets == null) {
+            mDataSets = ArrayList<IBarLineScatterCandleBubbleDataSet<out Entry>>()
         }
-        mDataSets.clear();
-
-        mYMax = -Float.MAX_VALUE;
-        mYMin = Float.MAX_VALUE;
-        mXMax = -Float.MAX_VALUE;
-        mXMin = Float.MAX_VALUE;
-
-        mLeftAxisMax = -Float.MAX_VALUE;
-        mLeftAxisMin = Float.MAX_VALUE;
-        mRightAxisMax = -Float.MAX_VALUE;
-        mRightAxisMin = Float.MAX_VALUE;
-
-        List<BarLineScatterCandleBubbleData> allData = getAllData();
-
-        for (ChartData data : allData) {
-
-            data.calcMinMax();
-
-            List<IBarLineScatterCandleBubbleDataSet<? extends Entry>> sets = data.getDataSets();
-            mDataSets.addAll(sets);
-
-            if (data.getYMax() > mYMax)
-                mYMax = data.getYMax();
-
-            if (data.getYMin() < mYMin)
-                mYMin = data.getYMin();
-
-            if (data.getXMax() > mXMax)
-                mXMax = data.getXMax();
-
-            if (data.getXMin() < mXMin)
-                mXMin = data.getXMin();
-
-            for (IBarLineScatterCandleBubbleDataSet<? extends Entry> dataset : sets) {
-                if (dataset.getAxisDependency() == YAxis.AxisDependency.LEFT)  {
-                    if (dataset.getYMax() > mLeftAxisMax) {
-                        mLeftAxisMax = dataset.getYMax();
+        mDataSets!!.clear()
+        mYMax = -Float.MAX_VALUE
+        mYMin = Float.MAX_VALUE
+        mXMax = -Float.MAX_VALUE
+        mXMin = Float.MAX_VALUE
+        mLeftAxisMax = -Float.MAX_VALUE
+        mLeftAxisMin = Float.MAX_VALUE
+        mRightAxisMax = -Float.MAX_VALUE
+        mRightAxisMin = Float.MAX_VALUE
+        val allData = getAllData()
+        for (data in allData) {
+            data.calcMinMax()
+            val sets = data.dataSets
+            mDataSets!!.addAll(sets!!)
+            if (data.yMax > mYMax) mYMax = data.yMax
+            if (data.yMin < mYMin) mYMin = data.yMin
+            if (data.xMax > mXMax) mXMax = data.xMax
+            if (data.xMin < mXMin) mXMin = data.xMin
+            for (dataset in sets) {
+                if (dataset!!.axisDependency == AxisDependency.LEFT) {
+                    if (dataset.yMax > mLeftAxisMax) {
+                        mLeftAxisMax = dataset.yMax
                     }
-
-                    if (dataset.getYMin() < mLeftAxisMin) {
-                        mLeftAxisMin = dataset.getYMin();
+                    if (dataset.yMin < mLeftAxisMin) {
+                        mLeftAxisMin = dataset.yMin
                     }
-                }
-                else {
-                    if (dataset.getYMax() > mRightAxisMax) {
-                        mRightAxisMax = dataset.getYMax();
+                } else {
+                    if (dataset.yMax > mRightAxisMax) {
+                        mRightAxisMax = dataset.yMax
                     }
-
-                    if (dataset.getYMin() < mRightAxisMin) {
-                        mRightAxisMin = dataset.getYMin();
+                    if (dataset.yMin < mRightAxisMin) {
+                        mRightAxisMin = dataset.yMin
                     }
                 }
             }
         }
     }
 
-    public BubbleData getBubbleData() {
-        return mBubbleData;
+    fun getBubbleData(): BubbleData? {
+        return mBubbleData
     }
 
-    public LineData getLineData() {
-        return mLineData;
+    fun getLineData(): LineData? {
+        return mLineData
     }
 
-    public BarData getBarData() {
-        return mBarData;
+    fun getBarData(): BarData? {
+        return mBarData
     }
 
-    public ScatterData getScatterData() {
-        return mScatterData;
+    fun getScatterData(): ScatterData? {
+        return mScatterData
     }
 
-    public CandleData getCandleData() {
-        return mCandleData;
+    fun getCandleData(): CandleData? {
+        return mCandleData
     }
 
     /**
@@ -140,41 +200,27 @@ public class CombinedData extends BarLineScatterCandleBubbleData<IBarLineScatter
      *
      * @return
      */
-    public List<BarLineScatterCandleBubbleData> getAllData() {
-
-        List<BarLineScatterCandleBubbleData> data = new ArrayList<BarLineScatterCandleBubbleData>();
-        if (mLineData != null)
-            data.add(mLineData);
-        if (mBarData != null)
-            data.add(mBarData);
-        if (mScatterData != null)
-            data.add(mScatterData);
-        if (mCandleData != null)
-            data.add(mCandleData);
-        if (mBubbleData != null)
-            data.add(mBubbleData);
-
-        return data;
+    fun getAllData(): List<BarLineScatterCandleBubbleData<*>> {
+        val data: MutableList<BarLineScatterCandleBubbleData<*>> = ArrayList()
+        if (mLineData != null) data.add(mLineData!!)
+        if (mBarData != null) data.add(mBarData!!)
+        if (mScatterData != null) data.add(mScatterData!!)
+        if (mCandleData != null) data.add(mCandleData!!)
+        if (mBubbleData != null) data.add(mBubbleData!!)
+        return data
     }
 
-    public BarLineScatterCandleBubbleData getDataByIndex(int index) {
-        return getAllData().get(index);
+    fun getDataByIndex(index: Int): BarLineScatterCandleBubbleData<*> {
+        return getAllData()[index]
     }
 
-    @Override
-    public void notifyDataChanged() {
-        if (mLineData != null)
-            mLineData.notifyDataChanged();
-        if (mBarData != null)
-            mBarData.notifyDataChanged();
-        if (mCandleData != null)
-            mCandleData.notifyDataChanged();
-        if (mScatterData != null)
-            mScatterData.notifyDataChanged();
-        if (mBubbleData != null)
-            mBubbleData.notifyDataChanged();
-
-        calcMinMax(); // recalculate everything
+    override fun notifyDataChanged() {
+        if (mLineData != null) mLineData!!.notifyDataChanged()
+        if (mBarData != null) mBarData!!.notifyDataChanged()
+        if (mCandleData != null) mCandleData!!.notifyDataChanged()
+        if (mScatterData != null) mScatterData!!.notifyDataChanged()
+        if (mBubbleData != null) mBubbleData!!.notifyDataChanged()
+        calcMinMax() // recalculate everything
     }
 
     /**
@@ -183,28 +229,19 @@ public class CombinedData extends BarLineScatterCandleBubbleData<IBarLineScatter
      * @param highlight
      * @return the entry that is highlighted
      */
-    @Override
-    public Entry getEntryForHighlight(Highlight highlight) {
-
-        if (highlight.getDataIndex() >= getAllData().size())
-            return null;
-
-        ChartData data = getDataByIndex(highlight.getDataIndex());
-
-        if (highlight.getDataSetIndex() >= data.getDataSetCount())
-            return null;
+    override fun getEntryForHighlight(highlight: Highlight): Entry? {
+        if (highlight.dataIndex >= getAllData().size) return null
+        val data: ChartData<*> = getDataByIndex(highlight.dataIndex)
+        if (highlight.dataSetIndex >= data.dataSetCount) return null
 
         // The value of the highlighted entry could be NaN -
         //   if we are not interested in highlighting a specific value.
-
-        List<Entry> entries = data.getDataSetByIndex(highlight.getDataSetIndex())
-                .getEntriesForXValue(highlight.getX());
-        for (Entry entry : entries)
-            if (entry.getY() == highlight.getY() ||
-                    Float.isNaN(highlight.getY()))
-                return entry;
-
-        return null;
+        val entries = data.getDataSetByIndex(highlight.dataSetIndex)
+            .getEntriesForXValue(highlight.x)
+        for (entry in entries!!) if (entry.y == highlight.y ||
+            java.lang.Float.isNaN(highlight.y)
+        ) return entry
+        return null
     }
 
     /**
@@ -213,60 +250,43 @@ public class CombinedData extends BarLineScatterCandleBubbleData<IBarLineScatter
      * @param highlight current highlight
      * @return dataset related to highlight
      */
-    public IBarLineScatterCandleBubbleDataSet<? extends Entry> getDataSetByHighlight(Highlight highlight) {
-        if (highlight.getDataIndex() >= getAllData().size())
-            return null;
-
-        BarLineScatterCandleBubbleData data = getDataByIndex(highlight.getDataIndex());
-
-        if (highlight.getDataSetIndex() >= data.getDataSetCount())
-            return null;
-
-        return (IBarLineScatterCandleBubbleDataSet<? extends Entry>)
-                data.getDataSets().get(highlight.getDataSetIndex());
+    fun getDataSetByHighlight(highlight: Highlight): IBarLineScatterCandleBubbleDataSet<out Entry>? {
+        if (highlight.dataIndex >= getAllData().size) return null
+        val data = getDataByIndex(highlight.dataIndex)
+        return if (highlight.dataSetIndex >= data.dataSetCount) null else data.dataSets[highlight.dataSetIndex] as IBarLineScatterCandleBubbleDataSet<out Entry>
     }
 
-    public int getDataIndex(ChartData data) {
-        return getAllData().indexOf(data);
+    fun getDataIndex(data: ChartData<*>?): Int {
+        return getAllData().indexOf(data)
     }
 
-    @Override
-    public boolean removeDataSet(IBarLineScatterCandleBubbleDataSet<? extends Entry> d) {
-
-        List<BarLineScatterCandleBubbleData> datas = getAllData();
-
-        boolean success = false;
-
-        for (ChartData data : datas) {
-
-            success = data.removeDataSet(d);
-
+    override fun removeDataSet(d: IBarLineScatterCandleBubbleDataSet<out Entry?>?): Boolean {
+        val datas = getAllData()
+        var success = false
+        for (data in datas) {
+            success = data.removeDataSet(d)
             if (success) {
-                break;
+                break
             }
         }
-
-        return success;
+        return success
     }
 
-    @Deprecated
-    @Override
-    public boolean removeDataSet(int index) {
-        Log.e("MPAndroidChart", "removeDataSet(int index) not supported for CombinedData");
-        return false;
+    @Deprecated("")
+    override fun removeDataSet(index: Int): Boolean {
+        Log.e("MPAndroidChart", "removeDataSet(int index) not supported for CombinedData")
+        return false
     }
 
-    @Deprecated
-    @Override
-    public boolean removeEntry(Entry e, int dataSetIndex) {
-        Log.e("MPAndroidChart", "removeEntry(...) not supported for CombinedData");
-        return false;
+    @Deprecated("")
+    override fun removeEntry(e: Entry?, dataSetIndex: Int): Boolean {
+        Log.e("MPAndroidChart", "removeEntry(...) not supported for CombinedData")
+        return false
     }
 
-    @Deprecated
-    @Override
-    public boolean removeEntry(float xValue, int dataSetIndex) {
-        Log.e("MPAndroidChart", "removeEntry(...) not supported for CombinedData");
-        return false;
+    @Deprecated("")
+    override fun removeEntry(xValue: Float, dataSetIndex: Int): Boolean {
+        Log.e("MPAndroidChart", "removeEntry(...) not supported for CombinedData")
+        return false
     }
 }

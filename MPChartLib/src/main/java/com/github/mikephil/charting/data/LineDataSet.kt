@@ -1,129 +1,195 @@
+package com.github.mikephil.charting.data
 
-package com.github.mikephil.charting.data;
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.entryCount
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.getEntryForIndex
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.label
+import com.github.mikephil.charting.highlight.Highlight.x
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.calcMinMaxY
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.yMax
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.yMin
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.axisDependency
+import com.github.mikephil.charting.highlight.Highlight.dataSetIndex
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.getEntryForXValue
+import com.github.mikephil.charting.highlight.Highlight.y
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.addEntry
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.xMax
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.xMin
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.removeEntry
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.colors
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.valueFormatter
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.valueTextColor
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.setValueTextColors
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.valueTypeface
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.valueTextSize
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.setDrawValues
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.isHighlightEnabled
+import com.github.mikephil.charting.interfaces.datasets.IBubbleDataSet.highlightCircleWidth
+import com.github.mikephil.charting.utils.Utils.convertDpToPixel
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.calcMinMax
+import com.github.mikephil.charting.utils.ColorTemplate.createColors
+import com.github.mikephil.charting.utils.Utils.defaultValueFormatter
+import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet.scatterShapeSize
+import com.github.mikephil.charting.highlight.Highlight.dataIndex
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.getEntriesForXValue
+import android.annotation.TargetApi
+import android.os.Build
+import com.github.mikephil.charting.data.filter.ApproximatorN
+import android.os.Parcelable
+import android.graphics.drawable.Drawable
+import android.os.Parcel
+import android.os.ParcelFormatException
+import android.os.Parcelable.Creator
+import com.github.mikephil.charting.data.BarLineScatterCandleBubbleData
+import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.data.BaseDataSet
+import com.github.mikephil.charting.data.DataSet.Rounding
+import com.github.mikephil.charting.data.DataSet
+import com.github.mikephil.charting.data.ChartData
+import com.github.mikephil.charting.interfaces.datasets.IPieDataSet
+import android.annotation.SuppressLint
+import android.content.Context
+import android.graphics.Color
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
+import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.interfaces.datasets.IDataSet
+import com.github.mikephil.charting.components.YAxis.AxisDependency
+import com.github.mikephil.charting.formatter.IValueFormatter
+import android.graphics.Typeface
+import com.github.mikephil.charting.interfaces.datasets.IRadarDataSet
+import com.github.mikephil.charting.data.BarLineScatterCandleBubbleDataSet
+import com.github.mikephil.charting.utils.Fill
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.interfaces.datasets.IBubbleDataSet
+import com.github.mikephil.charting.interfaces.datasets.ICandleDataSet
+import com.github.mikephil.charting.data.PieDataSet.ValuePosition
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.RadarEntry
+import com.github.mikephil.charting.components.YAxis
+import com.github.mikephil.charting.components.Legend.LegendForm
+import com.github.mikephil.charting.components.Legend
+import android.graphics.DashPathEffect
+import android.util.Log
+import com.github.mikephil.charting.utils.MPPointF
+import com.github.mikephil.charting.utils.ColorTemplate
+import com.github.mikephil.charting.data.BubbleEntry
+import com.github.mikephil.charting.data.CandleEntry
+import com.github.mikephil.charting.data.LineRadarDataSet
+import com.github.mikephil.charting.formatter.IFillFormatter
+import com.github.mikephil.charting.formatter.DefaultFillFormatter
+import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet
+import com.github.mikephil.charting.interfaces.datasets.IBarLineScatterCandleBubbleDataSet
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.ScatterData
+import com.github.mikephil.charting.data.CandleData
+import com.github.mikephil.charting.data.BubbleData
+import com.github.mikephil.charting.data.RadarDataSet
+import com.github.mikephil.charting.data.BubbleDataSet
+import com.github.mikephil.charting.data.LineScatterCandleRadarDataSet
+import com.github.mikephil.charting.data.CandleDataSet
+import com.github.mikephil.charting.data.ScatterDataSet
+import com.github.mikephil.charting.charts.ScatterChart.ScatterShape
+import com.github.mikephil.charting.renderer.scatter.TriangleShapeRenderer
+import com.github.mikephil.charting.interfaces.datasets.ILineRadarDataSet
+import com.github.mikephil.charting.interfaces.datasets.ILineScatterCandleRadarDataSet
+import java.util.ArrayList
 
-import android.content.Context;
-import android.graphics.Color;
-import android.graphics.DashPathEffect;
-import android.util.Log;
-
-import com.github.mikephil.charting.formatter.DefaultFillFormatter;
-import com.github.mikephil.charting.formatter.IFillFormatter;
-import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
-import com.github.mikephil.charting.utils.ColorTemplate;
-import com.github.mikephil.charting.utils.Utils;
-
-import java.util.ArrayList;
-import java.util.List;
-
-public class LineDataSet extends LineRadarDataSet<Entry> implements ILineDataSet {
-
-    /**
-     * Drawing mode for this line dataset
-     **/
-    private LineDataSet.Mode mMode = Mode.LINEAR;
-
-    /**
-     * List representing all colors that are used for the circles
-     */
-    private List<Integer> mCircleColors = null;
-
-    /**
-     * the color of the inner circles
-     */
-    private int mCircleHoleColor = Color.WHITE;
-
-    /**
-     * the radius of the circle-shaped value indicators
-     */
-    private float mCircleRadius = 8f;
-
-    /**
-     * the hole radius of the circle-shaped value indicators
-     */
-    private float mCircleHoleRadius = 4f;
-
-    /**
-     * sets the intensity of the cubic lines
-     */
-    private float mCubicIntensity = 0.2f;
-
-    /**
-     * the path effect of this DataSet that makes dashed lines possible
-     */
-    private DashPathEffect mDashPathEffect = null;
-
-    /**
-     * formatter for customizing the position of the fill-line
-     */
-    private IFillFormatter mFillFormatter = new DefaultFillFormatter();
-
-    /**
-     * if true, drawing circles is enabled
-     */
-    private boolean mDrawCircles = true;
-
-    private boolean mDrawCircleHole = true;
-
-
-    public LineDataSet(List<Entry> yVals, String label) {
-        super(yVals, label);
-
-        // mCircleRadius = Utils.convertDpToPixel(4f);
-        // mLineWidth = Utils.convertDpToPixel(1f);
-
-        if (mCircleColors == null) {
-            mCircleColors = new ArrayList<Integer>();
-        }
-        mCircleColors.clear();
-
-        // default colors
-        // mColors.add(Color.rgb(192, 255, 140));
-        // mColors.add(Color.rgb(255, 247, 140));
-        mCircleColors.add(Color.rgb(140, 234, 255));
-    }
-
-    @Override
-    public DataSet<Entry> copy() {
-        List<Entry> entries = new ArrayList<Entry>();
-        for (int i = 0; i < mEntries.size(); i++) {
-            entries.add(mEntries.get(i).copy());
-        }
-        LineDataSet copied = new LineDataSet(entries, getLabel());
-        copy(copied);
-        return copied;
-    }
-
-    protected void copy(LineDataSet lineDataSet) {
-        super.copy(lineDataSet);
-        lineDataSet.mCircleColors = mCircleColors;
-        lineDataSet.mCircleHoleColor = mCircleHoleColor;
-        lineDataSet.mCircleHoleRadius = mCircleHoleRadius;
-        lineDataSet.mCircleRadius = mCircleRadius;
-        lineDataSet.mCubicIntensity = mCubicIntensity;
-        lineDataSet.mDashPathEffect = mDashPathEffect;
-        lineDataSet.mDrawCircleHole = mDrawCircleHole;
-        lineDataSet.mDrawCircles = mDrawCircleHole;
-        lineDataSet.mFillFormatter = mFillFormatter;
-        lineDataSet.mMode = mMode;
-    }
-
+class LineDataSet(yVals: MutableList<Entry?>?, label: String?) :
+    LineRadarDataSet<Entry?>(yVals, label), ILineDataSet {
     /**
      * Returns the drawing mode for this line dataset
      *
      * @return
      */
-    @Override
-    public LineDataSet.Mode getMode() {
-        return mMode;
-    }
-
     /**
      * Returns the drawing mode for this LineDataSet
      *
      * @return
      */
-    public void setMode(LineDataSet.Mode mode) {
-        mMode = mode;
+    /**
+     * Drawing mode for this line dataset
+     */
+    override var mode = Mode.LINEAR
+    /**
+     * returns all colors specified for the circles
+     *
+     * @return
+     */
+    /**
+     * Sets the colors that should be used for the circles of this DataSet.
+     * Colors are reused as soon as the number of Entries the DataSet represents
+     * is higher than the size of the colors array. Make sure that the colors
+     * are already prepared (by calling getResources().getColor(...)) before
+     * adding them to the DataSet.
+     *
+     * @param colors
+     */
+    /**
+     * List representing all colors that are used for the circles
+     */
+    var circleColors: List<Int>? = null
+
+    /**
+     * the color of the inner circles
+     */
+    private var mCircleHoleColor = Color.WHITE
+
+    /**
+     * the radius of the circle-shaped value indicators
+     */
+    private var mCircleRadius = 8f
+
+    /**
+     * the hole radius of the circle-shaped value indicators
+     */
+    private var mCircleHoleRadius = 4f
+
+    /**
+     * sets the intensity of the cubic lines
+     */
+    private var mCubicIntensity = 0.2f
+
+    /**
+     * the path effect of this DataSet that makes dashed lines possible
+     */
+    override var dashPathEffect: DashPathEffect? = null
+        private set
+
+    /**
+     * formatter for customizing the position of the fill-line
+     */
+    private var mFillFormatter: IFillFormatter = DefaultFillFormatter()
+
+    /**
+     * if true, drawing circles is enabled
+     */
+    override var isDrawCirclesEnabled = true
+        private set
+    private var mDrawCircleHole = true
+    override fun copy(): DataSet<Entry?>? {
+        val entries: MutableList<Entry?> = ArrayList()
+        for (i in mEntries!!.indices) {
+            entries.add(mEntries!![i]!!.copy())
+        }
+        val copied = LineDataSet(entries, getLabel())
+        copy(copied)
+        return copied
+    }
+
+    protected fun copy(lineDataSet: LineDataSet) {
+        super.copy(lineDataSet)
+        lineDataSet.circleColors = circleColors
+        lineDataSet.mCircleHoleColor = mCircleHoleColor
+        lineDataSet.mCircleHoleRadius = mCircleHoleRadius
+        lineDataSet.mCircleRadius = mCircleRadius
+        lineDataSet.mCubicIntensity = mCubicIntensity
+        lineDataSet.dashPathEffect = dashPathEffect
+        lineDataSet.mDrawCircleHole = mDrawCircleHole
+        lineDataSet.isDrawCirclesEnabled = mDrawCircleHole
+        lineDataSet.mFillFormatter = mFillFormatter
+        lineDataSet.mode = mode
     }
 
     /**
@@ -132,21 +198,14 @@ public class LineDataSet extends LineRadarDataSet<Entry> implements ILineDataSet
      *
      * @param intensity
      */
-    public void setCubicIntensity(float intensity) {
-
-        if (intensity > 1f)
-            intensity = 1f;
-        if (intensity < 0.05f)
-            intensity = 0.05f;
-
-        mCubicIntensity = intensity;
-    }
-
-    @Override
-    public float getCubicIntensity() {
-        return mCubicIntensity;
-    }
-
+    override var cubicIntensity: Float
+        get() = mCubicIntensity
+        set(intensity) {
+            var intensity = intensity
+            if (intensity > 1f) intensity = 1f
+            if (intensity < 0.05f) intensity = 0.05f
+            mCubicIntensity = intensity
+        }
 
     /**
      * Sets the radius of the drawn circles.
@@ -154,19 +213,15 @@ public class LineDataSet extends LineRadarDataSet<Entry> implements ILineDataSet
      *
      * @param radius
      */
-    public void setCircleRadius(float radius) {
-
-        if (radius >= 1f) {
-            mCircleRadius = Utils.convertDpToPixel(radius);
-        } else {
-            Log.e("LineDataSet", "Circle radius cannot be < 1");
+    override var circleRadius: Float
+        get() = mCircleRadius
+        set(radius) {
+            if (radius >= 1f) {
+                mCircleRadius = convertDpToPixel(radius)
+            } else {
+                Log.e("LineDataSet", "Circle radius cannot be < 1")
+            }
         }
-    }
-
-    @Override
-    public float getCircleRadius() {
-        return mCircleRadius;
-    }
 
     /**
      * Sets the hole radius of the drawn circles.
@@ -174,40 +229,34 @@ public class LineDataSet extends LineRadarDataSet<Entry> implements ILineDataSet
      *
      * @param holeRadius
      */
-    public void setCircleHoleRadius(float holeRadius) {
-
-        if (holeRadius >= 0.5f) {
-            mCircleHoleRadius = Utils.convertDpToPixel(holeRadius);
-        } else {
-            Log.e("LineDataSet", "Circle radius cannot be < 0.5");
+    override var circleHoleRadius: Float
+        get() = mCircleHoleRadius
+        set(holeRadius) {
+            if (holeRadius >= 0.5f) {
+                mCircleHoleRadius = convertDpToPixel(holeRadius)
+            } else {
+                Log.e("LineDataSet", "Circle radius cannot be < 0.5")
+            }
         }
-    }
-
-    @Override
-    public float getCircleHoleRadius() {
-        return mCircleHoleRadius;
-    }
-
+    /**
+     * This function is deprecated because of unclarity. Use getCircleRadius instead.
+     */
     /**
      * sets the size (radius) of the circle shpaed value indicators,
      * default size = 4f
-     * <p/>
+     *
+     *
      * This method is deprecated because of unclarity. Use setCircleRadius instead.
      *
      * @param size
      */
-    @Deprecated
-    public void setCircleSize(float size) {
-        setCircleRadius(size);
-    }
-
-    /**
-     * This function is deprecated because of unclarity. Use getCircleRadius instead.
-     */
-    @Deprecated
-    public float getCircleSize() {
-        return getCircleRadius();
-    }
+    @get:Deprecated("")
+    @set:Deprecated("")
+    var circleSize: Float
+        get() = circleRadius
+        set(size) {
+            circleRadius = size
+        }
 
     /**
      * Enables the line to be drawn in dashed mode, e.g. like this
@@ -218,28 +267,23 @@ public class LineDataSet extends LineRadarDataSet<Entry> implements ILineDataSet
      * @param spaceLength the length of space in between the pieces
      * @param phase       offset, in degrees (normally, use 0)
      */
-    public void enableDashedLine(float lineLength, float spaceLength, float phase) {
-        mDashPathEffect = new DashPathEffect(new float[]{
+    fun enableDashedLine(lineLength: Float, spaceLength: Float, phase: Float) {
+        dashPathEffect = DashPathEffect(
+            floatArrayOf(
                 lineLength, spaceLength
-        }, phase);
+            ), phase
+        )
     }
 
     /**
      * Disables the line to be drawn in dashed mode.
      */
-    public void disableDashedLine() {
-        mDashPathEffect = null;
+    fun disableDashedLine() {
+        dashPathEffect = null
     }
 
-    @Override
-    public boolean isDashedLineEnabled() {
-        return mDashPathEffect == null ? false : true;
-    }
-
-    @Override
-    public DashPathEffect getDashPathEffect() {
-        return mDashPathEffect;
-    }
+    override val isDashedLineEnabled: Boolean
+        get() = if (dashPathEffect == null) false else true
 
     /**
      * set this to true to enable the drawing of circle indicators for this
@@ -247,46 +291,25 @@ public class LineDataSet extends LineRadarDataSet<Entry> implements ILineDataSet
      *
      * @param enabled
      */
-    public void setDrawCircles(boolean enabled) {
-        this.mDrawCircles = enabled;
+    fun setDrawCircles(enabled: Boolean) {
+        isDrawCirclesEnabled = enabled
     }
 
-    @Override
-    public boolean isDrawCirclesEnabled() {
-        return mDrawCircles;
+    @get:Deprecated("")
+    override val isDrawCubicEnabled: Boolean
+        get() = mode == Mode.CUBIC_BEZIER
+
+    @get:Deprecated("")
+    override val isDrawSteppedEnabled: Boolean
+        get() = mode == Mode.STEPPED
+
+    /** ALL CODE BELOW RELATED TO CIRCLE-COLORS  */
+    override fun getCircleColor(index: Int): Int {
+        return circleColors!![index]
     }
 
-    @Deprecated
-    @Override
-    public boolean isDrawCubicEnabled() {
-        return mMode == Mode.CUBIC_BEZIER;
-    }
-
-    @Deprecated
-    @Override
-    public boolean isDrawSteppedEnabled() {
-        return mMode == Mode.STEPPED;
-    }
-
-    /** ALL CODE BELOW RELATED TO CIRCLE-COLORS */
-
-    /**
-     * returns all colors specified for the circles
-     *
-     * @return
-     */
-    public List<Integer> getCircleColors() {
-        return mCircleColors;
-    }
-
-    @Override
-    public int getCircleColor(int index) {
-        return mCircleColors.get(index);
-    }
-
-    @Override
-    public int getCircleColorCount() {
-        return mCircleColors.size();
+    override fun getCircleColorCount(): Int {
+        return circleColors!!.size
     }
 
     /**
@@ -298,21 +321,8 @@ public class LineDataSet extends LineRadarDataSet<Entry> implements ILineDataSet
      *
      * @param colors
      */
-    public void setCircleColors(List<Integer> colors) {
-        mCircleColors = colors;
-    }
-
-    /**
-     * Sets the colors that should be used for the circles of this DataSet.
-     * Colors are reused as soon as the number of Entries the DataSet represents
-     * is higher than the size of the colors array. Make sure that the colors
-     * are already prepared (by calling getResources().getColor(...)) before
-     * adding them to the DataSet.
-     *
-     * @param colors
-     */
-    public void setCircleColors(int... colors) {
-        this.mCircleColors = ColorTemplate.createColors(colors);
+    fun setCircleColors(vararg colors: Int) {
+        circleColors = createColors(colors)
     }
 
     /**
@@ -325,19 +335,16 @@ public class LineDataSet extends LineRadarDataSet<Entry> implements ILineDataSet
      *
      * @param colors
      */
-    public void setCircleColors(int[] colors, Context c) {
-
-        List<Integer> clrs = mCircleColors;
+    fun setCircleColors(colors: IntArray, c: Context) {
+        var clrs = circleColors
         if (clrs == null) {
-            clrs = new ArrayList<>();
+            clrs = ArrayList()
         }
-        clrs.clear();
-
-        for (int color : colors) {
-            clrs.add(c.getResources().getColor(color));
+        clrs.clear()
+        for (color in colors) {
+            clrs.add(c.resources.getColor(color))
         }
-
-        mCircleColors = clrs;
+        circleColors = clrs
     }
 
     /**
@@ -346,19 +353,19 @@ public class LineDataSet extends LineRadarDataSet<Entry> implements ILineDataSet
      *
      * @param color
      */
-    public void setCircleColor(int color) {
-        resetCircleColors();
-        mCircleColors.add(color);
+    fun setCircleColor(color: Int) {
+        resetCircleColors()
+        circleColors.add(color)
     }
 
     /**
      * resets the circle-colors array and creates a new one
      */
-    public void resetCircleColors() {
-        if (mCircleColors == null) {
-            mCircleColors = new ArrayList<Integer>();
+    fun resetCircleColors() {
+        if (circleColors == null) {
+            circleColors = ArrayList()
         }
-        mCircleColors.clear();
+        circleColors.clear()
     }
 
     /**
@@ -366,13 +373,12 @@ public class LineDataSet extends LineRadarDataSet<Entry> implements ILineDataSet
      *
      * @param color
      */
-    public void setCircleHoleColor(int color) {
-        mCircleHoleColor = color;
+    fun setCircleHoleColor(color: Int) {
+        mCircleHoleColor = color
     }
 
-    @Override
-    public int getCircleHoleColor() {
-        return mCircleHoleColor;
+    override fun getCircleHoleColor(): Int {
+        return mCircleHoleColor
     }
 
     /**
@@ -380,13 +386,12 @@ public class LineDataSet extends LineRadarDataSet<Entry> implements ILineDataSet
      *
      * @param enabled
      */
-    public void setDrawCircleHole(boolean enabled) {
-        mDrawCircleHole = enabled;
+    fun setDrawCircleHole(enabled: Boolean) {
+        mDrawCircleHole = enabled
     }
 
-    @Override
-    public boolean isDrawCircleHoleEnabled() {
-        return mDrawCircleHole;
+    override fun isDrawCircleHoleEnabled(): Boolean {
+        return mDrawCircleHole
     }
 
     /**
@@ -395,23 +400,30 @@ public class LineDataSet extends LineRadarDataSet<Entry> implements ILineDataSet
      *
      * @param formatter
      */
-    public void setFillFormatter(IFillFormatter formatter) {
-
-        if (formatter == null)
-            mFillFormatter = new DefaultFillFormatter();
-        else
-            mFillFormatter = formatter;
+    fun setFillFormatter(formatter: IFillFormatter?) {
+        mFillFormatter = formatter ?: DefaultFillFormatter()
     }
 
-    @Override
-    public IFillFormatter getFillFormatter() {
-        return mFillFormatter;
+    override fun getFillFormatter(): IFillFormatter {
+        return mFillFormatter
     }
 
-    public enum Mode {
-        LINEAR,
-        STEPPED,
-        CUBIC_BEZIER,
-        HORIZONTAL_BEZIER
+    enum class Mode {
+        LINEAR, STEPPED, CUBIC_BEZIER, HORIZONTAL_BEZIER
+    }
+
+    init {
+
+        // mCircleRadius = Utils.convertDpToPixel(4f);
+        // mLineWidth = Utils.convertDpToPixel(1f);
+        if (circleColors == null) {
+            circleColors = ArrayList()
+        }
+        circleColors.clear()
+
+        // default colors
+        // mColors.add(Color.rgb(192, 255, 140));
+        // mColors.add(Color.rgb(255, 247, 140));
+        circleColors.add(Color.rgb(140, 234, 255))
     }
 }
