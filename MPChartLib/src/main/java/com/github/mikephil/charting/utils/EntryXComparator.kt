@@ -1,22 +1,17 @@
-package com.github.mikephil.charting.utils;
+package com.github.mikephil.charting.utils
 
-import com.github.mikephil.charting.data.Entry;
-
-import java.util.Comparator;
+import com.github.mikephil.charting.data.Entry
+import java.util.Comparator
 
 /**
  * Comparator for comparing Entry-objects by their x-value.
  * Created by philipp on 17/06/15.
  */
-public class EntryXComparator implements Comparator<Entry> {
-    @Override
-    public int compare(Entry entry1, Entry entry2) {
-        float diff = entry1.getX() - entry2.getX();
-
-        if (diff == 0f) return 0;
-        else {
-            if (diff > 0f) return 1;
-            else return -1;
+class EntryXComparator : Comparator<Entry> {
+    override fun compare(entry1: Entry, entry2: Entry): Int {
+        val diff = entry1.x - entry2.x
+        return if (diff == 0f) 0 else {
+            if (diff > 0f) 1 else -1
         }
     }
 }
