@@ -727,7 +727,7 @@ abstract class ChartData<T : IDataSet<out Entry?>?> {
      *
      * @return
      */
-    val entryCount: Int
+    val maxVisibleCount: Int
         get() {
             var count = 0
             for (set in mDataSets!!) {
@@ -735,6 +735,9 @@ abstract class ChartData<T : IDataSet<out Entry?>?> {
             }
             return count
         }
+public get() {
+        return mData.entryCount
+    }
 
     /**
      * Returns the DataSet object with the maximum number of entries or null if there are no DataSets.

@@ -46,7 +46,7 @@ class AnotherBarActivity : DemoBase(), OnSeekBarChangeListener {
         seekBarY = findViewById(R.id.seekBar2)
         seekBarY.setOnSeekBarChangeListener(this)
         chart = findViewById(R.id.chart1)
-        chart.getDescription().isEnabled = false
+        chart.description.isEnabled = false
 
         // if more than 60 entries are displayed in the chart, no values will be
         // drawn
@@ -67,7 +67,7 @@ class AnotherBarActivity : DemoBase(), OnSeekBarChangeListener {
 
         // add a nice and smooth animation
         chart.animateY(1500)
-        chart.getLegend().isEnabled = false
+        chart.legend.isEnabled = false
     }
 
     override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {

@@ -1,12 +1,8 @@
+package com.github.mikephil.charting.charts
 
-package com.github.mikephil.charting.charts;
-
-import android.content.Context;
-import android.util.AttributeSet;
-
-import com.github.mikephil.charting.data.BubbleData;
-import com.github.mikephil.charting.interfaces.dataprovider.BubbleDataProvider;
-import com.github.mikephil.charting.renderer.BubbleChartRenderer;
+import android.content.Context
+import android.util.AttributeSet
+import com.github.mikephil.charting.renderer.BubbleChartRenderer
 
 /**
  * The BubbleChart. Draws bubbles. Bubble chart implementation: Copyright 2015
@@ -16,28 +12,21 @@ import com.github.mikephil.charting.renderer.BubbleChartRenderer;
  *
  * @author Philipp Jahoda
  */
-public class BubbleChart extends BarLineChartBase<BubbleData> implements BubbleDataProvider {
-
-    public BubbleChart(Context context) {
-        super(context);
+class BubbleChart : BarLineChartBase<BubbleData?>, BubbleDataProvider {
+    constructor(context: Context?) : super(context) {}
+    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {}
+    constructor(context: Context?, attrs: AttributeSet?, defStyle: Int) : super(
+        context,
+        attrs,
+        defStyle
+    ) {
     }
 
-    public BubbleChart(Context context, AttributeSet attrs) {
-        super(context, attrs);
+    override fun init() {
+        super.init()
+        mRenderer = BubbleChartRenderer(this, mAnimator, mViewPortHandler)
     }
 
-    public BubbleChart(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
-    }
-
-    @Override
-    protected void init() {
-        super.init();
-
-        mRenderer = new BubbleChartRenderer(this, mAnimator, mViewPortHandler);
-    }
-
-    public BubbleData getBubbleData() {
-        return mData;
-    }
+    val bubbleData: BubbleData
+        get() = mData
 }

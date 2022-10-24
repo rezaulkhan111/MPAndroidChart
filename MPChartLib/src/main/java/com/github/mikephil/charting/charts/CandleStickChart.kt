@@ -1,44 +1,31 @@
+package com.github.mikephil.charting.charts
 
-package com.github.mikephil.charting.charts;
-
-import android.content.Context;
-import android.util.AttributeSet;
-
-import com.github.mikephil.charting.data.CandleData;
-import com.github.mikephil.charting.interfaces.dataprovider.CandleDataProvider;
-import com.github.mikephil.charting.renderer.CandleStickChartRenderer;
+import android.content.Context
+import android.util.AttributeSet
+import com.github.mikephil.charting.renderer.CandleStickChartRenderer
 
 /**
  * Financial chart type that draws candle-sticks (OHCL chart).
  *
  * @author Philipp Jahoda
  */
-public class CandleStickChart extends BarLineChartBase<CandleData> implements CandleDataProvider {
-
-    public CandleStickChart(Context context) {
-        super(context);
+class CandleStickChart : BarLineChartBase<CandleData?>, CandleDataProvider {
+    constructor(context: Context?) : super(context) {}
+    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {}
+    constructor(context: Context?, attrs: AttributeSet?, defStyle: Int) : super(
+        context,
+        attrs,
+        defStyle
+    ) {
     }
 
-    public CandleStickChart(Context context, AttributeSet attrs) {
-        super(context, attrs);
+    override fun init() {
+        super.init()
+        mRenderer = CandleStickChartRenderer(this, mAnimator, mViewPortHandler)
+        xAxis.spaceMin = 0.5f
+        xAxis.spaceMax = 0.5f
     }
 
-    public CandleStickChart(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
-    }
-
-    @Override
-    protected void init() {
-        super.init();
-
-        mRenderer = new CandleStickChartRenderer(this, mAnimator, mViewPortHandler);
-
-        getXAxis().setSpaceMin(0.5f);
-        getXAxis().setSpaceMax(0.5f);
-    }
-
-    @Override
-    public CandleData getCandleData() {
-        return mData;
-    }
+    val candleData: CandleData
+        get() = mData
 }
