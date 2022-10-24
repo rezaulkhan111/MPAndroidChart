@@ -1,18 +1,38 @@
+package com.xxmassdeveloper.mpchartexample.custom
 
-package com.xxmassdeveloper.mpchartexample.custom;
-
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.widget.TextView;
-
-import com.github.mikephil.charting.components.MarkerView;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
-import com.github.mikephil.charting.highlight.Highlight;
-import com.github.mikephil.charting.utils.MPPointF;
-import com.xxmassdeveloper.mpchartexample.R;
-
-import java.text.DecimalFormat;
+import com.github.mikephil.charting.utils.Utils.formatNumber
+import com.github.mikephil.charting.data.CandleEntry.high
+import com.github.mikephil.charting.data.BaseEntry.y
+import com.github.mikephil.charting.components.MarkerView.refreshContent
+import com.github.mikephil.charting.formatter.IAxisValueFormatter.getFormattedValue
+import com.github.mikephil.charting.data.Entry.x
+import com.github.mikephil.charting.charts.BarLineChartBase.visibleXRange
+import com.github.mikephil.charting.data.BarEntry.yVals
+import com.github.mikephil.charting.highlight.Highlight.stackIndex
+import com.github.mikephil.charting.data.BarEntry.y
+import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet.scatterShapeSize
+import com.github.mikephil.charting.utils.ViewPortHandler.scaleX
+import android.annotation.SuppressLint
+import android.content.Context
+import com.github.mikephil.charting.components.MarkerView
+import android.widget.TextView
+import com.github.mikephil.charting.data.CandleEntry
+import com.github.mikephil.charting.utils.MPPointF
+import com.xxmassdeveloper.mpchartexample.R
+import com.github.mikephil.charting.formatter.IAxisValueFormatter
+import com.github.mikephil.charting.formatter.IFillFormatter
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
+import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider
+import android.graphics.Typeface
+import com.github.mikephil.charting.formatter.IValueFormatter
+import com.github.mikephil.charting.utils.ViewPortHandler
+import com.github.mikephil.charting.components.AxisBase
+import com.github.mikephil.charting.charts.BarLineChartBase
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.highlight.Highlight
+import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet
+import java.text.DecimalFormat
 
 /**
  * Custom implementation of the MarkerView.
@@ -20,33 +40,30 @@ import java.text.DecimalFormat;
  * @author Philipp Jahoda
  */
 @SuppressLint("ViewConstructor")
-public class XYMarkerView extends MarkerView {
-
-    private final TextView tvContent;
-    private final IAxisValueFormatter xAxisValueFormatter;
-
-    private final DecimalFormat format;
-
-    public XYMarkerView(Context context, IAxisValueFormatter xAxisValueFormatter) {
-        super(context, R.layout.custom_marker_view);
-
-        this.xAxisValueFormatter = xAxisValueFormatter;
-        tvContent = findViewById(R.id.tvContent);
-        format = new DecimalFormat("###.0");
-    }
+class XYMarkerView(context: Context?, private val xAxisValueFormatter: IAxisValueFormatter) :
+    MarkerView(context, R.layout.custom_marker_view) {
+    private val tvContent: TextView
+    private val format: DecimalFormat
 
     // runs every time the MarkerView is redrawn, can be used to update the
     // content (user-interface)
-    @Override
-    public void refreshContent(Entry e, Highlight highlight) {
-
-        tvContent.setText(String.format("x: %s, y: %s", xAxisValueFormatter.getFormattedValue(e.getX(), null), format.format(e.getY())));
-
-        super.refreshContent(e, highlight);
+    override fun refreshContent(e: Entry?, highlight: Highlight?) {
+        tvContent.text = String.format(
+            "x: %s, y: %s", xAxisValueFormatter.getFormattedValue(
+                e!!.x, null
+            ), format.format(e.y)
+        )
+        super.refreshContent(e, highlight)
     }
 
-    @Override
-    public MPPointF getOffset() {
-        return new MPPointF(-(getWidth() / 2), -getHeight());
+    override var offset: MPPointF
+        get() = MPPointF((-(width / 2)).toFloat(), (-height).toFloat())
+        set(offset) {
+            super.offset = offset
+        }
+
+    init {
+        tvContent = findViewById(R.id.tvContent)
+        format = DecimalFormat("###.0")
     }
 }

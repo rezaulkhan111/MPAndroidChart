@@ -1,139 +1,104 @@
-package com.xxmassdeveloper.mpchartexample.custom;
+package com.xxmassdeveloper.mpchartexample.custom
 
-import com.github.mikephil.charting.charts.BarLineChartBase;
-import com.github.mikephil.charting.components.AxisBase;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.utils.Utils.formatNumber
+import com.github.mikephil.charting.data.CandleEntry.high
+import com.github.mikephil.charting.data.BaseEntry.y
+import com.github.mikephil.charting.components.MarkerView.refreshContent
+import com.github.mikephil.charting.formatter.IAxisValueFormatter.getFormattedValue
+import com.github.mikephil.charting.data.Entry.x
+import com.github.mikephil.charting.charts.BarLineChartBase.visibleXRange
+import com.github.mikephil.charting.data.BarEntry.yVals
+import com.github.mikephil.charting.highlight.Highlight.stackIndex
+import com.github.mikephil.charting.data.BarEntry.y
+import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet.scatterShapeSize
+import com.github.mikephil.charting.utils.ViewPortHandler.scaleX
+import android.annotation.SuppressLint
+import com.github.mikephil.charting.components.MarkerView
+import android.widget.TextView
+import com.github.mikephil.charting.data.CandleEntry
+import com.github.mikephil.charting.utils.MPPointF
+import com.xxmassdeveloper.mpchartexample.R
+import com.github.mikephil.charting.formatter.IAxisValueFormatter
+import com.github.mikephil.charting.formatter.IFillFormatter
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
+import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider
+import android.graphics.Typeface
+import com.github.mikephil.charting.formatter.IValueFormatter
+import com.github.mikephil.charting.utils.ViewPortHandler
+import com.github.mikephil.charting.components.AxisBase
+import com.github.mikephil.charting.charts.BarLineChartBase
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet
 
 /**
  * Created by philipp on 02/06/16.
  */
-public class DayAxisValueFormatter implements IAxisValueFormatter
-{
+class DayAxisValueFormatter(private val chart: BarLineChartBase<*>) : IAxisValueFormatter {
+    private val mMonths = arrayOf(
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    )
 
-    private final String[] mMonths = new String[]{
-            "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-    };
-
-    private final BarLineChartBase<?> chart;
-
-    public DayAxisValueFormatter(BarLineChartBase<?> chart) {
-        this.chart = chart;
-    }
-
-    @Override
-    public String getFormattedValue(float value, AxisBase axis) {
-
-        int days = (int) value;
-
-        int year = determineYear(days);
-
-        int month = determineMonth(days);
-        String monthName = mMonths[month % mMonths.length];
-        String yearName = String.valueOf(year);
-
-        if (chart.getVisibleXRange() > 30 * 6) {
-
-            return monthName + " " + yearName;
+    override fun getFormattedValue(value: Float, axis: AxisBase?): String {
+        val days = value.toInt()
+        val year = determineYear(days)
+        val month = determineMonth(days)
+        val monthName = mMonths[month % mMonths.size]
+        val yearName = year.toString()
+        return if (chart.visibleXRange > 30 * 6) {
+            "$monthName $yearName"
         } else {
-
-            int dayOfMonth = determineDayOfMonth(days, month + 12 * (year - 2016));
-
-            String appendix = "th";
-
-            switch (dayOfMonth) {
-                case 1:
-                    appendix = "st";
-                    break;
-                case 2:
-                    appendix = "nd";
-                    break;
-                case 3:
-                    appendix = "rd";
-                    break;
-                case 21:
-                    appendix = "st";
-                    break;
-                case 22:
-                    appendix = "nd";
-                    break;
-                case 23:
-                    appendix = "rd";
-                    break;
-                case 31:
-                    appendix = "st";
-                    break;
+            val dayOfMonth = determineDayOfMonth(days, month + 12 * (year - 2016))
+            var appendix = "th"
+            when (dayOfMonth) {
+                1 -> appendix = "st"
+                2 -> appendix = "nd"
+                3 -> appendix = "rd"
+                21 -> appendix = "st"
+                22 -> appendix = "nd"
+                23 -> appendix = "rd"
+                31 -> appendix = "st"
             }
-
-            return dayOfMonth == 0 ? "" : dayOfMonth + appendix + " " + monthName;
+            if (dayOfMonth == 0) "" else "$dayOfMonth$appendix $monthName"
         }
     }
 
-    private int getDaysForMonth(int month, int year) {
+    private fun getDaysForMonth(month: Int, year: Int): Int {
 
         // month is 0-based
-
         if (month == 1) {
-            boolean is29Feb = false;
-
-            if (year < 1582)
-                is29Feb = (year < 1 ? year + 1 : year) % 4 == 0;
-            else if (year > 1582)
-                is29Feb = year % 4 == 0 && (year % 100 != 0 || year % 400 == 0);
-
-            return is29Feb ? 29 : 28;
+            var is29Feb = false
+            if (year < 1582) is29Feb =
+                (if (year < 1) year + 1 else year) % 4 == 0 else if (year > 1582) is29Feb =
+                year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)
+            return if (is29Feb) 29 else 28
         }
-
-        if (month == 3 || month == 5 || month == 8 || month == 10)
-            return 30;
-        else
-            return 31;
+        return if (month == 3 || month == 5 || month == 8 || month == 10) 30 else 31
     }
 
-    private int determineMonth(int dayOfYear) {
-
-        int month = -1;
-        int days = 0;
-
+    private fun determineMonth(dayOfYear: Int): Int {
+        var month = -1
+        var days = 0
         while (days < dayOfYear) {
-            month = month + 1;
-
-            if (month >= 12)
-                month = 0;
-
-            int year = determineYear(days);
-            days += getDaysForMonth(month, year);
+            month = month + 1
+            if (month >= 12) month = 0
+            val year = determineYear(days)
+            days += getDaysForMonth(month, year)
         }
-
-        return Math.max(month, 0);
+        return Math.max(month, 0)
     }
 
-    private int determineDayOfMonth(int days, int month) {
-
-        int count = 0;
-        int daysForMonths = 0;
-
+    private fun determineDayOfMonth(days: Int, month: Int): Int {
+        var count = 0
+        var daysForMonths = 0
         while (count < month) {
-
-            int year = determineYear(daysForMonths);
-            daysForMonths += getDaysForMonth(count % 12, year);
-            count++;
+            val year = determineYear(daysForMonths)
+            daysForMonths += getDaysForMonth(count % 12, year)
+            count++
         }
-
-        return days - daysForMonths;
+        return days - daysForMonths
     }
 
-    private int determineYear(int days) {
-
-        if (days <= 366)
-            return 2016;
-        else if (days <= 730)
-            return 2017;
-        else if (days <= 1094)
-            return 2018;
-        else if (days <= 1458)
-            return 2019;
-        else
-            return 2020;
-
+    private fun determineYear(days: Int): Int {
+        return if (days <= 366) 2016 else if (days <= 730) 2017 else if (days <= 1094) 2018 else if (days <= 1458) 2019 else 2020
     }
 }
