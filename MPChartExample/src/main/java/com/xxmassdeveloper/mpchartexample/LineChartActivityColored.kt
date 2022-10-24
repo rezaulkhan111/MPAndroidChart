@@ -1,155 +1,455 @@
+package com.xxmassdeveloper.mpchartexample
 
-package com.xxmassdeveloper.mpchartexample;
+import com.xxmassdeveloper.mpchartexample.notimportant.DemoBase.onCreate
+import com.github.mikephil.charting.charts.Chart.description
+import com.github.mikephil.charting.components.ComponentBase.isEnabled
+import com.github.mikephil.charting.charts.Chart.setTouchEnabled
+import com.github.mikephil.charting.charts.Chart.dragDecelerationFrictionCoef
+import com.github.mikephil.charting.charts.BarLineChartBase.isDragEnabled
+import com.github.mikephil.charting.charts.BarLineChartBase.setScaleEnabled
+import com.github.mikephil.charting.charts.BarLineChartBase.setDrawGridBackground
+import com.github.mikephil.charting.charts.BarLineChartBase.isHighlightPerDragEnabled
+import com.github.mikephil.charting.charts.BarLineChartBase.setViewPortOffsets
+import com.github.mikephil.charting.charts.Chart.legend
+import com.github.mikephil.charting.charts.Chart.xAxis
+import com.github.mikephil.charting.components.XAxis.position
+import com.github.mikephil.charting.components.ComponentBase.typeface
+import com.github.mikephil.charting.components.ComponentBase.textSize
+import com.github.mikephil.charting.components.ComponentBase.textColor
+import com.github.mikephil.charting.components.AxisBase.setDrawAxisLine
+import com.github.mikephil.charting.components.AxisBase.setDrawGridLines
+import com.github.mikephil.charting.components.AxisBase.setCenterAxisLabels
+import com.github.mikephil.charting.components.AxisBase.granularity
+import com.github.mikephil.charting.components.AxisBase.valueFormatter
+import com.github.mikephil.charting.charts.BarLineChartBase.axisLeft
+import com.github.mikephil.charting.components.YAxis.setPosition
+import com.github.mikephil.charting.utils.ColorTemplate.holoBlue
+import com.github.mikephil.charting.components.AxisBase.isGranularityEnabled
+import com.github.mikephil.charting.components.AxisBase.axisMinimum
+import com.github.mikephil.charting.components.AxisBase.axisMaximum
+import com.github.mikephil.charting.components.ComponentBase.yOffset
+import com.github.mikephil.charting.charts.BarLineChartBase.axisRight
+import com.xxmassdeveloper.mpchartexample.notimportant.DemoBase.getRandom
+import com.github.mikephil.charting.data.BaseDataSet.axisDependency
+import com.github.mikephil.charting.data.BaseDataSet.color
+import com.github.mikephil.charting.data.BaseDataSet.valueTextColor
+import com.github.mikephil.charting.data.LineRadarDataSet.lineWidth
+import com.github.mikephil.charting.data.LineDataSet.setDrawCircles
+import com.github.mikephil.charting.data.BaseDataSet.setDrawValues
+import com.github.mikephil.charting.data.LineRadarDataSet.fillAlpha
+import com.github.mikephil.charting.data.LineRadarDataSet.fillColor
+import com.github.mikephil.charting.data.BarLineScatterCandleBubbleDataSet.highLightColor
+import com.github.mikephil.charting.data.LineDataSet.setDrawCircleHole
+import com.github.mikephil.charting.data.ChartData.setValueTextColor
+import com.github.mikephil.charting.data.ChartData.setValueTextSize
+import com.github.mikephil.charting.charts.Chart.data
+import com.github.mikephil.charting.data.ChartData.dataSets
+import com.github.mikephil.charting.data.BaseDataSet.isDrawValuesEnabled
+import com.github.mikephil.charting.data.ChartData.isHighlightEnabled
+import com.github.mikephil.charting.data.LineRadarDataSet.isDrawFilledEnabled
+import com.github.mikephil.charting.data.LineRadarDataSet.setDrawFilled
+import com.github.mikephil.charting.data.LineDataSet.isDrawCirclesEnabled
+import com.github.mikephil.charting.data.LineDataSet.mode
+import com.github.mikephil.charting.charts.BarLineChartBase.isPinchZoomEnabled
+import com.github.mikephil.charting.charts.BarLineChartBase.setPinchZoom
+import com.github.mikephil.charting.charts.BarLineChartBase.isAutoScaleMinMaxEnabled
+import com.github.mikephil.charting.charts.BarLineChartBase.notifyDataSetChanged
+import com.github.mikephil.charting.charts.Chart.animateX
+import com.github.mikephil.charting.charts.Chart.animateY
+import com.github.mikephil.charting.charts.Chart.animateXY
+import com.xxmassdeveloper.mpchartexample.notimportant.DemoBase.requestStoragePermission
+import com.xxmassdeveloper.mpchartexample.notimportant.DemoBase.saveToGallery
+import com.github.mikephil.charting.charts.Chart.setOnChartValueSelectedListener
+import com.github.mikephil.charting.charts.BarChart.setDrawBarShadow
+import com.github.mikephil.charting.charts.BarChart.setDrawValueAboveBar
+import com.github.mikephil.charting.charts.BarLineChartBase.setMaxVisibleValueCount
+import com.github.mikephil.charting.components.AxisBase.labelCount
+import com.github.mikephil.charting.components.AxisBase.setLabelCount
+import com.github.mikephil.charting.components.YAxis.spaceTop
+import com.github.mikephil.charting.components.Legend.verticalAlignment
+import com.github.mikephil.charting.components.Legend.horizontalAlignment
+import com.github.mikephil.charting.components.Legend.orientation
+import com.github.mikephil.charting.components.Legend.setDrawInside
+import com.github.mikephil.charting.components.Legend.form
+import com.github.mikephil.charting.components.Legend.formSize
+import com.github.mikephil.charting.components.Legend.xEntrySpace
+import com.github.mikephil.charting.components.MarkerView.setChartView
+import com.github.mikephil.charting.charts.Chart.marker
+import com.github.mikephil.charting.data.ChartData.dataSetCount
+import com.github.mikephil.charting.data.ChartData.getDataSetByIndex
+import com.github.mikephil.charting.data.DataSet.setValues
+import com.github.mikephil.charting.data.ChartData.notifyDataChanged
+import com.github.mikephil.charting.data.BaseDataSet.setDrawIcons
+import com.github.mikephil.charting.data.BarDataSet.setFills
+import com.github.mikephil.charting.data.ChartData.setValueTypeface
+import com.github.mikephil.charting.data.BarData.barWidth
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.setDrawValues
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.isDrawValuesEnabled
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.setDrawIcons
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.isDrawIconsEnabled
+import com.github.mikephil.charting.data.BarDataSet.barBorderWidth
+import com.github.mikephil.charting.interfaces.datasets.IBarDataSet.barBorderWidth
+import com.github.mikephil.charting.charts.BarChart.getBarBounds
+import com.github.mikephil.charting.charts.BarLineChartBase.getPosition
+import com.github.mikephil.charting.charts.BarLineChartBase.lowestVisibleX
+import com.github.mikephil.charting.charts.BarLineChartBase.highestVisibleX
+import com.github.mikephil.charting.utils.MPPointF.Companion.recycleInstance
+import com.github.mikephil.charting.charts.PieChart.setUsePercentValues
+import com.github.mikephil.charting.charts.Chart.setExtraOffsets
+import com.github.mikephil.charting.charts.PieChart.setCenterTextTypeface
+import com.github.mikephil.charting.charts.PieChart.centerText
+import com.github.mikephil.charting.charts.PieChart.isDrawHoleEnabled
+import com.github.mikephil.charting.charts.PieChart.setHoleColor
+import com.github.mikephil.charting.charts.PieChart.setTransparentCircleColor
+import com.github.mikephil.charting.charts.PieChart.setTransparentCircleAlpha
+import com.github.mikephil.charting.charts.PieChart.holeRadius
+import com.github.mikephil.charting.charts.PieChart.transparentCircleRadius
+import com.github.mikephil.charting.charts.PieChart.setDrawCenterText
+import com.github.mikephil.charting.charts.PieRadarChartBase.rotationAngle
+import com.github.mikephil.charting.charts.PieRadarChartBase.isRotationEnabled
+import com.github.mikephil.charting.charts.Chart.isHighlightPerTapEnabled
+import com.github.mikephil.charting.components.Legend.yEntrySpace
+import com.github.mikephil.charting.charts.PieChart.setEntryLabelColor
+import com.github.mikephil.charting.charts.PieChart.setEntryLabelTypeface
+import com.github.mikephil.charting.charts.PieChart.setEntryLabelTextSize
+import com.github.mikephil.charting.data.PieDataSet.sliceSpace
+import com.github.mikephil.charting.data.BaseDataSet.iconsOffset
+import com.github.mikephil.charting.data.PieDataSet.selectionShift
+import com.github.mikephil.charting.data.BaseDataSet.colors
+import com.github.mikephil.charting.data.ChartData.setValueFormatter
+import com.github.mikephil.charting.charts.Chart.highlightValues
+import com.github.mikephil.charting.data.PieData.dataSets
+import com.github.mikephil.charting.charts.PieChart.minAngleForSlices
+import com.github.mikephil.charting.charts.PieRadarChartBase.notifyDataSetChanged
+import com.github.mikephil.charting.charts.PieChart.isDrawRoundedSlicesEnabled
+import com.github.mikephil.charting.charts.PieChart.setDrawRoundedSlices
+import com.github.mikephil.charting.charts.PieChart.isDrawSlicesUnderHoleEnabled
+import com.github.mikephil.charting.charts.PieChart.setDrawSlicesUnderHole
+import com.github.mikephil.charting.charts.PieChart.isDrawCenterTextEnabled
+import com.github.mikephil.charting.charts.PieChart.setDrawEntryLabels
+import com.github.mikephil.charting.charts.PieChart.isDrawEntryLabelsEnabled
+import com.github.mikephil.charting.charts.PieChart.isUsePercentValuesEnabled
+import com.github.mikephil.charting.charts.PieRadarChartBase.spin
+import com.github.mikephil.charting.data.BaseEntry.y
+import com.github.mikephil.charting.highlight.Highlight.x
+import com.github.mikephil.charting.highlight.Highlight.dataSetIndex
+import com.github.mikephil.charting.charts.BarLineChartBase.setOnDrawListener
+import com.github.mikephil.charting.components.XAxis.setAvoidFirstLastClipping
+import com.github.mikephil.charting.data.LineDataSet.circleRadius
+import com.github.mikephil.charting.data.Entry.x
+import com.github.mikephil.charting.data.Entry.toString
+import com.github.mikephil.charting.data.DataSet.toSimpleString
+import com.github.mikephil.charting.charts.Chart.legendRenderer
+import com.github.mikephil.charting.charts.BarLineChartBase.setGridBackgroundColor
+import com.github.mikephil.charting.charts.BarLineChartBase.setDrawBorders
+import com.github.mikephil.charting.components.YAxis.setDrawZeroLine
+import com.github.mikephil.charting.data.LineDataSet.setFillFormatter
+import com.github.mikephil.charting.data.ChartData.setDrawValues
+import com.github.mikephil.charting.components.AxisBase.enableGridDashedLine
+import com.github.mikephil.charting.components.LimitLine.lineWidth
+import com.github.mikephil.charting.components.LimitLine.enableDashedLine
+import com.github.mikephil.charting.components.LimitLine.labelPosition
+import com.github.mikephil.charting.components.AxisBase.setDrawLimitLinesBehindData
+import com.github.mikephil.charting.components.AxisBase.addLimitLine
+import com.github.mikephil.charting.data.BaseDataSet.notifyDataSetChanged
+import com.github.mikephil.charting.data.LineDataSet.enableDashedLine
+import com.github.mikephil.charting.data.LineDataSet.setCircleColor
+import com.github.mikephil.charting.data.BaseDataSet.formLineWidth
+import com.github.mikephil.charting.data.BaseDataSet.formLineDashEffect
+import com.github.mikephil.charting.data.BaseDataSet.formSize
+import com.github.mikephil.charting.data.BaseDataSet.valueTextSize
+import com.github.mikephil.charting.data.LineScatterCandleRadarDataSet.enableDashedHighlightLine
+import com.github.mikephil.charting.utils.Utils.sDKInt
+import com.github.mikephil.charting.data.LineRadarDataSet.fillDrawable
+import com.github.mikephil.charting.data.BaseDataSet.isDrawIconsEnabled
+import com.github.mikephil.charting.charts.Chart.xChartMin
+import com.github.mikephil.charting.charts.Chart.xChartMax
+import com.github.mikephil.charting.charts.BarLineChartBase.yChartMin
+import com.github.mikephil.charting.charts.BarLineChartBase.yChartMax
+import com.github.mikephil.charting.utils.ColorTemplate.colorWithAlpha
+import com.github.mikephil.charting.charts.BarLineChartBase.centerViewToAnimated
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.axisDependency
+import com.github.mikephil.charting.charts.RadarChart.webLineWidth
+import com.github.mikephil.charting.charts.RadarChart.webColor
+import com.github.mikephil.charting.charts.RadarChart.webLineWidthInner
+import com.github.mikephil.charting.charts.RadarChart.webColorInner
+import com.github.mikephil.charting.charts.RadarChart.webAlpha
+import com.github.mikephil.charting.components.ComponentBase.xOffset
+import com.github.mikephil.charting.charts.RadarChart.yAxis
+import com.github.mikephil.charting.components.AxisBase.setDrawLabels
+import com.github.mikephil.charting.data.RadarDataSet.setDrawHighlightCircleEnabled
+import com.github.mikephil.charting.data.LineScatterCandleRadarDataSet.setDrawHighlightIndicators
+import com.github.mikephil.charting.interfaces.datasets.ILineRadarDataSet.isDrawFilledEnabled
+import com.github.mikephil.charting.interfaces.datasets.ILineRadarDataSet.setDrawFilled
+import com.github.mikephil.charting.interfaces.datasets.IRadarDataSet.isDrawHighlightCircleEnabled
+import com.github.mikephil.charting.charts.RadarChart.notifyDataSetChanged
+import com.github.mikephil.charting.charts.BarChart.setFitBars
+import com.github.mikephil.charting.data.BaseDataSet.setColors
+import com.github.mikephil.charting.components.YAxis.spaceBottom
+import com.github.mikephil.charting.data.BaseDataSet.setColor
+import com.github.mikephil.charting.data.BubbleData.setHighlightCircleWidth
+import com.github.mikephil.charting.charts.PieChart.maxAngle
+import com.github.mikephil.charting.charts.PieChart.setCenterTextOffset
+import com.github.mikephil.charting.charts.BarLineChartBase.resetTracking
+import com.github.mikephil.charting.charts.Chart.maxHighlightDistance
+import com.github.mikephil.charting.data.ScatterDataSet.setScatterShape
+import com.github.mikephil.charting.data.ScatterDataSet.setScatterShapeHoleColor
+import com.github.mikephil.charting.data.ScatterDataSet.setScatterShapeHoleRadius
+import com.github.mikephil.charting.data.ScatterDataSet.setShapeRenderer
+import com.github.mikephil.charting.data.ScatterDataSet.setScatterShapeSize
+import com.github.mikephil.charting.utils.FileUtils.loadBarEntriesFromAssets
+import com.github.mikephil.charting.charts.CombinedChart.setDrawBarShadow
+import com.github.mikephil.charting.charts.CombinedChart.isHighlightFullBarEnabled
+import com.github.mikephil.charting.charts.CombinedChart.drawOrder
+import com.github.mikephil.charting.components.Legend.isWordWrapEnabled
+import com.github.mikephil.charting.data.CombinedData.setData
+import com.github.mikephil.charting.data.ChartData.xMax
+import com.github.mikephil.charting.charts.CombinedChart.data
+import com.github.mikephil.charting.data.ChartData.addDataSet
+import com.github.mikephil.charting.data.BarDataSet.stackLabels
+import com.github.mikephil.charting.data.BarData.groupBars
+import com.github.mikephil.charting.data.CandleDataSet.setDecreasingColor
+import com.github.mikephil.charting.data.CandleDataSet.setShadowColor
+import com.github.mikephil.charting.data.CandleDataSet.setBarSpace
+import com.github.mikephil.charting.data.BubbleDataSet.setHighlightCircleWidth
+import com.github.mikephil.charting.components.AxisBase.axisLineColor
+import com.github.mikephil.charting.data.LineDataSet.cubicIntensity
+import com.github.mikephil.charting.data.LineScatterCandleRadarDataSet.setDrawHorizontalHighlightIndicator
+import com.github.mikephil.charting.data.LineDataSet.setCircleColors
+import com.github.mikephil.charting.charts.Chart.setNoDataText
+import com.github.mikephil.charting.data.ChartData.addEntry
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.entryCount
+import com.github.mikephil.charting.charts.BarLineChartBase.setVisibleXRangeMaximum
+import com.github.mikephil.charting.charts.BarLineChartBase.moveViewTo
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.getEntryForXValue
+import com.github.mikephil.charting.data.ChartData.removeEntry
+import com.github.mikephil.charting.data.ChartData.removeDataSet
+import com.github.mikephil.charting.charts.Chart.clear
+import com.github.mikephil.charting.charts.Chart.extraTopOffset
+import com.github.mikephil.charting.charts.Chart.extraBottomOffset
+import com.github.mikephil.charting.charts.Chart.extraLeftOffset
+import com.github.mikephil.charting.charts.Chart.extraRightOffset
+import com.github.mikephil.charting.components.YAxis.zeroLineColor
+import com.github.mikephil.charting.components.YAxis.zeroLineWidth
+import com.github.mikephil.charting.data.BaseDataSet.setValueTextColors
+import com.github.mikephil.charting.data.CandleDataSet.setShadowWidth
+import com.github.mikephil.charting.data.CandleDataSet.setDecreasingPaintStyle
+import com.github.mikephil.charting.data.CandleDataSet.setIncreasingColor
+import com.github.mikephil.charting.data.CandleDataSet.setIncreasingPaintStyle
+import com.github.mikephil.charting.data.CandleDataSet.setNeutralColor
+import com.github.mikephil.charting.data.CandleDataSet.setShadowColorSameAsCandle
+import com.github.mikephil.charting.interfaces.datasets.ICandleDataSet.shadowColorSameAsCandle
+import com.github.mikephil.charting.data.LineDataSet.setCircleHoleColor
+import com.github.mikephil.charting.data.LineDataSet.circleHoleRadius
+import com.github.mikephil.charting.data.BarDataSet.barShadowColor
+import com.github.mikephil.charting.data.PieDataSet.valueLinePart1OffsetPercentage
+import com.github.mikephil.charting.data.PieDataSet.valueLinePart1Length
+import com.github.mikephil.charting.data.PieDataSet.valueLinePart2Length
+import com.github.mikephil.charting.data.PieDataSet.yValuePosition
+import com.github.mikephil.charting.components.YAxis.isInverted
+import com.github.mikephil.charting.charts.BarLineChartBase.moveViewToX
+import com.github.mikephil.charting.charts.Chart.clearValues
+import com.xxmassdeveloper.mpchartexample.listviewitems.ChartItem.getView
+import com.xxmassdeveloper.mpchartexample.listviewitems.ChartItem.itemType
+import com.github.mikephil.charting.data.BarDataSet.highLightAlpha
+import com.github.mikephil.charting.charts.BarChart.barData
+import com.github.mikephil.charting.data.BarData.getGroupWidth
+import com.github.mikephil.charting.charts.BarChart.groupBars
+import com.xxmassdeveloper.mpchartexample.notimportant.DemoBase
+import android.widget.SeekBar.OnSeekBarChangeListener
+import com.github.mikephil.charting.charts.LineChart
+import android.widget.SeekBar
+import android.widget.TextView
+import android.os.Bundle
+import com.xxmassdeveloper.mpchartexample.R
+import com.github.mikephil.charting.components.Legend
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.formatter.IAxisValueFormatter
+import com.github.mikephil.charting.components.AxisBase
+import com.github.mikephil.charting.components.YAxis
+import com.github.mikephil.charting.utils.ColorTemplate
+import com.github.mikephil.charting.components.YAxis.AxisDependency
+import android.content.Intent
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
+import androidx.core.content.ContextCompat
+import android.content.pm.PackageManager
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener
+import com.github.mikephil.charting.charts.BarChart
+import com.xxmassdeveloper.mpchartexample.custom.DayAxisValueFormatter
+import com.github.mikephil.charting.components.XAxis.XAxisPosition
+import com.xxmassdeveloper.mpchartexample.custom.MyAxisValueFormatter
+import com.github.mikephil.charting.components.YAxis.YAxisLabelPosition
+import com.github.mikephil.charting.components.Legend.LegendForm
+import com.xxmassdeveloper.mpchartexample.custom.XYMarkerView
+import com.github.mikephil.charting.utils.Fill
+import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
+import com.github.mikephil.charting.interfaces.datasets.IDataSet
+import android.graphics.RectF
+import com.github.mikephil.charting.utils.MPPointF
+import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.formatter.PercentFormatter
+import android.text.SpannableString
+import android.text.style.RelativeSizeSpan
+import android.text.style.StyleSpan
+import android.graphics.Typeface
+import android.text.style.ForegroundColorSpan
+import com.github.mikephil.charting.charts.Chart
+import com.github.mikephil.charting.formatter.IFillFormatter
+import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider
+import com.xxmassdeveloper.mpchartexample.custom.MyMarkerView
+import com.github.mikephil.charting.components.LimitLine
+import com.github.mikephil.charting.components.LimitLine.LimitLabelPosition
+import android.graphics.DashPathEffect
+import android.graphics.drawable.Drawable
+import com.github.mikephil.charting.charts.RadarChart
+import com.github.mikephil.charting.components.MarkerView
+import com.xxmassdeveloper.mpchartexample.custom.RadarMarkerView
+import com.github.mikephil.charting.interfaces.datasets.IRadarDataSet
+import com.github.mikephil.charting.charts.BubbleChart
+import com.github.mikephil.charting.interfaces.datasets.IBubbleDataSet
+import android.util.DisplayMetrics
+import android.widget.RelativeLayout
+import com.github.mikephil.charting.charts.ScatterChart
+import com.xxmassdeveloper.mpchartexample.custom.CustomScatterShapeRenderer
+import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet
+import com.github.mikephil.charting.charts.CombinedChart
+import com.github.mikephil.charting.charts.CombinedChart.DrawOrder
+import com.github.mikephil.charting.listener.OnChartGestureListener
+import com.github.mikephil.charting.listener.ChartTouchListener.ChartGesture
+import com.github.mikephil.charting.listener.ChartTouchListener
+import android.widget.Toast
+import com.github.mikephil.charting.formatter.IValueFormatter
+import com.github.mikephil.charting.utils.ViewPortHandler
+import com.github.mikephil.charting.charts.CandleStickChart
+import com.github.mikephil.charting.interfaces.datasets.ICandleDataSet
+import android.widget.ArrayAdapter
+import android.annotation.SuppressLint
+import android.graphics.Color
+import android.net.Uri
+import android.view.*
+import com.github.mikephil.charting.utils.EntryXComparator
+import com.github.mikephil.charting.charts.HorizontalBarChart
+import com.github.mikephil.charting.data.*
+import com.xxmassdeveloper.mpchartexample.listviewitems.ChartItem
+import com.xxmassdeveloper.mpchartexample.listviewitems.LineChartItem
+import com.xxmassdeveloper.mpchartexample.listviewitems.BarChartItem
+import com.xxmassdeveloper.mpchartexample.listviewitems.PieChartItem
+import com.github.mikephil.charting.formatter.LargeValueFormatter
+import java.util.ArrayList
 
-import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.net.Uri;
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.WindowManager;
-
-import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
-import com.xxmassdeveloper.mpchartexample.notimportant.DemoBase;
-
-import java.util.ArrayList;
-
-@SuppressWarnings("SameParameterValue")
-public class LineChartActivityColored extends DemoBase {
-
-    private final LineChart[] charts = new LineChart[4];
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setContentView(R.layout.activity_colored_lines);
-
-        setTitle("LineChartActivityColored");
-
-        charts[0] = findViewById(R.id.chart1);
-        charts[1] = findViewById(R.id.chart2);
-        charts[2] = findViewById(R.id.chart3);
-        charts[3] = findViewById(R.id.chart4);
-
-        Typeface mTf = Typeface.createFromAsset(getAssets(), "OpenSans-Bold.ttf");
-
-        for (int i = 0; i < charts.length; i++) {
-
-            LineData data = getData(36, 100);
-            data.setValueTypeface(mTf);
+class LineChartActivityColored : DemoBase() {
+    private val charts = arrayOfNulls<LineChart>(4)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_FULLSCREEN,
+            WindowManager.LayoutParams.FLAG_FULLSCREEN
+        )
+        setContentView(R.layout.activity_colored_lines)
+        title = "LineChartActivityColored"
+        charts[0] = findViewById(R.id.chart1)
+        charts[1] = findViewById(R.id.chart2)
+        charts[2] = findViewById(R.id.chart3)
+        charts[3] = findViewById(R.id.chart4)
+        val mTf = Typeface.createFromAsset(assets, "OpenSans-Bold.ttf")
+        for (i in charts.indices) {
+            val data = getData(36, 100f)
+            data.setValueTypeface(mTf)
 
             // add some transparency to the color with "& 0x90FFFFFF"
-            setupChart(charts[i], data, colors[i % colors.length]);
+            setupChart(charts[i], data, colors[i % colors.size])
         }
     }
 
-    private final int[] colors = new int[] {
-            Color.rgb(137, 230, 81),
-            Color.rgb(240, 240, 30),
-            Color.rgb(89, 199, 250),
-            Color.rgb(250, 104, 104)
-    };
+    private val colors = intArrayOf(
+        Color.rgb(137, 230, 81),
+        Color.rgb(240, 240, 30),
+        Color.rgb(89, 199, 250),
+        Color.rgb(250, 104, 104)
+    )
 
-    private void setupChart(LineChart chart, LineData data, int color) {
-
-        ((LineDataSet) data.getDataSetByIndex(0)).setCircleHoleColor(color);
+    private fun setupChart(chart: LineChart?, data: LineData, color: Int) {
+        (data.getDataSetByIndex(0) as LineDataSet?)!!.setCircleHoleColor(color)
 
         // no description text
-        chart.getDescription().setEnabled(false);
+        chart!!.description!!.isEnabled = false
 
         // chart.setDrawHorizontalGrid(false);
         //
         // enable / disable grid background
-        chart.setDrawGridBackground(false);
-//        chart.getRenderer().getGridPaint().setGridColor(Color.WHITE & 0x70FFFFFF);
+        chart.setDrawGridBackground(false)
+        //        chart.getRenderer().getGridPaint().setGridColor(Color.WHITE & 0x70FFFFFF);
 
         // enable touch gestures
-        chart.setTouchEnabled(true);
+        chart.setTouchEnabled(true)
 
         // enable scaling and dragging
-        chart.setDragEnabled(true);
-        chart.setScaleEnabled(true);
+        chart.isDragEnabled = true
+        chart.setScaleEnabled(true)
 
         // if disabled, scaling can be done on x- and y-axis separately
-        chart.setPinchZoom(false);
-
-        chart.setBackgroundColor(color);
+        chart.setPinchZoom(false)
+        chart.setBackgroundColor(color)
 
         // set custom chart offsets (automatic offset calculation is hereby disabled)
-        chart.setViewPortOffsets(10, 0, 10, 0);
+        chart.setViewPortOffsets(10f, 0f, 10f, 0f)
 
         // add data
-        chart.setData(data);
+        chart.data = data
 
         // get the legend (only possible after setting data)
-        Legend l = chart.getLegend();
-        l.setEnabled(false);
-
-        chart.getAxisLeft().setEnabled(false);
-        chart.getAxisLeft().setSpaceTop(40);
-        chart.getAxisLeft().setSpaceBottom(40);
-        chart.getAxisRight().setEnabled(false);
-
-        chart.getXAxis().setEnabled(false);
+        val l: Legend? = chart.legend
+        l!!.isEnabled = false
+        chart.axisLeft!!.isEnabled = false
+        chart.axisLeft!!.spaceTop = 40
+        chart.axisLeft!!.spaceBottom = 40
+        chart.axisRight!!.isEnabled = false
+        chart.xAxis.setEnabled(false)
 
         // animate calls invalidate()...
-        chart.animateX(2500);
+        chart.animateX(2500)
     }
 
-    private LineData getData(int count, float range) {
-
-        ArrayList<Entry> values = new ArrayList<>();
-
-        for (int i = 0; i < count; i++) {
-            float val = (float) (Math.random() * range) + 3;
-            values.add(new Entry(i, val));
+    private fun getData(count: Int, range: Float): LineData {
+        val values = ArrayList<Entry?>()
+        for (i in 0 until count) {
+            val `val` = (Math.random() * range).toFloat() + 3
+            values.add(Entry(i.toFloat(), `val`))
         }
 
         // create a dataset and give it a type
-        LineDataSet set1 = new LineDataSet(values, "DataSet 1");
+        val set1 = LineDataSet(values, "DataSet 1")
         // set1.setFillAlpha(110);
         // set1.setFillColor(Color.RED);
-
-        set1.setLineWidth(1.75f);
-        set1.setCircleRadius(5f);
-        set1.setCircleHoleRadius(2.5f);
-        set1.setColor(Color.WHITE);
-        set1.setCircleColor(Color.WHITE);
-        set1.setHighLightColor(Color.WHITE);
-        set1.setDrawValues(false);
+        set1.lineWidth = 1.75f
+        set1.circleRadius = 5f
+        set1.circleHoleRadius = 2.5f
+        set1.color = Color.WHITE
+        set1.setCircleColor(Color.WHITE)
+        set1.highLightColor = Color.WHITE
+        set1.setDrawValues(false)
 
         // create a data object with the data sets
-        return new LineData(set1);
+        return LineData(set1)
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.only_github, menu);
-        return true;
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.only_github, menu)
+        return true
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()) {
-            case R.id.viewGithub: {
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse("https://github.com/PhilJay/MPAndroidChart/blob/master/MPChartExample/src/com/xxmassdeveloper/mpchartexample/LineChartActivityColored.java"));
-                startActivity(i);
-                break;
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.viewGithub -> {
+                val i = Intent(Intent.ACTION_VIEW)
+                i.data =
+                    Uri.parse("https://github.com/PhilJay/MPAndroidChart/blob/master/MPChartExample/src/com/xxmassdeveloper/mpchartexample/LineChartActivityColored.java")
+                startActivity(i)
             }
         }
-
-        return true;
+        return true
     }
 
-    @Override
-    public void saveToGallery() { /* Intentionally left empty */ }
+    public override fun saveToGallery() { /* Intentionally left empty */
+    }
 }

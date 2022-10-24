@@ -1,320 +1,569 @@
+package com.xxmassdeveloper.mpchartexample
 
-package com.xxmassdeveloper.mpchartexample;
+import android.Manifest
+import com.xxmassdeveloper.mpchartexample.notimportant.DemoBase.onCreate
+import com.github.mikephil.charting.charts.Chart.description
+import com.github.mikephil.charting.components.ComponentBase.isEnabled
+import com.github.mikephil.charting.charts.Chart.setTouchEnabled
+import com.github.mikephil.charting.charts.Chart.dragDecelerationFrictionCoef
+import com.github.mikephil.charting.charts.BarLineChartBase.isDragEnabled
+import com.github.mikephil.charting.charts.BarLineChartBase.setScaleEnabled
+import com.github.mikephil.charting.charts.BarLineChartBase.setDrawGridBackground
+import com.github.mikephil.charting.charts.BarLineChartBase.isHighlightPerDragEnabled
+import com.github.mikephil.charting.charts.BarLineChartBase.setViewPortOffsets
+import com.github.mikephil.charting.charts.Chart.legend
+import com.github.mikephil.charting.charts.Chart.xAxis
+import com.github.mikephil.charting.components.XAxis.position
+import com.github.mikephil.charting.components.ComponentBase.typeface
+import com.github.mikephil.charting.components.ComponentBase.textSize
+import com.github.mikephil.charting.components.ComponentBase.textColor
+import com.github.mikephil.charting.components.AxisBase.setDrawAxisLine
+import com.github.mikephil.charting.components.AxisBase.setDrawGridLines
+import com.github.mikephil.charting.components.AxisBase.setCenterAxisLabels
+import com.github.mikephil.charting.components.AxisBase.granularity
+import com.github.mikephil.charting.components.AxisBase.valueFormatter
+import com.github.mikephil.charting.charts.BarLineChartBase.axisLeft
+import com.github.mikephil.charting.components.YAxis.setPosition
+import com.github.mikephil.charting.utils.ColorTemplate.holoBlue
+import com.github.mikephil.charting.components.AxisBase.isGranularityEnabled
+import com.github.mikephil.charting.components.AxisBase.axisMinimum
+import com.github.mikephil.charting.components.AxisBase.axisMaximum
+import com.github.mikephil.charting.components.ComponentBase.yOffset
+import com.github.mikephil.charting.charts.BarLineChartBase.axisRight
+import com.xxmassdeveloper.mpchartexample.notimportant.DemoBase.getRandom
+import com.github.mikephil.charting.data.BaseDataSet.axisDependency
+import com.github.mikephil.charting.data.BaseDataSet.color
+import com.github.mikephil.charting.data.BaseDataSet.valueTextColor
+import com.github.mikephil.charting.data.LineRadarDataSet.lineWidth
+import com.github.mikephil.charting.data.LineDataSet.setDrawCircles
+import com.github.mikephil.charting.data.BaseDataSet.setDrawValues
+import com.github.mikephil.charting.data.LineRadarDataSet.fillAlpha
+import com.github.mikephil.charting.data.LineRadarDataSet.fillColor
+import com.github.mikephil.charting.data.BarLineScatterCandleBubbleDataSet.highLightColor
+import com.github.mikephil.charting.data.LineDataSet.setDrawCircleHole
+import com.github.mikephil.charting.data.ChartData.setValueTextColor
+import com.github.mikephil.charting.data.ChartData.setValueTextSize
+import com.github.mikephil.charting.charts.Chart.data
+import com.github.mikephil.charting.data.ChartData.dataSets
+import com.github.mikephil.charting.data.BaseDataSet.isDrawValuesEnabled
+import com.github.mikephil.charting.data.ChartData.isHighlightEnabled
+import com.github.mikephil.charting.data.LineRadarDataSet.isDrawFilledEnabled
+import com.github.mikephil.charting.data.LineRadarDataSet.setDrawFilled
+import com.github.mikephil.charting.data.LineDataSet.isDrawCirclesEnabled
+import com.github.mikephil.charting.data.LineDataSet.mode
+import com.github.mikephil.charting.charts.BarLineChartBase.isPinchZoomEnabled
+import com.github.mikephil.charting.charts.BarLineChartBase.setPinchZoom
+import com.github.mikephil.charting.charts.BarLineChartBase.isAutoScaleMinMaxEnabled
+import com.github.mikephil.charting.charts.BarLineChartBase.notifyDataSetChanged
+import com.github.mikephil.charting.charts.Chart.animateX
+import com.github.mikephil.charting.charts.Chart.animateY
+import com.github.mikephil.charting.charts.Chart.animateXY
+import com.xxmassdeveloper.mpchartexample.notimportant.DemoBase.requestStoragePermission
+import com.xxmassdeveloper.mpchartexample.notimportant.DemoBase.saveToGallery
+import com.github.mikephil.charting.charts.Chart.setOnChartValueSelectedListener
+import com.github.mikephil.charting.charts.BarChart.setDrawBarShadow
+import com.github.mikephil.charting.charts.BarChart.setDrawValueAboveBar
+import com.github.mikephil.charting.charts.BarLineChartBase.setMaxVisibleValueCount
+import com.github.mikephil.charting.components.AxisBase.labelCount
+import com.github.mikephil.charting.components.AxisBase.setLabelCount
+import com.github.mikephil.charting.components.YAxis.spaceTop
+import com.github.mikephil.charting.components.Legend.verticalAlignment
+import com.github.mikephil.charting.components.Legend.horizontalAlignment
+import com.github.mikephil.charting.components.Legend.orientation
+import com.github.mikephil.charting.components.Legend.setDrawInside
+import com.github.mikephil.charting.components.Legend.form
+import com.github.mikephil.charting.components.Legend.formSize
+import com.github.mikephil.charting.components.Legend.xEntrySpace
+import com.github.mikephil.charting.components.MarkerView.setChartView
+import com.github.mikephil.charting.charts.Chart.marker
+import com.github.mikephil.charting.data.ChartData.dataSetCount
+import com.github.mikephil.charting.data.ChartData.getDataSetByIndex
+import com.github.mikephil.charting.data.DataSet.setValues
+import com.github.mikephil.charting.data.ChartData.notifyDataChanged
+import com.github.mikephil.charting.data.BaseDataSet.setDrawIcons
+import com.github.mikephil.charting.data.BarDataSet.setFills
+import com.github.mikephil.charting.data.ChartData.setValueTypeface
+import com.github.mikephil.charting.data.BarData.barWidth
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.setDrawValues
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.isDrawValuesEnabled
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.setDrawIcons
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.isDrawIconsEnabled
+import com.github.mikephil.charting.data.BarDataSet.barBorderWidth
+import com.github.mikephil.charting.interfaces.datasets.IBarDataSet.barBorderWidth
+import com.github.mikephil.charting.charts.BarChart.getBarBounds
+import com.github.mikephil.charting.charts.BarLineChartBase.getPosition
+import com.github.mikephil.charting.charts.BarLineChartBase.lowestVisibleX
+import com.github.mikephil.charting.charts.BarLineChartBase.highestVisibleX
+import com.github.mikephil.charting.utils.MPPointF.Companion.recycleInstance
+import com.github.mikephil.charting.charts.PieChart.setUsePercentValues
+import com.github.mikephil.charting.charts.Chart.setExtraOffsets
+import com.github.mikephil.charting.charts.PieChart.setCenterTextTypeface
+import com.github.mikephil.charting.charts.PieChart.centerText
+import com.github.mikephil.charting.charts.PieChart.isDrawHoleEnabled
+import com.github.mikephil.charting.charts.PieChart.setHoleColor
+import com.github.mikephil.charting.charts.PieChart.setTransparentCircleColor
+import com.github.mikephil.charting.charts.PieChart.setTransparentCircleAlpha
+import com.github.mikephil.charting.charts.PieChart.holeRadius
+import com.github.mikephil.charting.charts.PieChart.transparentCircleRadius
+import com.github.mikephil.charting.charts.PieChart.setDrawCenterText
+import com.github.mikephil.charting.charts.PieRadarChartBase.rotationAngle
+import com.github.mikephil.charting.charts.PieRadarChartBase.isRotationEnabled
+import com.github.mikephil.charting.charts.Chart.isHighlightPerTapEnabled
+import com.github.mikephil.charting.components.Legend.yEntrySpace
+import com.github.mikephil.charting.charts.PieChart.setEntryLabelColor
+import com.github.mikephil.charting.charts.PieChart.setEntryLabelTypeface
+import com.github.mikephil.charting.charts.PieChart.setEntryLabelTextSize
+import com.github.mikephil.charting.data.PieDataSet.sliceSpace
+import com.github.mikephil.charting.data.BaseDataSet.iconsOffset
+import com.github.mikephil.charting.data.PieDataSet.selectionShift
+import com.github.mikephil.charting.data.BaseDataSet.colors
+import com.github.mikephil.charting.data.ChartData.setValueFormatter
+import com.github.mikephil.charting.charts.Chart.highlightValues
+import com.github.mikephil.charting.data.PieData.dataSets
+import com.github.mikephil.charting.charts.PieChart.minAngleForSlices
+import com.github.mikephil.charting.charts.PieRadarChartBase.notifyDataSetChanged
+import com.github.mikephil.charting.charts.PieChart.isDrawRoundedSlicesEnabled
+import com.github.mikephil.charting.charts.PieChart.setDrawRoundedSlices
+import com.github.mikephil.charting.charts.PieChart.isDrawSlicesUnderHoleEnabled
+import com.github.mikephil.charting.charts.PieChart.setDrawSlicesUnderHole
+import com.github.mikephil.charting.charts.PieChart.isDrawCenterTextEnabled
+import com.github.mikephil.charting.charts.PieChart.setDrawEntryLabels
+import com.github.mikephil.charting.charts.PieChart.isDrawEntryLabelsEnabled
+import com.github.mikephil.charting.charts.PieChart.isUsePercentValuesEnabled
+import com.github.mikephil.charting.charts.PieRadarChartBase.spin
+import com.github.mikephil.charting.data.BaseEntry.y
+import com.github.mikephil.charting.highlight.Highlight.x
+import com.github.mikephil.charting.highlight.Highlight.dataSetIndex
+import com.github.mikephil.charting.charts.BarLineChartBase.setOnDrawListener
+import com.github.mikephil.charting.components.XAxis.setAvoidFirstLastClipping
+import com.github.mikephil.charting.data.LineDataSet.circleRadius
+import com.github.mikephil.charting.data.Entry.x
+import com.github.mikephil.charting.data.Entry.toString
+import com.github.mikephil.charting.data.DataSet.toSimpleString
+import com.github.mikephil.charting.charts.Chart.legendRenderer
+import com.github.mikephil.charting.charts.BarLineChartBase.setGridBackgroundColor
+import com.github.mikephil.charting.charts.BarLineChartBase.setDrawBorders
+import com.github.mikephil.charting.components.YAxis.setDrawZeroLine
+import com.github.mikephil.charting.data.LineDataSet.setFillFormatter
+import com.github.mikephil.charting.data.ChartData.setDrawValues
+import com.github.mikephil.charting.components.AxisBase.enableGridDashedLine
+import com.github.mikephil.charting.components.LimitLine.lineWidth
+import com.github.mikephil.charting.components.LimitLine.enableDashedLine
+import com.github.mikephil.charting.components.LimitLine.labelPosition
+import com.github.mikephil.charting.components.AxisBase.setDrawLimitLinesBehindData
+import com.github.mikephil.charting.components.AxisBase.addLimitLine
+import com.github.mikephil.charting.data.BaseDataSet.notifyDataSetChanged
+import com.github.mikephil.charting.data.LineDataSet.enableDashedLine
+import com.github.mikephil.charting.data.LineDataSet.setCircleColor
+import com.github.mikephil.charting.data.BaseDataSet.formLineWidth
+import com.github.mikephil.charting.data.BaseDataSet.formLineDashEffect
+import com.github.mikephil.charting.data.BaseDataSet.formSize
+import com.github.mikephil.charting.data.BaseDataSet.valueTextSize
+import com.github.mikephil.charting.data.LineScatterCandleRadarDataSet.enableDashedHighlightLine
+import com.github.mikephil.charting.utils.Utils.sDKInt
+import com.github.mikephil.charting.data.LineRadarDataSet.fillDrawable
+import com.github.mikephil.charting.data.BaseDataSet.isDrawIconsEnabled
+import com.github.mikephil.charting.charts.Chart.xChartMin
+import com.github.mikephil.charting.charts.Chart.xChartMax
+import com.github.mikephil.charting.charts.BarLineChartBase.yChartMin
+import com.github.mikephil.charting.charts.BarLineChartBase.yChartMax
+import com.github.mikephil.charting.utils.ColorTemplate.colorWithAlpha
+import com.github.mikephil.charting.charts.BarLineChartBase.centerViewToAnimated
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.axisDependency
+import com.github.mikephil.charting.charts.RadarChart.webLineWidth
+import com.github.mikephil.charting.charts.RadarChart.webColor
+import com.github.mikephil.charting.charts.RadarChart.webLineWidthInner
+import com.github.mikephil.charting.charts.RadarChart.webColorInner
+import com.github.mikephil.charting.charts.RadarChart.webAlpha
+import com.github.mikephil.charting.components.ComponentBase.xOffset
+import com.github.mikephil.charting.charts.RadarChart.yAxis
+import com.github.mikephil.charting.components.AxisBase.setDrawLabels
+import com.github.mikephil.charting.data.RadarDataSet.setDrawHighlightCircleEnabled
+import com.github.mikephil.charting.data.LineScatterCandleRadarDataSet.setDrawHighlightIndicators
+import com.github.mikephil.charting.interfaces.datasets.ILineRadarDataSet.isDrawFilledEnabled
+import com.github.mikephil.charting.interfaces.datasets.ILineRadarDataSet.setDrawFilled
+import com.github.mikephil.charting.interfaces.datasets.IRadarDataSet.isDrawHighlightCircleEnabled
+import com.github.mikephil.charting.charts.RadarChart.notifyDataSetChanged
+import com.github.mikephil.charting.charts.BarChart.setFitBars
+import com.github.mikephil.charting.data.BaseDataSet.setColors
+import com.github.mikephil.charting.components.YAxis.spaceBottom
+import com.github.mikephil.charting.data.BaseDataSet.setColor
+import com.github.mikephil.charting.data.BubbleData.setHighlightCircleWidth
+import com.github.mikephil.charting.charts.PieChart.maxAngle
+import com.github.mikephil.charting.charts.PieChart.setCenterTextOffset
+import com.github.mikephil.charting.charts.BarLineChartBase.resetTracking
+import com.github.mikephil.charting.charts.Chart.maxHighlightDistance
+import com.github.mikephil.charting.data.ScatterDataSet.setScatterShape
+import com.github.mikephil.charting.data.ScatterDataSet.setScatterShapeHoleColor
+import com.github.mikephil.charting.data.ScatterDataSet.setScatterShapeHoleRadius
+import com.github.mikephil.charting.data.ScatterDataSet.setShapeRenderer
+import com.github.mikephil.charting.data.ScatterDataSet.setScatterShapeSize
+import com.github.mikephil.charting.utils.FileUtils.loadBarEntriesFromAssets
+import com.github.mikephil.charting.charts.CombinedChart.setDrawBarShadow
+import com.github.mikephil.charting.charts.CombinedChart.isHighlightFullBarEnabled
+import com.github.mikephil.charting.charts.CombinedChart.drawOrder
+import com.github.mikephil.charting.components.Legend.isWordWrapEnabled
+import com.github.mikephil.charting.data.CombinedData.setData
+import com.github.mikephil.charting.data.ChartData.xMax
+import com.github.mikephil.charting.charts.CombinedChart.data
+import com.github.mikephil.charting.data.ChartData.addDataSet
+import com.github.mikephil.charting.data.BarDataSet.stackLabels
+import com.github.mikephil.charting.data.BarData.groupBars
+import com.github.mikephil.charting.data.CandleDataSet.setDecreasingColor
+import com.github.mikephil.charting.data.CandleDataSet.setShadowColor
+import com.github.mikephil.charting.data.CandleDataSet.setBarSpace
+import com.github.mikephil.charting.data.BubbleDataSet.setHighlightCircleWidth
+import com.github.mikephil.charting.components.AxisBase.axisLineColor
+import com.github.mikephil.charting.data.LineDataSet.cubicIntensity
+import com.github.mikephil.charting.data.LineScatterCandleRadarDataSet.setDrawHorizontalHighlightIndicator
+import com.github.mikephil.charting.data.LineDataSet.setCircleColors
+import com.github.mikephil.charting.charts.Chart.setNoDataText
+import com.github.mikephil.charting.data.ChartData.addEntry
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.entryCount
+import com.github.mikephil.charting.charts.BarLineChartBase.setVisibleXRangeMaximum
+import com.github.mikephil.charting.charts.BarLineChartBase.moveViewTo
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.getEntryForXValue
+import com.github.mikephil.charting.data.ChartData.removeEntry
+import com.github.mikephil.charting.data.ChartData.removeDataSet
+import com.github.mikephil.charting.charts.Chart.clear
+import com.github.mikephil.charting.charts.Chart.extraTopOffset
+import com.github.mikephil.charting.charts.Chart.extraBottomOffset
+import com.github.mikephil.charting.charts.Chart.extraLeftOffset
+import com.github.mikephil.charting.charts.Chart.extraRightOffset
+import com.github.mikephil.charting.components.YAxis.zeroLineColor
+import com.github.mikephil.charting.components.YAxis.zeroLineWidth
+import com.github.mikephil.charting.data.BaseDataSet.setValueTextColors
+import com.github.mikephil.charting.data.CandleDataSet.setShadowWidth
+import com.github.mikephil.charting.data.CandleDataSet.setDecreasingPaintStyle
+import com.github.mikephil.charting.data.CandleDataSet.setIncreasingColor
+import com.github.mikephil.charting.data.CandleDataSet.setIncreasingPaintStyle
+import com.github.mikephil.charting.data.CandleDataSet.setNeutralColor
+import com.github.mikephil.charting.data.CandleDataSet.setShadowColorSameAsCandle
+import com.github.mikephil.charting.interfaces.datasets.ICandleDataSet.shadowColorSameAsCandle
+import com.github.mikephil.charting.data.LineDataSet.setCircleHoleColor
+import com.github.mikephil.charting.data.LineDataSet.circleHoleRadius
+import com.github.mikephil.charting.data.BarDataSet.barShadowColor
+import com.github.mikephil.charting.data.PieDataSet.valueLinePart1OffsetPercentage
+import com.github.mikephil.charting.data.PieDataSet.valueLinePart1Length
+import com.github.mikephil.charting.data.PieDataSet.valueLinePart2Length
+import com.github.mikephil.charting.data.PieDataSet.yValuePosition
+import com.github.mikephil.charting.components.YAxis.isInverted
+import com.github.mikephil.charting.charts.BarLineChartBase.moveViewToX
+import com.github.mikephil.charting.charts.Chart.clearValues
+import com.xxmassdeveloper.mpchartexample.listviewitems.ChartItem.getView
+import com.xxmassdeveloper.mpchartexample.listviewitems.ChartItem.itemType
+import com.github.mikephil.charting.data.BarDataSet.highLightAlpha
+import com.github.mikephil.charting.charts.BarChart.barData
+import com.github.mikephil.charting.data.BarData.getGroupWidth
+import com.github.mikephil.charting.charts.BarChart.groupBars
+import com.xxmassdeveloper.mpchartexample.notimportant.DemoBase
+import android.widget.SeekBar.OnSeekBarChangeListener
+import com.github.mikephil.charting.charts.LineChart
+import android.widget.SeekBar
+import android.widget.TextView
+import android.os.Bundle
+import com.xxmassdeveloper.mpchartexample.R
+import com.github.mikephil.charting.components.Legend
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.formatter.IAxisValueFormatter
+import com.github.mikephil.charting.components.AxisBase
+import com.github.mikephil.charting.components.YAxis
+import com.github.mikephil.charting.utils.ColorTemplate
+import com.github.mikephil.charting.components.YAxis.AxisDependency
+import android.content.Intent
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
+import androidx.core.content.ContextCompat
+import android.content.pm.PackageManager
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener
+import com.github.mikephil.charting.charts.BarChart
+import com.xxmassdeveloper.mpchartexample.custom.DayAxisValueFormatter
+import com.github.mikephil.charting.components.XAxis.XAxisPosition
+import com.xxmassdeveloper.mpchartexample.custom.MyAxisValueFormatter
+import com.github.mikephil.charting.components.YAxis.YAxisLabelPosition
+import com.github.mikephil.charting.components.Legend.LegendForm
+import com.xxmassdeveloper.mpchartexample.custom.XYMarkerView
+import com.github.mikephil.charting.utils.Fill
+import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
+import com.github.mikephil.charting.interfaces.datasets.IDataSet
+import android.graphics.RectF
+import com.github.mikephil.charting.utils.MPPointF
+import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.formatter.PercentFormatter
+import android.text.SpannableString
+import android.text.style.RelativeSizeSpan
+import android.text.style.StyleSpan
+import android.graphics.Typeface
+import android.text.style.ForegroundColorSpan
+import com.github.mikephil.charting.charts.Chart
+import com.github.mikephil.charting.formatter.IFillFormatter
+import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider
+import com.xxmassdeveloper.mpchartexample.custom.MyMarkerView
+import com.github.mikephil.charting.components.LimitLine
+import com.github.mikephil.charting.components.LimitLine.LimitLabelPosition
+import android.graphics.DashPathEffect
+import android.graphics.drawable.Drawable
+import com.github.mikephil.charting.charts.RadarChart
+import com.github.mikephil.charting.components.MarkerView
+import com.xxmassdeveloper.mpchartexample.custom.RadarMarkerView
+import com.github.mikephil.charting.interfaces.datasets.IRadarDataSet
+import com.github.mikephil.charting.charts.BubbleChart
+import com.github.mikephil.charting.interfaces.datasets.IBubbleDataSet
+import android.util.DisplayMetrics
+import android.widget.RelativeLayout
+import com.github.mikephil.charting.charts.ScatterChart
+import com.xxmassdeveloper.mpchartexample.custom.CustomScatterShapeRenderer
+import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet
+import com.github.mikephil.charting.charts.CombinedChart
+import com.github.mikephil.charting.charts.CombinedChart.DrawOrder
+import com.github.mikephil.charting.listener.OnChartGestureListener
+import com.github.mikephil.charting.listener.ChartTouchListener.ChartGesture
+import com.github.mikephil.charting.listener.ChartTouchListener
+import android.widget.Toast
+import com.github.mikephil.charting.formatter.IValueFormatter
+import com.github.mikephil.charting.utils.ViewPortHandler
+import com.github.mikephil.charting.charts.CandleStickChart
+import com.github.mikephil.charting.interfaces.datasets.ICandleDataSet
+import android.widget.ArrayAdapter
+import android.annotation.SuppressLint
+import android.graphics.Color
+import android.net.Uri
+import android.util.Log
+import android.view.*
+import com.github.mikephil.charting.animation.Easing
+import com.github.mikephil.charting.utils.EntryXComparator
+import com.github.mikephil.charting.charts.HorizontalBarChart
+import com.github.mikephil.charting.data.*
+import com.xxmassdeveloper.mpchartexample.listviewitems.ChartItem
+import com.xxmassdeveloper.mpchartexample.listviewitems.LineChartItem
+import com.xxmassdeveloper.mpchartexample.listviewitems.BarChartItem
+import com.xxmassdeveloper.mpchartexample.listviewitems.PieChartItem
+import com.github.mikephil.charting.formatter.LargeValueFormatter
+import com.github.mikephil.charting.highlight.Highlight
+import java.util.ArrayList
 
-import android.Manifest;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.net.Uri;
-import android.os.Bundle;
-import androidx.core.content.ContextCompat;
-import android.text.SpannableString;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.RelativeSizeSpan;
-import android.text.style.StyleSpan;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.WindowManager;
-import android.widget.SeekBar;
-import android.widget.SeekBar.OnSeekBarChangeListener;
-import android.widget.TextView;
-
-import com.github.mikephil.charting.animation.Easing;
-import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.PieData;
-import com.github.mikephil.charting.data.PieDataSet;
-import com.github.mikephil.charting.data.PieEntry;
-import com.github.mikephil.charting.formatter.PercentFormatter;
-import com.github.mikephil.charting.highlight.Highlight;
-import com.github.mikephil.charting.interfaces.datasets.IDataSet;
-import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
-import com.github.mikephil.charting.utils.ColorTemplate;
-import com.xxmassdeveloper.mpchartexample.notimportant.DemoBase;
-
-import java.util.ArrayList;
-
-public class PiePolylineChartActivity extends DemoBase implements OnSeekBarChangeListener,
-        OnChartValueSelectedListener {
-
-    private PieChart chart;
-    private SeekBar seekBarX, seekBarY;
-    private TextView tvX, tvY;
-
-    private Typeface tf;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setContentView(R.layout.activity_piechart);
-
-        setTitle("PiePolylineChartActivity");
-
-        tvX = findViewById(R.id.tvXMax);
-        tvY = findViewById(R.id.tvYMax);
-
-        seekBarX = findViewById(R.id.seekBar1);
-        seekBarY = findViewById(R.id.seekBar2);
-
-        seekBarX.setOnSeekBarChangeListener(this);
-        seekBarY.setOnSeekBarChangeListener(this);
-
-        chart = findViewById(R.id.chart1);
-        chart.setUsePercentValues(true);
-        chart.getDescription().setEnabled(false);
-        chart.setExtraOffsets(5, 10, 5, 5);
-
-        chart.setDragDecelerationFrictionCoef(0.95f);
-
-        tf = Typeface.createFromAsset(getAssets(), "OpenSans-Regular.ttf");
-
-        chart.setCenterTextTypeface(Typeface.createFromAsset(getAssets(), "OpenSans-Light.ttf"));
-        chart.setCenterText(generateCenterSpannableText());
-
-        chart.setExtraOffsets(20.f, 0.f, 20.f, 0.f);
-
-        chart.setDrawHoleEnabled(true);
-        chart.setHoleColor(Color.WHITE);
-
-        chart.setTransparentCircleColor(Color.WHITE);
-        chart.setTransparentCircleAlpha(110);
-
-        chart.setHoleRadius(58f);
-        chart.setTransparentCircleRadius(61f);
-
-        chart.setDrawCenterText(true);
-
-        chart.setRotationAngle(0);
+class PiePolylineChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSelectedListener {
+    private var chart: PieChart? = null
+    private var seekBarX: SeekBar? = null
+    private var seekBarY: SeekBar? = null
+    private var tvX: TextView? = null
+    private var tvY: TextView? = null
+    private var tf: Typeface? = null
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_FULLSCREEN,
+            WindowManager.LayoutParams.FLAG_FULLSCREEN
+        )
+        setContentView(R.layout.activity_piechart)
+        title = "PiePolylineChartActivity"
+        tvX = findViewById(R.id.tvXMax)
+        tvY = findViewById(R.id.tvYMax)
+        seekBarX = findViewById(R.id.seekBar1)
+        seekBarY = findViewById(R.id.seekBar2)
+        seekBarX.setOnSeekBarChangeListener(this)
+        seekBarY.setOnSeekBarChangeListener(this)
+        chart = findViewById(R.id.chart1)
+        chart.setUsePercentValues(true)
+        chart.description!!.isEnabled = false
+        chart.setExtraOffsets(5f, 10f, 5f, 5f)
+        chart.dragDecelerationFrictionCoef = 0.95f
+        tf = Typeface.createFromAsset(assets, "OpenSans-Regular.ttf")
+        chart.setCenterTextTypeface(Typeface.createFromAsset(assets, "OpenSans-Light.ttf"))
+        chart.centerText = generateCenterSpannableText()
+        chart.setExtraOffsets(20f, 0f, 20f, 0f)
+        chart.isDrawHoleEnabled = true
+        chart.setHoleColor(Color.WHITE)
+        chart.setTransparentCircleColor(Color.WHITE)
+        chart.setTransparentCircleAlpha(110)
+        chart.holeRadius = 58f
+        chart.transparentCircleRadius = 61f
+        chart.setDrawCenterText(true)
+        chart.rotationAngle = 0f
         // enable rotation of the chart by touch
-        chart.setRotationEnabled(true);
-        chart.setHighlightPerTapEnabled(true);
+        chart.isRotationEnabled = true
+        chart.isHighlightPerTapEnabled = true
 
         // chart.setUnit(" €");
         // chart.setDrawUnitsInChart(true);
 
         // add a selection listener
-        chart.setOnChartValueSelectedListener(this);
-
-        seekBarX.setProgress(4);
-        seekBarY.setProgress(100);
-
-        chart.animateY(1400, Easing.EaseInOutQuad);
+        chart.setOnChartValueSelectedListener(this)
+        seekBarX.setProgress(4)
+        seekBarY.setProgress(100)
+        chart.animateY(1400, Easing.EaseInOutQuad)
         // chart.spin(2000, 0, 360);
-
-        Legend l = chart.getLegend();
-        l.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
-        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
-        l.setOrientation(Legend.LegendOrientation.VERTICAL);
-        l.setDrawInside(false);
-        l.setEnabled(false);
+        val l: Legend? = chart.legend
+        l!!.verticalAlignment = Legend.LegendVerticalAlignment.TOP
+        l.horizontalAlignment = Legend.LegendHorizontalAlignment.RIGHT
+        l.orientation = Legend.LegendOrientation.VERTICAL
+        l.setDrawInside(false)
+        l.isEnabled = false
     }
 
-    private void setData(int count, float range) {
-
-        ArrayList<PieEntry> entries = new ArrayList<>();
+    private fun setData(count: Int, range: Float) {
+        val entries = ArrayList<PieEntry?>()
 
         // NOTE: The order of the entries when being added to the entries array determines their position around the center of
         // the chart.
-        for (int i = 0; i < count; i++) {
-            entries.add(new PieEntry((float) (Math.random() * range) + range / 5, parties[i % parties.length]));
+        for (i in 0 until count) {
+            entries.add(
+                PieEntry(
+                    (Math.random() * range).toFloat() + range / 5,
+                    parties[i % parties.length]
+                )
+            )
         }
-
-        PieDataSet dataSet = new PieDataSet(entries, "Election Results");
-        dataSet.setSliceSpace(3f);
-        dataSet.setSelectionShift(5f);
+        val dataSet = PieDataSet(entries, "Election Results")
+        dataSet.sliceSpace = 3f
+        dataSet.selectionShift = 5f
 
         // add a lot of colors
-
-        ArrayList<Integer> colors = new ArrayList<>();
-
-        for (int c : ColorTemplate.VORDIPLOM_COLORS)
-            colors.add(c);
-
-        for (int c : ColorTemplate.JOYFUL_COLORS)
-            colors.add(c);
-
-        for (int c : ColorTemplate.COLORFUL_COLORS)
-            colors.add(c);
-
-        for (int c : ColorTemplate.LIBERTY_COLORS)
-            colors.add(c);
-
-        for (int c : ColorTemplate.PASTEL_COLORS)
-            colors.add(c);
-
-        colors.add(ColorTemplate.getHoloBlue());
-
-        dataSet.setColors(colors);
+        val colors = ArrayList<Int>()
+        for (c in ColorTemplate.VORDIPLOM_COLORS) colors.add(c)
+        for (c in ColorTemplate.JOYFUL_COLORS) colors.add(c)
+        for (c in ColorTemplate.COLORFUL_COLORS) colors.add(c)
+        for (c in ColorTemplate.LIBERTY_COLORS) colors.add(c)
+        for (c in ColorTemplate.PASTEL_COLORS) colors.add(c)
+        colors.add(holoBlue)
+        dataSet.colors = colors
         //dataSet.setSelectionShift(0f);
-
-
-        dataSet.setValueLinePart1OffsetPercentage(80.f);
-        dataSet.setValueLinePart1Length(0.2f);
-        dataSet.setValueLinePart2Length(0.4f);
+        dataSet.valueLinePart1OffsetPercentage = 80f
+        dataSet.valueLinePart1Length = 0.2f
+        dataSet.valueLinePart2Length = 0.4f
 
         //dataSet.setXValuePosition(PieDataSet.ValuePosition.OUTSIDE_SLICE);
-        dataSet.setYValuePosition(PieDataSet.ValuePosition.OUTSIDE_SLICE);
-
-        PieData data = new PieData(dataSet);
-        data.setValueFormatter(new PercentFormatter());
-        data.setValueTextSize(11f);
-        data.setValueTextColor(Color.BLACK);
-        data.setValueTypeface(tf);
-        chart.setData(data);
+        dataSet.yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+        val data = PieData(dataSet)
+        data.setValueFormatter(PercentFormatter())
+        data.setValueTextSize(11f)
+        data.setValueTextColor(Color.BLACK)
+        data.setValueTypeface(tf)
+        chart!!.data = data
 
         // undo all highlights
-        chart.highlightValues(null);
-
-        chart.invalidate();
+        chart!!.highlightValues(null)
+        chart.invalidate()
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.pie, menu);
-        return true;
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.pie, menu)
+        return true
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()) {
-            case R.id.viewGithub: {
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse("https://github.com/PhilJay/MPAndroidChart/blob/master/MPChartExample/src/com/xxmassdeveloper/mpchartexample/PiePolylineChartActivity.java"));
-                startActivity(i);
-                break;
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.viewGithub -> {
+                val i = Intent(Intent.ACTION_VIEW)
+                i.data =
+                    Uri.parse("https://github.com/PhilJay/MPAndroidChart/blob/master/MPChartExample/src/com/xxmassdeveloper/mpchartexample/PiePolylineChartActivity.java")
+                startActivity(i)
             }
-            case R.id.actionToggleValues: {
-                for (IDataSet<?> set : chart.getData().getDataSets())
-                    set.setDrawValues(!set.isDrawValuesEnabled());
-
-                chart.invalidate();
-                break;
+            R.id.actionToggleValues -> {
+                for (set in chart!!.data!!.dataSets) set.setDrawValues(!set.isDrawValuesEnabled)
+                chart.invalidate()
             }
-            case R.id.actionToggleHole: {
-                if (chart.isDrawHoleEnabled())
-                    chart.setDrawHoleEnabled(false);
-                else
-                    chart.setDrawHoleEnabled(true);
-                chart.invalidate();
-                break;
+            R.id.actionToggleHole -> {
+                if (chart!!.isDrawHoleEnabled) chart!!.isDrawHoleEnabled =
+                    false else chart!!.isDrawHoleEnabled = true
+                chart.invalidate()
             }
-            case R.id.actionToggleMinAngles: {
-                if (chart.getMinAngleForSlices() == 0f)
-                    chart.setMinAngleForSlices(36f);
-                else
-                    chart.setMinAngleForSlices(0f);
-                chart.notifyDataSetChanged();
-                chart.invalidate();
-                break;
+            R.id.actionToggleMinAngles -> {
+                if (chart!!.minAngleForSlices == 0f) chart!!.minAngleForSlices =
+                    36f else chart!!.minAngleForSlices = 0f
+                chart!!.notifyDataSetChanged()
+                chart.invalidate()
             }
-            case R.id.actionToggleCurvedSlices: {
-                boolean toSet = !chart.isDrawRoundedSlicesEnabled() || !chart.isDrawHoleEnabled();
-                chart.setDrawRoundedSlices(toSet);
-                if (toSet && !chart.isDrawHoleEnabled()) {
-                    chart.setDrawHoleEnabled(true);
+            R.id.actionToggleCurvedSlices -> {
+                val toSet = !chart!!.isDrawRoundedSlicesEnabled || !chart!!.isDrawHoleEnabled
+                chart!!.setDrawRoundedSlices(toSet)
+                if (toSet && !chart!!.isDrawHoleEnabled) {
+                    chart!!.isDrawHoleEnabled = true
                 }
-                if (toSet && chart.isDrawSlicesUnderHoleEnabled()) {
-                    chart.setDrawSlicesUnderHole(false);
+                if (toSet && chart!!.isDrawSlicesUnderHoleEnabled) {
+                    chart!!.setDrawSlicesUnderHole(false)
                 }
-                chart.invalidate();
-                break;
+                chart.invalidate()
             }
-            case R.id.actionDrawCenter: {
-                if (chart.isDrawCenterTextEnabled())
-                    chart.setDrawCenterText(false);
-                else
-                    chart.setDrawCenterText(true);
-                chart.invalidate();
-                break;
+            R.id.actionDrawCenter -> {
+                if (chart!!.isDrawCenterTextEnabled) chart!!.setDrawCenterText(false) else chart!!.setDrawCenterText(
+                    true
+                )
+                chart.invalidate()
             }
-            case R.id.actionToggleXValues: {
-
-                chart.setDrawEntryLabels(!chart.isDrawEntryLabelsEnabled());
-                chart.invalidate();
-                break;
+            R.id.actionToggleXValues -> {
+                chart!!.setDrawEntryLabels(!chart!!.isDrawEntryLabelsEnabled)
+                chart.invalidate()
             }
-            case R.id.actionTogglePercent:
-                chart.setUsePercentValues(!chart.isUsePercentValuesEnabled());
-                chart.invalidate();
-                break;
-            case R.id.animateX: {
-                chart.animateX(1400);
-                break;
+            R.id.actionTogglePercent -> {
+                chart!!.setUsePercentValues(!chart!!.isUsePercentValuesEnabled)
+                chart.invalidate()
             }
-            case R.id.animateY: {
-                chart.animateY(1400);
-                break;
+            R.id.animateX -> {
+                chart!!.animateX(1400)
             }
-            case R.id.animateXY: {
-                chart.animateXY(1400, 1400);
-                break;
+            R.id.animateY -> {
+                chart!!.animateY(1400)
             }
-            case R.id.actionToggleSpin: {
-                chart.spin(1000, chart.getRotationAngle(), chart.getRotationAngle() + 360, Easing.EaseInOutCubic);
-                break;
+            R.id.animateXY -> {
+                chart!!.animateXY(1400, 1400)
             }
-            case R.id.actionSave: {
-                if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                    saveToGallery();
+            R.id.actionToggleSpin -> {
+                chart!!.spin(
+                    1000,
+                    chart!!.rotationAngle,
+                    chart!!.rotationAngle + 360,
+                    Easing.EaseInOutCubic
+                )
+            }
+            R.id.actionSave -> {
+                if (ContextCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                    ) == PackageManager.PERMISSION_GRANTED
+                ) {
+                    saveToGallery()
                 } else {
-                    requestStoragePermission(chart);
+                    requestStoragePermission(chart)
                 }
-                break;
             }
         }
-        return true;
+        return true
     }
 
-    @Override
-    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-
-        tvX.setText(String.valueOf(seekBarX.getProgress()));
-        tvY.setText(String.valueOf(seekBarY.getProgress()));
-
-        setData(seekBarX.getProgress(), seekBarY.getProgress());
+    override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+        tvX!!.text = seekBarX!!.progress.toString()
+        tvY!!.text = seekBarY!!.progress.toString()
+        setData(seekBarX!!.progress, seekBarY!!.progress.toFloat())
     }
 
-    @Override
-    protected void saveToGallery() {
-        saveToGallery(chart, "PiePolylineChartActivity");
+    override fun saveToGallery() {
+        saveToGallery(chart!!, "PiePolylineChartActivity")
     }
 
-    private SpannableString generateCenterSpannableText() {
-
-        SpannableString s = new SpannableString("MPAndroidChart\ndeveloped by Philipp Jahoda");
-        s.setSpan(new RelativeSizeSpan(1.5f), 0, 14, 0);
-        s.setSpan(new StyleSpan(Typeface.NORMAL), 14, s.length() - 15, 0);
-        s.setSpan(new ForegroundColorSpan(Color.GRAY), 14, s.length() - 15, 0);
-        s.setSpan(new RelativeSizeSpan(.65f), 14, s.length() - 15, 0);
-        s.setSpan(new StyleSpan(Typeface.ITALIC), s.length() - 14, s.length(), 0);
-        s.setSpan(new ForegroundColorSpan(ColorTemplate.getHoloBlue()), s.length() - 14, s.length(), 0);
-        return s;
+    private fun generateCenterSpannableText(): SpannableString {
+        val s = SpannableString("MPAndroidChart\ndeveloped by Philipp Jahoda")
+        s.setSpan(RelativeSizeSpan(1.5f), 0, 14, 0)
+        s.setSpan(StyleSpan(Typeface.NORMAL), 14, s.length - 15, 0)
+        s.setSpan(ForegroundColorSpan(Color.GRAY), 14, s.length - 15, 0)
+        s.setSpan(RelativeSizeSpan(.65f), 14, s.length - 15, 0)
+        s.setSpan(StyleSpan(Typeface.ITALIC), s.length - 14, s.length, 0)
+        s.setSpan(ForegroundColorSpan(holoBlue), s.length - 14, s.length, 0)
+        return s
     }
 
-    @Override
-    public void onValueSelected(Entry e, Highlight h) {
-
-        if (e == null)
-            return;
-        Log.i("VAL SELECTED",
-                "Value: " + e.getY() + ", xIndex: " + e.getX()
-                        + ", DataSet index: " + h.getDataSetIndex());
+    override fun onValueSelected(e: Entry?, h: Highlight?) {
+        if (e == null) return
+        Log.i(
+            "VAL SELECTED",
+            "Value: " + e.y + ", xIndex: " + e.x
+                    + ", DataSet index: " + h!!.dataSetIndex
+        )
     }
 
-    @Override
-    public void onNothingSelected() {
-        Log.i("PieChart", "nothing selected");
+    override fun onNothingSelected() {
+        Log.i("PieChart", "nothing selected")
     }
 
-    @Override
-    public void onStartTrackingTouch(SeekBar seekBar) {}
-
-    @Override
-    public void onStopTrackingTouch(SeekBar seekBar) {}
+    override fun onStartTrackingTouch(seekBar: SeekBar) {}
+    override fun onStopTrackingTouch(seekBar: SeekBar) {}
 }
