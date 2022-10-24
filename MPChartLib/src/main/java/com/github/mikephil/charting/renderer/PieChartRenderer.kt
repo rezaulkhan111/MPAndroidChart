@@ -1,197 +1,232 @@
+package com.github.mikephil.charting.renderer
 
-package com.github.mikephil.charting.renderer;
+import android.graphics.*
+import com.github.mikephil.charting.utils.Utils.convertDpToPixel
+import com.github.mikephil.charting.utils.ViewPortHandler.contentWidth
+import com.github.mikephil.charting.utils.ViewPortHandler.isFullyZoomedOutY
+import com.github.mikephil.charting.utils.Transformer.getValuesByTouchPoint
+import com.github.mikephil.charting.utils.ViewPortHandler.contentLeft
+import com.github.mikephil.charting.utils.ViewPortHandler.contentTop
+import com.github.mikephil.charting.utils.ViewPortHandler.contentBottom
+import com.github.mikephil.charting.utils.MPPointD.Companion.recycleInstance
+import com.github.mikephil.charting.utils.Utils.roundToNextSignificant
+import com.github.mikephil.charting.utils.Utils.nextUp
+import com.github.mikephil.charting.utils.ViewPortHandler.scaleX
+import com.github.mikephil.charting.utils.ViewPortHandler.isFullyZoomedOutX
+import com.github.mikephil.charting.utils.ViewPortHandler.contentRight
+import com.github.mikephil.charting.utils.Utils.calcTextSize
+import com.github.mikephil.charting.utils.Utils.calcTextHeight
+import com.github.mikephil.charting.utils.Utils.getSizeOfRotatedRectangleByDegrees
+import com.github.mikephil.charting.utils.FSize.Companion.recycleInstance
+import com.github.mikephil.charting.utils.MPPointF.Companion.recycleInstance
+import com.github.mikephil.charting.utils.Transformer.pointValuesToPixel
+import com.github.mikephil.charting.utils.ViewPortHandler.isInBoundsX
+import com.github.mikephil.charting.utils.Utils.calcTextWidth
+import com.github.mikephil.charting.utils.ViewPortHandler.offsetRight
+import com.github.mikephil.charting.utils.ViewPortHandler.chartWidth
+import com.github.mikephil.charting.utils.Utils.drawXAxisValue
+import com.github.mikephil.charting.utils.ViewPortHandler.contentRect
+import com.github.mikephil.charting.utils.ViewPortHandler.offsetLeft
+import com.github.mikephil.charting.utils.Transformer.getPixelForValues
+import com.github.mikephil.charting.utils.Utils.getLineHeight
+import com.github.mikephil.charting.utils.Utils.getLineSpacing
+import com.github.mikephil.charting.utils.ViewPortHandler.chartHeight
+import com.github.mikephil.charting.utils.Transformer.rectValueToPixel
+import com.github.mikephil.charting.utils.ViewPortHandler.isInBoundsLeft
+import com.github.mikephil.charting.utils.ViewPortHandler.isInBoundsRight
+import com.github.mikephil.charting.utils.Fill.fillRect
+import com.github.mikephil.charting.utils.Transformer.rectToPixelPhase
+import com.github.mikephil.charting.utils.ViewPortHandler.isInBoundsY
+import com.github.mikephil.charting.utils.Utils.drawImage
+import com.github.mikephil.charting.utils.ViewPortHandler.smallestContentExtension
+import com.github.mikephil.charting.utils.Transformer.pathValueToPixel
+import com.github.mikephil.charting.utils.ViewPortHandler.isInBoundsTop
+import com.github.mikephil.charting.utils.ViewPortHandler.isInBoundsBottom
+import com.github.mikephil.charting.utils.Transformer.generateTransformedValuesLine
+import com.github.mikephil.charting.utils.Utils.sDKInt
+import com.github.mikephil.charting.utils.Utils.getPosition
+import com.github.mikephil.charting.utils.ColorTemplate.colorWithAlpha
+import com.github.mikephil.charting.utils.Transformer.generateTransformedValuesBubble
+import com.github.mikephil.charting.utils.Transformer.generateTransformedValuesScatter
+import com.github.mikephil.charting.utils.Transformer.generateTransformedValuesCandle
+import com.github.mikephil.charting.utils.Transformer.rectToPixelPhaseHorizontal
+import com.github.mikephil.charting.utils.ViewPortHandler.scaleY
+import com.github.mikephil.charting.utils.ViewPortHandler.contentHeight
+import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet
+import com.github.mikephil.charting.renderer.scatter.IShapeRenderer
+import com.github.mikephil.charting.components.AxisBase
+import com.github.mikephil.charting.animation.ChartAnimator
+import com.github.mikephil.charting.interfaces.dataprovider.ChartInterface
+import com.github.mikephil.charting.interfaces.datasets.IDataSet
+import com.github.mikephil.charting.formatter.IValueFormatter
+import android.graphics.Paint.Align
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.renderer.AxisRenderer
+import com.github.mikephil.charting.components.XAxis.XAxisPosition
+import com.github.mikephil.charting.components.LimitLine
+import com.github.mikephil.charting.components.LimitLine.LimitLabelPosition
+import com.github.mikephil.charting.components.YAxis
+import com.github.mikephil.charting.components.YAxis.AxisDependency
+import com.github.mikephil.charting.components.YAxis.YAxisLabelPosition
+import com.github.mikephil.charting.components.Legend
+import com.github.mikephil.charting.components.LegendEntry
+import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
+import com.github.mikephil.charting.interfaces.datasets.IPieDataSet
+import com.github.mikephil.charting.interfaces.datasets.ICandleDataSet
+import com.github.mikephil.charting.components.Legend.LegendOrientation
+import com.github.mikephil.charting.components.Legend.LegendHorizontalAlignment
+import com.github.mikephil.charting.components.Legend.LegendVerticalAlignment
+import com.github.mikephil.charting.components.Legend.LegendDirection
+import com.github.mikephil.charting.components.Legend.LegendForm
+import com.github.mikephil.charting.interfaces.dataprovider.BarDataProvider
+import com.github.mikephil.charting.renderer.BarLineScatterCandleBubbleRenderer
+import com.github.mikephil.charting.buffer.BarBuffer
+import android.graphics.drawable.Drawable
+import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.renderer.DataRenderer
+import android.text.TextPaint
+import android.text.StaticLayout
+import com.github.mikephil.charting.data.PieDataSet.ValuePosition
+import android.os.Build
+import android.text.Layout
+import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider
+import com.github.mikephil.charting.renderer.LineRadarRenderer
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
+import com.github.mikephil.charting.renderer.BarLineScatterCandleBubbleRenderer.XBounds
+import com.github.mikephil.charting.renderer.LineChartRenderer.DataSetImageCache
+import com.github.mikephil.charting.renderer.LineScatterCandleRadarRenderer
+import com.github.mikephil.charting.charts.RadarChart
+import com.github.mikephil.charting.interfaces.datasets.IRadarDataSet
+import com.github.mikephil.charting.interfaces.dataprovider.BubbleDataProvider
+import com.github.mikephil.charting.interfaces.datasets.IBubbleDataSet
+import com.github.mikephil.charting.interfaces.dataprovider.ScatterDataProvider
+import com.github.mikephil.charting.charts.CombinedChart
+import com.github.mikephil.charting.charts.Chart
+import com.github.mikephil.charting.charts.CombinedChart.DrawOrder
+import com.github.mikephil.charting.renderer.BarChartRenderer
+import com.github.mikephil.charting.renderer.BubbleChartRenderer
+import com.github.mikephil.charting.renderer.LineChartRenderer
+import com.github.mikephil.charting.renderer.CandleStickChartRenderer
+import com.github.mikephil.charting.renderer.ScatterChartRenderer
+import com.github.mikephil.charting.renderer.XAxisRenderer
+import com.github.mikephil.charting.renderer.YAxisRenderer
+import com.github.mikephil.charting.interfaces.dataprovider.CandleDataProvider
+import com.github.mikephil.charting.buffer.HorizontalBarBuffer
+import com.github.mikephil.charting.interfaces.datasets.ILineScatterCandleRadarDataSet
+import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.data.*
+import com.github.mikephil.charting.highlight.Highlight
+import com.github.mikephil.charting.interfaces.datasets.IBarLineScatterCandleBubbleDataSet
+import com.github.mikephil.charting.interfaces.dataprovider.BarLineScatterCandleBubbleDataProvider
+import com.github.mikephil.charting.utils.*
+import java.lang.ref.WeakReference
 
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Paint.Align;
-import android.graphics.Paint.Style;
-import android.graphics.Path;
-import android.graphics.RectF;
-import android.graphics.drawable.Drawable;
-import android.os.Build;
-import android.text.Layout;
-import android.text.StaticLayout;
-import android.text.TextPaint;
-
-import com.github.mikephil.charting.animation.ChartAnimator;
-import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.PieData;
-import com.github.mikephil.charting.data.PieDataSet;
-import com.github.mikephil.charting.data.PieEntry;
-import com.github.mikephil.charting.formatter.IValueFormatter;
-import com.github.mikephil.charting.highlight.Highlight;
-import com.github.mikephil.charting.interfaces.datasets.IPieDataSet;
-import com.github.mikephil.charting.utils.ColorTemplate;
-import com.github.mikephil.charting.utils.MPPointF;
-import com.github.mikephil.charting.utils.Utils;
-import com.github.mikephil.charting.utils.ViewPortHandler;
-
-import java.lang.ref.WeakReference;
-import java.util.List;
-
-public class PieChartRenderer extends DataRenderer {
-
-    protected PieChart mChart;
-
+class PieChartRenderer(
+    protected var mChart: PieChart, animator: ChartAnimator?,
+    viewPortHandler: ViewPortHandler?
+) : DataRenderer(animator, viewPortHandler) {
     /**
      * paint for the hole in the center of the pie chart and the transparent
      * circle
      */
-    protected Paint mHolePaint;
-    protected Paint mTransparentCirclePaint;
-    protected Paint mValueLinePaint;
+    var paintHole: Paint
+        protected set
+    var paintTransparentCircle: Paint
+        protected set
+    protected var mValueLinePaint: Paint
 
     /**
      * paint object for the text that can be displayed in the center of the
      * chart
      */
-    private TextPaint mCenterTextPaint;
+    val paintCenterText: TextPaint
 
     /**
      * paint object used for drwing the slice-text
      */
-    private Paint mEntryLabelsPaint;
-
-    private StaticLayout mCenterTextLayout;
-    private CharSequence mCenterTextLastValue;
-    private RectF mCenterTextLastBounds = new RectF();
-    private RectF[] mRectBuffer = {new RectF(), new RectF(), new RectF()};
+    val paintEntryLabels: Paint
+    private var mCenterTextLayout: StaticLayout? = null
+    private var mCenterTextLastValue: CharSequence? = null
+    private val mCenterTextLastBounds = RectF()
+    private val mRectBuffer = arrayOf(RectF(), RectF(), RectF())
 
     /**
      * Bitmap for drawing the center hole
      */
-    protected WeakReference<Bitmap> mDrawBitmap;
-
-    protected Canvas mBitmapCanvas;
-
-    public PieChartRenderer(PieChart chart, ChartAnimator animator,
-                            ViewPortHandler viewPortHandler) {
-        super(animator, viewPortHandler);
-        mChart = chart;
-
-        mHolePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mHolePaint.setColor(Color.WHITE);
-        mHolePaint.setStyle(Style.FILL);
-
-        mTransparentCirclePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mTransparentCirclePaint.setColor(Color.WHITE);
-        mTransparentCirclePaint.setStyle(Style.FILL);
-        mTransparentCirclePaint.setAlpha(105);
-
-        mCenterTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-        mCenterTextPaint.setColor(Color.BLACK);
-        mCenterTextPaint.setTextSize(Utils.convertDpToPixel(12f));
-
-        mValuePaint.setTextSize(Utils.convertDpToPixel(13f));
-        mValuePaint.setColor(Color.WHITE);
-        mValuePaint.setTextAlign(Align.CENTER);
-
-        mEntryLabelsPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mEntryLabelsPaint.setColor(Color.WHITE);
-        mEntryLabelsPaint.setTextAlign(Align.CENTER);
-        mEntryLabelsPaint.setTextSize(Utils.convertDpToPixel(13f));
-
-        mValueLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mValueLinePaint.setStyle(Style.STROKE);
-    }
-
-    public Paint getPaintHole() {
-        return mHolePaint;
-    }
-
-    public Paint getPaintTransparentCircle() {
-        return mTransparentCirclePaint;
-    }
-
-    public TextPaint getPaintCenterText() {
-        return mCenterTextPaint;
-    }
-
-    public Paint getPaintEntryLabels() {
-        return mEntryLabelsPaint;
-    }
-
-    @Override
-    public void initBuffers() {
+    protected var mDrawBitmap: WeakReference<Bitmap?>? = null
+    protected var mBitmapCanvas: Canvas? = null
+    override fun initBuffers() {
         // TODO Auto-generated method stub
     }
 
-    @Override
-    public void drawData(Canvas c) {
-
-        int width = (int) mViewPortHandler.getChartWidth();
-        int height = (int) mViewPortHandler.getChartHeight();
-
-        Bitmap drawBitmap = mDrawBitmap == null ? null : mDrawBitmap.get();
-
-        if (drawBitmap == null
-                || (drawBitmap.getWidth() != width)
-                || (drawBitmap.getHeight() != height)) {
-
+    override fun drawData(c: Canvas) {
+        val width = mViewPortHandler.chartWidth.toInt()
+        val height = mViewPortHandler.chartHeight.toInt()
+        var drawBitmap = if (mDrawBitmap == null) null else mDrawBitmap!!.get()
+        if (drawBitmap == null || drawBitmap.width != width
+            || drawBitmap.height != height
+        ) {
             if (width > 0 && height > 0) {
-                drawBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_4444);
-                mDrawBitmap = new WeakReference<>(drawBitmap);
-                mBitmapCanvas = new Canvas(drawBitmap);
-            } else
-                return;
+                drawBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_4444)
+                mDrawBitmap = WeakReference(drawBitmap)
+                mBitmapCanvas = Canvas(drawBitmap)
+            } else return
         }
-
-        drawBitmap.eraseColor(Color.TRANSPARENT);
-
-        PieData pieData = mChart.getData();
-
-        for (IPieDataSet set : pieData.getDataSets()) {
-
-            if (set.isVisible() && set.getEntryCount() > 0)
-                drawDataSet(c, set);
+        drawBitmap!!.eraseColor(Color.TRANSPARENT)
+        val pieData = mChart.data
+        for (set in pieData.dataSets) {
+            if (set.isVisible && set.entryCount > 0) drawDataSet(c, set)
         }
     }
 
-    private Path mPathBuffer = new Path();
-    private RectF mInnerRectBuffer = new RectF();
-
-    protected float calculateMinimumRadiusForSpacedSlice(
-            MPPointF center,
-            float radius,
-            float angle,
-            float arcStartPointX,
-            float arcStartPointY,
-            float startAngle,
-            float sweepAngle) {
-        final float angleMiddle = startAngle + sweepAngle / 2.f;
+    private val mPathBuffer = Path()
+    private val mInnerRectBuffer = RectF()
+    protected fun calculateMinimumRadiusForSpacedSlice(
+        center: MPPointF,
+        radius: Float,
+        angle: Float,
+        arcStartPointX: Float,
+        arcStartPointY: Float,
+        startAngle: Float,
+        sweepAngle: Float
+    ): Float {
+        val angleMiddle = startAngle + sweepAngle / 2f
 
         // Other point of the arc
-        float arcEndPointX = center.x + radius * (float) Math.cos((startAngle + sweepAngle) * Utils.FDEG2RAD);
-        float arcEndPointY = center.y + radius * (float) Math.sin((startAngle + sweepAngle) * Utils.FDEG2RAD);
+        val arcEndPointX =
+            center.x + radius * Math.cos(((startAngle + sweepAngle) * Utils.FDEG2RAD).toDouble())
+                .toFloat()
+        val arcEndPointY =
+            center.y + radius * Math.sin(((startAngle + sweepAngle) * Utils.FDEG2RAD).toDouble())
+                .toFloat()
 
         // Middle point on the arc
-        float arcMidPointX = center.x + radius * (float) Math.cos(angleMiddle * Utils.FDEG2RAD);
-        float arcMidPointY = center.y + radius * (float) Math.sin(angleMiddle * Utils.FDEG2RAD);
+        val arcMidPointX =
+            center.x + radius * Math.cos((angleMiddle * Utils.FDEG2RAD).toDouble()).toFloat()
+        val arcMidPointY =
+            center.y + radius * Math.sin((angleMiddle * Utils.FDEG2RAD).toDouble()).toFloat()
 
         // This is the base of the contained triangle
-        double basePointsDistance = Math.sqrt(
-                Math.pow(arcEndPointX - arcStartPointX, 2) +
-                        Math.pow(arcEndPointY - arcStartPointY, 2));
+        val basePointsDistance = Math.sqrt(
+            Math.pow((arcEndPointX - arcStartPointX).toDouble(), 2.0) +
+                    Math.pow((arcEndPointY - arcStartPointY).toDouble(), 2.0)
+        )
 
         // After reducing space from both sides of the "slice",
         //   the angle of the contained triangle should stay the same.
         // So let's find out the height of that triangle.
-        float containedTriangleHeight = (float) (basePointsDistance / 2.0 *
-                Math.tan((180.0 - angle) / 2.0 * Utils.DEG2RAD));
+        val containedTriangleHeight = (basePointsDistance / 2.0 *
+                Math.tan((180.0 - angle) / 2.0 * Utils.DEG2RAD)).toFloat()
 
         // Now we subtract that from the radius
-        float spacedRadius = radius - containedTriangleHeight;
+        var spacedRadius = radius - containedTriangleHeight
 
         // And now subtract the height of the arc that's between the triangle and the outer circle
         spacedRadius -= Math.sqrt(
-                Math.pow(arcMidPointX - (arcEndPointX + arcStartPointX) / 2.f, 2) +
-                        Math.pow(arcMidPointY - (arcEndPointY + arcStartPointY) / 2.f, 2));
-
-        return spacedRadius;
+            Math.pow((arcMidPointX - (arcEndPointX + arcStartPointX) / 2f).toDouble(), 2.0) +
+                    Math.pow((arcMidPointY - (arcEndPointY + arcStartPointY) / 2f).toDouble(), 2.0)
+        ).toFloat()
+        return spacedRadius
     }
 
     /**
@@ -200,463 +235,382 @@ public class PieChartRenderer extends DataRenderer {
      * @param dataSet
      * @return
      */
-    protected float getSliceSpace(IPieDataSet dataSet) {
-
-        if (!dataSet.isAutomaticallyDisableSliceSpacingEnabled())
-            return dataSet.getSliceSpace();
-
-        float spaceSizeRatio = dataSet.getSliceSpace() / mViewPortHandler.getSmallestContentExtension();
-        float minValueRatio = dataSet.getYMin() / mChart.getData().getYValueSum() * 2;
-
-        float sliceSpace = spaceSizeRatio > minValueRatio ? 0f : dataSet.getSliceSpace();
-
-        return sliceSpace;
+    protected fun getSliceSpace(dataSet: IPieDataSet): Float {
+        if (!dataSet.isAutomaticallyDisableSliceSpacingEnabled) return dataSet.sliceSpace
+        val spaceSizeRatio =
+            dataSet.sliceSpace / mViewPortHandler.smallestContentExtension
+        val minValueRatio = dataSet.yMin / mChart.data.yValueSum * 2
+        return if (spaceSizeRatio > minValueRatio) 0f else dataSet.sliceSpace
     }
 
-    protected void drawDataSet(Canvas c, IPieDataSet dataSet) {
-
-        float angle = 0;
-        float rotationAngle = mChart.getRotationAngle();
-
-        float phaseX = mAnimator.getPhaseX();
-        float phaseY = mAnimator.getPhaseY();
-
-        final RectF circleBox = mChart.getCircleBox();
-
-        final int entryCount = dataSet.getEntryCount();
-        final float[] drawAngles = mChart.getDrawAngles();
-        final MPPointF center = mChart.getCenterCircleBox();
-        final float radius = mChart.getRadius();
-        final boolean drawInnerArc = mChart.isDrawHoleEnabled() && !mChart.isDrawSlicesUnderHoleEnabled();
-        final float userInnerRadius = drawInnerArc
-                ? radius * (mChart.getHoleRadius() / 100.f)
-                : 0.f;
-        final float roundedRadius = (radius - (radius * mChart.getHoleRadius() / 100f)) / 2f;
-        final RectF roundedCircleBox = new RectF();
-        final boolean drawRoundedSlices = drawInnerArc && mChart.isDrawRoundedSlicesEnabled();
-
-        int visibleAngleCount = 0;
-        for (int j = 0; j < entryCount; j++) {
+    protected fun drawDataSet(c: Canvas?, dataSet: IPieDataSet) {
+        var angle = 0f
+        val rotationAngle = mChart.rotationAngle
+        val phaseX = mAnimator.phaseX
+        val phaseY = mAnimator.phaseY
+        val circleBox = mChart.circleBox
+        val entryCount = dataSet.entryCount
+        val drawAngles = mChart.drawAngles
+        val center = mChart.centerCircleBox
+        val radius = mChart.radius
+        val drawInnerArc = mChart.isDrawHoleEnabled && !mChart.isDrawSlicesUnderHoleEnabled
+        val userInnerRadius = if (drawInnerArc) radius * (mChart.holeRadius / 100f) else 0f
+        val roundedRadius = (radius - radius * mChart.holeRadius / 100f) / 2f
+        val roundedCircleBox = RectF()
+        val drawRoundedSlices = drawInnerArc && mChart.isDrawRoundedSlicesEnabled
+        var visibleAngleCount = 0
+        for (j in 0 until entryCount) {
             // draw only if the value is greater than zero
-            if ((Math.abs(dataSet.getEntryForIndex(j).getY()) > Utils.FLOAT_EPSILON)) {
-                visibleAngleCount++;
+            if (Math.abs(dataSet.getEntryForIndex(j).y) > Utils.FLOAT_EPSILON) {
+                visibleAngleCount++
             }
         }
-
-        final float sliceSpace = visibleAngleCount <= 1 ? 0.f : getSliceSpace(dataSet);
-
-        for (int j = 0; j < entryCount; j++) {
-
-            float sliceAngle = drawAngles[j];
-            float innerRadius = userInnerRadius;
-
-            Entry e = dataSet.getEntryForIndex(j);
+        val sliceSpace = if (visibleAngleCount <= 1) 0f else getSliceSpace(dataSet)
+        for (j in 0 until entryCount) {
+            val sliceAngle = drawAngles[j]
+            var innerRadius = userInnerRadius
+            val e: Entry = dataSet.getEntryForIndex(j)
 
             // draw only if the value is greater than zero
-            if (!(Math.abs(e.getY()) > Utils.FLOAT_EPSILON)) {
-                angle += sliceAngle * phaseX;
-                continue;
+            if (Math.abs(e.y) <= Utils.FLOAT_EPSILON) {
+                angle += sliceAngle * phaseX
+                continue
             }
 
             // Don't draw if it's highlighted, unless the chart uses rounded slices
-            if (dataSet.isHighlightEnabled() && mChart.needsHighlight(j) && !drawRoundedSlices) {
-                angle += sliceAngle * phaseX;
-                continue;
+            if (dataSet.isHighlightEnabled && mChart.needsHighlight(j) && !drawRoundedSlices) {
+                angle += sliceAngle * phaseX
+                continue
             }
-
-            final boolean accountForSliceSpacing = sliceSpace > 0.f && sliceAngle <= 180.f;
-
-            mRenderPaint.setColor(dataSet.getColor(j));
-
-            final float sliceSpaceAngleOuter = visibleAngleCount == 1 ?
-                    0.f :
-                    sliceSpace / (Utils.FDEG2RAD * radius);
-            final float startAngleOuter = rotationAngle + (angle + sliceSpaceAngleOuter / 2.f) * phaseY;
-            float sweepAngleOuter = (sliceAngle - sliceSpaceAngleOuter) * phaseY;
-            if (sweepAngleOuter < 0.f) {
-                sweepAngleOuter = 0.f;
+            val accountForSliceSpacing = sliceSpace > 0f && sliceAngle <= 180f
+            mRenderPaint.color = dataSet.getColor(j)
+            val sliceSpaceAngleOuter =
+                if (visibleAngleCount == 1) 0f else sliceSpace / (Utils.FDEG2RAD * radius)
+            val startAngleOuter = rotationAngle + (angle + sliceSpaceAngleOuter / 2f) * phaseY
+            var sweepAngleOuter = (sliceAngle - sliceSpaceAngleOuter) * phaseY
+            if (sweepAngleOuter < 0f) {
+                sweepAngleOuter = 0f
             }
-
-            mPathBuffer.reset();
-
+            mPathBuffer.reset()
             if (drawRoundedSlices) {
-                float x = center.x + (radius - roundedRadius) * (float) Math.cos(startAngleOuter * Utils.FDEG2RAD);
-                float y = center.y + (radius - roundedRadius) * (float) Math.sin(startAngleOuter * Utils.FDEG2RAD);
-                roundedCircleBox.set(x - roundedRadius, y - roundedRadius, x + roundedRadius, y + roundedRadius);
+                val x =
+                    center.x + (radius - roundedRadius) * Math.cos((startAngleOuter * Utils.FDEG2RAD).toDouble())
+                        .toFloat()
+                val y =
+                    center.y + (radius - roundedRadius) * Math.sin((startAngleOuter * Utils.FDEG2RAD).toDouble())
+                        .toFloat()
+                roundedCircleBox[x - roundedRadius, y - roundedRadius, x + roundedRadius] =
+                    y + roundedRadius
             }
-
-            float arcStartPointX = center.x + radius * (float) Math.cos(startAngleOuter * Utils.FDEG2RAD);
-            float arcStartPointY = center.y + radius * (float) Math.sin(startAngleOuter * Utils.FDEG2RAD);
-
-            if (sweepAngleOuter >= 360.f && sweepAngleOuter % 360f <= Utils.FLOAT_EPSILON) {
+            val arcStartPointX =
+                center.x + radius * Math.cos((startAngleOuter * Utils.FDEG2RAD).toDouble())
+                    .toFloat()
+            val arcStartPointY =
+                center.y + radius * Math.sin((startAngleOuter * Utils.FDEG2RAD).toDouble())
+                    .toFloat()
+            if (sweepAngleOuter >= 360f && sweepAngleOuter % 360f <= Utils.FLOAT_EPSILON) {
                 // Android is doing "mod 360"
-                mPathBuffer.addCircle(center.x, center.y, radius, Path.Direction.CW);
+                mPathBuffer.addCircle(center.x, center.y, radius, Path.Direction.CW)
             } else {
-
                 if (drawRoundedSlices) {
-                    mPathBuffer.arcTo(roundedCircleBox, startAngleOuter + 180, -180);
+                    mPathBuffer.arcTo(roundedCircleBox, startAngleOuter + 180, -180f)
                 }
-
                 mPathBuffer.arcTo(
-                        circleBox,
-                        startAngleOuter,
-                        sweepAngleOuter
-                );
+                    circleBox,
+                    startAngleOuter,
+                    sweepAngleOuter
+                )
             }
 
             // API < 21 does not receive floats in addArc, but a RectF
-            mInnerRectBuffer.set(
-                    center.x - innerRadius,
-                    center.y - innerRadius,
-                    center.x + innerRadius,
-                    center.y + innerRadius);
-
-            if (drawInnerArc && (innerRadius > 0.f || accountForSliceSpacing)) {
-
+            mInnerRectBuffer[center.x - innerRadius, center.y - innerRadius, center.x + innerRadius] =
+                center.y + innerRadius
+            if (drawInnerArc && (innerRadius > 0f || accountForSliceSpacing)) {
                 if (accountForSliceSpacing) {
-                    float minSpacedRadius =
-                            calculateMinimumRadiusForSpacedSlice(
-                                    center, radius,
-                                    sliceAngle * phaseY,
-                                    arcStartPointX, arcStartPointY,
-                                    startAngleOuter,
-                                    sweepAngleOuter);
-
-                    if (minSpacedRadius < 0.f)
-                        minSpacedRadius = -minSpacedRadius;
-
-                    innerRadius = Math.max(innerRadius, minSpacedRadius);
+                    var minSpacedRadius = calculateMinimumRadiusForSpacedSlice(
+                        center, radius,
+                        sliceAngle * phaseY,
+                        arcStartPointX, arcStartPointY,
+                        startAngleOuter,
+                        sweepAngleOuter
+                    )
+                    if (minSpacedRadius < 0f) minSpacedRadius = -minSpacedRadius
+                    innerRadius = Math.max(innerRadius, minSpacedRadius)
                 }
-
-                final float sliceSpaceAngleInner = visibleAngleCount == 1 || innerRadius == 0.f ?
-                        0.f :
-                        sliceSpace / (Utils.FDEG2RAD * innerRadius);
-                final float startAngleInner = rotationAngle + (angle + sliceSpaceAngleInner / 2.f) * phaseY;
-                float sweepAngleInner = (sliceAngle - sliceSpaceAngleInner) * phaseY;
-                if (sweepAngleInner < 0.f) {
-                    sweepAngleInner = 0.f;
+                val sliceSpaceAngleInner =
+                    if (visibleAngleCount == 1 || innerRadius == 0f) 0f else sliceSpace / (Utils.FDEG2RAD * innerRadius)
+                val startAngleInner = rotationAngle + (angle + sliceSpaceAngleInner / 2f) * phaseY
+                var sweepAngleInner = (sliceAngle - sliceSpaceAngleInner) * phaseY
+                if (sweepAngleInner < 0f) {
+                    sweepAngleInner = 0f
                 }
-                final float endAngleInner = startAngleInner + sweepAngleInner;
-
-                if (sweepAngleOuter >= 360.f && sweepAngleOuter % 360f <= Utils.FLOAT_EPSILON) {
+                val endAngleInner = startAngleInner + sweepAngleInner
+                if (sweepAngleOuter >= 360f && sweepAngleOuter % 360f <= Utils.FLOAT_EPSILON) {
                     // Android is doing "mod 360"
-                    mPathBuffer.addCircle(center.x, center.y, innerRadius, Path.Direction.CCW);
+                    mPathBuffer.addCircle(center.x, center.y, innerRadius, Path.Direction.CCW)
                 } else {
-
                     if (drawRoundedSlices) {
-                        float x = center.x + (radius - roundedRadius) * (float) Math.cos(endAngleInner * Utils.FDEG2RAD);
-                        float y = center.y + (radius - roundedRadius) * (float) Math.sin(endAngleInner * Utils.FDEG2RAD);
-                        roundedCircleBox.set(x - roundedRadius, y - roundedRadius, x + roundedRadius, y + roundedRadius);
-                        mPathBuffer.arcTo(roundedCircleBox, endAngleInner, 180);
-                    } else
-                        mPathBuffer.lineTo(
-                                center.x + innerRadius * (float) Math.cos(endAngleInner * Utils.FDEG2RAD),
-                                center.y + innerRadius * (float) Math.sin(endAngleInner * Utils.FDEG2RAD));
-
+                        val x =
+                            center.x + (radius - roundedRadius) * Math.cos((endAngleInner * Utils.FDEG2RAD).toDouble())
+                                .toFloat()
+                        val y =
+                            center.y + (radius - roundedRadius) * Math.sin((endAngleInner * Utils.FDEG2RAD).toDouble())
+                                .toFloat()
+                        roundedCircleBox[x - roundedRadius, y - roundedRadius, x + roundedRadius] =
+                            y + roundedRadius
+                        mPathBuffer.arcTo(roundedCircleBox, endAngleInner, 180f)
+                    } else mPathBuffer.lineTo(
+                        center.x + innerRadius * Math.cos((endAngleInner * Utils.FDEG2RAD).toDouble())
+                            .toFloat(),
+                        center.y + innerRadius * Math.sin((endAngleInner * Utils.FDEG2RAD).toDouble())
+                            .toFloat()
+                    )
                     mPathBuffer.arcTo(
-                            mInnerRectBuffer,
-                            endAngleInner,
-                            -sweepAngleInner
-                    );
+                        mInnerRectBuffer,
+                        endAngleInner,
+                        -sweepAngleInner
+                    )
                 }
             } else {
-
                 if (sweepAngleOuter % 360f > Utils.FLOAT_EPSILON) {
                     if (accountForSliceSpacing) {
-
-                        float angleMiddle = startAngleOuter + sweepAngleOuter / 2.f;
-
-                        float sliceSpaceOffset =
-                                calculateMinimumRadiusForSpacedSlice(
-                                        center,
-                                        radius,
-                                        sliceAngle * phaseY,
-                                        arcStartPointX,
-                                        arcStartPointY,
-                                        startAngleOuter,
-                                        sweepAngleOuter);
-
-                        float arcEndPointX = center.x +
-                                sliceSpaceOffset * (float) Math.cos(angleMiddle * Utils.FDEG2RAD);
-                        float arcEndPointY = center.y +
-                                sliceSpaceOffset * (float) Math.sin(angleMiddle * Utils.FDEG2RAD);
-
+                        val angleMiddle = startAngleOuter + sweepAngleOuter / 2f
+                        val sliceSpaceOffset = calculateMinimumRadiusForSpacedSlice(
+                            center,
+                            radius,
+                            sliceAngle * phaseY,
+                            arcStartPointX,
+                            arcStartPointY,
+                            startAngleOuter,
+                            sweepAngleOuter
+                        )
+                        val arcEndPointX = center.x +
+                                sliceSpaceOffset * Math.cos((angleMiddle * Utils.FDEG2RAD).toDouble())
+                            .toFloat()
+                        val arcEndPointY = center.y +
+                                sliceSpaceOffset * Math.sin((angleMiddle * Utils.FDEG2RAD).toDouble())
+                            .toFloat()
                         mPathBuffer.lineTo(
-                                arcEndPointX,
-                                arcEndPointY);
-
+                            arcEndPointX,
+                            arcEndPointY
+                        )
                     } else {
                         mPathBuffer.lineTo(
-                                center.x,
-                                center.y);
+                            center.x,
+                            center.y
+                        )
                     }
                 }
-
             }
-
-            mPathBuffer.close();
-
-            mBitmapCanvas.drawPath(mPathBuffer, mRenderPaint);
-
-            angle += sliceAngle * phaseX;
+            mPathBuffer.close()
+            mBitmapCanvas!!.drawPath(mPathBuffer, mRenderPaint)
+            angle += sliceAngle * phaseX
         }
-
-        MPPointF.recycleInstance(center);
+        recycleInstance(center)
     }
 
-    @Override
-    public void drawValues(Canvas c) {
-
-        MPPointF center = mChart.getCenterCircleBox();
+    override fun drawValues(c: Canvas) {
+        val center = mChart.centerCircleBox
 
         // get whole the radius
-        float radius = mChart.getRadius();
-        float rotationAngle = mChart.getRotationAngle();
-        float[] drawAngles = mChart.getDrawAngles();
-        float[] absoluteAngles = mChart.getAbsoluteAngles();
-
-        float phaseX = mAnimator.getPhaseX();
-        float phaseY = mAnimator.getPhaseY();
-
-        final float roundedRadius = (radius - (radius * mChart.getHoleRadius() / 100f)) / 2f;
-        final float holeRadiusPercent = mChart.getHoleRadius() / 100.f;
-        float labelRadiusOffset = radius / 10f * 3.6f;
-
-        if (mChart.isDrawHoleEnabled()) {
-            labelRadiusOffset = (radius - (radius * holeRadiusPercent)) / 2f;
-
-            if (!mChart.isDrawSlicesUnderHoleEnabled() && mChart.isDrawRoundedSlicesEnabled()) {
+        val radius = mChart.radius
+        var rotationAngle = mChart.rotationAngle
+        val drawAngles = mChart.drawAngles
+        val absoluteAngles = mChart.absoluteAngles
+        val phaseX = mAnimator.phaseX
+        val phaseY = mAnimator.phaseY
+        val roundedRadius = (radius - radius * mChart.holeRadius / 100f) / 2f
+        val holeRadiusPercent = mChart.holeRadius / 100f
+        var labelRadiusOffset = radius / 10f * 3.6f
+        if (mChart.isDrawHoleEnabled) {
+            labelRadiusOffset = (radius - radius * holeRadiusPercent) / 2f
+            if (!mChart.isDrawSlicesUnderHoleEnabled && mChart.isDrawRoundedSlicesEnabled) {
                 // Add curved circle slice and spacing to rotation angle, so that it sits nicely inside
-                rotationAngle += roundedRadius * 360 / (Math.PI * 2 * radius);
+                rotationAngle += (roundedRadius * 360 / (Math.PI * 2 * radius)).toFloat()
             }
         }
-
-        final float labelRadius = radius - labelRadiusOffset;
-
-        PieData data = mChart.getData();
-        List<IPieDataSet> dataSets = data.getDataSets();
-
-        float yValueSum = data.getYValueSum();
-
-        boolean drawEntryLabels = mChart.isDrawEntryLabelsEnabled();
-
-        float angle;
-        int xIndex = 0;
-
-        c.save();
-
-        float offset = Utils.convertDpToPixel(5.f);
-
-        for (int i = 0; i < dataSets.size(); i++) {
-
-            IPieDataSet dataSet = dataSets.get(i);
-
-            final boolean drawValues = dataSet.isDrawValuesEnabled();
-
-            if (!drawValues && !drawEntryLabels)
-                continue;
-
-            final PieDataSet.ValuePosition xValuePosition = dataSet.getXValuePosition();
-            final PieDataSet.ValuePosition yValuePosition = dataSet.getYValuePosition();
+        val labelRadius = radius - labelRadiusOffset
+        val data = mChart.data
+        val dataSets = data.dataSets
+        val yValueSum = data.yValueSum
+        val drawEntryLabels = mChart.isDrawEntryLabelsEnabled
+        var angle: Float
+        var xIndex = 0
+        c.save()
+        val offset = convertDpToPixel(5f)
+        for (i in dataSets.indices) {
+            val dataSet = dataSets[i]
+            val drawValues = dataSet.isDrawValuesEnabled
+            if (!drawValues && !drawEntryLabels) continue
+            val xValuePosition = dataSet.xValuePosition
+            val yValuePosition = dataSet.yValuePosition
 
             // apply the text-styling defined by the DataSet
-            applyValueTextStyle(dataSet);
-
-            float lineHeight = Utils.calcTextHeight(mValuePaint, "Q")
-                    + Utils.convertDpToPixel(4f);
-
-            IValueFormatter formatter = dataSet.getValueFormatter();
-
-            int entryCount = dataSet.getEntryCount();
-
-            boolean isUseValueColorForLineEnabled = dataSet.isUseValueColorForLineEnabled();
-            int valueLineColor = dataSet.getValueLineColor();
-
-            mValueLinePaint.setStrokeWidth(Utils.convertDpToPixel(dataSet.getValueLineWidth()));
-
-            final float sliceSpace = getSliceSpace(dataSet);
-
-            MPPointF iconsOffset = MPPointF.getInstance(dataSet.getIconsOffset());
-            iconsOffset.x = Utils.convertDpToPixel(iconsOffset.x);
-            iconsOffset.y = Utils.convertDpToPixel(iconsOffset.y);
-
-            for (int j = 0; j < entryCount; j++) {
-
-                PieEntry entry = dataSet.getEntryForIndex(j);
-
-                if (xIndex == 0)
-                    angle = 0.f;
-                else
-                    angle = absoluteAngles[xIndex - 1] * phaseX;
-
-                final float sliceAngle = drawAngles[xIndex];
-                final float sliceSpaceMiddleAngle = sliceSpace / (Utils.FDEG2RAD * labelRadius);
+            applyValueTextStyle(dataSet)
+            val lineHeight = (calcTextHeight(mValuePaint, "Q")
+                    + convertDpToPixel(4f))
+            val formatter = dataSet.valueFormatter
+            val entryCount = dataSet.entryCount
+            val isUseValueColorForLineEnabled = dataSet.isUseValueColorForLineEnabled
+            val valueLineColor = dataSet.valueLineColor
+            mValueLinePaint.strokeWidth = convertDpToPixel(dataSet.valueLineWidth)
+            val sliceSpace = getSliceSpace(dataSet)
+            val iconsOffset = MPPointF.getInstance(dataSet.iconsOffset)
+            iconsOffset.x = convertDpToPixel(iconsOffset.x)
+            iconsOffset.y = convertDpToPixel(iconsOffset.y)
+            for (j in 0 until entryCount) {
+                val entry = dataSet.getEntryForIndex(j)
+                angle = if (xIndex == 0) 0f else absoluteAngles[xIndex - 1] * phaseX
+                val sliceAngle = drawAngles[xIndex]
+                val sliceSpaceMiddleAngle = sliceSpace / (Utils.FDEG2RAD * labelRadius)
 
                 // offset needed to center the drawn text in the slice
-                final float angleOffset = (sliceAngle - sliceSpaceMiddleAngle / 2.f) / 2.f;
-
-                angle = angle + angleOffset;
-
-                final float transformedAngle = rotationAngle + angle * phaseY;
-
-                float value = mChart.isUsePercentValuesEnabled() ? entry.getY()
-                        / yValueSum * 100f : entry.getY();
-                String entryLabel = entry.getLabel();
-
-                final float sliceXBase = (float) Math.cos(transformedAngle * Utils.FDEG2RAD);
-                final float sliceYBase = (float) Math.sin(transformedAngle * Utils.FDEG2RAD);
-
-                final boolean drawXOutside = drawEntryLabels &&
-                        xValuePosition == PieDataSet.ValuePosition.OUTSIDE_SLICE;
-                final boolean drawYOutside = drawValues &&
-                        yValuePosition == PieDataSet.ValuePosition.OUTSIDE_SLICE;
-                final boolean drawXInside = drawEntryLabels &&
-                        xValuePosition == PieDataSet.ValuePosition.INSIDE_SLICE;
-                final boolean drawYInside = drawValues &&
-                        yValuePosition == PieDataSet.ValuePosition.INSIDE_SLICE;
-
+                val angleOffset = (sliceAngle - sliceSpaceMiddleAngle / 2f) / 2f
+                angle = angle + angleOffset
+                val transformedAngle = rotationAngle + angle * phaseY
+                val value: Float = if (mChart.isUsePercentValuesEnabled) entry.y
+                / yValueSum * 100f else entry.getY()
+                val entryLabel = entry.label
+                val sliceXBase = Math.cos((transformedAngle * Utils.FDEG2RAD).toDouble()).toFloat()
+                val sliceYBase = Math.sin((transformedAngle * Utils.FDEG2RAD).toDouble()).toFloat()
+                val drawXOutside = drawEntryLabels &&
+                        xValuePosition == ValuePosition.OUTSIDE_SLICE
+                val drawYOutside = drawValues &&
+                        yValuePosition == ValuePosition.OUTSIDE_SLICE
+                val drawXInside = drawEntryLabels &&
+                        xValuePosition == ValuePosition.INSIDE_SLICE
+                val drawYInside = drawValues &&
+                        yValuePosition == ValuePosition.INSIDE_SLICE
                 if (drawXOutside || drawYOutside) {
-
-                    final float valueLineLength1 = dataSet.getValueLinePart1Length();
-                    final float valueLineLength2 = dataSet.getValueLinePart2Length();
-                    final float valueLinePart1OffsetPercentage = dataSet.getValueLinePart1OffsetPercentage() / 100.f;
-
-                    float pt2x, pt2y;
-                    float labelPtx, labelPty;
-
-                    float line1Radius;
-
-                    if (mChart.isDrawHoleEnabled())
-                        line1Radius = (radius - (radius * holeRadiusPercent))
-                                * valueLinePart1OffsetPercentage
-                                + (radius * holeRadiusPercent);
-                    else
-                        line1Radius = radius * valueLinePart1OffsetPercentage;
-
-                    final float polyline2Width = dataSet.isValueLineVariableLength()
-                            ? labelRadius * valueLineLength2 * (float) Math.abs(Math.sin(
-                            transformedAngle * Utils.FDEG2RAD))
-                            : labelRadius * valueLineLength2;
-
-                    final float pt0x = line1Radius * sliceXBase + center.x;
-                    final float pt0y = line1Radius * sliceYBase + center.y;
-
-                    final float pt1x = labelRadius * (1 + valueLineLength1) * sliceXBase + center.x;
-                    final float pt1y = labelRadius * (1 + valueLineLength1) * sliceYBase + center.y;
-
+                    val valueLineLength1 = dataSet.valueLinePart1Length
+                    val valueLineLength2 = dataSet.valueLinePart2Length
+                    val valueLinePart1OffsetPercentage =
+                        dataSet.valueLinePart1OffsetPercentage / 100f
+                    var pt2x: Float
+                    var pt2y: Float
+                    var labelPtx: Float
+                    var labelPty: Float
+                    var line1Radius: Float
+                    line1Radius =
+                        if (mChart.isDrawHoleEnabled) (radius - radius * holeRadiusPercent)
+                    * valueLinePart1OffsetPercentage
+                    +radius * holeRadiusPercent else radius * valueLinePart1OffsetPercentage
+                    val polyline2Width =
+                        if (dataSet.isValueLineVariableLength) labelRadius * valueLineLength2 * Math.abs(
+                            Math.sin(
+                                (
+                                        transformedAngle * Utils.FDEG2RAD).toDouble()
+                            )
+                        ).toFloat() else labelRadius * valueLineLength2
+                    val pt0x = line1Radius * sliceXBase + center.x
+                    val pt0y = line1Radius * sliceYBase + center.y
+                    val pt1x = labelRadius * (1 + valueLineLength1) * sliceXBase + center.x
+                    val pt1y = labelRadius * (1 + valueLineLength1) * sliceYBase + center.y
                     if (transformedAngle % 360.0 >= 90.0 && transformedAngle % 360.0 <= 270.0) {
-                        pt2x = pt1x - polyline2Width;
-                        pt2y = pt1y;
-
-                        mValuePaint.setTextAlign(Align.RIGHT);
-
-                        if(drawXOutside)
-                            mEntryLabelsPaint.setTextAlign(Align.RIGHT);
-
-                        labelPtx = pt2x - offset;
-                        labelPty = pt2y;
+                        pt2x = pt1x - polyline2Width
+                        pt2y = pt1y
+                        mValuePaint.textAlign = Align.RIGHT
+                        if (drawXOutside) paintEntryLabels.textAlign = Align.RIGHT
+                        labelPtx = pt2x - offset
+                        labelPty = pt2y
                     } else {
-                        pt2x = pt1x + polyline2Width;
-                        pt2y = pt1y;
-                        mValuePaint.setTextAlign(Align.LEFT);
-
-                        if(drawXOutside)
-                            mEntryLabelsPaint.setTextAlign(Align.LEFT);
-
-                        labelPtx = pt2x + offset;
-                        labelPty = pt2y;
+                        pt2x = pt1x + polyline2Width
+                        pt2y = pt1y
+                        mValuePaint.textAlign = Align.LEFT
+                        if (drawXOutside) paintEntryLabels.textAlign = Align.LEFT
+                        labelPtx = pt2x + offset
+                        labelPty = pt2y
                     }
-
-                    int lineColor = ColorTemplate.COLOR_NONE;
-
-                    if (isUseValueColorForLineEnabled)
-                        lineColor = dataSet.getColor(j);
-                    else if (valueLineColor != ColorTemplate.COLOR_NONE)
-                        lineColor = valueLineColor;
-
+                    var lineColor = ColorTemplate.COLOR_NONE
+                    if (isUseValueColorForLineEnabled) lineColor =
+                        dataSet.getColor(j) else if (valueLineColor != ColorTemplate.COLOR_NONE) lineColor =
+                        valueLineColor
                     if (lineColor != ColorTemplate.COLOR_NONE) {
-                        mValueLinePaint.setColor(lineColor);
-                        c.drawLine(pt0x, pt0y, pt1x, pt1y, mValueLinePaint);
-                        c.drawLine(pt1x, pt1y, pt2x, pt2y, mValueLinePaint);
+                        mValueLinePaint.color = lineColor
+                        c.drawLine(pt0x, pt0y, pt1x, pt1y, mValueLinePaint)
+                        c.drawLine(pt1x, pt1y, pt2x, pt2y, mValueLinePaint)
                     }
 
                     // draw everything, depending on settings
                     if (drawXOutside && drawYOutside) {
-
-                        drawValue(c,
-                                formatter,
-                                value,
-                                entry,
-                                0,
-                                labelPtx,
-                                labelPty,
-                                dataSet.getValueTextColor(j));
-
-                        if (j < data.getEntryCount() && entryLabel != null) {
-                            drawEntryLabel(c, entryLabel, labelPtx, labelPty + lineHeight);
+                        drawValue(
+                            c,
+                            formatter,
+                            value,
+                            entry,
+                            0,
+                            labelPtx,
+                            labelPty,
+                            dataSet.getValueTextColor(j)
+                        )
+                        if (j < data.entryCount && entryLabel != null) {
+                            drawEntryLabel(c, entryLabel, labelPtx, labelPty + lineHeight)
                         }
-
                     } else if (drawXOutside) {
-                        if (j < data.getEntryCount() && entryLabel != null) {
-                            drawEntryLabel(c, entryLabel, labelPtx, labelPty + lineHeight / 2.f);
+                        if (j < data.entryCount && entryLabel != null) {
+                            drawEntryLabel(c, entryLabel, labelPtx, labelPty + lineHeight / 2f)
                         }
                     } else if (drawYOutside) {
-
-                        drawValue(c, formatter, value, entry, 0, labelPtx, labelPty + lineHeight / 2.f, dataSet
-                                .getValueTextColor(j));
+                        drawValue(
+                            c,
+                            formatter,
+                            value,
+                            entry,
+                            0,
+                            labelPtx,
+                            labelPty + lineHeight / 2f,
+                            dataSet
+                                .getValueTextColor(j)
+                        )
                     }
                 }
-
                 if (drawXInside || drawYInside) {
                     // calculate the text position
-                    float x = labelRadius * sliceXBase + center.x;
-                    float y = labelRadius * sliceYBase + center.y;
-
-                    mValuePaint.setTextAlign(Align.CENTER);
+                    val x = labelRadius * sliceXBase + center.x
+                    val y = labelRadius * sliceYBase + center.y
+                    mValuePaint.textAlign = Align.CENTER
 
                     // draw everything, depending on settings
                     if (drawXInside && drawYInside) {
-
-                        drawValue(c, formatter, value, entry, 0, x, y, dataSet.getValueTextColor(j));
-
-                        if (j < data.getEntryCount() && entryLabel != null) {
-                            drawEntryLabel(c, entryLabel, x, y + lineHeight);
+                        drawValue(c, formatter, value, entry, 0, x, y, dataSet.getValueTextColor(j))
+                        if (j < data.entryCount && entryLabel != null) {
+                            drawEntryLabel(c, entryLabel, x, y + lineHeight)
                         }
-
                     } else if (drawXInside) {
-                        if (j < data.getEntryCount() && entryLabel != null) {
-                            drawEntryLabel(c, entryLabel, x, y + lineHeight / 2f);
+                        if (j < data.entryCount && entryLabel != null) {
+                            drawEntryLabel(c, entryLabel, x, y + lineHeight / 2f)
                         }
                     } else if (drawYInside) {
-
-                        drawValue(c, formatter, value, entry, 0, x, y + lineHeight / 2f, dataSet.getValueTextColor(j));
+                        drawValue(
+                            c,
+                            formatter,
+                            value,
+                            entry,
+                            0,
+                            x,
+                            y + lineHeight / 2f,
+                            dataSet.getValueTextColor(j)
+                        )
                     }
                 }
-
-                if (entry.getIcon() != null && dataSet.isDrawIconsEnabled()) {
-
-                    Drawable icon = entry.getIcon();
-
-                    float x = (labelRadius + iconsOffset.y) * sliceXBase + center.x;
-                    float y = (labelRadius + iconsOffset.y) * sliceYBase + center.y;
-                    y += iconsOffset.x;
-
-                    Utils.drawImage(
-                            c,
-                            icon,
-                            (int)x,
-                            (int)y,
-                            icon.getIntrinsicWidth(),
-                            icon.getIntrinsicHeight());
+                if (entry.icon != null && dataSet.isDrawIconsEnabled) {
+                    val icon = entry.icon
+                    val x = (labelRadius + iconsOffset.y) * sliceXBase + center.x
+                    var y = (labelRadius + iconsOffset.y) * sliceYBase + center.y
+                    y += iconsOffset.x
+                    drawImage(
+                        c,
+                        icon, x.toInt(), y.toInt(),
+                        icon.intrinsicWidth,
+                        icon.intrinsicHeight
+                    )
                 }
-
-                xIndex++;
+                xIndex++
             }
-
-            MPPointF.recycleInstance(iconsOffset);
+            recycleInstance(iconsOffset)
         }
-        MPPointF.recycleInstance(center);
-        c.restore();
+        recycleInstance(center)
+        c.restore()
     }
 
     /**
@@ -667,335 +621,275 @@ public class PieChartRenderer extends DataRenderer {
      * @param x
      * @param y
      */
-    protected void drawEntryLabel(Canvas c, String label, float x, float y) {
-        c.drawText(label, x, y, mEntryLabelsPaint);
+    protected fun drawEntryLabel(c: Canvas, label: String?, x: Float, y: Float) {
+        c.drawText(label!!, x, y, paintEntryLabels)
     }
 
-    @Override
-    public void drawExtras(Canvas c) {
-        drawHole(c);
-        c.drawBitmap(mDrawBitmap.get(), 0, 0, null);
-        drawCenterText(c);
+    override fun drawExtras(c: Canvas) {
+        drawHole(c)
+        c.drawBitmap(mDrawBitmap!!.get()!!, 0f, 0f, null)
+        drawCenterText(c)
     }
 
-    private Path mHoleCirclePath = new Path();
+    private val mHoleCirclePath = Path()
 
     /**
      * draws the hole in the center of the chart and the transparent circle /
      * hole
      */
-    protected void drawHole(Canvas c) {
-
-        if (mChart.isDrawHoleEnabled() && mBitmapCanvas != null) {
-
-            float radius = mChart.getRadius();
-            float holeRadius = radius * (mChart.getHoleRadius() / 100);
-            MPPointF center = mChart.getCenterCircleBox();
-
-            if (Color.alpha(mHolePaint.getColor()) > 0) {
+    protected fun drawHole(c: Canvas?) {
+        if (mChart.isDrawHoleEnabled && mBitmapCanvas != null) {
+            val radius = mChart.radius
+            val holeRadius = radius * (mChart.holeRadius / 100)
+            val center = mChart.centerCircleBox
+            if (Color.alpha(paintHole.color) > 0) {
                 // draw the hole-circle
-                mBitmapCanvas.drawCircle(
-                        center.x, center.y,
-                        holeRadius, mHolePaint);
+                mBitmapCanvas!!.drawCircle(
+                    center.x, center.y,
+                    holeRadius, paintHole
+                )
             }
 
             // only draw the circle if it can be seen (not covered by the hole)
-            if (Color.alpha(mTransparentCirclePaint.getColor()) > 0 &&
-                    mChart.getTransparentCircleRadius() > mChart.getHoleRadius()) {
-
-                int alpha = mTransparentCirclePaint.getAlpha();
-                float secondHoleRadius = radius * (mChart.getTransparentCircleRadius() / 100);
-
-                mTransparentCirclePaint.setAlpha((int) ((float) alpha * mAnimator.getPhaseX() * mAnimator.getPhaseY()));
+            if (Color.alpha(paintTransparentCircle.color) > 0 &&
+                mChart.transparentCircleRadius > mChart.holeRadius
+            ) {
+                val alpha = paintTransparentCircle.alpha
+                val secondHoleRadius = radius * (mChart.transparentCircleRadius / 100)
+                paintTransparentCircle.alpha =
+                    (alpha.toFloat() * mAnimator.phaseX * mAnimator.phaseY).toInt()
 
                 // draw the transparent-circle
-                mHoleCirclePath.reset();
-                mHoleCirclePath.addCircle(center.x, center.y, secondHoleRadius, Path.Direction.CW);
-                mHoleCirclePath.addCircle(center.x, center.y, holeRadius, Path.Direction.CCW);
-                mBitmapCanvas.drawPath(mHoleCirclePath, mTransparentCirclePaint);
+                mHoleCirclePath.reset()
+                mHoleCirclePath.addCircle(center.x, center.y, secondHoleRadius, Path.Direction.CW)
+                mHoleCirclePath.addCircle(center.x, center.y, holeRadius, Path.Direction.CCW)
+                mBitmapCanvas!!.drawPath(mHoleCirclePath, paintTransparentCircle)
 
                 // reset alpha
-                mTransparentCirclePaint.setAlpha(alpha);
+                paintTransparentCircle.alpha = alpha
             }
-            MPPointF.recycleInstance(center);
+            recycleInstance(center)
         }
     }
 
-    protected Path mDrawCenterTextPathBuffer = new Path();
+    protected var mDrawCenterTextPathBuffer = Path()
+
     /**
      * draws the description text in the center of the pie chart makes most
      * sense when center-hole is enabled
      */
-    protected void drawCenterText(Canvas c) {
-
-        CharSequence centerText = mChart.getCenterText();
-
-        if (mChart.isDrawCenterTextEnabled() && centerText != null) {
-
-            MPPointF center = mChart.getCenterCircleBox();
-            MPPointF offset = mChart.getCenterTextOffset();
-
-            float x = center.x + offset.x;
-            float y = center.y + offset.y;
-
-            float innerRadius = mChart.isDrawHoleEnabled() && !mChart.isDrawSlicesUnderHoleEnabled()
-                    ? mChart.getRadius() * (mChart.getHoleRadius() / 100f)
-                    : mChart.getRadius();
-
-            RectF holeRect = mRectBuffer[0];
-            holeRect.left = x - innerRadius;
-            holeRect.top = y - innerRadius;
-            holeRect.right = x + innerRadius;
-            holeRect.bottom = y + innerRadius;
-            RectF boundingRect = mRectBuffer[1];
-            boundingRect.set(holeRect);
-
-            float radiusPercent = mChart.getCenterTextRadiusPercent() / 100f;
+    protected fun drawCenterText(c: Canvas) {
+        val centerText = mChart.centerText
+        if (mChart.isDrawCenterTextEnabled && centerText != null) {
+            val center = mChart.centerCircleBox
+            val offset = mChart.centerTextOffset
+            val x = center.x + offset.x
+            val y = center.y + offset.y
+            val innerRadius =
+                if (mChart.isDrawHoleEnabled && !mChart.isDrawSlicesUnderHoleEnabled) mChart.radius * (mChart.holeRadius / 100f) else mChart.radius
+            val holeRect = mRectBuffer[0]
+            holeRect.left = x - innerRadius
+            holeRect.top = y - innerRadius
+            holeRect.right = x + innerRadius
+            holeRect.bottom = y + innerRadius
+            val boundingRect = mRectBuffer[1]
+            boundingRect.set(holeRect)
+            val radiusPercent = mChart.centerTextRadiusPercent / 100f
             if (radiusPercent > 0.0) {
                 boundingRect.inset(
-                        (boundingRect.width() - boundingRect.width() * radiusPercent) / 2.f,
-                        (boundingRect.height() - boundingRect.height() * radiusPercent) / 2.f
-                );
+                    (boundingRect.width() - boundingRect.width() * radiusPercent) / 2f,
+                    (boundingRect.height() - boundingRect.height() * radiusPercent) / 2f
+                )
             }
-
-            if (!centerText.equals(mCenterTextLastValue) || !boundingRect.equals(mCenterTextLastBounds)) {
+            if (centerText != mCenterTextLastValue || boundingRect != mCenterTextLastBounds) {
 
                 // Next time we won't recalculate StaticLayout...
-                mCenterTextLastBounds.set(boundingRect);
-                mCenterTextLastValue = centerText;
-
-                float width = mCenterTextLastBounds.width();
+                mCenterTextLastBounds.set(boundingRect)
+                mCenterTextLastValue = centerText
+                val width = mCenterTextLastBounds.width()
 
                 // If width is 0, it will crash. Always have a minimum of 1
-                mCenterTextLayout = new StaticLayout(centerText, 0, centerText.length(),
-                        mCenterTextPaint,
-                        (int) Math.max(Math.ceil(width), 1.f),
-                        Layout.Alignment.ALIGN_CENTER, 1.f, 0.f, false);
+                mCenterTextLayout = StaticLayout(
+                    centerText, 0, centerText.length,
+                    paintCenterText, Math.max(Math.ceil(width.toDouble()), 1.0).toInt(),
+                    Layout.Alignment.ALIGN_CENTER, 1f, 0f, false
+                )
             }
 
             //float layoutWidth = Utils.getStaticLayoutMaxWidth(mCenterTextLayout);
-            float layoutHeight = mCenterTextLayout.getHeight();
-
-            c.save();
+            val layoutHeight = mCenterTextLayout!!.height.toFloat()
+            c.save()
             if (Build.VERSION.SDK_INT >= 18) {
-                Path path = mDrawCenterTextPathBuffer;
-                path.reset();
-                path.addOval(holeRect, Path.Direction.CW);
-                c.clipPath(path);
+                val path = mDrawCenterTextPathBuffer
+                path.reset()
+                path.addOval(holeRect, Path.Direction.CW)
+                c.clipPath(path)
             }
-
-            c.translate(boundingRect.left, boundingRect.top + (boundingRect.height() - layoutHeight) / 2.f);
-            mCenterTextLayout.draw(c);
-
-            c.restore();
-
-            MPPointF.recycleInstance(center);
-            MPPointF.recycleInstance(offset);
+            c.translate(
+                boundingRect.left,
+                boundingRect.top + (boundingRect.height() - layoutHeight) / 2f
+            )
+            mCenterTextLayout!!.draw(c)
+            c.restore()
+            recycleInstance(center)
+            recycleInstance(offset)
         }
     }
 
-    protected RectF mDrawHighlightedRectF = new RectF();
-    @Override
-    public void drawHighlighted(Canvas c, Highlight[] indices) {
+    protected var mDrawHighlightedRectF = RectF()
+    override fun drawHighlighted(c: Canvas, indices: Array<Highlight>) {
 
         /* Skip entirely if using rounded circle slices, because it doesn't make sense to highlight
          * in this way.
          * TODO: add support for changing slice color with highlighting rather than only shifting the slice
          */
-
-        final boolean drawInnerArc = mChart.isDrawHoleEnabled() && !mChart.isDrawSlicesUnderHoleEnabled();
-        if (drawInnerArc && mChart.isDrawRoundedSlicesEnabled())
-            return;
-
-        float phaseX = mAnimator.getPhaseX();
-        float phaseY = mAnimator.getPhaseY();
-
-        float angle;
-        float rotationAngle = mChart.getRotationAngle();
-
-        float[] drawAngles = mChart.getDrawAngles();
-        float[] absoluteAngles = mChart.getAbsoluteAngles();
-        final MPPointF center = mChart.getCenterCircleBox();
-        final float radius = mChart.getRadius();
-        final float userInnerRadius = drawInnerArc
-                ? radius * (mChart.getHoleRadius() / 100.f)
-                : 0.f;
-
-        final RectF highlightedCircleBox = mDrawHighlightedRectF;
-        highlightedCircleBox.set(0,0,0,0);
-
-        for (int i = 0; i < indices.length; i++) {
+        val drawInnerArc = mChart.isDrawHoleEnabled && !mChart.isDrawSlicesUnderHoleEnabled
+        if (drawInnerArc && mChart.isDrawRoundedSlicesEnabled) return
+        val phaseX = mAnimator.phaseX
+        val phaseY = mAnimator.phaseY
+        var angle: Float
+        val rotationAngle = mChart.rotationAngle
+        val drawAngles = mChart.drawAngles
+        val absoluteAngles = mChart.absoluteAngles
+        val center = mChart.centerCircleBox
+        val radius = mChart.radius
+        val userInnerRadius = if (drawInnerArc) radius * (mChart.holeRadius / 100f) else 0f
+        val highlightedCircleBox = mDrawHighlightedRectF
+        highlightedCircleBox[0f, 0f, 0f] = 0f
+        for (i in indices.indices) {
 
             // get the index to highlight
-            int index = (int) indices[i].getX();
-
-            if (index >= drawAngles.length)
-                continue;
-
-            IPieDataSet set = mChart.getData()
-                    .getDataSetByIndex(indices[i].getDataSetIndex());
-
-            if (set == null || !set.isHighlightEnabled())
-                continue;
-
-            final int entryCount = set.getEntryCount();
-            int visibleAngleCount = 0;
-            for (int j = 0; j < entryCount; j++) {
+            val index = indices[i].x.toInt()
+            if (index >= drawAngles.size) continue
+            val set = mChart.data
+                .getDataSetByIndex(indices[i].dataSetIndex)
+            if (set == null || !set.isHighlightEnabled) continue
+            val entryCount = set.entryCount
+            var visibleAngleCount = 0
+            for (j in 0 until entryCount) {
                 // draw only if the value is greater than zero
-                if ((Math.abs(set.getEntryForIndex(j).getY()) > Utils.FLOAT_EPSILON)) {
-                    visibleAngleCount++;
+                if (Math.abs(set.getEntryForIndex(j).y) > Utils.FLOAT_EPSILON) {
+                    visibleAngleCount++
                 }
             }
-
-            if (index == 0)
-                angle = 0.f;
-            else
-                angle = absoluteAngles[index - 1] * phaseX;
-
-            final float sliceSpace = visibleAngleCount <= 1 ? 0.f : set.getSliceSpace();
-
-            float sliceAngle = drawAngles[index];
-            float innerRadius = userInnerRadius;
-
-            float shift = set.getSelectionShift();
-            final float highlightedRadius = radius + shift;
-            highlightedCircleBox.set(mChart.getCircleBox());
-            highlightedCircleBox.inset(-shift, -shift);
-
-            final boolean accountForSliceSpacing = sliceSpace > 0.f && sliceAngle <= 180.f;
-
-            Integer highlightColor = set.getHighlightColor();
-            if (highlightColor == null)
-                highlightColor = set.getColor(index);
-            mRenderPaint.setColor(highlightColor);
-
-            final float sliceSpaceAngleOuter = visibleAngleCount == 1 ?
-                    0.f :
-                    sliceSpace / (Utils.FDEG2RAD * radius);
-
-            final float sliceSpaceAngleShifted = visibleAngleCount == 1 ?
-                    0.f :
-                    sliceSpace / (Utils.FDEG2RAD * highlightedRadius);
-
-            final float startAngleOuter = rotationAngle + (angle + sliceSpaceAngleOuter / 2.f) * phaseY;
-            float sweepAngleOuter = (sliceAngle - sliceSpaceAngleOuter) * phaseY;
-            if (sweepAngleOuter < 0.f) {
-                sweepAngleOuter = 0.f;
+            angle = if (index == 0) 0f else absoluteAngles[index - 1] * phaseX
+            val sliceSpace = if (visibleAngleCount <= 1) 0f else set.sliceSpace
+            val sliceAngle = drawAngles[index]
+            var innerRadius = userInnerRadius
+            val shift = set.selectionShift
+            val highlightedRadius = radius + shift
+            highlightedCircleBox.set(mChart.circleBox)
+            highlightedCircleBox.inset(-shift, -shift)
+            val accountForSliceSpacing = sliceSpace > 0f && sliceAngle <= 180f
+            var highlightColor = set.highlightColor
+            if (highlightColor == null) highlightColor = set.getColor(index)
+            mRenderPaint.color = highlightColor
+            val sliceSpaceAngleOuter =
+                if (visibleAngleCount == 1) 0f else sliceSpace / (Utils.FDEG2RAD * radius)
+            val sliceSpaceAngleShifted =
+                if (visibleAngleCount == 1) 0f else sliceSpace / (Utils.FDEG2RAD * highlightedRadius)
+            val startAngleOuter = rotationAngle + (angle + sliceSpaceAngleOuter / 2f) * phaseY
+            var sweepAngleOuter = (sliceAngle - sliceSpaceAngleOuter) * phaseY
+            if (sweepAngleOuter < 0f) {
+                sweepAngleOuter = 0f
             }
-
-            final float startAngleShifted = rotationAngle + (angle + sliceSpaceAngleShifted / 2.f) * phaseY;
-            float sweepAngleShifted = (sliceAngle - sliceSpaceAngleShifted) * phaseY;
-            if (sweepAngleShifted < 0.f) {
-                sweepAngleShifted = 0.f;
+            val startAngleShifted = rotationAngle + (angle + sliceSpaceAngleShifted / 2f) * phaseY
+            var sweepAngleShifted = (sliceAngle - sliceSpaceAngleShifted) * phaseY
+            if (sweepAngleShifted < 0f) {
+                sweepAngleShifted = 0f
             }
-
-            mPathBuffer.reset();
-
-            if (sweepAngleOuter >= 360.f && sweepAngleOuter % 360f <= Utils.FLOAT_EPSILON) {
+            mPathBuffer.reset()
+            if (sweepAngleOuter >= 360f && sweepAngleOuter % 360f <= Utils.FLOAT_EPSILON) {
                 // Android is doing "mod 360"
-                mPathBuffer.addCircle(center.x, center.y, highlightedRadius, Path.Direction.CW);
+                mPathBuffer.addCircle(center.x, center.y, highlightedRadius, Path.Direction.CW)
             } else {
-
                 mPathBuffer.moveTo(
-                        center.x + highlightedRadius * (float) Math.cos(startAngleShifted * Utils.FDEG2RAD),
-                        center.y + highlightedRadius * (float) Math.sin(startAngleShifted * Utils.FDEG2RAD));
-
+                    center.x + highlightedRadius * Math.cos((startAngleShifted * Utils.FDEG2RAD).toDouble())
+                        .toFloat(),
+                    center.y + highlightedRadius * Math.sin((startAngleShifted * Utils.FDEG2RAD).toDouble())
+                        .toFloat()
+                )
                 mPathBuffer.arcTo(
-                        highlightedCircleBox,
-                        startAngleShifted,
-                        sweepAngleShifted
-                );
+                    highlightedCircleBox,
+                    startAngleShifted,
+                    sweepAngleShifted
+                )
             }
-
-            float sliceSpaceRadius = 0.f;
+            var sliceSpaceRadius = 0f
             if (accountForSliceSpacing) {
-                sliceSpaceRadius =
-                        calculateMinimumRadiusForSpacedSlice(
-                                center, radius,
-                                sliceAngle * phaseY,
-                                center.x + radius * (float) Math.cos(startAngleOuter * Utils.FDEG2RAD),
-                                center.y + radius * (float) Math.sin(startAngleOuter * Utils.FDEG2RAD),
-                                startAngleOuter,
-                                sweepAngleOuter);
+                sliceSpaceRadius = calculateMinimumRadiusForSpacedSlice(
+                    center, radius,
+                    sliceAngle * phaseY,
+                    center.x + radius * Math.cos((startAngleOuter * Utils.FDEG2RAD).toDouble())
+                        .toFloat(),
+                    center.y + radius * Math.sin((startAngleOuter * Utils.FDEG2RAD).toDouble())
+                        .toFloat(),
+                    startAngleOuter,
+                    sweepAngleOuter
+                )
             }
 
             // API < 21 does not receive floats in addArc, but a RectF
-            mInnerRectBuffer.set(
-                    center.x - innerRadius,
-                    center.y - innerRadius,
-                    center.x + innerRadius,
-                    center.y + innerRadius);
-
+            mInnerRectBuffer[center.x - innerRadius, center.y - innerRadius, center.x + innerRadius] =
+                center.y + innerRadius
             if (drawInnerArc &&
-                    (innerRadius > 0.f || accountForSliceSpacing)) {
-
+                (innerRadius > 0f || accountForSliceSpacing)
+            ) {
                 if (accountForSliceSpacing) {
-                    float minSpacedRadius = sliceSpaceRadius;
-
-                    if (minSpacedRadius < 0.f)
-                        minSpacedRadius = -minSpacedRadius;
-
-                    innerRadius = Math.max(innerRadius, minSpacedRadius);
+                    var minSpacedRadius = sliceSpaceRadius
+                    if (minSpacedRadius < 0f) minSpacedRadius = -minSpacedRadius
+                    innerRadius = Math.max(innerRadius, minSpacedRadius)
                 }
-
-                final float sliceSpaceAngleInner = visibleAngleCount == 1 || innerRadius == 0.f ?
-                        0.f :
-                        sliceSpace / (Utils.FDEG2RAD * innerRadius);
-                final float startAngleInner = rotationAngle + (angle + sliceSpaceAngleInner / 2.f) * phaseY;
-                float sweepAngleInner = (sliceAngle - sliceSpaceAngleInner) * phaseY;
-                if (sweepAngleInner < 0.f) {
-                    sweepAngleInner = 0.f;
+                val sliceSpaceAngleInner =
+                    if (visibleAngleCount == 1 || innerRadius == 0f) 0f else sliceSpace / (Utils.FDEG2RAD * innerRadius)
+                val startAngleInner = rotationAngle + (angle + sliceSpaceAngleInner / 2f) * phaseY
+                var sweepAngleInner = (sliceAngle - sliceSpaceAngleInner) * phaseY
+                if (sweepAngleInner < 0f) {
+                    sweepAngleInner = 0f
                 }
-                final float endAngleInner = startAngleInner + sweepAngleInner;
-
-                if (sweepAngleOuter >= 360.f && sweepAngleOuter % 360f <= Utils.FLOAT_EPSILON) {
+                val endAngleInner = startAngleInner + sweepAngleInner
+                if (sweepAngleOuter >= 360f && sweepAngleOuter % 360f <= Utils.FLOAT_EPSILON) {
                     // Android is doing "mod 360"
-                    mPathBuffer.addCircle(center.x, center.y, innerRadius, Path.Direction.CCW);
+                    mPathBuffer.addCircle(center.x, center.y, innerRadius, Path.Direction.CCW)
                 } else {
-
                     mPathBuffer.lineTo(
-                            center.x + innerRadius * (float) Math.cos(endAngleInner * Utils.FDEG2RAD),
-                            center.y + innerRadius * (float) Math.sin(endAngleInner * Utils.FDEG2RAD));
-
+                        center.x + innerRadius * Math.cos((endAngleInner * Utils.FDEG2RAD).toDouble())
+                            .toFloat(),
+                        center.y + innerRadius * Math.sin((endAngleInner * Utils.FDEG2RAD).toDouble())
+                            .toFloat()
+                    )
                     mPathBuffer.arcTo(
-                            mInnerRectBuffer,
-                            endAngleInner,
-                            -sweepAngleInner
-                    );
+                        mInnerRectBuffer,
+                        endAngleInner,
+                        -sweepAngleInner
+                    )
                 }
             } else {
-
                 if (sweepAngleOuter % 360f > Utils.FLOAT_EPSILON) {
-
                     if (accountForSliceSpacing) {
-                        final float angleMiddle = startAngleOuter + sweepAngleOuter / 2.f;
-
-                        final float arcEndPointX = center.x +
-                                sliceSpaceRadius * (float) Math.cos(angleMiddle * Utils.FDEG2RAD);
-                        final float arcEndPointY = center.y +
-                                sliceSpaceRadius * (float) Math.sin(angleMiddle * Utils.FDEG2RAD);
-
+                        val angleMiddle = startAngleOuter + sweepAngleOuter / 2f
+                        val arcEndPointX = center.x +
+                                sliceSpaceRadius * Math.cos((angleMiddle * Utils.FDEG2RAD).toDouble())
+                            .toFloat()
+                        val arcEndPointY = center.y +
+                                sliceSpaceRadius * Math.sin((angleMiddle * Utils.FDEG2RAD).toDouble())
+                            .toFloat()
                         mPathBuffer.lineTo(
-                                arcEndPointX,
-                                arcEndPointY);
-
+                            arcEndPointX,
+                            arcEndPointY
+                        )
                     } else {
-
                         mPathBuffer.lineTo(
-                                center.x,
-                                center.y);
+                            center.x,
+                            center.y
+                        )
                     }
-
                 }
-
             }
-
-            mPathBuffer.close();
-
-            mBitmapCanvas.drawPath(mPathBuffer, mRenderPaint);
+            mPathBuffer.close()
+            mBitmapCanvas!!.drawPath(mPathBuffer, mRenderPaint)
         }
-
-        MPPointF.recycleInstance(center);
+        recycleInstance(center)
     }
 
     /**
@@ -1003,68 +897,82 @@ public class PieChartRenderer extends DataRenderer {
      *
      * @param c
      */
-    protected void drawRoundedSlices(Canvas c) {
-
-        if (!mChart.isDrawRoundedSlicesEnabled())
-            return;
-
-        IPieDataSet dataSet = mChart.getData().getDataSet();
-
-        if (!dataSet.isVisible())
-            return;
-
-        float phaseX = mAnimator.getPhaseX();
-        float phaseY = mAnimator.getPhaseY();
-
-        MPPointF center = mChart.getCenterCircleBox();
-        float r = mChart.getRadius();
+    protected fun drawRoundedSlices(c: Canvas?) {
+        if (!mChart.isDrawRoundedSlicesEnabled) return
+        val dataSet = mChart.data.dataSet
+        if (!dataSet.isVisible) return
+        val phaseX = mAnimator.phaseX
+        val phaseY = mAnimator.phaseY
+        val center = mChart.centerCircleBox
+        val r = mChart.radius
 
         // calculate the radius of the "slice-circle"
-        float circleRadius = (r - (r * mChart.getHoleRadius() / 100f)) / 2f;
-
-        float[] drawAngles = mChart.getDrawAngles();
-        float angle = mChart.getRotationAngle();
-
-        for (int j = 0; j < dataSet.getEntryCount(); j++) {
-
-            float sliceAngle = drawAngles[j];
-
-            Entry e = dataSet.getEntryForIndex(j);
+        val circleRadius = (r - r * mChart.holeRadius / 100f) / 2f
+        val drawAngles = mChart.drawAngles
+        var angle = mChart.rotationAngle
+        for (j in 0 until dataSet.entryCount) {
+            val sliceAngle = drawAngles[j]
+            val e: Entry = dataSet.getEntryForIndex(j)
 
             // draw only if the value is greater than zero
-            if ((Math.abs(e.getY()) > Utils.FLOAT_EPSILON)) {
-
-                float x = (float) ((r - circleRadius)
-                        * Math.cos(Math.toRadians((angle + sliceAngle)
-                        * phaseY)) + center.x);
-                float y = (float) ((r - circleRadius)
-                        * Math.sin(Math.toRadians((angle + sliceAngle)
-                        * phaseY)) + center.y);
-
-                mRenderPaint.setColor(dataSet.getColor(j));
-                mBitmapCanvas.drawCircle(x, y, circleRadius, mRenderPaint);
+            if (Math.abs(e.y) > Utils.FLOAT_EPSILON) {
+                val x = ((r - circleRadius)
+                        * Math.cos(
+                    Math.toRadians(
+                        ((angle + sliceAngle)
+                                * phaseY).toDouble()
+                    )
+                ) + center.x).toFloat()
+                val y = ((r - circleRadius)
+                        * Math.sin(
+                    Math.toRadians(
+                        ((angle + sliceAngle)
+                                * phaseY).toDouble()
+                    )
+                ) + center.y).toFloat()
+                mRenderPaint.color = dataSet.getColor(j)
+                mBitmapCanvas!!.drawCircle(x, y, circleRadius, mRenderPaint)
             }
-
-            angle += sliceAngle * phaseX;
+            angle += sliceAngle * phaseX
         }
-        MPPointF.recycleInstance(center);
+        recycleInstance(center)
     }
 
     /**
-     * Releases the drawing bitmap. This should be called when {@link LineChart#onDetachedFromWindow()}.
+     * Releases the drawing bitmap. This should be called when [LineChart.onDetachedFromWindow].
      */
-    public void releaseBitmap() {
+    fun releaseBitmap() {
         if (mBitmapCanvas != null) {
-            mBitmapCanvas.setBitmap(null);
-            mBitmapCanvas = null;
+            mBitmapCanvas!!.setBitmap(null)
+            mBitmapCanvas = null
         }
         if (mDrawBitmap != null) {
-            Bitmap drawBitmap = mDrawBitmap.get();
-            if (drawBitmap != null) {
-                drawBitmap.recycle();
-            }
-            mDrawBitmap.clear();
-            mDrawBitmap = null;
+            val drawBitmap = mDrawBitmap!!.get()
+            drawBitmap?.recycle()
+            mDrawBitmap!!.clear()
+            mDrawBitmap = null
         }
+    }
+
+    init {
+        paintHole = Paint(Paint.ANTI_ALIAS_FLAG)
+        paintHole.color = Color.WHITE
+        paintHole.style = Paint.Style.FILL
+        paintTransparentCircle = Paint(Paint.ANTI_ALIAS_FLAG)
+        paintTransparentCircle.color = Color.WHITE
+        paintTransparentCircle.style = Paint.Style.FILL
+        paintTransparentCircle.alpha = 105
+        paintCenterText = TextPaint(Paint.ANTI_ALIAS_FLAG)
+        paintCenterText.color = Color.BLACK
+        paintCenterText.textSize = convertDpToPixel(12f)
+        mValuePaint.textSize = convertDpToPixel(13f)
+        mValuePaint.color = Color.WHITE
+        mValuePaint.textAlign = Align.CENTER
+        paintEntryLabels = Paint(Paint.ANTI_ALIAS_FLAG)
+        paintEntryLabels.color = Color.WHITE
+        paintEntryLabels.textAlign = Align.CENTER
+        paintEntryLabels.textSize = convertDpToPixel(13f)
+        mValueLinePaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        mValueLinePaint.style = Paint.Style.STROKE
     }
 }
