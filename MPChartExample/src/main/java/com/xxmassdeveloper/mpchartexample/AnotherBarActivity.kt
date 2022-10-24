@@ -1,29 +1,25 @@
 package com.xxmassdeveloper.mpchartexample
 
 import android.Manifest
-import com.xxmassdeveloper.mpchartexample.notimportant.DemoBase
-import android.widget.SeekBar.OnSeekBarChangeListener
-import com.github.mikephil.charting.charts.BarChart
-import android.widget.SeekBar
-import android.widget.TextView
-import android.os.Bundle
-import android.view.WindowManager
-import com.xxmassdeveloper.mpchartexample.R
-import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.components.XAxis.XAxisPosition
-import com.github.mikephil.charting.data.BarEntry
-import com.github.mikephil.charting.data.BarDataSet
-import com.github.mikephil.charting.utils.ColorTemplate
-import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
-import com.github.mikephil.charting.data.BarData
 import android.content.Intent
-import com.github.mikephil.charting.interfaces.datasets.IDataSet
-import androidx.core.content.ContextCompat
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import java.util.ArrayList
+import android.view.WindowManager
+import android.widget.SeekBar
+import android.widget.SeekBar.OnSeekBarChangeListener
+import android.widget.TextView
+import androidx.core.content.ContextCompat
+import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.components.XAxis.XAxisPosition
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
+import com.github.mikephil.charting.utils.ColorTemplate
+import com.xxmassdeveloper.mpchartexample.notimportant.DemoBase
 
 class AnotherBarActivity : DemoBase(), OnSeekBarChangeListener {
     private lateinit var chart: BarChart
