@@ -1,9 +1,10 @@
 package com.github.mikephil.charting.renderer.scatter
 
-import android.graphics.*
+import android.graphics.Canvas
+import android.graphics.Paint
 import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet
-import com.github.mikephil.charting.renderer.scatter.IShapeRenderer
-import com.github.mikephil.charting.utils.*
+import com.github.mikephil.charting.utils.Utils
+import com.github.mikephil.charting.utils.ViewPortHandler
 
 /**
  * Created by wajdic on 15/06/2016.
