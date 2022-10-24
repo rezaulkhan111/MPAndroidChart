@@ -1,99 +1,92 @@
-package com.github.mikephil.charting.jobs;
+package com.github.mikephil.charting.jobs
 
-import android.animation.Animator;
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
-import android.annotation.SuppressLint;
-import android.view.View;
-
-import com.github.mikephil.charting.utils.Transformer;
-import com.github.mikephil.charting.utils.ViewPortHandler;
+import android.animation.Animator
+import com.github.mikephil.charting.utils.ObjectPool.Companion.create
+import com.github.mikephil.charting.utils.ObjectPool.setReplenishPercentage
+import com.github.mikephil.charting.utils.ObjectPool.get
+import com.github.mikephil.charting.utils.ObjectPool.recycle
+import com.github.mikephil.charting.utils.ViewPortHandler.zoom
+import com.github.mikephil.charting.utils.ViewPortHandler.refresh
+import com.github.mikephil.charting.utils.ViewPortHandler.scaleY
+import com.github.mikephil.charting.utils.ViewPortHandler.scaleX
+import com.github.mikephil.charting.utils.Transformer.pointValuesToPixel
+import com.github.mikephil.charting.utils.ViewPortHandler.translate
+import com.github.mikephil.charting.utils.ViewPortHandler.centerViewPort
+import com.github.mikephil.charting.utils.ViewPortHandler.setZoom
+import com.github.mikephil.charting.utils.ViewPortHandler
+import com.github.mikephil.charting.components.YAxis.AxisDependency
+import com.github.mikephil.charting.jobs.ViewPortJob
+import com.github.mikephil.charting.jobs.ZoomJob
+import com.github.mikephil.charting.charts.BarLineChartBase
+import com.github.mikephil.charting.utils.ObjectPool.Poolable
+import com.github.mikephil.charting.jobs.MoveViewJob
+import android.annotation.SuppressLint
+import com.github.mikephil.charting.components.YAxis
+import com.github.mikephil.charting.jobs.AnimatedViewPortJob
+import com.github.mikephil.charting.jobs.AnimatedZoomJob
+import android.animation.ValueAnimator
+import com.github.mikephil.charting.jobs.AnimatedMoveViewJob
+import android.animation.ValueAnimator.AnimatorUpdateListener
+import android.animation.ObjectAnimator
+import android.view.View
+import com.github.mikephil.charting.utils.Transformer
+import java.lang.IllegalArgumentException
 
 /**
  * Created by Philipp Jahoda on 19/02/16.
  */
 @SuppressLint("NewApi")
-public abstract class AnimatedViewPortJob extends ViewPortJob implements ValueAnimator.AnimatorUpdateListener, Animator.AnimatorListener {
-
-    protected ObjectAnimator animator;
-
-    protected float phase;
-
-    protected float xOrigin;
-    protected float yOrigin;
-
-    public AnimatedViewPortJob(ViewPortHandler viewPortHandler, float xValue, float yValue, Transformer trans, View v, float xOrigin, float yOrigin, long duration) {
-        super(viewPortHandler, xValue, yValue, trans, v);
-        this.xOrigin = xOrigin;
-        this.yOrigin = yOrigin;
-        animator = ObjectAnimator.ofFloat(this, "phase", 0f, 1f);
-        animator.setDuration(duration);
-        animator.addUpdateListener(this);
-        animator.addListener(this);
-    }
-
+abstract class AnimatedViewPortJob(
+    viewPortHandler: ViewPortHandler?,
+    xValue: Float,
+    yValue: Float,
+    trans: Transformer?,
+    v: View?,
+    var xOrigin: Float,
+    var yOrigin: Float,
+    duration: Long
+) : ViewPortJob(viewPortHandler, xValue, yValue, trans, v), AnimatorUpdateListener,
+    Animator.AnimatorListener {
+    protected var animator: ObjectAnimator
+    var phase = 0f
     @SuppressLint("NewApi")
-    @Override
-    public void run() {
-        animator.start();
+    override fun run() {
+        animator.start()
     }
 
-    public float getPhase() {
-        return phase;
+    abstract fun recycleSelf()
+    protected fun resetAnimator() {
+        animator.removeAllListeners()
+        animator.removeAllUpdateListeners()
+        animator.reverse()
+        animator.addUpdateListener(this)
+        animator.addListener(this)
     }
 
-    public void setPhase(float phase) {
-        this.phase = phase;
-    }
-
-    public float getXOrigin() {
-        return xOrigin;
-    }
-
-    public float getYOrigin() {
-        return yOrigin;
-    }
-
-    public abstract void recycleSelf();
-
-    protected void resetAnimator(){
-        animator.removeAllListeners();
-        animator.removeAllUpdateListeners();
-        animator.reverse();
-        animator.addUpdateListener(this);
-        animator.addListener(this);
-    }
-
-    @Override
-    public void onAnimationStart(Animator animation) {
-
-    }
-
-    @Override
-    public void onAnimationEnd(Animator animation) {
-        try{
-            recycleSelf();
-        }catch (IllegalArgumentException e){
+    override fun onAnimationStart(animation: Animator) {}
+    override fun onAnimationEnd(animation: Animator) {
+        try {
+            recycleSelf()
+        } catch (e: IllegalArgumentException) {
             // don't worry about it.
         }
     }
 
-    @Override
-    public void onAnimationCancel(Animator animation) {
-        try{
-            recycleSelf();
-        }catch (IllegalArgumentException e){
+    override fun onAnimationCancel(animation: Animator) {
+        try {
+            recycleSelf()
+        } catch (e: IllegalArgumentException) {
             // don't worry about it.
         }
     }
 
-    @Override
-    public void onAnimationRepeat(Animator animation) {
+    override fun onAnimationRepeat(animation: Animator) {}
+    override fun onAnimationUpdate(animation: ValueAnimator) {}
 
-    }
-
-    @Override
-    public void onAnimationUpdate(ValueAnimator animation) {
-
+    init {
+        animator = ObjectAnimator.ofFloat(this, "phase", 0f, 1f)
+        animator.duration = duration
+        animator.addUpdateListener(this)
+        animator.addListener(this)
     }
 }

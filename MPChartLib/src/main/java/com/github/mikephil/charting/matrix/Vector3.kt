@@ -127,9 +127,9 @@ class Vector3 {
     }
 
     companion object {
-        val ZERO = Vector3(0, 0, 0)
-        val UNIT_X = Vector3(1, 0, 0)
-        val UNIT_Y = Vector3(0, 1, 0)
-        val UNIT_Z = Vector3(0, 0, 1)
+        val ZERO = Vector3(0F, 0F, 0F)
+        val UNIT_X = Vector3(1F, 0F, 0F)
+        val UNIT_Y = Vector3(0F, 1F, 0F)
+        val UNIT_Z = Vector3(0F, 0F, 1F)
     }
 }

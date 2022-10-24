@@ -1,119 +1,132 @@
-package com.github.mikephil.charting.jobs;
+package com.github.mikephil.charting.jobs
 
-import android.animation.Animator;
-import android.animation.ValueAnimator;
-import android.annotation.SuppressLint;
-import android.graphics.Matrix;
-import android.view.View;
-
-import com.github.mikephil.charting.charts.BarLineChartBase;
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.utils.ObjectPool;
-import com.github.mikephil.charting.utils.Transformer;
-import com.github.mikephil.charting.utils.ViewPortHandler;
+import android.animation.Animator
+import com.github.mikephil.charting.utils.ObjectPool.Companion.create
+import com.github.mikephil.charting.utils.ObjectPool.setReplenishPercentage
+import com.github.mikephil.charting.utils.ObjectPool.get
+import com.github.mikephil.charting.utils.ObjectPool.recycle
+import com.github.mikephil.charting.utils.ViewPortHandler.zoom
+import com.github.mikephil.charting.utils.ViewPortHandler.refresh
+import com.github.mikephil.charting.utils.ViewPortHandler.scaleY
+import com.github.mikephil.charting.utils.ViewPortHandler.scaleX
+import com.github.mikephil.charting.utils.Transformer.pointValuesToPixel
+import com.github.mikephil.charting.utils.ViewPortHandler.translate
+import com.github.mikephil.charting.utils.ViewPortHandler.centerViewPort
+import com.github.mikephil.charting.utils.ViewPortHandler.setZoom
+import com.github.mikephil.charting.utils.ViewPortHandler
+import com.github.mikephil.charting.components.YAxis.AxisDependency
+import com.github.mikephil.charting.jobs.ViewPortJob
+import com.github.mikephil.charting.jobs.ZoomJob
+import com.github.mikephil.charting.charts.BarLineChartBase
+import com.github.mikephil.charting.utils.ObjectPool.Poolable
+import com.github.mikephil.charting.jobs.MoveViewJob
+import android.annotation.SuppressLint
+import com.github.mikephil.charting.components.YAxis
+import com.github.mikephil.charting.jobs.AnimatedViewPortJob
+import com.github.mikephil.charting.jobs.AnimatedZoomJob
+import android.animation.ValueAnimator
+import com.github.mikephil.charting.jobs.AnimatedMoveViewJob
+import android.animation.ValueAnimator.AnimatorUpdateListener
+import android.animation.ObjectAnimator
+import android.graphics.Matrix
+import android.view.View
+import com.github.mikephil.charting.utils.ObjectPool
+import com.github.mikephil.charting.utils.Transformer
 
 /**
  * Created by Philipp Jahoda on 19/02/16.
  */
 @SuppressLint("NewApi")
-public class AnimatedZoomJob extends AnimatedViewPortJob implements Animator.AnimatorListener {
+class AnimatedZoomJob @SuppressLint("NewApi") constructor(
+    viewPortHandler: ViewPortHandler?,
+    v: View?,
+    trans: Transformer?,
+    axis: YAxis?,
+    xAxisRange: Float,
+    scaleX: Float,
+    scaleY: Float,
+    xOrigin: Float,
+    yOrigin: Float,
+    protected var zoomCenterX: Float,
+    protected var zoomCenterY: Float,
+    protected var zoomOriginX: Float,
+    protected var zoomOriginY: Float,
+    duration: Long
+) : AnimatedViewPortJob(viewPortHandler, scaleX, scaleY, trans, v, xOrigin, yOrigin, duration),
+    Animator.AnimatorListener {
+    companion object {
+        private var pool: ObjectPool<AnimatedZoomJob?>? = null
+        @JvmStatic
+        fun getInstance(
+            viewPortHandler: ViewPortHandler?,
+            v: View?,
+            trans: Transformer?,
+            axis: YAxis?,
+            xAxisRange: Float,
+            scaleX: Float,
+            scaleY: Float,
+            xOrigin: Float,
+            yOrigin: Float,
+            zoomCenterX: Float,
+            zoomCenterY: Float,
+            zoomOriginX: Float,
+            zoomOriginY: Float,
+            duration: Long
+        ): AnimatedZoomJob? {
+            val result = pool!!.get()
+            result!!.mViewPortHandler = viewPortHandler
+            result.xValue = scaleX
+            result.yValue = scaleY
+            result.mTrans = trans
+            result.view = v
+            result.xOrigin = xOrigin
+            result.yOrigin = yOrigin
+            result.yAxis = axis
+            result.xAxisRange = xAxisRange
+            result.resetAnimator()
+            result.animator.duration = duration
+            return result
+        }
 
-    private static ObjectPool<AnimatedZoomJob> pool;
-
-    static {
-        pool = ObjectPool.create(8, new AnimatedZoomJob(null,null,null,null,0,0,0,0,0,0,0,0,0,0));
+        init {
+            pool = create(8, AnimatedZoomJob(null, null, null, null, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+        }
     }
 
-    public static AnimatedZoomJob getInstance(ViewPortHandler viewPortHandler, View v, Transformer trans, YAxis axis, float xAxisRange, float scaleX, float scaleY, float xOrigin, float yOrigin, float zoomCenterX, float zoomCenterY, float zoomOriginX, float zoomOriginY, long duration) {
-        AnimatedZoomJob result = pool.get();
-        result.mViewPortHandler = viewPortHandler;
-        result.xValue = scaleX;
-        result.yValue = scaleY;
-        result.mTrans = trans;
-        result.view = v;
-        result.xOrigin = xOrigin;
-        result.yOrigin = yOrigin;
-        result.yAxis = axis;
-        result.xAxisRange = xAxisRange;
-        result.resetAnimator();
-        result.animator.setDuration(duration);
-        return result;
+    protected var yAxis: YAxis?
+    protected var xAxisRange: Float
+    protected var mOnAnimationUpdateMatrixBuffer = Matrix()
+    override fun onAnimationUpdate(animation: ValueAnimator) {
+        val scaleX = xOrigin + (xValue - xOrigin) * phase
+        val scaleY = yOrigin + (yValue - yOrigin) * phase
+        val save = mOnAnimationUpdateMatrixBuffer
+        mViewPortHandler!!.setZoom(scaleX, scaleY, save)
+        mViewPortHandler!!.refresh(save, view!!, false)
+        val valsInView = yAxis!!.mAxisRange / mViewPortHandler!!.scaleY
+        val xsInView = xAxisRange / mViewPortHandler!!.scaleX
+        pts[0] = zoomOriginX + (zoomCenterX - xsInView / 2f - zoomOriginX) * phase
+        pts[1] = zoomOriginY + (zoomCenterY + valsInView / 2f - zoomOriginY) * phase
+        mTrans!!.pointValuesToPixel(pts)
+        mViewPortHandler!!.translate(pts, save)
+        mViewPortHandler!!.refresh(save, view!!, true)
     }
 
-    protected float zoomOriginX;
-    protected float zoomOriginY;
-
-    protected float zoomCenterX;
-    protected float zoomCenterY;
-
-    protected YAxis yAxis;
-
-    protected float xAxisRange;
-
-    @SuppressLint("NewApi")
-    public AnimatedZoomJob(ViewPortHandler viewPortHandler, View v, Transformer trans, YAxis axis, float xAxisRange, float scaleX, float scaleY, float xOrigin, float yOrigin, float zoomCenterX, float zoomCenterY, float zoomOriginX, float zoomOriginY, long duration) {
-        super(viewPortHandler, scaleX, scaleY, trans, v, xOrigin, yOrigin, duration);
-
-        this.zoomCenterX = zoomCenterX;
-        this.zoomCenterY = zoomCenterY;
-        this.zoomOriginX = zoomOriginX;
-        this.zoomOriginY = zoomOriginY;
-        this.animator.addListener(this);
-        this.yAxis = axis;
-        this.xAxisRange = xAxisRange;
+    override fun onAnimationEnd(animation: Animator) {
+        (view as BarLineChartBase<*>).calculateOffsets()
+        view.postInvalidate()
     }
 
-    protected Matrix mOnAnimationUpdateMatrixBuffer = new Matrix();
-    @Override
-    public void onAnimationUpdate(ValueAnimator animation) {
-
-        float scaleX = xOrigin + (xValue - xOrigin) * phase;
-        float scaleY = yOrigin + (yValue - yOrigin) * phase;
-
-        Matrix save = mOnAnimationUpdateMatrixBuffer;
-        mViewPortHandler.setZoom(scaleX, scaleY, save);
-        mViewPortHandler.refresh(save, view, false);
-
-        float valsInView = yAxis.mAxisRange / mViewPortHandler.getScaleY();
-        float xsInView =  xAxisRange / mViewPortHandler.getScaleX();
-
-        pts[0] = zoomOriginX + ((zoomCenterX - xsInView / 2f) - zoomOriginX) * phase;
-        pts[1] = zoomOriginY + ((zoomCenterY + valsInView / 2f) - zoomOriginY) * phase;
-
-        mTrans.pointValuesToPixel(pts);
-
-        mViewPortHandler.translate(pts, save);
-        mViewPortHandler.refresh(save, view, true);
+    override fun onAnimationCancel(animation: Animator) {}
+    override fun onAnimationRepeat(animation: Animator) {}
+    override fun recycleSelf() {}
+    override fun onAnimationStart(animation: Animator) {}
+    protected override fun instantiate(): Poolable? {
+        return AnimatedZoomJob(null, null, null, null, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     }
 
-    @Override
-    public void onAnimationEnd(Animator animation) {
-        ((BarLineChartBase) view).calculateOffsets();
-        view.postInvalidate();
-    }
-
-    @Override
-    public void onAnimationCancel(Animator animation) {
-
-    }
-
-    @Override
-    public void onAnimationRepeat(Animator animation) {
-
-    }
-
-    @Override
-    public void recycleSelf() {
-
-    }
-
-    @Override
-    public void onAnimationStart(Animator animation) {
-
-    }
-
-    @Override
-    protected ObjectPool.Poolable instantiate() {
-        return new AnimatedZoomJob(null,null,null,null,0,0,0,0,0,0,0,0,0,0);
+    init {
+        animator.addListener(this)
+        yAxis = axis
+        this.xAxisRange = xAxisRange
     }
 }
