@@ -2,8 +2,6 @@ package com.github.mikephil.charting.utils
 
 import android.content.res.Resources
 import android.graphics.Color
-import com.github.mikephil.charting.utils.ColorTemplate
-import java.util.ArrayList
 
 /**
  * Class that holds predefined color integer arrays (e.g.

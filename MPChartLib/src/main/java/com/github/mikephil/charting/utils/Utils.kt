@@ -328,7 +328,7 @@ object Utils {
     fun roundToNextSignificant(number: Double): Float {
         if (java.lang.Double.isInfinite(number) ||
             java.lang.Double.isNaN(number) || number == 0.0
-        ) return 0
+        ) return 0F
         val d = Math.ceil(Math.log10(if (number < 0) -number else number).toFloat().toDouble())
             .toFloat()
         val pw = 1 - d.toInt()

@@ -1,6 +1,5 @@
 package com.github.mikephil.charting.model
 
-import com.github.mikephil.charting.utils.Fill.gradientColors
 import com.github.mikephil.charting.utils.Fill
 
 /**

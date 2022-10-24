@@ -1,7 +1,5 @@
 package com.github.mikephil.charting.utils
 
-import com.github.mikephil.charting.utils.ViewPortHandler
-
 /**
  * Transformer class for the HorizontalBarChart.
  *

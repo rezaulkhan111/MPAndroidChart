@@ -1,7 +1,6 @@
 package com.github.mikephil.charting.utils
 
 import com.github.mikephil.charting.utils.ObjectPool.Poolable
-import com.github.mikephil.charting.utils.MPPointD
 
 /**
  * Point encapsulating two double values.

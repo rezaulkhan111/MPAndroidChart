@@ -2,16 +2,13 @@ package com.github.mikephil.charting.utils
 
 import android.graphics.Matrix
 import android.graphics.Path
-import com.github.mikephil.charting.utils.MPPointD.Companion.getInstance
-import com.github.mikephil.charting.utils.ViewPortHandler
-import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet
-import com.github.mikephil.charting.interfaces.datasets.IBubbleDataSet
-import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
-import com.github.mikephil.charting.interfaces.datasets.ICandleDataSet
-import com.github.mikephil.charting.data.CandleEntry
 import android.graphics.RectF
 import com.github.mikephil.charting.data.Entry
-import com.github.mikephil.charting.utils.MPPointD
+import com.github.mikephil.charting.interfaces.datasets.IBubbleDataSet
+import com.github.mikephil.charting.interfaces.datasets.ICandleDataSet
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
+import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet
+import com.github.mikephil.charting.utils.MPPointD.Companion.getInstance
 
 /**
  * Transformer class that contains all matrices and is responsible for
