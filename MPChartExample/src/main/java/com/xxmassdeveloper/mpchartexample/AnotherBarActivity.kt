@@ -136,7 +136,7 @@ class AnotherBarActivity : DemoBase(), OnSeekBarChangeListener {
             }
             R.id.actionToggleBarBorders -> {
                 for (set in chart.data.dataSets) (set as BarDataSet).barBorderWidth =
-                    if (set.getBarBorderWidth() == 1f) 0f else 1f
+                    if (set.barBorderWidth == 1f) 0f else 1f
                 chart.invalidate()
             }
             R.id.animateX -> {

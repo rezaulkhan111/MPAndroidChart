@@ -200,10 +200,10 @@ class LegendRenderer(
                         computedEntries.add(
                             LegendEntry(
                                 label,
-                                dataSet.getForm(),
-                                dataSet.getFormSize(),
-                                dataSet.getFormLineWidth(),
-                                dataSet.getFormLineDashEffect(),
+                                dataSet.form,
+                                dataSet.formSize,
+                                dataSet.formLineWidth,
+                                dataSet.formLineDashEffect,
                                 clrs[j]
                             )
                         )
@@ -212,7 +212,7 @@ class LegendRenderer(
                         // add the legend description label
                         computedEntries.add(
                             LegendEntry(
-                                dataSet.getLabel(),
+                                dataSet.label,
                                 LegendForm.NONE, Float.NaN, Float.NaN,
                                 null,
                                 ColorTemplate.COLOR_NONE
@@ -226,10 +226,10 @@ class LegendRenderer(
                         computedEntries.add(
                             LegendEntry(
                                 pds.getEntryForIndex(j).label,
-                                dataSet.getForm(),
-                                dataSet.getFormSize(),
-                                dataSet.getFormLineWidth(),
-                                dataSet.getFormLineDashEffect(),
+                                dataSet.form,
+                                dataSet.formSize,
+                                dataSet.formLineWidth,
+                                dataSet.formLineDashEffect,
                                 clrs[j]
                             )
                         )
@@ -239,7 +239,7 @@ class LegendRenderer(
                         // add the legend description label
                         computedEntries.add(
                             LegendEntry(
-                                dataSet.getLabel(),
+                                dataSet.label,
                                 LegendForm.NONE, Float.NaN, Float.NaN,
                                 null,
                                 ColorTemplate.COLOR_NONE
@@ -254,20 +254,20 @@ class LegendRenderer(
                     computedEntries.add(
                         LegendEntry(
                             null,
-                            dataSet.getForm(),
-                            dataSet.getFormSize(),
-                            dataSet.getFormLineWidth(),
-                            dataSet.getFormLineDashEffect(),
+                            dataSet.form,
+                            dataSet.formSize,
+                            dataSet.formLineWidth,
+                            dataSet.formLineDashEffect,
                             decreasingColor
                         )
                     )
                     computedEntries.add(
                         LegendEntry(
-                            dataSet.getLabel(),
-                            dataSet.getForm(),
-                            dataSet.getFormSize(),
-                            dataSet.getFormLineWidth(),
-                            dataSet.getFormLineDashEffect(),
+                            dataSet.label,
+                            dataSet.form,
+                            dataSet.formSize,
+                            dataSet.formLineWidth,
+                            dataSet.formLineDashEffect,
                             increasingColor
                         )
                     )
