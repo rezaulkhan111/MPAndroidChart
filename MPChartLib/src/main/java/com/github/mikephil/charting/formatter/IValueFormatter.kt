@@ -1,7 +1,21 @@
-package com.github.mikephil.charting.formatter;
+package com.github.mikephil.charting.formatter
 
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.utils.ViewPortHandler;
+import com.github.mikephil.charting.interfaces.dataprovider.ChartInterface.yChartMax
+import com.github.mikephil.charting.interfaces.dataprovider.ChartInterface.yChartMin
+import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider.lineData
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.yMax
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.yMin
+import com.github.mikephil.charting.interfaces.datasets.IDataSet
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
+import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider
+import com.github.mikephil.charting.utils.ViewPortHandler
+import com.github.mikephil.charting.formatter.IValueFormatter
+import com.github.mikephil.charting.formatter.IAxisValueFormatter
+import com.github.mikephil.charting.components.AxisBase
+import com.github.mikephil.charting.formatter.IFillFormatter
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.data.Entry
 
 /**
  * Interface that allows custom formatting of all values inside the chart before they are
@@ -11,9 +25,7 @@ import com.github.mikephil.charting.utils.ViewPortHandler;
  *
  * @author Philipp Jahoda
  */
-public interface IValueFormatter
-{
-
+interface IValueFormatter {
     /**
      * Called when a value (from labels inside the chart) is formatted
      * before being drawn. For performance reasons, avoid excessive calculations
@@ -25,5 +37,10 @@ public interface IValueFormatter
      * @param viewPortHandler provides information about the current chart state (scale, translation, ...)
      * @return the formatted label ready for being drawn
      */
-    String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler);
+    fun getFormattedValue(
+        value: Float,
+        entry: Entry?,
+        dataSetIndex: Int,
+        viewPortHandler: ViewPortHandler?
+    ): String
 }

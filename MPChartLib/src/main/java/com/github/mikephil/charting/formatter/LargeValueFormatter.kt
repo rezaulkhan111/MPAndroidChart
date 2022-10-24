@@ -1,11 +1,22 @@
+package com.github.mikephil.charting.formatter
 
-package com.github.mikephil.charting.formatter;
-
-import com.github.mikephil.charting.components.AxisBase;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.utils.ViewPortHandler;
-
-import java.text.DecimalFormat;
+import com.github.mikephil.charting.interfaces.dataprovider.ChartInterface.yChartMax
+import com.github.mikephil.charting.interfaces.dataprovider.ChartInterface.yChartMin
+import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider.lineData
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.yMax
+import com.github.mikephil.charting.interfaces.datasets.IDataSet.yMin
+import com.github.mikephil.charting.interfaces.datasets.IDataSet
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
+import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider
+import com.github.mikephil.charting.utils.ViewPortHandler
+import com.github.mikephil.charting.formatter.IValueFormatter
+import com.github.mikephil.charting.formatter.IAxisValueFormatter
+import com.github.mikephil.charting.components.AxisBase
+import com.github.mikephil.charting.formatter.IFillFormatter
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.data.Entry
+import java.text.DecimalFormat
 
 /**
  * Predefined value-formatter that formats large numbers in a pretty way.
@@ -15,42 +26,38 @@ import java.text.DecimalFormat;
  * (https://github.com/romangromov) for this piece of code.
  *
  * @author Philipp Jahoda
- * @author Oleksandr Tyshkovets <olexandr.tyshkovets@gmail.com>
+ * @author Oleksandr Tyshkovets <olexandr.tyshkovets></olexandr.tyshkovets>@gmail.com>
  */
-public class LargeValueFormatter implements IValueFormatter, IAxisValueFormatter
-{
-
-    private String[] mSuffix = new String[]{
-            "", "k", "m", "b", "t"
-    };
-    private int mMaxLength = 5;
-    private DecimalFormat mFormat;
-    private String mText = "";
-
-    public LargeValueFormatter() {
-        mFormat = new DecimalFormat("###E00");
-    }
+class LargeValueFormatter() : IValueFormatter, IAxisValueFormatter {
+    private var mSuffix = arrayOf(
+        "", "k", "m", "b", "t"
+    )
+    private var mMaxLength = 5
+    private val mFormat: DecimalFormat
+    private var mText = ""
 
     /**
      * Creates a formatter that appends a specified text to the result string
      *
      * @param appendix a text that will be appended
      */
-    public LargeValueFormatter(String appendix) {
-        this();
-        mText = appendix;
+    constructor(appendix: String) : this() {
+        mText = appendix
     }
 
     // IValueFormatter
-    @Override
-    public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
-        return makePretty(value) + mText;
+    override fun getFormattedValue(
+        value: Float,
+        entry: Entry?,
+        dataSetIndex: Int,
+        viewPortHandler: ViewPortHandler?
+    ): String {
+        return makePretty(value.toDouble()) + mText
     }
 
     // IAxisValueFormatter
-    @Override
-    public String getFormattedValue(float value, AxisBase axis) {
-        return makePretty(value) + mText;
+    override fun getFormattedValue(value: Float, axis: AxisBase?): String {
+        return makePretty(value.toDouble()) + mText
     }
 
     /**
@@ -58,8 +65,8 @@ public class LargeValueFormatter implements IValueFormatter, IAxisValueFormatter
      *
      * @param appendix
      */
-    public void setAppendix(String appendix) {
-        this.mText = appendix;
+    fun setAppendix(appendix: String) {
+        mText = appendix
     }
 
     /**
@@ -68,36 +75,34 @@ public class LargeValueFormatter implements IValueFormatter, IAxisValueFormatter
      *
      * @param suffix new suffix
      */
-    public void setSuffix(String[] suffix) {
-        this.mSuffix = suffix;
+    fun setSuffix(suffix: Array<String>) {
+        mSuffix = suffix
     }
 
-    public void setMaxLength(int maxLength) {
-        this.mMaxLength = maxLength;
+    fun setMaxLength(maxLength: Int) {
+        mMaxLength = maxLength
     }
 
     /**
      * Formats each number properly. Special thanks to Roman Gromov
      * (https://github.com/romangromov) for this piece of code.
      */
-    private String makePretty(double number) {
-
-        String r = mFormat.format(number);
-
-        int numericValue1 = Character.getNumericValue(r.charAt(r.length() - 1));
-        int numericValue2 = Character.getNumericValue(r.charAt(r.length() - 2));
-        int combined = Integer.valueOf(numericValue2 + "" + numericValue1);
-
-        r = r.replaceAll("E[0-9][0-9]", mSuffix[combined / 3]);
-
-        while (r.length() > mMaxLength || r.matches("[0-9]+\\.[a-z]")) {
-            r = r.substring(0, r.length() - 2) + r.substring(r.length() - 1);
+    private fun makePretty(number: Double): String {
+        var r = mFormat.format(number)
+        val numericValue1 = Character.getNumericValue(r[r.length - 1])
+        val numericValue2 = Character.getNumericValue(r[r.length - 2])
+        val combined = Integer.valueOf(numericValue2.toString() + "" + numericValue1)
+        r = r.replace("E[0-9][0-9]".toRegex(), mSuffix[combined / 3])
+        while (r.length > mMaxLength || r.matches("[0-9]+\\.[a-z]")) {
+            r = r.substring(0, r.length - 2) + r.substring(r.length - 1)
         }
-
-        return r;
+        return r
     }
 
-    public int getDecimalDigits() {
-        return 0;
+    val decimalDigits: Int
+        get() = 0
+
+    init {
+        mFormat = DecimalFormat("###E00")
     }
 }
