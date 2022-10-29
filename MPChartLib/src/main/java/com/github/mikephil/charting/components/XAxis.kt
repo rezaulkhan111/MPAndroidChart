@@ -1,44 +1,6 @@
 package com.github.mikephil.charting.components
 
 import com.github.mikephil.charting.utils.Utils.convertDpToPixel
-import com.github.mikephil.charting.utils.Utils.calcTextWidth
-import com.github.mikephil.charting.utils.Utils.calcTextHeight
-import com.github.mikephil.charting.utils.Utils.getLineHeight
-import com.github.mikephil.charting.utils.Utils.getLineSpacing
-import com.github.mikephil.charting.utils.ViewPortHandler.contentWidth
-import com.github.mikephil.charting.utils.Utils.calcTextSize
-import com.github.mikephil.charting.utils.FSize.Companion.getInstance
-import com.github.mikephil.charting.formatter.IAxisValueFormatter.getFormattedValue
-import com.github.mikephil.charting.formatter.DefaultAxisValueFormatter.decimalDigits
-import com.github.mikephil.charting.components.AxisBase
-import com.github.mikephil.charting.components.XAxis.XAxisPosition
-import com.github.mikephil.charting.components.YAxis.YAxisLabelPosition
-import com.github.mikephil.charting.components.YAxis.AxisDependency
-import com.github.mikephil.charting.components.ComponentBase
-import com.github.mikephil.charting.components.LegendEntry
-import com.github.mikephil.charting.components.Legend.LegendHorizontalAlignment
-import com.github.mikephil.charting.components.Legend.LegendVerticalAlignment
-import com.github.mikephil.charting.components.Legend.LegendOrientation
-import com.github.mikephil.charting.components.Legend.LegendDirection
-import com.github.mikephil.charting.components.Legend.LegendForm
-import android.graphics.DashPathEffect
-import com.github.mikephil.charting.utils.ColorTemplate
-import com.github.mikephil.charting.utils.FSize
-import com.github.mikephil.charting.utils.ViewPortHandler
-import com.github.mikephil.charting.utils.MPPointF
-import com.github.mikephil.charting.formatter.IAxisValueFormatter
-import com.github.mikephil.charting.components.LimitLine
-import com.github.mikephil.charting.formatter.DefaultAxisValueFormatter
-import com.github.mikephil.charting.components.LimitLine.LimitLabelPosition
-import android.widget.RelativeLayout
-import com.github.mikephil.charting.components.IMarker
-import com.github.mikephil.charting.charts.Chart
-import android.view.LayoutInflater
-import android.view.View.MeasureSpec
-import android.graphics.Paint.Align
-import android.graphics.drawable.Drawable
-import android.os.Build
-import android.graphics.Typeface
 
 /**
  * Class representing the x-axis labels settings. Only use the setter methods to

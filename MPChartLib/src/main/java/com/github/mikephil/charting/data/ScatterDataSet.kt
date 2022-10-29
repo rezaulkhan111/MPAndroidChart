@@ -1,6 +1,10 @@
 package com.github.mikephil.charting.data
 
+import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet
 import com.github.mikephil.charting.renderer.scatter.ChevronDownShapeRenderer
+import com.github.mikephil.charting.renderer.scatter.IShapeRenderer
+import com.github.mikephil.charting.renderer.scatter.SquareShapeRenderer
+import com.github.mikephil.charting.utils.ColorTemplate
 import java.util.ArrayList
 
 class ScatterDataSet(yVals: MutableList<Entry?>?, label: String?) :
