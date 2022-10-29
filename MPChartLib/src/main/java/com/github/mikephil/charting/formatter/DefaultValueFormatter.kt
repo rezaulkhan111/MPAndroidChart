@@ -14,7 +14,7 @@ class DefaultValueFormatter(digits: Int) : IValueFormatter {
     /**
      * DecimalFormat for formatting
      */
-    protected var mFormat: DecimalFormat? = null
+     var mFormat: DecimalFormat? = null
 
     /**
      * Returns the number of decimal digits this formatter uses.
@@ -22,7 +22,7 @@ class DefaultValueFormatter(digits: Int) : IValueFormatter {
      * @return
      */
     var decimalDigits = 0
-        protected set
+         set
 
     /**
      * Sets up the formatter with a given number of decimal digits.

@@ -70,7 +70,7 @@ class PieDataSet(yVals: MutableList<PieEntry?>?, label: String?) : DataSet<PieEn
         return copied
     }
 
-    protected fun copy(pieDataSet: PieDataSet?) {
+     fun copy(pieDataSet: PieDataSet?) {
         super.copy(pieDataSet)
     }
 

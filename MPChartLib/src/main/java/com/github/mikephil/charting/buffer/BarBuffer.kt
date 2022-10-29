@@ -4,13 +4,13 @@ import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
 
 open class BarBuffer(size: Int, dataSetCount: Int, containsStacks: Boolean) :
     AbstractBuffer<IBarDataSet>(size) {
-    protected var mDataSetIndex = 0
-    protected var mDataSetCount = 1
-    protected var mContainsStacks = false
-    protected var mInverted = false
+    var mDataSetIndex = 0
+    var mDataSetCount = 1
+    var mContainsStacks = false
+    var mInverted = false
 
     /** width of the bar on the x-axis, in values (not pixels)  */
-    protected var mBarWidth = 1f
+     var mBarWidth = 1f
     fun setBarWidth(barWidth: Float) {
         mBarWidth = barWidth
     }
@@ -23,7 +23,7 @@ open class BarBuffer(size: Int, dataSetCount: Int, containsStacks: Boolean) :
         mInverted = inverted
     }
 
-    protected fun addBar(left: Float, top: Float, right: Float, bottom: Float) {
+     fun addBar(left: Float, top: Float, right: Float, bottom: Float) {
         buffer[index++] = left
         buffer[index++] = top
         buffer[index++] = right
@@ -49,11 +49,11 @@ open class BarBuffer(size: Int, dataSetCount: Int, containsStacks: Boolean) :
                 var bottom: Float
                 var top: Float
                 if (mInverted) {
-                    bottom = if (y >= 0) y else 0
-                    top = if (y <= 0) y else 0
+                    bottom = if (y >= 0) y else 0F
+                    top = if (y <= 0) y else 0F
                 } else {
-                    top = if (y >= 0) y else 0
-                    bottom = if (y <= 0) y else 0
+                    top = if (y >= 0) y else 0F
+                    bottom = if (y <= 0) y else 0F
                 }
 
                 // multiply the height of the rect with the phase

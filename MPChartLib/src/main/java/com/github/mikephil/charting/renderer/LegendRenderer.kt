@@ -21,11 +21,11 @@ import com.github.mikephil.charting.utils.ViewPortHandler
 import java.util.*
 
 class LegendRenderer(
-    viewPortHandler: ViewPortHandler?,
+    viewPortHandler: ViewPortHandler,
     /**
      * the legend object this renderer renders
      */
-    protected var mLegend: Legend
+    var mLegend: Legend
 ) : Renderer(viewPortHandler) {
     /**
      * Returns the Paint object used for drawing the Legend labels.
@@ -46,8 +46,8 @@ class LegendRenderer(
      * paint used for the legend forms
      */
     var formPaint: Paint
-        protected set
-    protected var computedEntries: MutableList<LegendEntry> = ArrayList(16)
+        set
+    var computedEntries: MutableList<LegendEntry> = ArrayList(16)
 
     /**
      * Prepares the legend and calculates all needed forms, labels and colors.
@@ -61,13 +61,13 @@ class LegendRenderer(
             // loop for building up the colors and labels used in the legend
             for (i in 0 until data.dataSetCount) {
                 val dataSet = data.getDataSetByIndex(i) ?: continue
-                val clrs = dataSet.colors
+                val clrs = dataSet.colors!!
                 val entryCount = dataSet.entryCount
 
                 // if we have a barchart with stacked bars
                 if (dataSet is IBarDataSet && dataSet.isStacked) {
                     val bds = dataSet
-                    val sLabels = bds.stackLabels
+                    val sLabels = bds.stackLabels!!
                     val minEntries = Math.min(clrs.size, bds.stackSize)
                     for (j in 0 until minEntries) {
                         var label: String?
@@ -80,11 +80,11 @@ class LegendRenderer(
                         computedEntries.add(
                             LegendEntry(
                                 label,
-                                dataSet.form,
+                                dataSet.form!!,
                                 dataSet.formSize,
                                 dataSet.formLineWidth,
                                 dataSet.formLineDashEffect,
-                                clrs[j]
+                                clrs[j]!!
                             )
                         )
                     }
@@ -105,12 +105,12 @@ class LegendRenderer(
                     while (j < clrs.size && j < entryCount) {
                         computedEntries.add(
                             LegendEntry(
-                                pds.getEntryForIndex(j).label,
-                                dataSet.form,
+                                pds.getEntryForIndex(j)!!.label,
+                                dataSet.form!!,
                                 dataSet.formSize,
                                 dataSet.formLineWidth,
                                 dataSet.formLineDashEffect,
-                                clrs[j]
+                                clrs[j]!!
                             )
                         )
                         j++
@@ -134,7 +134,7 @@ class LegendRenderer(
                     computedEntries.add(
                         LegendEntry(
                             null,
-                            dataSet.form,
+                            dataSet.form!!,
                             dataSet.formSize,
                             dataSet.formLineWidth,
                             dataSet.formLineDashEffect,
@@ -144,7 +144,7 @@ class LegendRenderer(
                     computedEntries.add(
                         LegendEntry(
                             dataSet.label,
-                            dataSet.form,
+                            dataSet.form!!,
                             dataSet.formSize,
                             dataSet.formLineWidth,
                             dataSet.formLineDashEffect,
@@ -155,21 +155,20 @@ class LegendRenderer(
                     var j = 0
                     while (j < clrs.size && j < entryCount) {
                         var label: String?
-
                         // if multiple colors are set for a DataSet, group them
                         label = if (j < clrs.size - 1 && j < entryCount - 1) {
                             null
                         } else { // add label to the last entry
-                            data.getDataSetByIndex(i).label
+                            data.getDataSetByIndex(i)!!.label
                         }
                         computedEntries.add(
                             LegendEntry(
                                 label,
-                                dataSet.form,
+                                dataSet.form!!,
                                 dataSet.formSize,
                                 dataSet.formLineWidth,
                                 dataSet.formLineDashEffect,
-                                clrs[j]
+                                clrs[j]!!
                             )
                         )
                         j++
@@ -190,7 +189,7 @@ class LegendRenderer(
         mLegend.calculateDimensions(labelPaint, mViewPortHandler)
     }
 
-    protected var legendFontMetrics = Paint.FontMetrics()
+    var legendFontMetrics = Paint.FontMetrics()
     fun renderLegend(c: Canvas) {
         if (!mLegend.isEnabled) return
         val tf = mLegend.typeface
@@ -292,7 +291,6 @@ class LegendRenderer(
                 }
             }
             LegendOrientation.VERTICAL -> {
-
                 // contains the stacked legend size in pixels
                 var stack = 0f
                 var wasStacked = false
@@ -364,7 +362,7 @@ class LegendRenderer(
      * @param entry  the entry to render
      * @param legend the legend context
      */
-    protected fun drawForm(
+    fun drawForm(
         c: Canvas,
         x: Float, y: Float,
         entry: LegendEntry,
@@ -416,7 +414,7 @@ class LegendRenderer(
      * @param y
      * @param label the label to draw
      */
-    protected fun drawLabel(c: Canvas, x: Float, y: Float, label: String?) {
+    fun drawLabel(c: Canvas, x: Float, y: Float, label: String?) {
         c.drawText(label!!, x, y, labelPaint)
     }
 

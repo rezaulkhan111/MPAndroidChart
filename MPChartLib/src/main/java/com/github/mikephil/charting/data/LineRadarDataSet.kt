@@ -82,7 +82,7 @@ abstract class LineRadarDataSet<T : Entry?>(yVals: MutableList<T?>?, label: Stri
         isDrawFilledEnabled = filled
     }
 
-    protected fun copy(lineRadarDataSet: LineRadarDataSet<*>) {
+     fun copy(lineRadarDataSet: LineRadarDataSet<*>) {
         super.copy(lineRadarDataSet)
         lineRadarDataSet.isDrawFilledEnabled = isDrawFilledEnabled
         lineRadarDataSet.fillAlpha = fillAlpha

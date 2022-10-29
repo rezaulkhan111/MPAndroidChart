@@ -10,7 +10,7 @@ class DefaultAxisValueFormatter(digits: Int) : IAxisValueFormatter {
     /**
      * decimalformat for formatting
      */
-    protected var mFormat: DecimalFormat
+     var mFormat: DecimalFormat
     /**
      * Returns the number of decimal digits this formatter uses or -1, if unspecified.
      *
@@ -20,7 +20,7 @@ class DefaultAxisValueFormatter(digits: Int) : IAxisValueFormatter {
      * the number of decimal digits this formatter uses
      */
     var decimalDigits = 0
-        protected set
+         set
 
     override fun getFormattedValue(value: Float, axis: AxisBase?): String {
         // avoid memory allocations here (for performance)

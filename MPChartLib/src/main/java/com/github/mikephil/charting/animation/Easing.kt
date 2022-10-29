@@ -9,9 +9,9 @@ import androidx.annotation.RequiresApi
  * @author Daniel Cohen Gindi
  * @author Mick Ashton
  */
-@RequiresApi(11)
+//@RequiresApi(11)
 object Easing {
-    private const val DOUBLE_PI = 2f * Math.PI.toFloat()
+    const val DOUBLE_PI = 2f * Math.PI.toFloat()
     val Linear: EasingFunction = object : EasingFunction {
         override fun getInterpolation(input: Float): Float {
             return input
@@ -27,6 +27,7 @@ object Easing {
             return -input * (input - 2f)
         }
     }
+
     @JvmField
     val EaseInOutQuad: EasingFunction = object : EasingFunction {
         override fun getInterpolation(input: Float): Float {
@@ -37,6 +38,7 @@ object Easing {
             } else -0.5f * (--input * (input - 2f) - 1f)
         }
     }
+
     @JvmField
     val EaseInCubic: EasingFunction = object : EasingFunction {
         override fun getInterpolation(input: Float): Float {
@@ -50,6 +52,7 @@ object Easing {
             return Math.pow(input.toDouble(), 3.0).toFloat() + 1f
         }
     }
+
     @JvmField
     val EaseInOutCubic: EasingFunction = object : EasingFunction {
         override fun getInterpolation(input: Float): Float {

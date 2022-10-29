@@ -357,7 +357,7 @@ class HorizontalBarChartRenderer(
         }
     }
 
-    protected fun drawValue(c: Canvas, valueText: String?, x: Float, y: Float, color: Int) {
+     fun drawValue(c: Canvas, valueText: String?, x: Float, y: Float, color: Int) {
         mValuePaint.color = color
         c.drawText(valueText!!, x, y, mValuePaint)
     }

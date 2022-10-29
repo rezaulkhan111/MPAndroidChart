@@ -75,8 +75,8 @@ class RadarChart : PieRadarChartBase<RadarData?> {
      * the object reprsenting the y-axis labels
      */
     private var mYAxis: YAxis? = null
-    protected var mYAxisRenderer: YAxisRendererRadarChart? = null
-    protected var mXAxisRenderer: XAxisRendererRadarChart? = null
+     var mYAxisRenderer: YAxisRendererRadarChart? = null
+     var mXAxisRenderer: XAxisRendererRadarChart? = null
 
     constructor(context: Context?) : super(context) {}
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {}

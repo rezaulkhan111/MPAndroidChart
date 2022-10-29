@@ -124,7 +124,7 @@ open class Entry : BaseEntry, Parcelable {
         }
     }
 
-    protected constructor(`in`: Parcel) {
+     constructor(`in`: Parcel) {
         x = `in`.readFloat()
         y = `in`.readFloat()
         if (`in`.readInt() == 1) {

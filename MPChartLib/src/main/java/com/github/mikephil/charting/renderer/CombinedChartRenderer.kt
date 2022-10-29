@@ -22,8 +22,8 @@ class CombinedChartRenderer(
     /**
      * all rederers for the different kinds of data this combined-renderer can draw
      */
-    protected var mRenderers: MutableList<DataRenderer> = ArrayList(5)
-    protected var mChart: WeakReference<Chart<*>>
+     var mRenderers: MutableList<DataRenderer> = ArrayList(5)
+     var mChart: WeakReference<Chart<*>>
 
     /**
      * Creates the renderers needed for this combined-renderer in the required order. Also takes the DrawOrder into

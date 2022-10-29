@@ -16,12 +16,12 @@ open class ChartHighlighter<T : BarLineScatterCandleBubbleDataProvider?>(
     /**
      * instance of the data-provider
      */
-    protected var mChart: T
+     var mChart: T
 ) : IHighlighter {
     /**
      * buffer for storing previously highlighted values
      */
-    protected var mHighlightBuffer: MutableList<Highlight> = ArrayList()
+     var mHighlightBuffer: MutableList<Highlight> = ArrayList()
     override fun getHighlight(
         x: Float,
         y: Float
@@ -40,7 +40,7 @@ open class ChartHighlighter<T : BarLineScatterCandleBubbleDataProvider?>(
      * @param y
      * @return
      */
-    protected fun getValsForTouch(x: Float, y: Float): MPPointD {
+     fun getValsForTouch(x: Float, y: Float): MPPointD {
 
         // take any transformer to determine the x-axis value
         return mChart!!.getTransformer(AxisDependency.LEFT)!!
@@ -55,7 +55,7 @@ open class ChartHighlighter<T : BarLineScatterCandleBubbleDataProvider?>(
      * @param y
      * @return
      */
-    protected fun getHighlightForX(
+     fun getHighlightForX(
         xVal: Float,
         x: Float,
         y: Float
@@ -83,7 +83,7 @@ open class ChartHighlighter<T : BarLineScatterCandleBubbleDataProvider?>(
      * @param axis
      * @return
      */
-    protected fun getMinimumDistance(
+     fun getMinimumDistance(
         closestValues: List<Highlight>,
         pos: Float,
         axis: AxisDependency
@@ -101,7 +101,7 @@ open class ChartHighlighter<T : BarLineScatterCandleBubbleDataProvider?>(
         return distance
     }
 
-    protected fun getHighlightPos(h: Highlight): Float {
+     fun getHighlightPos(h: Highlight): Float {
         return h.yPx
     }
 
@@ -114,7 +114,7 @@ open class ChartHighlighter<T : BarLineScatterCandleBubbleDataProvider?>(
      * @param y    touch position
      * @return
      */
-    protected open fun getHighlightsAtXValue(xVal: Float, x: Float, y: Float): List<Highlight> {
+     open fun getHighlightsAtXValue(xVal: Float, x: Float, y: Float): List<Highlight> {
         mHighlightBuffer.clear()
         val data = data ?: return mHighlightBuffer
         var i = 0
@@ -142,7 +142,7 @@ open class ChartHighlighter<T : BarLineScatterCandleBubbleDataProvider?>(
      * @param rounding
      * @return
      */
-    protected open fun buildHighlights(
+     open fun buildHighlights(
         set: IDataSet<*>,
         dataSetIndex: Int,
         xVal: Float,

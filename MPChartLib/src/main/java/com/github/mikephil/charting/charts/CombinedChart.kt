@@ -4,8 +4,10 @@ import android.content.Context
 import android.graphics.Canvas
 import android.util.AttributeSet
 import android.util.Log
-import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.highlight.Highlight
+import com.github.mikephil.charting.interfaces.dataprovider.CombinedDataProvider
+import com.github.mikephil.charting.interfaces.datasets.IDataSet
 import com.github.mikephil.charting.renderer.CombinedChartRenderer
 
 /**
@@ -19,8 +21,7 @@ class CombinedChart : BarLineChartBase<CombinedData?>, CombinedDataProvider {
      * if set to true, all values are drawn above their bars, instead of below
      * their top
      */
-    var isDrawValueAboveBarEnabled = true
-        private set
+    override var isDrawValueAboveBarEnabled = true
     /**
      * @return true the highlight operation is be full-bar oriented, false if single-value
      */
@@ -33,15 +34,15 @@ class CombinedChart : BarLineChartBase<CombinedData?>, CombinedDataProvider {
     /**
      * flag that indicates whether the highlight should be full-bar oriented, or single-value?
      */
-    var isHighlightFullBarEnabled = false
+    override var isHighlightFullBarEnabled = false
 
     /**
      * if set to true, a grey area is drawn behind each bar that indicates the
      * maximum value
      */
-    var isDrawBarShadowEnabled = false
-        private set
-    protected var mDrawOrder: Array<DrawOrder>
+    override var isDrawBarShadowEnabled = false
+
+    lateinit var mDrawOrder: Array<DrawOrder>
 
     /**
      * enum that allows to specify the order in which the different data objects
@@ -74,8 +75,8 @@ class CombinedChart : BarLineChartBase<CombinedData?>, CombinedDataProvider {
         mRenderer = CombinedChartRenderer(this, mAnimator, mViewPortHandler)
     }
 
-    val combinedData: CombinedData
-        get() = mData
+    override val combinedData: CombinedData
+        get() = mData!!
     override var data: T?
         get() = super.data
         set(data) {
@@ -110,16 +111,16 @@ class CombinedChart : BarLineChartBase<CombinedData?>, CombinedDataProvider {
         }
     }
 
-    val lineData: LineData?
-        get() = if (mData == null) null else mData.getLineData()
-    val barData: BarData?
-        get() = if (mData == null) null else mData.getBarData()
-    val scatterData: ScatterData?
-        get() = if (mData == null) null else mData.getScatterData()
-    val candleData: CandleData?
-        get() = if (mData == null) null else mData.getCandleData()
-    val bubbleData: BubbleData?
-        get() = if (mData == null) null else mData.getBubbleData()
+    override val lineData: LineData?
+        get() = if (mData == null) null else mData!!.getLineData()
+    override val barData: BarData?
+        get() = if (mData == null) null else mData!!.getBarData()
+    override val scatterData: ScatterData?
+        get() = if (mData == null) null else mData!!.getScatterData()
+    override val candleData: CandleData?
+        get() = if (mData == null) null else mData!!.getCandleData()
+    override val bubbleData: BubbleData?
+        get() = if (mData == null) null else mData!!.getBubbleData()
 
     /**
      * If set to true, all values are drawn above their bars, instead of below
@@ -164,13 +165,12 @@ class CombinedChart : BarLineChartBase<CombinedData?>, CombinedDataProvider {
      * draws all MarkerViews on the highlighted positions
      */
     override fun drawMarkers(canvas: Canvas?) {
-
         // if there is no marker view or drawing marker is disabled
         if (mMarker == null || !isDrawMarkersEnabled || !valuesToHighlight()) return
         for (i in mIndicesToHighlight.indices) {
             val highlight = mIndicesToHighlight[i]
-            val set: IDataSet<*> = mData.getDataSetByHighlight(highlight)
-            val e: Entry = mData.getEntryForHighlight(highlight)
+            val set: IDataSet<*> = mData!!.getDataSetByHighlight(highlight)!!
+            val e: Entry = mData!!.getEntryForHighlight(highlight)
                 ?: continue
             val entryIndex: Int = set.getEntryIndex(e)
 
@@ -179,13 +179,13 @@ class CombinedChart : BarLineChartBase<CombinedData?>, CombinedDataProvider {
             val pos = getMarkerPosition(highlight)
 
             // check bounds
-            if (!mViewPortHandler.isInBounds(pos!![0], pos[1])) continue
+            if (!mViewPortHandler.isInBounds(pos[0], pos[1])) continue
 
             // callbacks to update the content
-            mMarker.refreshContent(e, highlight)
+            mMarker!!.refreshContent(e, highlight)
 
             // draw the marker
-            mMarker.draw(canvas, pos[0], pos[1])
+            mMarker!!.draw(canvas!!, pos[0], pos[1])
         }
     }
 }

@@ -5,8 +5,8 @@ import com.github.mikephil.charting.utils.Utils.convertDpToPixel
 
 class BubbleDataSet(yVals: MutableList<BubbleEntry?>?, label: String?) :
     BarLineScatterCandleBubbleDataSet<BubbleEntry?>(yVals, label), IBubbleDataSet {
-    protected var mMaxSize = 0f
-    protected var mNormalizeSize = true
+     var mMaxSize = 0f
+     var mNormalizeSize = true
     private var mHighlightCircleWidth = 2.5f
     override fun setHighlightCircleWidth(width: Float) {
         mHighlightCircleWidth = convertDpToPixel(width)
@@ -34,7 +34,7 @@ class BubbleDataSet(yVals: MutableList<BubbleEntry?>?, label: String?) :
         return copied
     }
 
-    protected fun copy(bubbleDataSet: BubbleDataSet) {
+     fun copy(bubbleDataSet: BubbleDataSet) {
         bubbleDataSet.mHighlightCircleWidth = mHighlightCircleWidth
         bubbleDataSet.mNormalizeSize = mNormalizeSize
     }

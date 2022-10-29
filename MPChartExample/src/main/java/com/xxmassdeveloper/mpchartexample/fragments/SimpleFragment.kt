@@ -16,7 +16,7 @@ import com.github.mikephil.charting.utils.FileUtils.loadEntriesFromAssets
 
 abstract class SimpleFragment : Fragment() {
     private var tf: Typeface? = null
-    protected var context: Context? = null
+     var context: Context? = null
     override fun onAttach(context: Context) {
         super.onAttach(context)
         this.context = context
@@ -31,7 +31,7 @@ abstract class SimpleFragment : Fragment() {
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
-    protected fun generateBarData(dataSets: Int, range: Float, count: Int): BarData {
+     fun generateBarData(dataSets: Int, range: Float, count: Int): BarData {
         val sets = ArrayList<IBarDataSet>()
         for (i in 0 until dataSets) {
             val entries = ArrayList<BarEntry?>()
@@ -47,7 +47,7 @@ abstract class SimpleFragment : Fragment() {
         return d
     }
 
-    protected fun generateScatterData(dataSets: Int, range: Float, count: Int): ScatterData {
+     fun generateScatterData(dataSets: Int, range: Float, count: Int): ScatterData {
         val sets = ArrayList<IScatterDataSet>()
         val shapes = allDefaultShapes
         for (i in 0 until dataSets) {
@@ -71,7 +71,7 @@ abstract class SimpleFragment : Fragment() {
      * generates less data (1 DataSet, 4 values)
      * @return PieData
      */
-    protected fun generatePieData(): PieData {
+     fun generatePieData(): PieData {
         val count = 4
         val entries1 = ArrayList<PieEntry?>()
         for (i in 0 until count) {
@@ -87,7 +87,7 @@ abstract class SimpleFragment : Fragment() {
         return d
     }
 
-    protected fun generateLineData(): LineData {
+     fun generateLineData(): LineData {
         val sets = ArrayList<ILineDataSet>()
         val ds1 = LineDataSet(
             loadEntriesFromAssets(
@@ -115,8 +115,8 @@ abstract class SimpleFragment : Fragment() {
     }
 
     // load DataSets from files in assets folder
-    protected val complexity: LineData
-        protected get() {
+     val complexity: LineData
+         get() {
             val sets = ArrayList<ILineDataSet>()
             val ds1 = LineDataSet(
                 loadEntriesFromAssets(

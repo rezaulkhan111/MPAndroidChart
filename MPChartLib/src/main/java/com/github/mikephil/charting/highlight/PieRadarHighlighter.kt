@@ -7,12 +7,12 @@ import com.github.mikephil.charting.interfaces.datasets.IDataSet.entryCount
 /**
  * Created by philipp on 12/06/16.
  */
-abstract class PieRadarHighlighter<T : PieRadarChartBase<*>?>(protected var mChart: T) :
+abstract class PieRadarHighlighter<T : PieRadarChartBase<*>?>( var mChart: T) :
     IHighlighter {
     /**
      * buffer for storing previously highlighted values
      */
-    protected var mHighlightBuffer: List<Highlight> = ArrayList()
+     var mHighlightBuffer: List<Highlight> = ArrayList()
     override fun getHighlight(x: Float, y: Float): Highlight? {
         val touchDistanceToCenter = mChart!!.distanceToCenter(x, y)
 
@@ -45,5 +45,5 @@ abstract class PieRadarHighlighter<T : PieRadarChartBase<*>?>(protected var mCha
      * @param y
      * @return
      */
-    protected abstract fun getClosestHighlight(index: Int, x: Float, y: Float): Highlight?
+     abstract fun getClosestHighlight(index: Int, x: Float, y: Float): Highlight?
 }

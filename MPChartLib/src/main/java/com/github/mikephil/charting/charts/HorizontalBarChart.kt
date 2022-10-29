@@ -1,11 +1,16 @@
 package com.github.mikephil.charting.charts
 
 import android.content.Context
+import android.graphics.RectF
 import android.util.AttributeSet
 import android.util.Log
+import com.github.mikephil.charting.components.YAxis
+import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.highlight.Highlight
+import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
 import com.github.mikephil.charting.renderer.HorizontalBarChartRenderer
+import com.github.mikephil.charting.utils.MPPointF
 import com.github.mikephil.charting.utils.Utils
 
 /**
@@ -15,6 +20,7 @@ import com.github.mikephil.charting.utils.Utils
  * @author Philipp Jahoda
  */
 class HorizontalBarChart : BarChart {
+
     constructor(context: Context?) : super(context) {}
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {}
     constructor(context: Context?, attrs: AttributeSet?, defStyle: Int) : super(
@@ -154,11 +160,11 @@ class HorizontalBarChart : BarChart {
     }
 
     override fun prepareValuePxMatrix() {
-        mRightAxisTransformer!!.prepareMatrixValuePx(
+        mRightAxisTransformer.prepareMatrixValuePx(
             mAxisRight.mAxisMinimum, mAxisRight.mAxisRange, mXAxis.mAxisRange,
             mXAxis.mAxisMinimum
         )
-        mLeftAxisTransformer!!.prepareMatrixValuePx(
+        mLeftAxisTransformer.prepareMatrixValuePx(
             mAxisLeft.mAxisMinimum, mAxisLeft.mAxisRange, mXAxis.mAxisRange,
             mXAxis.mAxisMinimum
         )
@@ -180,13 +186,13 @@ class HorizontalBarChart : BarChart {
         val barWidth = mData!!.barWidth
         val top = x - barWidth / 2f
         val bottom = x + barWidth / 2f
-        val left: Float = if (y >= 0) y else 0
-        val right: Float = if (y <= 0) y else 0
+        val left: Float = if (y >= 0) y else 0F
+        val right: Float = if (y <= 0) y else 0F
         bounds.set(left, top, right, bottom)
         getTransformer(set.axisDependency)!!.rectValueToPixel(bounds)
     }
 
-    protected override var mGetPositionBuffer = FloatArray(2)
+    override var mGetPositionBuffer = FloatArray(2)
 
     /**
      * Returns a recyclable MPPointF instance.
@@ -195,7 +201,7 @@ class HorizontalBarChart : BarChart {
      * @param axis
      * @return
      */
-    override fun getPosition(e: Entry?, axis: AxisDependency?): MPPointF? {
+    override fun getPosition(e: Entry?, axis: YAxis.AxisDependency?): MPPointF? {
         if (e == null) return null
         val vals = mGetPositionBuffer
         vals[0] = e.y
@@ -224,19 +230,19 @@ class HorizontalBarChart : BarChart {
 
     override val lowestVisibleX: Float
         get() {
-            getTransformer(AxisDependency.LEFT)!!.getValuesByTouchPoint(
+            getTransformer(YAxis.AxisDependency.LEFT)!!.getValuesByTouchPoint(
                 mViewPortHandler.contentLeft(),
                 mViewPortHandler.contentBottom(), posForGetLowestVisibleX
             )
-            return Math.max(mXAxis.mAxisMinimum, posForGetLowestVisibleX.y).toFloat()
+            return Math.max(mXAxis.mAxisMinimum, posForGetLowestVisibleX.y.toFloat())
         }
     override val highestVisibleX: Float
         get() {
-            getTransformer(AxisDependency.LEFT)!!.getValuesByTouchPoint(
+            getTransformer(YAxis.AxisDependency.LEFT)!!.getValuesByTouchPoint(
                 mViewPortHandler.contentLeft(),
                 mViewPortHandler.contentTop(), posForGetHighestVisibleX
             )
-            return Math.min(mXAxis.mAxisMaximum, posForGetHighestVisibleX.y).toFloat()
+            return Math.min(mXAxis.mAxisMaximum, posForGetHighestVisibleX.y.toFloat())
         }
 
     /**
@@ -258,17 +264,17 @@ class HorizontalBarChart : BarChart {
         mViewPortHandler.setMinMaxScaleY(minScale, maxScale)
     }
 
-    override fun setVisibleYRangeMaximum(maxYRange: Float, axis: AxisDependency) {
+    override fun setVisibleYRangeMaximum(maxYRange: Float, axis: YAxis.AxisDependency) {
         val yScale = getAxisRange(axis) / maxYRange
         mViewPortHandler.setMinimumScaleX(yScale)
     }
 
-    override fun setVisibleYRangeMinimum(minYRange: Float, axis: AxisDependency) {
+    override fun setVisibleYRangeMinimum(minYRange: Float, axis: YAxis.AxisDependency) {
         val yScale = getAxisRange(axis) / minYRange
         mViewPortHandler.setMaximumScaleX(yScale)
     }
 
-    override fun setVisibleYRange(minYRange: Float, maxYRange: Float, axis: AxisDependency) {
+    override fun setVisibleYRange(minYRange: Float, maxYRange: Float, axis: YAxis.AxisDependency) {
         val minScale = getAxisRange(axis) / minYRange
         val maxScale = getAxisRange(axis) / maxYRange
         mViewPortHandler.setMinMaxScaleX(minScale, maxScale)

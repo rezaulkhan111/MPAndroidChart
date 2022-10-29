@@ -10,27 +10,13 @@ import com.github.mikephil.charting.animation.Easing.EasingFunction
 import com.github.mikephil.charting.components.AxisBase.isDrawLabelsEnabled
 import com.github.mikephil.charting.components.ComponentBase.isEnabled
 import com.github.mikephil.charting.components.Legend.*
-import com.github.mikephil.charting.components.Legend.horizontalAlignment
-import com.github.mikephil.charting.components.Legend.isDrawInsideEnabled
-import com.github.mikephil.charting.components.Legend.maxSizePercent
-import com.github.mikephil.charting.components.Legend.orientation
-import com.github.mikephil.charting.components.Legend.verticalAlignment
 import com.github.mikephil.charting.data.*
-import com.github.mikephil.charting.data.BarEntry.y
-import com.github.mikephil.charting.data.BaseEntry.y
-import com.github.mikephil.charting.highlight.Highlight.y
 import com.github.mikephil.charting.interfaces.datasets.IDataSet
 import com.github.mikephil.charting.listener.PieRadarChartTouchListener
-import com.github.mikephil.charting.renderer.LegendRenderer.computeLegend
-import com.github.mikephil.charting.utils.MPPointD.Companion.recycleInstance
 import com.github.mikephil.charting.utils.MPPointF
 import com.github.mikephil.charting.utils.MPPointF.Companion.recycleInstance
 import com.github.mikephil.charting.utils.Utils.convertDpToPixel
 import com.github.mikephil.charting.utils.Utils.getNormalizedAngle
-import com.github.mikephil.charting.utils.ViewPortHandler.chartHeight
-import com.github.mikephil.charting.utils.ViewPortHandler.chartWidth
-import com.github.mikephil.charting.utils.ViewPortHandler.contentRect
-import com.github.mikephil.charting.utils.ViewPortHandler.restrainViewPort
 
 /**
  * Baseclass of PieChart and RadarChart.
@@ -114,7 +100,7 @@ abstract class PieRadarChartBase<T : ChartData<out IDataSet<out Entry?>?>?> : Ch
     override fun notifyDataSetChanged() {
         if (mData == null) return
         calcMinMax()
-        if (mLegend != null) mLegendRenderer.computeLegend(mData)
+        if (mLegend != null) mLegendRenderer.computeLegend(mData!!)
         calculateOffsets()
     }
 
@@ -123,12 +109,12 @@ abstract class PieRadarChartBase<T : ChartData<out IDataSet<out Entry?>?>?> : Ch
         var legendRight = 0f
         var legendBottom = 0f
         var legendTop = 0f
-        if (mLegend != null && mLegend.isEnabled && !mLegend.isDrawInsideEnabled) {
+        if (mLegend != null && mLegend!!.isEnabled && !mLegend!!.isDrawInsideEnabled) {
             val fullLegendWidth = Math.min(
-                mLegend.mNeededWidth,
-                mViewPortHandler.chartWidth * mLegend.maxSizePercent
+                mLegend!!.mNeededWidth,
+                mViewPortHandler.chartWidth * mLegend!!.maxSizePercent
             )
-            when (mLegend.orientation) {
+            when (mLegend!!.orientation) {
                 LegendOrientation.VERTICAL -> {
                     var xLegendOffset = 0f
                     if (mLegend.horizontalAlignment === LegendHorizontalAlignment.LEFT
@@ -165,10 +151,10 @@ abstract class PieRadarChartBase<T : ChartData<out IDataSet<out Entry?>?>?> : Ch
                             recycleInstance(reference)
                         }
                     }
-                    when (mLegend.horizontalAlignment) {
+                    when (mLegend!!.horizontalAlignment) {
                         LegendHorizontalAlignment.LEFT -> legendLeft = xLegendOffset
                         LegendHorizontalAlignment.RIGHT -> legendRight = xLegendOffset
-                        LegendHorizontalAlignment.CENTER -> when (mLegend.verticalAlignment) {
+                        LegendHorizontalAlignment.CENTER -> when (mLegend!!.verticalAlignment) {
                             LegendVerticalAlignment.TOP -> legendTop = Math.min(
                                 mLegend.mNeededHeight,
                                 mViewPortHandler.chartHeight * mLegend.maxSizePercent

@@ -74,7 +74,7 @@ open class BarHighlighter(chart: BarDataProvider) : ChartHighlighter<BarDataProv
      * @param value
      * @return
      */
-    protected fun getClosestStackIndex(ranges: Array<Range>?, value: Float): Int {
+     fun getClosestStackIndex(ranges: Array<Range>?, value: Float): Int {
         if (ranges == null || ranges.size == 0) return 0
         var stackIndex = 0
         for (range in ranges) {
@@ -121,6 +121,6 @@ open class BarHighlighter(chart: BarDataProvider) : ChartHighlighter<BarDataProv
         return Math.abs(x1 - x2)
     }
 
-    protected override val data: BarLineScatterCandleBubbleData<*>?
-        protected get() = mChart!!.barData
+     override val data: BarLineScatterCandleBubbleData<*>?
+         get() = mChart!!.barData
 }

@@ -23,11 +23,11 @@ class HorizontalBarBuffer(size: Int, dataSetCount: Int, containsStacks: Boolean)
                 var left: Float
                 var right: Float
                 if (mInverted) {
-                    left = if (y >= 0) y else 0
-                    right = if (y <= 0) y else 0
+                    left = if (y >= 0) y else 0F
+                    right = if (y <= 0) y else 0F
                 } else {
-                    right = if (y >= 0) y else 0
-                    left = if (y <= 0) y else 0
+                    right = if (y >= 0) y else 0F
+                    left = if (y <= 0) y else 0F
                 }
 
                 // multiply the height of the rect with the phase

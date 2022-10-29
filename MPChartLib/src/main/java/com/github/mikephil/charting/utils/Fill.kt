@@ -28,7 +28,7 @@ open class Fill {
     /**
      * the drawable to be used for filling
      */
-    protected var mDrawable: Drawable? = null
+     var mDrawable: Drawable? = null
     var gradientColors: IntArray? = null
     var gradientPositions: FloatArray? = null
 

@@ -10,16 +10,16 @@ import com.github.mikephil.charting.utils.Utils.convertDpToPixel
 abstract class LineScatterCandleRadarDataSet<T : Entry?>(yVals: MutableList<T?>?, label: String?) :
     BarLineScatterCandleBubbleDataSet<T>(yVals, label), ILineScatterCandleRadarDataSet<T> {
     override var isVerticalHighlightIndicatorEnabled = true
-        protected set
+         set
     override var isHorizontalHighlightIndicatorEnabled = true
-        protected set
+         set
 
     /** the width of the highlight indicator lines  */
-    protected var mHighlightLineWidth = 0.5f
+     var mHighlightLineWidth = 0.5f
 
     /** the path effect for dashed highlight-lines  */
     override var dashPathEffectHighlight: DashPathEffect? = null
-        protected set
+         set
 
     /**
      * Enables / disables the horizontal highlight-indicator. If disabled, the indicator is not drawn.
@@ -87,7 +87,7 @@ abstract class LineScatterCandleRadarDataSet<T : Entry?>(yVals: MutableList<T?>?
     val isDashedHighlightLineEnabled: Boolean
         get() = if (dashPathEffectHighlight == null) false else true
 
-    protected fun copy(lineScatterCandleRadarDataSet: LineScatterCandleRadarDataSet<*>) {
+     fun copy(lineScatterCandleRadarDataSet: LineScatterCandleRadarDataSet<*>) {
         super.copy(lineScatterCandleRadarDataSet)
         lineScatterCandleRadarDataSet.isHorizontalHighlightIndicatorEnabled =
             isHorizontalHighlightIndicatorEnabled

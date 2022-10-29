@@ -5,23 +5,11 @@ import android.graphics.RectF
 import android.util.AttributeSet
 import android.util.Log
 import com.github.mikephil.charting.components.AxisBase.calculate
-import com.github.mikephil.charting.components.AxisBase.spaceMax
-import com.github.mikephil.charting.components.AxisBase.spaceMin
 import com.github.mikephil.charting.components.YAxis.AxisDependency
 import com.github.mikephil.charting.components.YAxis.calculate
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarEntry
-import com.github.mikephil.charting.data.BarEntry.y
-import com.github.mikephil.charting.data.BaseEntry.y
-import com.github.mikephil.charting.data.Entry.x
 import com.github.mikephil.charting.highlight.*
-import com.github.mikephil.charting.highlight.Highlight.axis
-import com.github.mikephil.charting.highlight.Highlight.dataSetIndex
-import com.github.mikephil.charting.highlight.Highlight.x
-import com.github.mikephil.charting.highlight.Highlight.xPx
-import com.github.mikephil.charting.highlight.Highlight.y
-import com.github.mikephil.charting.highlight.Highlight.yPx
-import com.github.mikephil.charting.highlight.IHighlighter.getHighlight
 import com.github.mikephil.charting.interfaces.dataprovider.BarDataProvider
 import com.github.mikephil.charting.renderer.BarChartRenderer
 
@@ -55,7 +43,6 @@ open class BarChart : BarLineChartBase<BarData?>, BarDataProvider {
      * if set to true, all values are drawn above their bars, instead of below their top
      */
     override var isDrawValueAboveBarEnabled = true
-        private set
     /**
      * returns true if drawing shadows (maxvalue) for each bar is enabled, false if not
      *
@@ -65,7 +52,6 @@ open class BarChart : BarLineChartBase<BarData?>, BarDataProvider {
      * if set to true, a grey area is drawn behind each bar that indicates the maximum value
      */
     override var isDrawBarShadowEnabled = false
-        private set
     private var mFitBars = false
 
     constructor(context: Context?) : super(context) {}
@@ -163,8 +149,8 @@ open class BarChart : BarLineChartBase<BarData?>, BarDataProvider {
         val barWidth = mData!!.barWidth
         val left = x - barWidth / 2f
         val right = x + barWidth / 2f
-        val top: Float = if (y >= 0) y else 0
-        val bottom: Float = if (y <= 0) y else 0
+        val top: Float = if (y >= 0) y else 0F
+        val bottom: Float = if (y <= 0) y else 0F
         outputRect[left, top, right] = bottom
         getTransformer(set.axisDependency)!!.rectValueToPixel(outputRect)
     }
@@ -194,10 +180,10 @@ open class BarChart : BarLineChartBase<BarData?>, BarDataProvider {
      *
      * @param x
      * @param dataSetIndex
-     * @param stackIndex   the index inside the stack - only relevant for stacked entries
+     * @param dataIndex   the index inside the stack - only relevant for stacked entries
      */
-    override fun highlightValue(x: Float, dataSetIndex: Int, stackIndex: Int) {
-        highlightValue(Highlight(x, dataSetIndex, stackIndex), false)
+    override fun highlightValue(x: Float, dataSetIndex: Int, dataIndex: Int) {
+        highlightValue(Highlight(x, dataSetIndex, dataIndex), false)
     }
 
     override val barData: BarData?

@@ -18,13 +18,13 @@ class ScatterChartRenderer(
     override fun initBuffers() {}
     override fun drawData(c: Canvas) {
         val scatterData = mChart.scatterData
-        for (set in scatterData.dataSets) {
-            if (set.isVisible) drawDataSet(c, set)
+        for (set in scatterData!!.dataSets!!) {
+            if (set!!.isVisible) drawDataSet(c, set)
         }
     }
 
     var mPixelBuffer = FloatArray(2)
-    protected fun drawDataSet(c: Canvas?, dataSet: IScatterDataSet) {
+    fun drawDataSet(c: Canvas?, dataSet: IScatterDataSet) {
         if (dataSet.entryCount < 1) return
         val viewPortHandler = mViewPortHandler
         val trans = mChart.getTransformer(dataSet.axisDependency)
@@ -41,16 +41,16 @@ class ScatterChartRenderer(
             .toInt()
         for (i in 0 until max) {
             val e = dataSet.getEntryForIndex(i)
-            mPixelBuffer[0] = e.x
+            mPixelBuffer[0] = e!!.x
             mPixelBuffer[1] = e.y * phaseY
-            trans.pointValuesToPixel(mPixelBuffer)
+            trans!!.pointValuesToPixel(mPixelBuffer)
             if (!viewPortHandler.isInBoundsRight(mPixelBuffer[0])) break
             if (!viewPortHandler.isInBoundsLeft(mPixelBuffer[0])
                 || !viewPortHandler.isInBoundsY(mPixelBuffer[1])
             ) continue
             mRenderPaint.color = dataSet.getColor(i / 2)
             renderer.renderShape(
-                c, dataSet, mViewPortHandler,
+                c!!, dataSet, mViewPortHandler,
                 mPixelBuffer[0], mPixelBuffer[1],
                 mRenderPaint
             )
@@ -58,24 +58,23 @@ class ScatterChartRenderer(
     }
 
     override fun drawValues(c: Canvas) {
-
         // if values are drawn
         if (isDrawingValuesAllowed(mChart)) {
-            val dataSets = mChart.scatterData.dataSets
-            for (i in 0 until mChart.scatterData.dataSetCount) {
-                val dataSet = dataSets[i]
-                if (!shouldDrawValues(dataSet) || dataSet.entryCount < 1) continue
+            val dataSets = mChart.scatterData!!.dataSets
+            for (i in 0 until mChart.scatterData!!.dataSetCount) {
+                val dataSet = dataSets!![i]
+                if (!shouldDrawValues(dataSet!!) || dataSet.entryCount < 1) continue
 
                 // apply the text-styling defined by the DataSet
                 applyValueTextStyle(dataSet)
                 mXBounds[mChart] = dataSet
-                val positions = mChart.getTransformer(dataSet.axisDependency)
+                val positions = mChart.getTransformer(dataSet.axisDependency)!!
                     .generateTransformedValuesScatter(
                         dataSet,
                         mAnimator.phaseX, mAnimator.phaseY, mXBounds.min, mXBounds.max
                     )
                 val shapeSize = Utils.convertDpToPixel(dataSet.scatterShapeSize)
-                val iconsOffset = MPPointF.getInstance(dataSet.iconsOffset)
+                val iconsOffset = MPPointF.getInstance(dataSet.iconsOffset!!)
                 iconsOffset.x = Utils.convertDpToPixel(iconsOffset.x)
                 iconsOffset.y = Utils.convertDpToPixel(iconsOffset.y)
                 var j = 0
@@ -93,8 +92,8 @@ class ScatterChartRenderer(
                     if (dataSet.isDrawValuesEnabled) {
                         drawValue(
                             c,
-                            dataSet.valueFormatter,
-                            entry.y,
+                            dataSet.valueFormatter!!,
+                            entry!!.y,
                             entry,
                             i,
                             positions[j],
@@ -102,11 +101,11 @@ class ScatterChartRenderer(
                             dataSet.getValueTextColor(j / 2 + mXBounds.min)
                         )
                     }
-                    if (entry.icon != null && dataSet.isDrawIconsEnabled) {
+                    if (entry!!.icon != null && dataSet.isDrawIconsEnabled) {
                         val icon = entry.icon
                         drawImage(
                             c,
-                            icon,
+                            icon!!,
                             (positions[j] + iconsOffset.x).toInt(),
                             (positions[j + 1] + iconsOffset.y).toInt(),
                             icon.intrinsicWidth,
@@ -124,12 +123,12 @@ class ScatterChartRenderer(
     override fun drawHighlighted(c: Canvas, indices: Array<Highlight>) {
         val scatterData = mChart.scatterData
         for (high in indices) {
-            val set = scatterData.getDataSetByIndex(high.dataSetIndex)
+            val set = scatterData!!.getDataSetByIndex(high.dataSetIndex)
             if (set == null || !set.isHighlightEnabled) continue
             val e = set.getEntryForXValue(high.x, high.y)
             if (!isInBoundsX(e, set)) continue
             val pix = mChart.getTransformer(set.axisDependency).getPixelForValues(
-                e.x, e.y * mAnimator
+                e!!.x, e.y * mAnimator
                     .phaseY
             )
             high.setDraw(pix.x.toFloat(), pix.y.toFloat())

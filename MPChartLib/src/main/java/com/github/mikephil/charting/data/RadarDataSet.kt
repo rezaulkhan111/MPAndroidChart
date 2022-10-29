@@ -7,16 +7,16 @@ import com.github.mikephil.charting.utils.ColorTemplate
 class RadarDataSet(yVals: MutableList<RadarEntry?>?, label: String?) :
     LineRadarDataSet<RadarEntry?>(yVals, label), IRadarDataSet {
     /// flag indicating whether highlight circle should be drawn or not
-    protected var mDrawHighlightCircleEnabled = false
-    protected var mHighlightCircleFillColor = Color.WHITE
+     var mDrawHighlightCircleEnabled = false
+     var mHighlightCircleFillColor = Color.WHITE
 
     /// The stroke color for highlight circle.
     /// If Utils.COLOR_NONE, the color of the dataset is taken.
-    protected var mHighlightCircleStrokeColor = ColorTemplate.COLOR_NONE
-    protected var mHighlightCircleStrokeAlpha = (0.3 * 255).toInt()
-    protected var mHighlightCircleInnerRadius = 3.0f
-    protected var mHighlightCircleOuterRadius = 4.0f
-    protected var mHighlightCircleStrokeWidth = 2.0f
+     var mHighlightCircleStrokeColor = ColorTemplate.COLOR_NONE
+     var mHighlightCircleStrokeAlpha = (0.3 * 255).toInt()
+     var mHighlightCircleInnerRadius = 3.0f
+     var mHighlightCircleOuterRadius = 4.0f
+     var mHighlightCircleStrokeWidth = 2.0f
 
     /// Returns true if highlight circle should be drawn, false if not
     override fun isDrawHighlightCircleEnabled(): Boolean {
@@ -90,7 +90,7 @@ class RadarDataSet(yVals: MutableList<RadarEntry?>?, label: String?) :
         return copied
     }
 
-    protected fun copy(radarDataSet: RadarDataSet) {
+     fun copy(radarDataSet: RadarDataSet) {
         super.copy(radarDataSet)
         radarDataSet.mDrawHighlightCircleEnabled = mDrawHighlightCircleEnabled
         radarDataSet.mHighlightCircleFillColor = mHighlightCircleFillColor

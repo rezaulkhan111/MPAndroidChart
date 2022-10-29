@@ -15,7 +15,7 @@ class CombinedHighlighter(chart: CombinedDataProvider, barChart: BarDataProvider
     /**
      * bar highlighter for supporting stacked highlighting
      */
-    protected var barHighlighter: BarHighlighter?
+     var barHighlighter: BarHighlighter?
     override fun getHighlightsAtXValue(xVal: Float, x: Float, y: Float): List<Highlight> {
         mHighlightBuffer.clear()
         val dataObjects = mChart!!.combinedData!!.allData

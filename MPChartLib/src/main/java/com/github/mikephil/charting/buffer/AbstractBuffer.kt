@@ -9,22 +9,22 @@ package com.github.mikephil.charting.buffer
 </T> */
 abstract class AbstractBuffer<T>(size: Int) {
     /** index in the buffer  */
-    protected var index = 0
+     var index = 0
 
     /** float-buffer that holds the data points to draw, order: x,y,x,y,...  */
     val buffer: FloatArray
 
     /** animation phase x-axis  */
-    protected var phaseX = 1f
+     var phaseX = 1f
 
     /** animation phase y-axis  */
-    protected var phaseY = 1f
+     var phaseY = 1f
 
     /** indicates from which x-index the visible data begins  */
-    protected var mFrom = 0
+     var mFrom = 0
 
     /** indicates to which x-index the visible data ranges  */
-    protected var mTo = 0
+     var mTo = 0
 
     /** limits the drawing on the x-axis  */
     fun limitFrom(from: Int) {

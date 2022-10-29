@@ -30,11 +30,11 @@ open class ViewPortHandler
      * this rectangle defines the area in which graph values can be drawn
      */
     var contentRect = RectF()
-        protected set
+         set
     var chartWidth = 0f
-        protected set
+         set
     var chartHeight = 0f
-        protected set
+         set
 
     /**
      * minimum scale value on the y-axis
@@ -305,7 +305,7 @@ open class ViewPortHandler
         return save
     }
 
-    protected var valsBufferForFitScreen = FloatArray(9)
+     var valsBufferForFitScreen = FloatArray(9)
 
     /**
      * Resets all zooming and dragging and makes the chart fit exactly it's
@@ -365,7 +365,7 @@ open class ViewPortHandler
         outputMatrix.postTranslate(-x, -y)
     }
 
-    protected var mCenterViewPortMatrixBuffer = Matrix()
+     var mCenterViewPortMatrixBuffer = Matrix()
 
     /**
      * Centers the viewport around the specified position (x-index and y-value)
@@ -390,7 +390,7 @@ open class ViewPortHandler
     /**
      * buffer for storing the 9 matrix values of a 3x3 matrix
      */
-    protected val matrixBuffer = FloatArray(9)
+     val matrixBuffer = FloatArray(9)
 
     /**
      * call this method to refresh the graph with a given matrix

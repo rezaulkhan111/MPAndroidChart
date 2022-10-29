@@ -24,7 +24,7 @@ abstract class ChartData<T : IDataSet<out Entry?>?> {
      * maximum y-value in the value array across all axes
      */
     var yMax = -Float.MAX_VALUE
-        protected set
+         set
     /**
      * Returns the smallest y-value the data object contains.
      *
@@ -34,7 +34,7 @@ abstract class ChartData<T : IDataSet<out Entry?>?> {
      * the minimum y-value in the value array across all axes
      */
     var yMin = Float.MAX_VALUE
-        protected set
+         set
     /**
      * Returns the maximum x-value this data object contains.
      *
@@ -44,7 +44,7 @@ abstract class ChartData<T : IDataSet<out Entry?>?> {
      * maximum x-value in the value array
      */
     var xMax = -Float.MAX_VALUE
-        protected set
+         set
     /**
      * Returns the minimum x-value this data object contains.
      *
@@ -54,16 +54,16 @@ abstract class ChartData<T : IDataSet<out Entry?>?> {
      * minimum x-value in the value array
      */
     var xMin = Float.MAX_VALUE
-        protected set
-    protected var mLeftAxisMax = -Float.MAX_VALUE
-    protected var mLeftAxisMin = Float.MAX_VALUE
-    protected var mRightAxisMax = -Float.MAX_VALUE
-    protected var mRightAxisMin = Float.MAX_VALUE
+         set
+     var mLeftAxisMax = -Float.MAX_VALUE
+     var mLeftAxisMin = Float.MAX_VALUE
+     var mRightAxisMax = -Float.MAX_VALUE
+     var mRightAxisMin = Float.MAX_VALUE
 
     /**
      * array that holds all DataSets the ChartData object represents
      */
-    protected var mDataSets: MutableList<T>?
+     var mDataSets: MutableList<T>?
 
     /**
      * Default constructor.

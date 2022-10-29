@@ -14,7 +14,7 @@ abstract class ChartTouchListener<T : Chart<*>?>(
     /**
      * the chart the listener represents
      */
-    protected var mChart: T
+     var mChart: T
 ) : SimpleOnGestureListener(), OnTouchListener {
     enum class ChartGesture {
         NONE, DRAG, X_ZOOM, Y_ZOOM, PINCH_ZOOM, ROTATE, SINGLE_TAP, DOUBLE_TAP, LONG_PRESS, FLING
@@ -43,12 +43,12 @@ abstract class ChartTouchListener<T : Chart<*>?>(
     /**
      * the last highlighted object (via touch)
      */
-    protected var mLastHighlighted: Highlight? = null
+     var mLastHighlighted: Highlight? = null
 
     /**
      * the gesturedetector used for detecting taps and longpresses, ...
      */
-    protected var mGestureDetector: GestureDetector
+     var mGestureDetector: GestureDetector
 
     /**
      * Calls the OnChartGestureListener to do the start callback
@@ -113,7 +113,7 @@ abstract class ChartTouchListener<T : Chart<*>?>(
          * @param startY
          * @return
          */
-        protected fun distance(eventX: Float, startX: Float, eventY: Float, startY: Float): Float {
+        fun distance(eventX: Float, startX: Float, eventY: Float, startY: Float): Float {
             val dx = eventX - startX
             val dy = eventY - startY
             return Math.sqrt((dx * dx + dy * dy).toDouble()).toFloat()

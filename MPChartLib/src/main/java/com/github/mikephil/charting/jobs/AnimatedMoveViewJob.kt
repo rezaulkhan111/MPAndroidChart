@@ -70,7 +70,7 @@ class AnimatedMoveViewJob(
         recycleInstance(this)
     }
 
-    protected override fun instantiate(): Poolable? {
+     override fun instantiate(): Poolable? {
         return AnimatedMoveViewJob(null, 0, 0, null, null, 0, 0, 0)
     }
 }

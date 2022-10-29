@@ -19,17 +19,17 @@ open class BarChartRenderer(
     /**
      * the rect object that is used for drawing the bars
      */
-    protected var mBarRect = RectF()
-    protected var mBarBuffers: Array<BarBuffer?>
-    protected var mShadowPaint: Paint
-    protected var mBarBorderPaint: Paint
+     var mBarRect = RectF()
+     lateinit var mBarBuffers: Array<BarBuffer?>
+     var mShadowPaint: Paint
+     var mBarBorderPaint: Paint
     override fun initBuffers() {
         val barData = mChart.barData
-        mBarBuffers = arrayOfNulls(barData.dataSetCount)
+        mBarBuffers = arrayOfNulls(barData?.dataSetCount!!)
         for (i in mBarBuffers.indices) {
             val set = barData.getDataSetByIndex(i)
             mBarBuffers[i] = BarBuffer(
-                set.entryCount * 4 * if (set.isStacked) set.stackSize else 1,
+                set!!.entryCount * 4 * if (set.isStacked) set.stackSize else 1,
                 barData.dataSetCount, set.isStacked
             )
         }
@@ -37,16 +37,16 @@ open class BarChartRenderer(
 
     override fun drawData(c: Canvas) {
         val barData = mChart.barData
-        for (i in 0 until barData.dataSetCount) {
+        for (i in 0 until barData!!.dataSetCount) {
             val set = barData.getDataSetByIndex(i)
-            if (set.isVisible) {
+            if (set!!.isVisible) {
                 drawDataSet(c, set, i)
             }
         }
     }
 
     private val mBarShadowRectBuffer = RectF()
-    protected open fun drawDataSet(c: Canvas, dataSet: IBarDataSet, index: Int) {
+     open fun drawDataSet(c: Canvas, dataSet: IBarDataSet, index: Int) {
         val trans = mChart.getTransformer(dataSet.axisDependency)
         mBarBorderPaint.color = dataSet.barBorderColor
         mBarBorderPaint.strokeWidth =
@@ -59,7 +59,7 @@ open class BarChartRenderer(
         if (mChart.isDrawBarShadowEnabled) {
             mShadowPaint.color = dataSet.barShadowColor
             val barData = mChart.barData
-            val barWidth = barData.barWidth
+            val barWidth = barData!!.barWidth
             val barWidthHalf = barWidth / 2.0f
             var x: Float
             var i = 0
@@ -69,10 +69,10 @@ open class BarChartRenderer(
             )
             while (i < count) {
                 val e = dataSet.getEntryForIndex(i)
-                x = e.x
+                x = e!!.x
                 mBarShadowRectBuffer.left = x - barWidthHalf
                 mBarShadowRectBuffer.right = x + barWidthHalf
-                trans.rectValueToPixel(mBarShadowRectBuffer)
+                trans!!.rectValueToPixel(mBarShadowRectBuffer)
                 if (!mViewPortHandler.isInBoundsLeft(mBarShadowRectBuffer.right)) {
                     i++
                     continue
@@ -90,11 +90,11 @@ open class BarChartRenderer(
         buffer!!.setPhases(phaseX, phaseY)
         buffer.setDataSet(index)
         buffer.setInverted(mChart.isInverted(dataSet.axisDependency))
-        buffer.setBarWidth(mChart.barData.barWidth)
+        buffer.setBarWidth(mChart.barData!!.barWidth)
         buffer.feed(dataSet)
-        trans.pointValuesToPixel(buffer.buffer)
-        val isCustomFill = dataSet.fills != null && !dataSet.fills.isEmpty()
-        val isSingleColor = dataSet.colors.size == 1
+        trans?.pointValuesToPixel(buffer.buffer)
+        val isCustomFill = dataSet.fills != null && dataSet.fills!!.isNotEmpty()
+        val isSingleColor = dataSet.colors?.size == 1
         val isInverted = mChart.isInverted(dataSet.axisDependency)
         if (isSingleColor) {
             mRenderPaint.color = dataSet.color
@@ -115,7 +115,7 @@ open class BarChartRenderer(
             }
             if (isCustomFill) {
                 dataSet.getFill(pos)
-                    .fillRect(
+                    ?.fillRect(
                         c, mRenderPaint,
                         buffer.buffer[j],
                         buffer.buffer[j + 1],
@@ -140,7 +140,7 @@ open class BarChartRenderer(
         }
     }
 
-    protected open fun prepareBarHighlight(
+     open fun prepareBarHighlight(
         x: Float,
         y1: Float,
         y2: Float,
@@ -154,17 +154,16 @@ open class BarChartRenderer(
     }
 
     override fun drawValues(c: Canvas) {
-
         // if values are drawn
         if (isDrawingValuesAllowed(mChart)) {
-            val dataSets = mChart.barData.dataSets
+            val dataSets = mChart.barData?.dataSets
             val valueOffsetPlus = convertDpToPixel(4.5f)
             var posOffset = 0f
             var negOffset = 0f
             val drawValueAboveBar = mChart.isDrawValueAboveBarEnabled
-            for (i in 0 until mChart.barData.dataSetCount) {
-                val dataSet = dataSets[i]
-                if (!shouldDrawValues(dataSet)) continue
+            for (i in 0 until mChart.barData!!.dataSetCount) {
+                val dataSet = dataSets!![i]
+                if (!shouldDrawValues(dataSet!!)) continue
 
                 // apply the text-styling defined by the DataSet
                 applyValueTextStyle(dataSet)
@@ -185,7 +184,7 @@ open class BarChartRenderer(
                 // get the buffer
                 val buffer = mBarBuffers[i]
                 val phaseY = mAnimator.phaseY
-                val iconsOffset = MPPointF.getInstance(dataSet.iconsOffset)
+                val iconsOffset = MPPointF.getInstance(dataSet.iconsOffset!!)
                 iconsOffset.x = convertDpToPixel(iconsOffset.x)
                 iconsOffset.y = convertDpToPixel(iconsOffset.y)
 
@@ -202,24 +201,24 @@ open class BarChartRenderer(
                             continue
                         }
                         val entry = dataSet.getEntryForIndex(j / 4)
-                        val `val` = entry.y
+                        val valX = entry?.y
                         if (dataSet.isDrawValuesEnabled) {
                             drawValue(
-                                c, dataSet.valueFormatter, `val`, entry, i, x,
-                                if (`val` >= 0) buffer.buffer[j + 1] + posOffset else buffer.buffer[j + 3] + negOffset,
+                                c, dataSet.valueFormatter!!, valX!!, entry, i, x,
+                                if (valX >= 0) buffer.buffer[j + 1] + posOffset else buffer.buffer[j + 3] + negOffset,
                                 dataSet.getValueTextColor(j / 4)
                             )
                         }
-                        if (entry.icon != null && dataSet.isDrawIconsEnabled) {
+                        if (entry?.icon != null && dataSet.isDrawIconsEnabled) {
                             val icon = entry.icon
                             var px = x
                             var py =
-                                if (`val` >= 0) buffer.buffer[j + 1] + posOffset else buffer.buffer[j + 3] + negOffset
+                                if (valX!! >= 0) buffer.buffer[j + 1] + posOffset else buffer.buffer[j + 3] + negOffset
                             px += iconsOffset.x
                             py += iconsOffset.y
                             drawImage(
                                 c,
-                                icon, px.toInt(), py.toInt(),
+                                icon!!, px.toInt(), py.toInt(),
                                 icon.intrinsicWidth,
                                 icon.intrinsicHeight
                             )
@@ -234,7 +233,7 @@ open class BarChartRenderer(
                     var index = 0
                     while (index < dataSet.entryCount * mAnimator.phaseX) {
                         val entry = dataSet.getEntryForIndex(index)
-                        val vals = entry.yVals
+                        val vals = entry?.yVals
                         val x = (buffer!!.buffer[bufferIndex] + buffer.buffer[bufferIndex + 2]) / 2f
                         val color = dataSet.getValueTextColor(index)
 
@@ -248,13 +247,13 @@ open class BarChartRenderer(
                             ) continue
                             if (dataSet.isDrawValuesEnabled) {
                                 drawValue(
-                                    c, dataSet.valueFormatter, entry.y, entry, i, x,
+                                    c, dataSet.valueFormatter!!, entry!!.y, entry, i, x,
                                     buffer.buffer[bufferIndex + 1] +
                                             if (entry.y >= 0) posOffset else negOffset,
                                     color
                                 )
                             }
-                            if (entry.icon != null && dataSet.isDrawIconsEnabled) {
+                            if (entry!!.icon != null && dataSet.isDrawIconsEnabled) {
                                 val icon = entry.icon
                                 var px = x
                                 var py = buffer.buffer[bufferIndex + 1] +
@@ -262,13 +261,11 @@ open class BarChartRenderer(
                                 px += iconsOffset.x
                                 py += iconsOffset.y
                                 drawImage(
-                                    c,
-                                    icon, px.toInt(), py.toInt(),
+                                    c, icon!!, px.toInt(), py.toInt(),
                                     icon.intrinsicWidth,
                                     icon.intrinsicHeight
                                 )
                             }
-
                             // draw stack values
                         } else {
                             val transformed = FloatArray(vals.size * 2)
@@ -295,7 +292,7 @@ open class BarChartRenderer(
                                     idx++
                                 }
                             }
-                            trans.pointValuesToPixel(transformed)
+                            trans!!.pointValuesToPixel(transformed)
                             var k = 0
                             while (k < transformed.size) {
                                 val `val` = vals[k / 2]
@@ -313,7 +310,7 @@ open class BarChartRenderer(
                                 if (dataSet.isDrawValuesEnabled) {
                                     drawValue(
                                         c,
-                                        dataSet.valueFormatter,
+                                        dataSet.valueFormatter!!,
                                         vals[k / 2],
                                         entry,
                                         i,
@@ -326,7 +323,7 @@ open class BarChartRenderer(
                                     val icon = entry.icon
                                     drawImage(
                                         c,
-                                        icon,
+                                        icon!!,
                                         (x + iconsOffset.x).toInt(),
                                         (y + iconsOffset.y).toInt(),
                                         icon.intrinsicWidth,
@@ -349,30 +346,30 @@ open class BarChartRenderer(
     override fun drawHighlighted(c: Canvas, indices: Array<Highlight>) {
         val barData = mChart.barData
         for (high in indices) {
-            val set = barData.getDataSetByIndex(high.dataSetIndex)
+            val set = barData!!.getDataSetByIndex(high.dataSetIndex)
             if (set == null || !set.isHighlightEnabled) continue
             val e = set.getEntryForXValue(high.x, high.y)
             if (!isInBoundsX(e, set)) continue
             val trans = mChart.getTransformer(set.axisDependency)
             mHighlightPaint.color = set.highLightColor
             mHighlightPaint.alpha = set.highLightAlpha
-            val isStack = if (high.stackIndex >= 0 && e.isStacked) true else false
+            val isStack = high.stackIndex >= 0 && e!!.isStacked
             val y1: Float
             val y2: Float
             if (isStack) {
                 if (mChart.isHighlightFullBarEnabled) {
-                    y1 = e.positiveSum
+                    y1 = e!!.positiveSum
                     y2 = -e.negativeSum
                 } else {
-                    val range = e.ranges[high.stackIndex]
-                    y1 = range.from
+                    val range = e!!.ranges[high.stackIndex]
+                    y1 = range!!.from
                     y2 = range.to
                 }
             } else {
-                y1 = e.y
+                y1 = e!!.y
                 y2 = 0f
             }
-            prepareBarHighlight(e.x, y1, y2, barData.barWidth / 2f, trans)
+            prepareBarHighlight(e.x, y1, y2, barData.barWidth / 2f, trans!!)
             setHighlightDrawPos(high, mBarRect)
             c.drawRect(mBarRect, mHighlightPaint)
         }
@@ -382,7 +379,7 @@ open class BarChartRenderer(
      * Sets the drawing position of the highlight object based on the riven bar-rect.
      * @param high
      */
-    protected open fun setHighlightDrawPos(high: Highlight, bar: RectF) {
+     open fun setHighlightDrawPos(high: Highlight, bar: RectF) {
         high.setDraw(bar.centerX(), bar.top)
     }
 

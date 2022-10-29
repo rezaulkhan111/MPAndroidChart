@@ -220,7 +220,7 @@ class BarEntry : Entry {
         positiveSum = sumPos
     }
 
-    protected fun calcRanges() {
+     fun calcRanges() {
         val values = yVals
         if (values == null || values.size == 0) return
         ranges = arrayOfNulls(values.size)

@@ -16,18 +16,18 @@ import com.github.mikephil.charting.utils.MPPointD.Companion.getInstance
  *
  * @author Philipp Jahoda
  */
-open class Transformer(protected var mViewPortHandler: ViewPortHandler) {
+open class Transformer( var mViewPortHandler: ViewPortHandler) {
     /**
      * matrix to map the values to the screen pixels
      */
     var valueMatrix = Matrix()
-        protected set
+         set
 
     /**
      * matrix for handling the different offsets of the chart
      */
     var offsetMatrix = Matrix()
-        protected set
+         set
 
     /**
      * Prepares the matrix that transforms values to pixels. Calculates the
@@ -73,7 +73,7 @@ open class Transformer(protected var mViewPortHandler: ViewPortHandler) {
         }
     }
 
-    protected var valuePointsForGenerateTransformedValuesScatter = FloatArray(1)
+     var valuePointsForGenerateTransformedValuesScatter = FloatArray(1)
 
     /**
      * Transforms an List of Entry into a float array containing the x and
@@ -107,7 +107,7 @@ open class Transformer(protected var mViewPortHandler: ViewPortHandler) {
         return valuePoints
     }
 
-    protected var valuePointsForGenerateTransformedValuesBubble = FloatArray(1)
+     var valuePointsForGenerateTransformedValuesBubble = FloatArray(1)
 
     /**
      * Transforms an List of Entry into a float array containing the x and
@@ -143,7 +143,7 @@ open class Transformer(protected var mViewPortHandler: ViewPortHandler) {
         return valuePoints
     }
 
-    protected var valuePointsForGenerateTransformedValuesLine = FloatArray(1)
+     var valuePointsForGenerateTransformedValuesLine = FloatArray(1)
 
     /**
      * Transforms an List of Entry into a float array containing the x and
@@ -178,7 +178,7 @@ open class Transformer(protected var mViewPortHandler: ViewPortHandler) {
         return valuePoints
     }
 
-    protected var valuePointsForGenerateTransformedValuesCandle = FloatArray(1)
+     var valuePointsForGenerateTransformedValuesCandle = FloatArray(1)
 
     /**
      * Transforms an List of Entry into a float array containing the x and
@@ -321,7 +321,7 @@ open class Transformer(protected var mViewPortHandler: ViewPortHandler) {
         for (i in rects.indices) m.mapRect(rects[i])
     }
 
-    protected var mPixelToValueMatrixBuffer = Matrix()
+     var mPixelToValueMatrixBuffer = Matrix()
 
     /**
      * Transforms the given array of touch positions (pixels) (x, y, x, y, ...)

@@ -2,7 +2,6 @@ package com.github.mikephil.charting.animation
 
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator.AnimatorUpdateListener
-import androidx.annotation.RequiresApi
 import com.github.mikephil.charting.animation.Easing.EasingFunction
 
 /**
@@ -16,19 +15,19 @@ class ChartAnimator {
     private var mListener: AnimatorUpdateListener? = null
 
     /** The phase of drawn values on the y-axis. 0 - 1  */
-    protected var mPhaseY = 1f
+     var mPhaseY = 1f
 
     /** The phase of drawn values on the x-axis. 0 - 1  */
-    protected var mPhaseX = 1f
+     var mPhaseX = 1f
 
     constructor() {}
 
-    @RequiresApi(11)
+//    @RequiresApi(11)
     constructor(listener: AnimatorUpdateListener?) {
         mListener = listener
     }
 
-    @RequiresApi(11)
+//    @RequiresApi(11)
     private fun xAnimator(duration: Int, easing: EasingFunction?): ObjectAnimator {
         val animatorX = ObjectAnimator.ofFloat(this, "phaseX", 0f, 1f)
         animatorX.interpolator = easing
@@ -36,7 +35,7 @@ class ChartAnimator {
         return animatorX
     }
 
-    @RequiresApi(11)
+//    @RequiresApi(11)
     private fun yAnimator(duration: Int, easing: EasingFunction?): ObjectAnimator {
         val animatorY = ObjectAnimator.ofFloat(this, "phaseY", 0f, 1f)
         animatorY.interpolator = easing
@@ -49,7 +48,7 @@ class ChartAnimator {
      *
      * @param durationMillis animation duration
      */
-    @RequiresApi(11)
+//    @RequiresApi(11)
     fun animateX(durationMillis: Int) {
         animateX(durationMillis, Easing.Linear)
     }
@@ -60,7 +59,7 @@ class ChartAnimator {
      * @param durationMillis animation duration
      * @param easing EasingFunction
      */
-    @RequiresApi(11)
+//    @RequiresApi(11)
     fun animateX(durationMillis: Int, easing: EasingFunction?) {
         val animatorX = xAnimator(durationMillis, easing)
         animatorX.addUpdateListener(mListener)
@@ -73,7 +72,7 @@ class ChartAnimator {
      * @param durationMillisX animation duration along the X axis
      * @param durationMillisY animation duration along the Y axis
      */
-    @RequiresApi(11)
+//    @RequiresApi(11)
     fun animateXY(durationMillisX: Int, durationMillisY: Int) {
         animateXY(durationMillisX, durationMillisY, Easing.Linear, Easing.Linear)
     }
@@ -85,7 +84,7 @@ class ChartAnimator {
      * @param durationMillisY animation duration along the Y axis
      * @param easing EasingFunction for both axes
      */
-    @RequiresApi(11)
+//    @RequiresApi(11)
     fun animateXY(durationMillisX: Int, durationMillisY: Int, easing: EasingFunction?) {
         val xAnimator = xAnimator(durationMillisX, easing)
         val yAnimator = yAnimator(durationMillisY, easing)
@@ -106,7 +105,7 @@ class ChartAnimator {
      * @param easingX EasingFunction for the X axis
      * @param easingY EasingFunction for the Y axis
      */
-    @RequiresApi(11)
+//    @RequiresApi(11)
     fun animateXY(
         durationMillisX: Int, durationMillisY: Int, easingX: EasingFunction?,
         easingY: EasingFunction?
@@ -127,7 +126,7 @@ class ChartAnimator {
      *
      * @param durationMillis animation duration
      */
-    @RequiresApi(11)
+//    @RequiresApi(11)
     fun animateY(durationMillis: Int) {
         animateY(durationMillis, Easing.Linear)
     }
@@ -138,7 +137,7 @@ class ChartAnimator {
      * @param durationMillis animation duration
      * @param easing EasingFunction
      */
-    @RequiresApi(11)
+//    @RequiresApi(11)
     fun animateY(durationMillis: Int, easing: EasingFunction?) {
         val animatorY = yAnimator(durationMillis, easing)
         animatorY.addUpdateListener(mListener)

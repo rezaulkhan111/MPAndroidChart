@@ -15,12 +15,12 @@ import com.github.mikephil.charting.utils.ViewPortHandler
  */
 class ZoomJob(
     viewPortHandler: ViewPortHandler?,
-    protected var scaleX: Float,
-    protected var scaleY: Float,
+     var scaleX: Float,
+     var scaleY: Float,
     xValue: Float,
     yValue: Float,
     trans: Transformer?,
-    protected var axisDependency: AxisDependency?,
+     var axisDependency: AxisDependency?,
     v: View?
 ) : ViewPortJob(viewPortHandler, xValue, yValue, trans, v) {
     companion object {
@@ -58,7 +58,7 @@ class ZoomJob(
         }
     }
 
-    protected var mRunMatrixBuffer = Matrix()
+     var mRunMatrixBuffer = Matrix()
     override fun run() {
         val save = mRunMatrixBuffer
         mViewPortHandler!!.zoom(scaleX, scaleY, save)
@@ -76,7 +76,7 @@ class ZoomJob(
         recycleInstance(this)
     }
 
-    protected override fun instantiate(): Poolable? {
+     override fun instantiate(): Poolable? {
         return ZoomJob(null, 0, 0, 0, 0, null, null, null)
     }
 }

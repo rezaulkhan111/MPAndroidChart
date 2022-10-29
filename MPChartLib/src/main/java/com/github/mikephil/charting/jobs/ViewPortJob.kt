@@ -15,16 +15,16 @@ import com.github.mikephil.charting.utils.ViewPortHandler
  * @author Philipp Jahoda
  */
 abstract class ViewPortJob(
-    protected var mViewPortHandler: ViewPortHandler?, xValue: Float, yValue: Float,
+     var mViewPortHandler: ViewPortHandler?, xValue: Float, yValue: Float,
     trans: Transformer?, v: View?
 ) : Poolable(), Runnable {
-    protected var pts = FloatArray(2)
+     var pts = FloatArray(2)
     var xValue = 0f
-        protected set
+         set
     var yValue = 0f
-        protected set
-    protected var mTrans: Transformer?
-    protected var view: View?
+         set
+     var mTrans: Transformer?
+     var view: View?
 
     init {
         this.xValue = xValue

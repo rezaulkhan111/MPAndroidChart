@@ -77,7 +77,7 @@ class BarDataSet(yVals: MutableList<BarEntry?>, label: String?) :
      * array of labels used to describe the different values of the stacked bars
      */
     override var stackLabels = arrayOf<String>()
-    protected var mFills: MutableList<Fill>? = null
+     var mFills: MutableList<Fill>? = null
     override fun copy(): DataSet<BarEntry?>? {
         val entries: MutableList<BarEntry?> = ArrayList()
         for (i in mEntries!!.indices) {
@@ -88,7 +88,7 @@ class BarDataSet(yVals: MutableList<BarEntry?>, label: String?) :
         return copied
     }
 
-    protected fun copy(barDataSet: BarDataSet) {
+     fun copy(barDataSet: BarDataSet) {
         super.copy(barDataSet)
         barDataSet.stackSize = stackSize
         barDataSet.barShadowColor = barShadowColor

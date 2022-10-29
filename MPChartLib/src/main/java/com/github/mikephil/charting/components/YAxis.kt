@@ -58,7 +58,7 @@ class YAxis : AxisBase {
      * flag that indicates if the zero-line should be drawn regardless of other grid lines
      */
     var isDrawZeroLineEnabled = false
-        protected set
+         set
     /**
      * Returns true if autoscale restriction for axis min value is enabled
      */
@@ -96,7 +96,7 @@ class YAxis : AxisBase {
     /**
      * Width of the zero line in pixels
      */
-    protected var mZeroLineWidth = 1f
+     var mZeroLineWidth = 1f
     /**
      * Returns the top axis space in percent of the full range. Default 10f
      *

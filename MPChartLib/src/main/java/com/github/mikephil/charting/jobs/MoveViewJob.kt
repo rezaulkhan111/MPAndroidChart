@@ -54,7 +54,7 @@ class MoveViewJob(
         recycleInstance(this)
     }
 
-    protected override fun instantiate(): Poolable? {
+     override fun instantiate(): Poolable? {
         return MoveViewJob(mViewPortHandler, xValue, yValue, mTrans, view)
     }
 }

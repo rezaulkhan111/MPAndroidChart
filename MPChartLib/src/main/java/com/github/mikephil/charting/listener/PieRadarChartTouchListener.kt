@@ -16,7 +16,7 @@ import com.github.mikephil.charting.utils.Utils.postInvalidateOnAnimation
  */
 class PieRadarChartTouchListener(chart: PieRadarChartBase<*>) :
     ChartTouchListener<PieRadarChartBase<*>?>(chart) {
-    private val mTouchStartPoint = MPPointF.getInstance(0, 0)
+    private val mTouchStartPoint = MPPointF.getInstance(0F, 0F)
 
     /**
      * the angle where the dragging started
@@ -46,7 +46,7 @@ class PieRadarChartTouchListener(chart: PieRadarChartBase<*>) :
                 }
                 MotionEvent.ACTION_MOVE -> {
                     if (mChart!!.isDragDecelerationEnabled) sampleVelocity(x, y)
-                    if (mTouchMode == ChartTouchListener.Companion.NONE
+                    if (mTouchMode == NONE
                         && ChartTouchListener.Companion.distance(
                             x,
                             mTouchStartPoint.x,

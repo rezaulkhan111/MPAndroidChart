@@ -16,6 +16,7 @@ class MPPointF : Poolable {
 
     companion object {
         private var pool: ObjectPool<MPPointF>? = null
+
         fun getInstance(x: Float, y: Float): MPPointF {
             val result = pool!!.get()!!
             result.x = x
@@ -24,13 +25,7 @@ class MPPointF : Poolable {
         }
 
         @JvmStatic
-        val contentCenter: MPPointF
-            get() = pool!!.get()!!
-
-        get()
-        {
-            return MPPointF.instance
-        }
+        fun getInstance(): MPPointF = pool!!.get()!!
 
         fun getInstance(copy: MPPointF): MPPointF {
             val result = pool!!.get()!!

@@ -15,31 +15,31 @@ abstract class DataSet<T : Entry?>(entries: MutableList<T?>?, label: String?) :
     /**
      * the entries that this DataSet represents / holds together
      */
-    protected var mEntries: MutableList<T>?
+     var mEntries: MutableList<T>?
 
     /**
      * maximum y-value in the value array
      */
     override var yMax = -Float.MAX_VALUE
-        protected set
+         set
 
     /**
      * minimum y-value in the value array
      */
     override var yMin = Float.MAX_VALUE
-        protected set
+         set
 
     /**
      * maximum x-value in the value array
      */
     override var xMax = -Float.MAX_VALUE
-        protected set
+         set
 
     /**
      * minimum x-value in the value array
      */
     override var xMin = Float.MAX_VALUE
-        protected set
+         set
 
     override fun calcMinMax() {
         yMax = -Float.MAX_VALUE
@@ -71,18 +71,18 @@ abstract class DataSet<T : Entry?>(entries: MutableList<T?>?, label: String?) :
      *
      * @param e
      */
-    protected open fun calcMinMax(e: T?) {
+     open fun calcMinMax(e: T?) {
         if (e == null) return
         calcMinMaxX(e)
         calcMinMaxY(e)
     }
 
-    protected fun calcMinMaxX(e: T) {
+     fun calcMinMaxX(e: T) {
         if (e.getX() < xMin) xMin = e.getX()
         if (e.getX() > xMax) xMax = e.getX()
     }
 
-    protected open fun calcMinMaxY(e: T) {
+     open fun calcMinMaxY(e: T) {
         if (e.getY() < yMin) yMin = e.getY()
         if (e.getY() > yMax) yMax = e.getY()
     }
@@ -138,7 +138,7 @@ abstract class DataSet<T : Entry?>(entries: MutableList<T?>?, label: String?) :
      *
      * @param dataSet
      */
-    protected fun copy(dataSet: DataSet<*>?) {
+     fun copy(dataSet: DataSet<*>?) {
         super.copy(dataSet!!)
     }
 

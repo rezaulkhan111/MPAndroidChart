@@ -27,10 +27,10 @@ class AnimatedZoomJob @SuppressLint("NewApi") constructor(
     scaleY: Float,
     xOrigin: Float,
     yOrigin: Float,
-    protected var zoomCenterX: Float,
-    protected var zoomCenterY: Float,
-    protected var zoomOriginX: Float,
-    protected var zoomOriginY: Float,
+     var zoomCenterX: Float,
+     var zoomCenterY: Float,
+     var zoomOriginX: Float,
+     var zoomOriginY: Float,
     duration: Long
 ) : AnimatedViewPortJob(viewPortHandler, scaleX, scaleY, trans, v, xOrigin, yOrigin, duration),
     Animator.AnimatorListener {

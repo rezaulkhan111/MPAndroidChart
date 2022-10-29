@@ -29,7 +29,7 @@ class BubbleChartRenderer(
 
     private val sizeBuffer = FloatArray(4)
     private val pointBuffer = FloatArray(2)
-    protected fun getShapeSize(
+     fun getShapeSize(
         entrySize: Float,
         maxSize: Float,
         reference: Float,
@@ -41,7 +41,7 @@ class BubbleChartRenderer(
         return reference * factor
     }
 
-    protected fun drawDataSet(c: Canvas, dataSet: IBubbleDataSet) {
+     fun drawDataSet(c: Canvas, dataSet: IBubbleDataSet) {
         if (dataSet.entryCount < 1) return
         val trans = mChart.getTransformer(dataSet.axisDependency)
         val phaseY = mAnimator.phaseY

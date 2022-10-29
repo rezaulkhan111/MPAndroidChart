@@ -17,7 +17,7 @@ class ScatterDataSet(yVals: MutableList<Entry?>?, label: String?) :
     /**
      * Renderer responsible for rendering this DataSet, default: square
      */
-    protected var mShapeRenderer: IShapeRenderer? = SquareShapeRenderer()
+     var mShapeRenderer: IShapeRenderer? = SquareShapeRenderer()
 
     /**
      * The radius of the hole in the shape (applies to Square, Circle and Triangle)
@@ -41,7 +41,7 @@ class ScatterDataSet(yVals: MutableList<Entry?>?, label: String?) :
         return copied
     }
 
-    protected fun copy(scatterDataSet: ScatterDataSet) {
+     fun copy(scatterDataSet: ScatterDataSet) {
         super.copy(scatterDataSet)
         scatterDataSet.mShapeSize = mShapeSize
         scatterDataSet.mShapeRenderer = mShapeRenderer

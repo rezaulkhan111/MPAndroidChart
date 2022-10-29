@@ -5,7 +5,6 @@ import android.graphics.Canvas
 import android.graphics.RectF
 import android.graphics.Typeface
 import android.util.AttributeSet
-import com.github.mikephil.charting.components.ComponentBase.textSize
 import com.github.mikephil.charting.components.Description.text
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.ChartData.entryCount
@@ -16,8 +15,6 @@ import com.github.mikephil.charting.highlight.*
 import com.github.mikephil.charting.highlight.Highlight.x
 import com.github.mikephil.charting.interfaces.datasets.IDataSet.entryCount
 import com.github.mikephil.charting.interfaces.datasets.IPieDataSet
-import com.github.mikephil.charting.renderer.LegendRenderer.labelPaint
-import com.github.mikephil.charting.renderer.LegendRenderer.renderLegend
 import com.github.mikephil.charting.renderer.PieChartRenderer
 import com.github.mikephil.charting.utils.MPPointF
 import com.github.mikephil.charting.utils.MPPointF.Companion.recycleInstance
@@ -125,7 +122,7 @@ class PieChart : PieRadarChartBase<PieData?> {
      * variable for the text that is drawn in the center of the pie-chart
      */
     private var mCenterText: CharSequence = ""
-    private val mCenterTextOffset = MPPointF.getInstance(0, 0)
+    private val mCenterTextOffset = MPPointF.getInstance(0F, 0F)
     /**
      * Returns the size of the hole radius in percent of the total radius.
      *
@@ -232,7 +229,7 @@ class PieChart : PieRadarChartBase<PieData?> {
         calcAngles()
     }
 
-    override fun getMarkerPosition(highlight: Highlight?): FloatArray {
+    override fun getMarkerPosition(high: Highlight?): FloatArray {
         val center = centerCircleBox
         var r = radius
         var off = r / 10f * 3.6f
@@ -241,7 +238,7 @@ class PieChart : PieRadarChartBase<PieData?> {
         }
         r -= off // offset to keep things inside the chart
         val rotationAngle = rotationAngle
-        val entryIndex = highlight!!.x.toInt()
+        val entryIndex = high!!.x.toInt()
 
         // offset needed to center the drawn text in the slice
         val offset = drawAngles[entryIndex] / 2
@@ -274,14 +271,14 @@ class PieChart : PieRadarChartBase<PieData?> {
             drawAngles = FloatArray(entryCount)
         } else {
             for (i in 0 until entryCount) {
-                drawAngles[i] = 0
+                drawAngles[i] = 0F
             }
         }
         if (absoluteAngles.size != entryCount) {
             absoluteAngles = FloatArray(entryCount)
         } else {
             for (i in 0 until entryCount) {
-                absoluteAngles[i] = 0
+                absoluteAngles[i] = 0F
             }
         }
         val yValueSum = mData!!.yValueSum
@@ -336,7 +333,6 @@ class PieChart : PieRadarChartBase<PieData?> {
      * @return
      */
     fun needsHighlight(index: Int): Boolean {
-
         // no highlight
         if (!valuesToHighlight()) return false
         for (i in mIndicesToHighlight.indices)  // check if the xvalue for the given dataset needs highlight
@@ -372,7 +368,6 @@ class PieChart : PieRadarChartBase<PieData?> {
         }
 
     override fun getIndexForAngle(angle: Float): Int {
-
         // take the current angle of the chart into consideration
         val a = getNormalizedAngle(angle - rotationAngle)
         for (i in absoluteAngles.indices) {
@@ -437,12 +432,12 @@ class PieChart : PieRadarChartBase<PieData?> {
         isDrawCenterTextEnabled = enabled
     }
 
-    protected override val requiredLegendOffset: Float
-        protected get() = mLegendRenderer.labelPaint.textSize * 2f
-    protected override val requiredBaseOffset: Float
-        protected get() = 0
+    override val requiredLegendOffset: Float
+        get() = mLegendRenderer.labelPaint.textSize * 2f
+    override val requiredBaseOffset: Float
+        get() = 0F
     override val radius: Float
-        get() = if (circleBox == null) 0 else Math.min(
+        get() = if (circleBox == null) 0F else Math.min(
             circleBox.width() / 2f,
             circleBox.height() / 2f
         )

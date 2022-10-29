@@ -93,7 +93,7 @@ class LineDataSet(yVals: MutableList<Entry?>?, label: String?) :
         return copied
     }
 
-    protected fun copy(lineDataSet: LineDataSet) {
+     fun copy(lineDataSet: LineDataSet) {
         super.copy(lineDataSet)
         lineDataSet.circleColors = circleColors
         lineDataSet.mCircleHoleColor = mCircleHoleColor

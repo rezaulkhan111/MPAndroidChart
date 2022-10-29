@@ -18,15 +18,15 @@ import com.github.mikephil.charting.utils.ViewPortHandler
 import com.github.mikephil.charting.utils.ViewPortHandler.isInBoundsX
 
 class RadarChartRenderer(
-    protected var mChart: RadarChart, animator: ChartAnimator?,
+     var mChart: RadarChart, animator: ChartAnimator?,
     viewPortHandler: ViewPortHandler?
 ) : LineRadarRenderer(animator, viewPortHandler) {
     /**
      * paint for drawing the web
      */
     var webPaint: Paint
-        protected set
-    protected var mHighlightCirclePaint: Paint
+         set
+     var mHighlightCirclePaint: Paint
     override fun initBuffers() {
         // TODO Auto-generated method stub
     }
@@ -41,7 +41,7 @@ class RadarChartRenderer(
         }
     }
 
-    protected var mDrawDataSetSurfacePathBuffer = Path()
+     var mDrawDataSetSurfacePathBuffer = Path()
 
     /**
      * Draws the RadarDataSet
@@ -50,7 +50,7 @@ class RadarChartRenderer(
      * @param dataSet
      * @param mostEntries the entry count of the dataset with the most entries
      */
-    protected fun drawDataSet(c: Canvas, dataSet: IRadarDataSet, mostEntries: Int) {
+     fun drawDataSet(c: Canvas, dataSet: IRadarDataSet, mostEntries: Int) {
         val phaseX = mAnimator.phaseX
         val phaseY = mAnimator.phaseY
         val sliceangle = mChart.sliceAngle
@@ -173,7 +173,7 @@ class RadarChartRenderer(
         drawWeb(c)
     }
 
-    protected fun drawWeb(c: Canvas) {
+     fun drawWeb(c: Canvas) {
         val sliceangle = mChart.sliceAngle
 
         // calculate the factor that is needed for transforming the value to
@@ -271,7 +271,7 @@ class RadarChartRenderer(
         recycleInstance(pOut)
     }
 
-    protected var mDrawHighlightCirclePathBuffer = Path()
+     var mDrawHighlightCirclePathBuffer = Path()
     fun drawHighlightCircle(
         c: Canvas,
         point: MPPointF,
