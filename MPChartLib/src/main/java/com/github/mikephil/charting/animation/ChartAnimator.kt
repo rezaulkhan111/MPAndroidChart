@@ -1,10 +1,9 @@
 package com.github.mikephil.charting.animation
 
-import com.github.mikephil.charting.animation.Easing.EasingFunction
-import android.animation.TimeInterpolator
-import android.animation.ValueAnimator.AnimatorUpdateListener
 import android.animation.ObjectAnimator
+import android.animation.ValueAnimator.AnimatorUpdateListener
 import androidx.annotation.RequiresApi
+import com.github.mikephil.charting.animation.Easing.EasingFunction
 
 /**
  * Object responsible for all animations in the Chart. Animations require API level 11.

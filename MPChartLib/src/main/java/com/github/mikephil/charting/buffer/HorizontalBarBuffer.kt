@@ -1,15 +1,6 @@
 package com.github.mikephil.charting.buffer
 
-import com.github.mikephil.charting.interfaces.datasets.IDataSet.entryCount
-import com.github.mikephil.charting.interfaces.datasets.IDataSet.getEntryForIndex
-import com.github.mikephil.charting.data.Entry.x
-import com.github.mikephil.charting.data.BarEntry.y
-import com.github.mikephil.charting.data.BarEntry.yVals
-import com.github.mikephil.charting.data.BarEntry.negativeSum
-import com.github.mikephil.charting.buffer.AbstractBuffer
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
-import com.github.mikephil.charting.data.BarEntry
-import com.github.mikephil.charting.buffer.BarBuffer
 
 class HorizontalBarBuffer(size: Int, dataSetCount: Int, containsStacks: Boolean) :
     BarBuffer(size, dataSetCount, containsStacks) {
