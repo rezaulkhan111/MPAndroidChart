@@ -12,6 +12,8 @@ import com.github.mikephil.charting.utils.Utils.convertDpToPixel
 import com.github.mikephil.charting.utils.Utils.getLineHeight
 import com.github.mikephil.charting.utils.Utils.getLineSpacing
 import com.github.mikephil.charting.utils.ViewPortHandler
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * Class representing the legend of the chart. The legend will contain one entry
@@ -72,227 +74,93 @@ class Legend() : ComponentBase() {
     /**
      * The legend entries array
      */
-    var entries = arrayOf<LegendEntry>()
-        private set
+    private var mEntries = arrayOf<LegendEntry>()
 
     /**
      * Entries that will be appended to the end of the auto calculated entries after calculating the legend.
      * (if the legend has already been calculated, you will need to call notifyDataSetChanged() to let the changes take effect)
      */
-    var extraEntries: Array<LegendEntry>
-        private set
-    /**
-     * @return true if a custom legend entries has been set default
-     * false (automatic legend)
-     */
+    private lateinit var mExtraEntries: Array<LegendEntry>
+
     /**
      * Are the legend labels/colors a custom value or auto calculated? If false,
      * then it's auto, if true, then custom. default false (automatic legend)
      */
-    var isLegendCustom = false
-        private set
-    /**
-     * returns the horizontal alignment of the legend
-     *
-     * @return
-     */
-    /**
-     * sets the horizontal alignment of the legend
-     *
-     * @param value
-     */
-    var horizontalAlignment = LegendHorizontalAlignment.LEFT
-    /**
-     * returns the vertical alignment of the legend
-     *
-     * @return
-     */
-    /**
-     * sets the vertical alignment of the legend
-     *
-     * @param value
-     */
-    var verticalAlignment = LegendVerticalAlignment.BOTTOM
-    /**
-     * returns the orientation of the legend
-     *
-     * @return
-     */
-    /**
-     * sets the orientation of the legend
-     *
-     * @param value
-     */
-    var orientation = LegendOrientation.HORIZONTAL
+    private var mIsLegendCustom = false
 
-    /**
-     * returns whether the legend will draw inside the chart or outside
-     *
-     * @return
-     */
-    var isDrawInsideEnabled = false
-        private set
-    /**
-     * returns the text direction of the legend
-     *
-     * @return
-     */
-    /**
-     * sets the text direction of the legend
-     *
-     * @param pos
-     */
+    private var mHorizontalAlignment = LegendHorizontalAlignment.LEFT
+    private var mVerticalAlignment = LegendVerticalAlignment.BOTTOM
+    private var mOrientation = LegendOrientation.HORIZONTAL
+    private var mDrawInside = false
+
     /**
      * the text direction for the legend
      */
-    var direction = LegendDirection.LEFT_TO_RIGHT
-    /**
-     * returns the current form/shape that is set for the legend
-     *
-     * @return
-     */
-    /**
-     * sets the form/shape of the legend forms
-     *
-     * @param shape
-     */
+    private var mDirection = LegendDirection.LEFT_TO_RIGHT
+
     /**
      * the shape/form the legend colors are drawn in
      */
-    var form = LegendForm.SQUARE
-    /**
-     * returns the size in dp of the legend forms
-     *
-     * @return
-     */
-    /**
-     * sets the size in dp of the legend forms, default 8f
-     *
-     * @param size
-     */
+    private var mShape = LegendForm.SQUARE
+
     /**
      * the size of the legend forms/shapes
      */
-    var formSize = 8f
-    /**
-     * returns the line width in dp for drawing forms that consist of lines
-     *
-     * @return
-     */
-    /**
-     * sets the line width in dp for forms that consist of lines, default 3f
-     *
-     * @param size
-     */
+    private var mFormSize = 8f
+
     /**
      * the size of the legend forms/shapes
      */
-    var formLineWidth = 3f
-    /**
-     * @return The line dash path effect used for shapes that consist of lines.
-     */
-    /**
-     * Sets the line dash path effect used for shapes that consist of lines.
-     *
-     * @param dashPathEffect
-     */
+    private var mFormLineWidth = 3f
+
     /**
      * Line dash path effect used for shapes that consist of lines.
      */
-    var formLineDashEffect: DashPathEffect? = null
-    /**
-     * returns the space between the legend entries on a horizontal axis in
-     * pixels
-     *
-     * @return
-     */
-    /**
-     * sets the space between the legend entries on a horizontal axis in pixels,
-     * converts to dp internally
-     *
-     * @param space
-     */
+    private var mFormLineDashEffect: DashPathEffect? = null
+
     /**
      * the space between the legend entries on a horizontal axis, default 6f
      */
-    var xEntrySpace = 6f
-    /**
-     * returns the space between the legend entries on a vertical axis in pixels
-     *
-     * @return
-     */
-    /**
-     * sets the space between the legend entries on a vertical axis in pixels,
-     * converts to dp internally
-     *
-     * @param space
-     */
+    private var mXEntrySpace = 6f
+
     /**
      * the space between the legend entries on a vertical axis, default 5f
      */
-    var yEntrySpace = 0f
-    /**
-     * returns the space between the form and the actual label/text
-     *
-     * @return
-     */
-    /**
-     * sets the space between the form and the actual label/text, converts to dp
-     * internally
-     *
-     * @param space
-     */
+    private var mYEntrySpace = 0f
+
     /**
      * the space between the legend entries on a vertical axis, default 2f
      * private float mYEntrySpace = 2f; / ** the space between the form and the
      * actual label/text
      */
-    var formToTextSpace = 5f
-    /**
-     * returns the space that is left out between stacked forms (with no label)
-     *
-     * @return
-     */
-    /**
-     * sets the space that is left out between stacked forms (with no label)
-     *
-     * @param space
-     */
+    private var mFormToTextSpace = 5f
+
     /**
      * the space that should be left between stacked forms
      */
-    var stackSpace = 3f
-    /**
-     * The maximum relative size out of the whole chart view. / If the legend is
-     * to the right/left of the chart, then this affects the width of the
-     * legend. / If the legend is to the top/bottom of the chart, then this
-     * affects the height of the legend. / If the legend is the center of the
-     * piechart, then this defines the size of the rectangular bounds out of the
-     * size of the "hole". / default: 0.95f (95%)
-     *
-     * @return
-     */
-    /**
-     * The maximum relative size out of the whole chart view. / If
-     * the legend is to the right/left of the chart, then this affects the width
-     * of the legend. / If the legend is to the top/bottom of the chart, then
-     * this affects the height of the legend. / default: 0.95f (95%)
-     *
-     * @param maxSize
-     */
+    private var mStackSpace = 3f
+
     /**
      * the maximum relative size out of the whole chart view in percent
      */
-    var maxSizePercent = 0.95f
+    private var mMaxSizePercent = 0.95f
+
+    /**
+     * default constructor
+     */
+    init {
+        mTextSize = convertDpToPixel(10f)
+        mXOffset = convertDpToPixel(5f)
+        mYOffset = convertDpToPixel(3f) // 2
+    }
 
     /**
      * Constructor. Provide entries for the legend.
      *
      * @param entries
      */
-    constructor(entries: Array<LegendEntry>?) : this() {
-        requireNotNull(entries) { "entries array is NULL" }
-        this.entries = entries
+    constructor(entries: Array<LegendEntry>) : this() {
+        mEntries = entries
     }
 
     /**
@@ -301,7 +169,11 @@ class Legend() : ComponentBase() {
      * @param entries
      */
     fun setEntries(entries: List<LegendEntry>) {
-        this.entries = entries.toTypedArray()
+        mEntries = entries.toTypedArray()
+    }
+
+    fun getEntries(): Array<LegendEntry> {
+        return mEntries
     }
 
     /**
@@ -314,12 +186,10 @@ class Legend() : ComponentBase() {
     fun getMaximumEntryWidth(p: Paint?): Float {
         var max = 0f
         var maxFormSize = 0f
-        val formToTextSpace = convertDpToPixel(
-            formToTextSpace
-        )
-        for (entry in entries) {
+        val formToTextSpace = convertDpToPixel(mFormToTextSpace)
+        for (entry in mEntries) {
             val formSize = convertDpToPixel(
-                if (java.lang.Float.isNaN(entry.formSize)) formSize else entry.formSize
+                if (java.lang.Float.isNaN(entry.formSize)) mFormSize else entry.formSize
             )
             if (formSize > maxFormSize) maxFormSize = formSize
             val label = entry.label ?: continue
@@ -337,7 +207,7 @@ class Legend() : ComponentBase() {
      */
     fun getMaximumEntryHeight(p: Paint?): Float {
         var max = 0f
-        for (entry in entries) {
+        for (entry in mEntries) {
             val label = entry.label ?: continue
             val length = calcTextHeight(p!!, label).toFloat()
             if (length > max) max = length
@@ -345,14 +215,18 @@ class Legend() : ComponentBase() {
         return max
     }
 
-    fun setExtra(entries: List<LegendEntry>) {
-        extraEntries = entries.toTypedArray()
+    fun getExtraEntries(): Array<LegendEntry> {
+        return mExtraEntries
     }
 
-    fun setExtra(entries: Array<LegendEntry>?) {
+    fun setExtra(entries: List<LegendEntry>) {
+        mExtraEntries = entries.toTypedArray()
+    }
+
+    fun setExtra(entries: Array<LegendEntry>) {
         var entries = entries
         if (entries == null) entries = arrayOf()
-        extraEntries = entries
+        mExtraEntries = entries
     }
 
     /**
@@ -361,9 +235,9 @@ class Legend() : ComponentBase() {
      * (if the legend has already been calculated, you will need to call notifyDataSetChanged()
      * to let the changes take effect)
      */
-    fun setExtra(colors: IntArray, labels: Array<String?>) {
+    fun setExtra(colors: IntArray, labels: Array<String>) {
         val entries: MutableList<LegendEntry> = ArrayList()
-        for (i in 0 until Math.min(colors.size, labels.size)) {
+        for (i in 0 until min(colors.size, labels.size)) {
             val entry = LegendEntry()
             entry.formColor = colors[i]
             entry.label = labels[i]
@@ -374,7 +248,7 @@ class Legend() : ComponentBase() {
                 LegendForm.EMPTY
             entries.add(entry)
         }
-        extraEntries = entries.toTypedArray()
+        mExtraEntries = entries.toTypedArray()
     }
 
     /**
@@ -386,8 +260,8 @@ class Legend() : ComponentBase() {
      * notifyDataSetChanged() is needed to auto-calculate the legend again)
      */
     fun setCustom(entries: Array<LegendEntry>) {
-        this.entries = entries
-        isLegendCustom = true
+        mEntries = entries
+        mIsLegendCustom = true
     }
 
     /**
@@ -399,8 +273,8 @@ class Legend() : ComponentBase() {
      * notifyDataSetChanged() is needed to auto-calculate the legend again)
      */
     fun setCustom(entries: List<LegendEntry>) {
-        this.entries = entries.toTypedArray()
-        isLegendCustom = true
+        mEntries = entries.toTypedArray()
+        mIsLegendCustom = true
     }
 
     /**
@@ -409,7 +283,78 @@ class Legend() : ComponentBase() {
      * automatically (after notifyDataSetChanged() is called).
      */
     fun resetCustom() {
-        isLegendCustom = false
+        mIsLegendCustom = false
+    }
+
+    /**
+     * @return true if a custom legend entries has been set default
+     * false (automatic legend)
+     */
+    fun isLegendCustom(): Boolean {
+        return mIsLegendCustom
+    }
+
+    /**
+     * returns the horizontal alignment of the legend
+     *
+     * @return
+     */
+    fun getHorizontalAlignment(): LegendHorizontalAlignment {
+        return mHorizontalAlignment
+    }
+
+    /**
+     * sets the horizontal alignment of the legend
+     *
+     * @param value
+     */
+    fun setHorizontalAlignment(value: LegendHorizontalAlignment) {
+        mHorizontalAlignment = value
+    }
+
+    /**
+     * returns the vertical alignment of the legend
+     *
+     * @return
+     */
+    fun getVerticalAlignment(): LegendVerticalAlignment {
+        return mVerticalAlignment
+    }
+
+    /**
+     * sets the vertical alignment of the legend
+     *
+     * @param value
+     */
+    fun setVerticalAlignment(value: LegendVerticalAlignment) {
+        mVerticalAlignment = value
+    }
+
+    /**
+     * returns the orientation of the legend
+     *
+     * @return
+     */
+    fun getOrientation(): LegendOrientation {
+        return mOrientation
+    }
+
+    /**
+     * sets the orientation of the legend
+     *
+     * @param value
+     */
+    fun setOrientation(value: LegendOrientation) {
+        mOrientation = value
+    }
+
+    /**
+     * returns whether the legend will draw inside the chart or outside
+     *
+     * @return
+     */
+    fun isDrawInsideEnabled(): Boolean {
+        return mDrawInside
     }
 
     /**
@@ -418,29 +363,192 @@ class Legend() : ComponentBase() {
      * @param value
      */
     fun setDrawInside(value: Boolean) {
-        isDrawInsideEnabled = value
+        mDrawInside = value
+    }
+
+    /**
+     * returns the text direction of the legend
+     *
+     * @return
+     */
+    fun getDirection(): LegendDirection {
+        return mDirection
+    }
+
+    /**
+     * sets the text direction of the legend
+     *
+     * @param pos
+     */
+    fun setDirection(pos: LegendDirection) {
+        mDirection = pos
+    }
+
+    /**
+     * returns the current form/shape that is set for the legend
+     *
+     * @return
+     */
+    fun getForm(): LegendForm {
+        return mShape
+    }
+
+    /**
+     * sets the form/shape of the legend forms
+     *
+     * @param shape
+     */
+    fun setForm(shape: LegendForm) {
+        mShape = shape
+    }
+
+    /**
+     * sets the size in dp of the legend forms, default 8f
+     *
+     * @param size
+     */
+    fun setFormSize(size: Float) {
+        mFormSize = size
+    }
+
+    /**
+     * returns the size in dp of the legend forms
+     *
+     * @return
+     */
+    fun getFormSize(): Float {
+        return mFormSize
+    }
+
+    /**
+     * sets the line width in dp for forms that consist of lines, default 3f
+     *
+     * @param size
+     */
+    fun setFormLineWidth(size: Float) {
+        mFormLineWidth = size
+    }
+
+    /**
+     * returns the line width in dp for drawing forms that consist of lines
+     *
+     * @return
+     */
+    fun getFormLineWidth(): Float {
+        return mFormLineWidth
+    }
+
+    /**
+     * Sets the line dash path effect used for shapes that consist of lines.
+     *
+     * @param dashPathEffect
+     */
+    fun setFormLineDashEffect(dashPathEffect: DashPathEffect?) {
+        mFormLineDashEffect = dashPathEffect
+    }
+
+    /**
+     * @return The line dash path effect used for shapes that consist of lines.
+     */
+    fun getFormLineDashEffect(): DashPathEffect? {
+        return mFormLineDashEffect
+    }
+
+    /**
+     * returns the space between the legend entries on a horizontal axis in
+     * pixels
+     *
+     * @return
+     */
+    fun getXEntrySpace(): Float {
+        return mXEntrySpace
+    }
+
+    /**
+     * sets the space between the legend entries on a horizontal axis in pixels,
+     * converts to dp internally
+     *
+     * @param space
+     */
+    fun setXEntrySpace(space: Float) {
+        mXEntrySpace = space
+    }
+
+    /**
+     * returns the space between the legend entries on a vertical axis in pixels
+     *
+     * @return
+     */
+    fun getYEntrySpace(): Float {
+        return mYEntrySpace
+    }
+
+    /**
+     * sets the space between the legend entries on a vertical axis in pixels,
+     * converts to dp internally
+     *
+     * @param space
+     */
+    fun setYEntrySpace(space: Float) {
+        mYEntrySpace = space
+    }
+
+    /**
+     * returns the space between the form and the actual label/text
+     *
+     * @return
+     */
+    fun getFormToTextSpace(): Float {
+        return mFormToTextSpace
+    }
+
+    /**
+     * sets the space between the form and the actual label/text, converts to dp
+     * internally
+     *
+     * @param space
+     */
+    fun setFormToTextSpace(space: Float) {
+        mFormToTextSpace = space
+    }
+
+    /**
+     * returns the space that is left out between stacked forms (with no label)
+     *
+     * @return
+     */
+    fun getStackSpace(): Float {
+        return mStackSpace
+    }
+
+    /**
+     * sets the space that is left out between stacked forms (with no label)
+     *
+     * @param space
+     */
+    fun setStackSpace(space: Float) {
+        mStackSpace = space
     }
 
     /**
      * the total width of the legend (needed width space)
      */
-    @JvmField
     var mNeededWidth = 0f
 
     /**
      * the total height of the legend (needed height space)
      */
-    @JvmField
     var mNeededHeight = 0f
-    @JvmField
+
     var mTextHeightMax = 0f
+
     var mTextWidthMax = 0f
+
     /**
-     * If this is set, then word wrapping the legend is enabled. This means the
-     * legend will not be cut off if too long.
-     *
-     * @return
+     * flag that indicates if word wrapping is enabled
      */
+    private var mWordWrapEnabled = false
+
     /**
      * Should the legend word wrap? / this is currently supported only for:
      * BelowChartLeft, BelowChartRight, BelowChartCenter. / note that word
@@ -450,61 +558,93 @@ class Legend() : ComponentBase() {
      *
      * @param enabled
      */
+    fun setWordWrapEnabled(enabled: Boolean) {
+        mWordWrapEnabled = enabled
+    }
+
     /**
-     * flag that indicates if word wrapping is enabled
+     * If this is set, then word wrapping the legend is enabled. This means the
+     * legend will not be cut off if too long.
+     *
+     * @return
      */
-    var isWordWrapEnabled = false
+    fun isWordWrapEnabled(): Boolean {
+        return mWordWrapEnabled
+    }
+
+    /**
+     * The maximum relative size out of the whole chart view. / If the legend is
+     * to the right/left of the chart, then this affects the width of the
+     * legend. / If the legend is to the top/bottom of the chart, then this
+     * affects the height of the legend. / If the legend is the center of the
+     * piechart, then this defines the size of the rectangular bounds out of the
+     * size of the "hole". / default: 0.95f (95%)
+     *
+     * @return
+     */
+    fun getMaxSizePercent(): Float {
+        return mMaxSizePercent
+    }
+
+    /**
+     * The maximum relative size out of the whole chart view. / If
+     * the legend is to the right/left of the chart, then this affects the width
+     * of the legend. / If the legend is to the top/bottom of the chart, then
+     * this affects the height of the legend. / default: 0.95f (95%)
+     *
+     * @param maxSize
+     */
+    fun setMaxSizePercent(maxSize: Float) {
+        mMaxSizePercent = maxSize
+    }
+
     private val mCalculatedLabelSizes: MutableList<FSize> = ArrayList(16)
     private val mCalculatedLabelBreakPoints: MutableList<Boolean> = ArrayList(16)
     private val mCalculatedLineSizes: MutableList<FSize> = ArrayList(16)
-    val calculatedLabelSizes: List<FSize>
-        get() = mCalculatedLabelSizes
-    val calculatedLabelBreakPoints: List<Boolean>
-        get() = mCalculatedLabelBreakPoints
-    val calculatedLineSizes: List<FSize>
-        get() = mCalculatedLineSizes
+
+    fun getCalculatedLabelSizes(): List<FSize> {
+        return mCalculatedLabelSizes
+    }
+
+    fun getCalculatedLabelBreakPoints(): List<Boolean> {
+        return mCalculatedLabelBreakPoints
+    }
+
+    fun getCalculatedLineSizes(): List<FSize> {
+        return mCalculatedLineSizes
+    }
 
     /**
      * Calculates the dimensions of the Legend. This includes the maximum width
      * and height of a single entry, as well as the total width and height of
      * the Legend.
      *
-     * @param labelpaint
+     * @param labeling
      */
-    fun calculateDimensions(labelpaint: Paint?, viewPortHandler: ViewPortHandler) {
-        val defaultFormSize = convertDpToPixel(
-            formSize
-        )
-        val stackSpace = convertDpToPixel(
-            stackSpace
-        )
-        val formToTextSpace = convertDpToPixel(
-            formToTextSpace
-        )
-        val xEntrySpace = convertDpToPixel(
-            xEntrySpace
-        )
-        val yEntrySpace = convertDpToPixel(
-            yEntrySpace
-        )
-        val wordWrapEnabled = isWordWrapEnabled
-        val entries = entries
+    fun calculateDimensions(labeling: Paint, viewPortHandler: ViewPortHandler) {
+        val defaultFormSize = convertDpToPixel(mFormSize)
+        val stackSpace = convertDpToPixel(mStackSpace)
+        val formToTextSpace = convertDpToPixel(mFormToTextSpace)
+        val xEntrySpace = convertDpToPixel(mXEntrySpace)
+        val yEntrySpace = convertDpToPixel(mYEntrySpace)
+        val wordWrapEnabled = mWordWrapEnabled
+        val entries = mEntries
         val entryCount = entries.size
-        mTextWidthMax = getMaximumEntryWidth(labelpaint)
-        mTextHeightMax = getMaximumEntryHeight(labelpaint)
-        when (orientation) {
+        mTextWidthMax = getMaximumEntryWidth(labeling)
+        mTextHeightMax = getMaximumEntryHeight(labeling)
+        when (mOrientation) {
             LegendOrientation.VERTICAL -> {
                 var maxWidth = 0f
                 var maxHeight = 0f
                 var width = 0f
                 val labelLineHeight = getLineHeight(
-                    labelpaint!!
+                    labeling
                 )
                 var wasStacked = false
                 var i = 0
                 while (i < entryCount) {
                     val e = entries[i]
-                    val drawingForm = e.form != LegendForm.NONE
+                    val drawingForm = e.form !== LegendForm.NONE
                     val formSize =
                         if (java.lang.Float.isNaN(e.formSize)) defaultFormSize else convertDpToPixel(
                             e.formSize
@@ -521,19 +661,19 @@ class Legend() : ComponentBase() {
 
                         // make a step to the left
                         if (drawingForm && !wasStacked) width += formToTextSpace else if (wasStacked) {
-                            maxWidth = Math.max(maxWidth, width)
+                            maxWidth = max(maxWidth, width)
                             maxHeight += labelLineHeight + yEntrySpace
                             width = 0f
                             wasStacked = false
                         }
-                        width += calcTextWidth(labelpaint, label).toFloat()
+                        width += calcTextWidth(labeling, label).toFloat()
                         maxHeight += labelLineHeight + yEntrySpace
                     } else {
                         wasStacked = true
                         width += formSize
                         if (i < entryCount - 1) width += stackSpace
                     }
-                    maxWidth = Math.max(maxWidth, width)
+                    maxWidth = max(maxWidth, width)
                     i++
                 }
                 mNeededWidth = maxWidth
@@ -541,12 +681,12 @@ class Legend() : ComponentBase() {
             }
             LegendOrientation.HORIZONTAL -> {
                 val labelLineHeight = getLineHeight(
-                    labelpaint!!
+                    labeling
                 )
                 val labelLineSpacing = getLineSpacing(
-                    labelpaint
+                    labeling
                 ) + yEntrySpace
-                val contentWidth = viewPortHandler.contentWidth() * maxSizePercent
+                val contentWidth = viewPortHandler.contentWidth() * mMaxSizePercent
 
                 // Start calculating layout
                 var maxLineWidth = 0f
@@ -559,7 +699,7 @@ class Legend() : ComponentBase() {
                 var i = 0
                 while (i < entryCount) {
                     val e = entries[i]
-                    val drawingForm = e.form != LegendForm.NONE
+                    val drawingForm = e.form !== LegendForm.NONE
                     val formSize =
                         if (java.lang.Float.isNaN(e.formSize)) defaultFormSize else convertDpToPixel(
                             e.formSize
@@ -579,7 +719,7 @@ class Legend() : ComponentBase() {
                     if (label != null) {
                         mCalculatedLabelSizes.add(
                             calcTextSize(
-                                labelpaint, label
+                                labeling, label
                             )
                         )
                         requiredWidth += if (drawingForm) formToTextSpace + formSize else 0f
@@ -630,14 +770,5 @@ class Legend() : ComponentBase() {
         }
         mNeededHeight += mYOffset
         mNeededWidth += mXOffset
-    }
-
-    /**
-     * default constructor
-     */
-    init {
-        mTextSize = convertDpToPixel(10f)
-        mXOffset = convertDpToPixel(5f)
-        mYOffset = convertDpToPixel(3f) // 2
     }
 }

@@ -8,7 +8,6 @@ class LegendEntry {
     constructor() {}
 
     /**
-     *
      * @param label The legend entry text. A `null` label will start a group.
      * @param form The form to draw for this entry.
      * @param formSize Set to NaN to use the legend's default.
@@ -17,11 +16,11 @@ class LegendEntry {
      * @param formColor The color for drawing the form.
      */
     constructor(
-        label: String?,
+        label: String,
         form: LegendForm,
         formSize: Float,
         formLineWidth: Float,
-        formLineDashEffect: DashPathEffect?,
+        formLineDashEffect: DashPathEffect,
         formColor: Int
     ) {
         this.label = label
@@ -36,7 +35,7 @@ class LegendEntry {
      * The legend entry text.
      * A `null` label will start a group.
      */
-    var label: String? = null
+    lateinit var label: String
 
     /**
      * The form to draw for this entry.
@@ -66,7 +65,7 @@ class LegendEntry {
      *
      * Set to null to use the legend's default
      */
-    var formLineDashEffect: DashPathEffect? = null
+    lateinit var formLineDashEffect: DashPathEffect
 
     /**
      * The color for drawing the form

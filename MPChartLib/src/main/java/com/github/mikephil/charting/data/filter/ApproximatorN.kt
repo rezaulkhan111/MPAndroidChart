@@ -5,6 +5,7 @@ package com.github.mikephil.charting.data.filter
  * http://psimpl.sourceforge.net/douglas-peucker.html
  */
 class ApproximatorN {
+
     fun reduceWithDouglasPeucker(points: FloatArray, resultCount: Float): FloatArray {
         val pointCount = points.size / 2
 
@@ -56,7 +57,7 @@ class ApproximatorN {
         return reducedEntries
     }
 
-    private class Line internal constructor(var start: Int, var end: Int, points: FloatArray) {
+    private class Line(var start: Int, var end: Int, points: FloatArray) {
         var distance = 0f
         var index = 0
         fun equals(rhs: Line): Boolean {
@@ -70,7 +71,8 @@ class ApproximatorN {
         init {
             val startPoint = floatArrayOf(points[start * 2], points[start * 2 + 1])
             val endPoint = floatArrayOf(points[end * 2], points[end * 2 + 1])
-            if (end <= start + 1) return
+            if (end <= start + 1) {
+            }
             var i = start + 1
             var i2 = i * 2
             while (i < end) {

@@ -16,10 +16,20 @@ import java.lang.ref.WeakReference
  *
  * @author Philipp Jahoda
  */
-open class MarkerView(context: Context?, layoutResource: Int) : RelativeLayout(context), IMarker {
-    private var mOffset: MPPointF? = MPPointF()
+open class MarkerView : RelativeLayout, IMarker {
+    private var mOffset: MPPointF = MPPointF()
     private val mOffset2 = MPPointF()
     private var mWeakChart: WeakReference<Chart<*>>? = null
+
+    /**
+     * Constructor. Sets up the MarkerView with a custom layout resource.
+     *
+     * @param context
+     * @param layoutResource the layout resource to use for the MarkerView
+     */
+    constructor(context: Context?, layoutResource: Int) : super(context) {
+        setupLayoutResource(layoutResource)
+    }
 
     /**
      * Sets the layout resource for a custom MarkerView.
@@ -28,10 +38,8 @@ open class MarkerView(context: Context?, layoutResource: Int) : RelativeLayout(c
      */
     private fun setupLayoutResource(layoutResource: Int) {
         val inflated = LayoutInflater.from(context).inflate(layoutResource, this)
-        inflated.layoutParams = LayoutParams(
-            LayoutParams.WRAP_CONTENT,
-            LayoutParams.WRAP_CONTENT
-        )
+        inflated.layoutParams =
+            LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
         inflated.measure(
             MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED),
             MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
@@ -41,32 +49,33 @@ open class MarkerView(context: Context?, layoutResource: Int) : RelativeLayout(c
         inflated.layout(0, 0, inflated.measuredWidth, inflated.measuredHeight)
     }
 
-    fun setOffset(offsetX: Float, offsetY: Float) {
-        mOffset!!.x = offsetX
-        mOffset!!.y = offsetY
+    open fun setOffset(offset: MPPointF) {
+        mOffset = offset
+        if (mOffset == null) {
+            mOffset = MPPointF()
+        }
     }
 
-    override var offset: MPPointF?
-        get() = mOffset
-        set(offset) {
-            mOffset = offset
-            if (mOffset == null) {
-                mOffset = MPPointF()
-            }
-        }
+    open fun setOffset(offsetX: Float, offsetY: Float) {
+        mOffset.x = offsetX
+        mOffset.y = offsetY
+    }
 
-    fun setChartView(chart: Chart<*>) {
+    override val offset: MPPointF = mOffset
+
+    open fun setChartView(chart: Chart<*>) {
         mWeakChart = WeakReference(chart)
     }
 
-    val chartView: Chart<*>?
-        get() = if (mWeakChart == null) null else mWeakChart!!.get()
+    open fun getChartView(): Chart<*>? {
+        return if (mWeakChart == null) null else mWeakChart!!.get()
+    }
 
     override fun getOffsetForDrawingAtPoint(posX: Float, posY: Float): MPPointF {
         val offset = offset
-        mOffset2.x = offset!!.x
+        mOffset2.x = offset.x
         mOffset2.y = offset.y
-        val chart = chartView
+        val chart = getChartView()
         val width = width.toFloat()
         val height = height.toFloat()
         if (posX + mOffset2.x < 0) {
@@ -82,7 +91,7 @@ open class MarkerView(context: Context?, layoutResource: Int) : RelativeLayout(c
         return mOffset2
     }
 
-    override fun refreshContent(e: Entry?, highlight: Highlight?) {
+    override fun refreshContent(e: Entry, highlight: Highlight) {
         measure(
             MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED),
             MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
@@ -97,15 +106,5 @@ open class MarkerView(context: Context?, layoutResource: Int) : RelativeLayout(c
         canvas.translate(posX + offset.x, posY + offset.y)
         draw(canvas)
         canvas.restoreToCount(saveId)
-    }
-
-    /**
-     * Constructor. Sets up the MarkerView with a custom layout resource.
-     *
-     * @param context
-     * @param layoutResource the layout resource to use for the MarkerView
-     */
-    init {
-        setupLayoutResource(layoutResource)
     }
 }

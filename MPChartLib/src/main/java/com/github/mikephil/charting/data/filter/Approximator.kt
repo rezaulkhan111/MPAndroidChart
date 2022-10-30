@@ -2,7 +2,8 @@ package com.github.mikephil.charting.data.filter
 
 import android.annotation.TargetApi
 import android.os.Build
-import java.util.*
+import kotlin.math.abs
+import kotlin.math.sqrt
 
 /**
  * Implemented according to Wiki-Pseudocode []
@@ -15,9 +16,7 @@ class Approximator {
     fun reduceWithDouglasPeucker(points: FloatArray, tolerance: Float): FloatArray {
         var greatestIndex = 0
         var greatestDistance = 0f
-        val line: Line = Line(
-            points[0], points[1], points[points.size - 2], points[points.size - 1]
-        )
+        val line = Line(points[0], points[1], points[points.size - 2], points[points.size - 1])
         var i = 2
         while (i < points.size - 2) {
             val distance = line.distance(points[i], points[i + 1])
@@ -29,14 +28,14 @@ class Approximator {
         }
         return if (greatestDistance > tolerance) {
             val reduced1 = reduceWithDouglasPeucker(
-                Arrays.copyOfRange(points, 0, greatestIndex + 2),
+                points.copyOfRange(0, greatestIndex + 2),
                 tolerance
             )
             val reduced2 = reduceWithDouglasPeucker(
-                Arrays.copyOfRange(points, greatestIndex, points.size),
+                points.copyOfRange(greatestIndex, points.size),
                 tolerance
             )
-            val result2 = Arrays.copyOfRange(reduced2, 2, reduced2.size)
+            val result2 = reduced2.copyOfRange(2, reduced2.size)
             concat(reduced1, result2)
         } else {
             line.points
@@ -65,15 +64,16 @@ class Approximator {
         return result
     }
 
-    private inner class Line(x1: Float, y1: Float, x2: Float, y2: Float) {
+    private class Line(x1: Float, y1: Float, x2: Float, y2: Float) {
         val points: FloatArray
         private val sxey: Float
         private val exsy: Float
         private val dx: Float
         private val dy: Float
         private val length: Float
+
         fun distance(x: Float, y: Float): Float {
-            return Math.abs(dy * x - dx * y + sxey - exsy) / length
+            return abs(dy * x - dx * y + sxey - exsy) / length
         }
 
         init {
@@ -81,7 +81,7 @@ class Approximator {
             dy = y1 - y2
             sxey = x1 * y2
             exsy = x2 * y1
-            length = Math.sqrt((dx * dx + dy * dy).toDouble()).toFloat()
+            length = sqrt((dx * dx + dy * dy).toDouble()).toFloat()
             points = floatArrayOf(x1, y1, x2, y2)
         }
     }

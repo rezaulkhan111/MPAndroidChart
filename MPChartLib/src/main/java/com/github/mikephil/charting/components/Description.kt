@@ -2,51 +2,51 @@ package com.github.mikephil.charting.components
 
 import android.graphics.Paint.Align
 import com.github.mikephil.charting.utils.MPPointF
+import com.github.mikephil.charting.utils.MPPointF.Companion.getInstance
 import com.github.mikephil.charting.utils.Utils.convertDpToPixel
 
 /**
  * Created by Philipp Jahoda on 17/09/16.
  */
-class Description : ComponentBase() {
+class Description() : ComponentBase() {
+    init {
+        mTextSize = convertDpToPixel(8f)
+    }
+
     /**
-     * Returns the description text.
-     *
-     * @return
+     * the text used in the description
      */
+    private var text = "Description Label"
+
+    /**
+     * the custom position of the description text
+     */
+    private lateinit var mPosition: MPPointF
+
+    /**
+     * the alignment of the description text
+     */
+    private var mTextAlign = Align.RIGHT
+
+
     /**
      * Sets the text to be shown as the description.
      * Never set this to null as this will cause nullpointer exception when drawing with Android Canvas.
      *
      * @param text
      */
+    fun setText(text: String) {
+        this.text = text
+    }
+
     /**
-     * the text used in the description
-     */
-    var text = "Description Label"
-    /**
-     * Returns the customized position of the description, or null if none set.
+     * Returns the description text.
      *
      * @return
      */
-    /**
-     * the custom position of the description text
-     */
-    var position: MPPointF? = null
-        private set
-    /**
-     * Returns the text alignment of the description.
-     *
-     * @return
-     */
-    /**
-     * Sets the text alignment of the description text. Default RIGHT.
-     *
-     * @param align
-     */
-    /**
-     * the alignment of the description text
-     */
-    var textAlign = Align.RIGHT
+    fun getText(): String {
+        return text
+    }
 
     /**
      * Sets a custom position for the description text in pixels on the screen.
@@ -55,17 +55,38 @@ class Description : ComponentBase() {
      * @param y - ycoordinate
      */
     fun setPosition(x: Float, y: Float) {
-        if (position == null) {
-            position = MPPointF.getInstance(x, y)
+        if (mPosition == null) {
+            mPosition = getInstance(x, y)
         } else {
-            position!!.x = x
-            position!!.y = y
+            mPosition.x = x
+            mPosition.y = y
         }
     }
 
-    init {
+    /**
+     * Returns the customized position of the description, or null if none set.
+     *
+     * @return
+     */
+    fun getPosition(): MPPointF {
+        return mPosition
+    }
 
-        // default size
-        mTextSize = convertDpToPixel(8f)
+    /**
+     * Sets the text alignment of the description text. Default RIGHT.
+     *
+     * @param align
+     */
+    fun setTextAlign(align: Align) {
+        mTextAlign = align
+    }
+
+    /**
+     * Returns the text alignment of the description.
+     *
+     * @return
+     */
+    fun getTextAlign(): Align {
+        return mTextAlign
     }
 }

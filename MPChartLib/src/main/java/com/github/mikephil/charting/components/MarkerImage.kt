@@ -18,54 +18,77 @@ import java.lang.ref.WeakReference
  *
  * @author Philipp Jahoda
  */
-class MarkerImage(private val mContext: Context, drawableResourceId: Int) : IMarker {
-    private var mDrawable: Drawable? = null
-    private var mOffset: MPPointF? = MPPointF()
+open class MarkerImage : IMarker {
+    private var mContext: Context
+    private var mDrawable: Drawable
+
+    private var mOffset: MPPointF = MPPointF()
     private val mOffset2 = MPPointF()
-    private var mWeakChart: WeakReference<Chart<*>>? = null
-    private var mSize: FSize? = FSize()
+    private lateinit var mWeakChart: WeakReference<Chart<*>>
+
+    private var mSize: FSize = FSize()
     private val mDrawableBoundsCache = Rect()
-    fun setOffset(offsetX: Float, offsetY: Float) {
-        mOffset!!.x = offsetX
-        mOffset!!.y = offsetY
+
+    /**
+     * Constructor. Sets up the MarkerView with a custom layout resource.
+     *
+     * @param context
+     * @param drawableResourceId the drawable resource to render
+     */
+    constructor(context: Context, drawableResourceId: Int) {
+        mContext = context
+        mDrawable = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mContext.resources.getDrawable(drawableResourceId, null)
+        } else {
+            mContext.resources.getDrawable(drawableResourceId)
+        }
     }
 
-    override var offset: MPPointF?
-        get() = mOffset
-        set(offset) {
-            mOffset = offset
-            if (mOffset == null) {
-                mOffset = MPPointF()
-            }
+    fun setOffset(offset: MPPointF) {
+        mOffset = offset
+        if (mOffset == null) {
+            mOffset = MPPointF()
         }
-    var size: FSize?
-        get() = mSize
-        set(size) {
-            mSize = size
-            if (mSize == null) {
-                mSize = FSize()
-            }
+    }
+
+    fun setOffset(offsetX: Float, offsetY: Float) {
+        mOffset.x = offsetX
+        mOffset.y = offsetY
+    }
+
+    override val offset: MPPointF = mOffset
+
+    fun setSize(size: FSize) {
+        mSize = size
+        if (mSize == null) {
+            mSize = FSize()
         }
+    }
+
+    fun getSize(): FSize {
+        return mSize
+    }
 
     fun setChartView(chart: Chart<*>) {
         mWeakChart = WeakReference(chart)
     }
 
-    val chartView: Chart<*>?
-        get() = if (mWeakChart == null) null else mWeakChart!!.get()
+    private fun getChartView(): Chart<*>? {
+        return if (mWeakChart == null) null else mWeakChart.get()
+    }
 
     override fun getOffsetForDrawingAtPoint(posX: Float, posY: Float): MPPointF {
         val offset = offset
-        mOffset2.x = offset!!.x
+        mOffset2.x = offset.x
         mOffset2.y = offset.y
-        val chart = chartView
+        val chart = getChartView()
         var width = mSize!!.width
         var height = mSize!!.height
         if (width == 0f && mDrawable != null) {
-            width = mDrawable.getIntrinsicWidth().toFloat()
+            width = mDrawable.intrinsicWidth.toFloat()
         }
         if (height == 0f && mDrawable != null) {
-            height = mDrawable.getIntrinsicHeight().toFloat()
+            height = mDrawable.intrinsicHeight.toFloat()
         }
         if (posX + mOffset2.x < 0) {
             mOffset2.x = -posX
@@ -80,17 +103,20 @@ class MarkerImage(private val mContext: Context, drawableResourceId: Int) : IMar
         return mOffset2
     }
 
-    override fun refreshContent(e: Entry?, highlight: Highlight?) {}
+    override fun refreshContent(e: Entry, highlight: Highlight) {
+
+    }
+
     override fun draw(canvas: Canvas, posX: Float, posY: Float) {
         if (mDrawable == null) return
         val offset = getOffsetForDrawingAtPoint(posX, posY)
         var width = mSize!!.width
         var height = mSize!!.height
         if (width == 0f) {
-            width = mDrawable.getIntrinsicWidth().toFloat()
+            width = mDrawable.intrinsicWidth.toFloat()
         }
         if (height == 0f) {
-            height = mDrawable.getIntrinsicHeight().toFloat()
+            height = mDrawable.intrinsicHeight.toFloat()
         }
         mDrawable.copyBounds(mDrawableBoundsCache)
         mDrawable.setBounds(
@@ -104,20 +130,6 @@ class MarkerImage(private val mContext: Context, drawableResourceId: Int) : IMar
         canvas.translate(posX + offset.x, posY + offset.y)
         mDrawable.draw(canvas)
         canvas.restoreToCount(saveId)
-        mDrawable.setBounds(mDrawableBoundsCache)
-    }
-
-    /**
-     * Constructor. Sets up the MarkerView with a custom layout resource.
-     *
-     * @param context
-     * @param drawableResourceId the drawable resource to render
-     */
-    init {
-        mDrawable = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            mContext.resources.getDrawable(drawableResourceId, null)
-        } else {
-            mContext.resources.getDrawable(drawableResourceId)
-        }
+        mDrawable.bounds = mDrawableBoundsCache
     }
 }
