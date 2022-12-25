@@ -8,10 +8,15 @@ import com.github.mikephil.charting.interfaces.datasets.IBarLineScatterCandleBub
  *
  * @author Philipp Jahoda
  */
-abstract class BarLineScatterCandleBubbleDataSet<T : Entry?>(
-    yVals: MutableList<T?>?,
+abstract class BarLineScatterCandleBubbleDataSet<T : Entry> constructor(
+    yVals: MutableList<T>?,
     label: String?
 ) : DataSet<T>(yVals, label), IBarLineScatterCandleBubbleDataSet<T> {
+    /**
+     * default highlight color
+     */
+    protected var mHighLightColor = Color.rgb(255, 187, 115)
+
     /**
      * Sets the color that is used for drawing the highlight indicators. Dont
      * forget to resolve the color using getResources().getColor(...) or
@@ -19,12 +24,16 @@ abstract class BarLineScatterCandleBubbleDataSet<T : Entry?>(
      *
      * @param color
      */
-    /**
-     * default highlight color
-     */
-    override var highLightColor = Color.rgb(255, 187, 115)
-    protected fun copy(barLineScatterCandleBubbleDataSet: BarLineScatterCandleBubbleDataSet<*>) {
+    open fun setHighLightColor(color: Int) {
+        mHighLightColor = color
+    }
+
+    override fun getHighLightColor(): Int {
+        return mHighLightColor
+    }
+
+    protected open fun copy(barLineScatterCandleBubbleDataSet: BarLineScatterCandleBubbleDataSet<*>) {
         super.copy(barLineScatterCandleBubbleDataSet)
-        barLineScatterCandleBubbleDataSet.highLightColor = highLightColor
+        barLineScatterCandleBubbleDataSet.mHighLightColor = mHighLightColor
     }
 }

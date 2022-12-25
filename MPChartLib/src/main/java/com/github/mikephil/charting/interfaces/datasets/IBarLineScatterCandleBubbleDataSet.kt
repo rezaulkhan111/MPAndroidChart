@@ -11,5 +11,5 @@ interface IBarLineScatterCandleBubbleDataSet<T : Entry?> : IDataSet<T> {
      *
      * @return
      */
-    val highLightColor: Int
+    fun getHighLightColor(): Int
 }

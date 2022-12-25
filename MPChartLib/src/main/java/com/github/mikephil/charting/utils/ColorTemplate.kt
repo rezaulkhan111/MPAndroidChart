@@ -115,7 +115,7 @@ object ColorTemplate {
      * @return
      */
     @JvmStatic
-    fun createColors(colors: IntArray): List<Int> {
+    fun createColors(colors: IntArray): MutableList<Int> {
         val result: MutableList<Int> = ArrayList()
         for (i in colors) {
             result.add(i)

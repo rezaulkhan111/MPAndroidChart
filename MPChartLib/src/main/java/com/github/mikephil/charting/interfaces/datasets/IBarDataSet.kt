@@ -6,9 +6,10 @@ import com.github.mikephil.charting.utils.Fill
 /**
  * Created by philipp on 21/10/15.
  */
-interface IBarDataSet : IBarLineScatterCandleBubbleDataSet<BarEntry?> {
-    val fills: List<Fill?>?
-    fun getFill(index: Int): Fill?
+interface IBarDataSet : IBarLineScatterCandleBubbleDataSet<BarEntry> {
+    fun getFills(): List<Fill>
+
+    fun getFill(index: Int): Fill
 
     /**
      * Returns true if this DataSet is stacked (stacksize > 1) or not.

@@ -74,6 +74,6 @@ class BubbleEntry : Entry {
     }
 
     override fun copy(): BubbleEntry {
-        return BubbleEntry(x, y, size, data)
+        return BubbleEntry(getX(), getY(), size, getData())
     }
 }

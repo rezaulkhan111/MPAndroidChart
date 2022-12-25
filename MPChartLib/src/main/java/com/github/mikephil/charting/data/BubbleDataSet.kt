@@ -3,11 +3,16 @@ package com.github.mikephil.charting.data
 import com.github.mikephil.charting.interfaces.datasets.IBubbleDataSet
 import com.github.mikephil.charting.utils.Utils.convertDpToPixel
 
-class BubbleDataSet(yVals: MutableList<BubbleEntry?>?, label: String?) :
-    BarLineScatterCandleBubbleDataSet<BubbleEntry?>(yVals, label), IBubbleDataSet {
-     var mMaxSize = 0f
-     var mNormalizeSize = true
+class BubbleDataSet : BarLineScatterCandleBubbleDataSet<BubbleEntry>, IBubbleDataSet {
+
+    protected var mMaxSize = 0f
+    protected var mNormalizeSize = true
     private var mHighlightCircleWidth = 2.5f
+
+    constructor(yVals: List<BubbleEntry?>?, label: String?) {
+        super(yVals, label)
+    }
+
     override fun setHighlightCircleWidth(width: Float) {
         mHighlightCircleWidth = convertDpToPixel(width)
     }
@@ -16,25 +21,25 @@ class BubbleDataSet(yVals: MutableList<BubbleEntry?>?, label: String?) :
         return mHighlightCircleWidth
     }
 
-    override fun calcMinMax(e: BubbleEntry?) {
+    protected override fun calcMinMax(e: BubbleEntry?) {
         super.calcMinMax(e)
-        val size = e.getSize()
+        val size = e!!.size
         if (size > mMaxSize) {
             mMaxSize = size
         }
     }
 
-    override fun copy(): DataSet<BubbleEntry?>? {
-        val entries: MutableList<BubbleEntry?> = ArrayList()
+    override fun copy(): DataSet<BubbleEntry> {
+        val entries: MutableList<BubbleEntry> = ArrayList()
         for (i in mEntries!!.indices) {
             entries.add(mEntries!![i]!!.copy())
         }
-        val copied = BubbleDataSet(entries, getLabel())
+        val copied = BubbleDataSet(entries, label)
         copy(copied)
         return copied
     }
 
-     fun copy(bubbleDataSet: BubbleDataSet) {
+    protected fun copy(bubbleDataSet: BubbleDataSet) {
         bubbleDataSet.mHighlightCircleWidth = mHighlightCircleWidth
         bubbleDataSet.mNormalizeSize = mNormalizeSize
     }

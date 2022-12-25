@@ -91,6 +91,7 @@ class ApproximatorN {
     }
 
     companion object {
+
         private fun distanceToLine(
             ptX: Float, ptY: Float, fromLinePoint1: FloatArray, fromLinePoint2: FloatArray
         ): Float {

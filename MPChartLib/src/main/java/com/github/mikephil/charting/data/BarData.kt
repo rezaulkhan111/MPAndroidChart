@@ -7,21 +7,29 @@ import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
  *
  * @author Philipp Jahoda
  */
-class BarData : BarLineScatterCandleBubbleData<IBarDataSet?> {
+class BarData : BarLineScatterCandleBubbleData<IBarDataSet> {
+    /**
+     * the width of the bars on the x-axis, in values (not pixels)
+     */
+    private var mBarWidth = 0.85f
+
+    constructor() : super() {}
+    constructor(dataSets: IBarDataSet) : super(*dataSets) {}
+    constructor(dataSets: List<IBarDataSet>) : super(dataSets) {}
+
     /**
      * Sets the width each bar should have on the x-axis (in values, not pixels).
      * Default 0.85f
      *
      * @param mBarWidth
      */
-    /**
-     * the width of the bars on the x-axis, in values (not pixels)
-     */
-    var barWidth = 0.85f
+    fun setBarWidth(mBarWidth: Float) {
+        this.mBarWidth = mBarWidth
+    }
 
-    constructor() : super() {}
-    constructor(vararg dataSets: IBarDataSet?) : super(*dataSets) {}
-    constructor(dataSets: List<IBarDataSet>?) : super(dataSets) {}
+    fun getBarWidth(): Float {
+        return mBarWidth
+    }
 
     /**
      * Groups all BarDataSet objects this data object holds together by modifying the x-value of their entries.
@@ -39,11 +47,11 @@ class BarData : BarLineScatterCandleBubbleData<IBarDataSet?> {
         if (setCount <= 1) {
             throw RuntimeException("BarData needs to hold at least 2 BarDataSets to allow grouping.")
         }
-        val max = maxEntryCountSet
-        val maxEntryCount = max!!.entryCount
+        val max = maxEntryCountSet!!
+        val maxEntryCount = max.entryCount
         val groupSpaceWidthHalf = groupSpace / 2f
         val barSpaceHalf = barSpace / 2f
-        val barWidthHalf = barWidth / 2f
+        val barWidthHalf = mBarWidth / 2f
         val interval = getGroupWidth(groupSpace, barSpace)
         for (i in 0 until maxEntryCount) {
             val start = fromX
@@ -81,6 +89,6 @@ class BarData : BarLineScatterCandleBubbleData<IBarDataSet?> {
      * @return
      */
     fun getGroupWidth(groupSpace: Float, barSpace: Float): Float {
-        return mDataSets!!.size * (barWidth + barSpace) + groupSpace
+        return mDataSets!!.size * (mBarWidth + barSpace) + groupSpace
     }
 }
