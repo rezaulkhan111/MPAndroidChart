@@ -18,7 +18,7 @@ class BubbleEntry : Entry {
      * @return
      */
     /** size value  */
-    var size = 0f
+    private var mSize: Float = 0f
 
     /**
      * Constructor.
@@ -28,7 +28,7 @@ class BubbleEntry : Entry {
      * @param size The size of the bubble.
      */
     constructor(x: Float, y: Float, size: Float) : super(x, y) {
-        this.size = size
+        this.mSize = size
     }
 
     /**
@@ -40,7 +40,7 @@ class BubbleEntry : Entry {
      * @param data Spot for additional data this Entry represents.
      */
     constructor(x: Float, y: Float, size: Float, data: Any?) : super(x, y, data) {
-        this.size = size
+        this.mSize = size
     }
 
     /**
@@ -52,7 +52,7 @@ class BubbleEntry : Entry {
      * @param icon Icon image
      */
     constructor(x: Float, y: Float, size: Float, icon: Drawable?) : super(x, y, icon) {
-        this.size = size
+        this.mSize = size
     }
 
     /**
@@ -70,10 +70,23 @@ class BubbleEntry : Entry {
         icon,
         data
     ) {
-        this.size = size
+        this.mSize = size
     }
 
     override fun copy(): BubbleEntry {
-        return BubbleEntry(getX(), getY(), size, getData())
+        return BubbleEntry(getX(), getY(), mSize, getData())
+    }
+
+    /**
+     * Returns the size of this entry (the size of the bubble).
+     *
+     * @return
+     */
+    fun getSize(): Float {
+        return mSize
+    }
+
+    fun setSize(size: Float) {
+        this.mSize = size
     }
 }

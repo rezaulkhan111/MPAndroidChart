@@ -8,10 +8,12 @@ import com.github.mikephil.charting.interfaces.datasets.IBarLineScatterCandleBub
  *
  * @author Philipp Jahoda
  */
-abstract class BarLineScatterCandleBubbleDataSet<T : Entry> constructor(
+abstract class BarLineScatterCandleBubbleDataSet<T : Entry>(
     yVals: MutableList<T>?,
     label: String?
-) : DataSet<T>(yVals, label), IBarLineScatterCandleBubbleDataSet<T> {
+) : DataSet<T>(yVals, label),
+    IBarLineScatterCandleBubbleDataSet<T> {
+
     /**
      * default highlight color
      */
@@ -33,7 +35,7 @@ abstract class BarLineScatterCandleBubbleDataSet<T : Entry> constructor(
     }
 
     protected open fun copy(barLineScatterCandleBubbleDataSet: BarLineScatterCandleBubbleDataSet<*>) {
-        super.copy(barLineScatterCandleBubbleDataSet)
+        copy(barLineScatterCandleBubbleDataSet)
         barLineScatterCandleBubbleDataSet.mHighLightColor = mHighLightColor
     }
 }

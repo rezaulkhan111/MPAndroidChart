@@ -5,12 +5,11 @@ import com.github.mikephil.charting.utils.Utils.convertDpToPixel
 
 class BubbleDataSet : BarLineScatterCandleBubbleDataSet<BubbleEntry>, IBubbleDataSet {
 
-    protected var mMaxSize = 0f
-    protected var mNormalizeSize = true
+    private var mMaxSize = 0f
+    private var mNormalizeSize = true
     private var mHighlightCircleWidth = 2.5f
 
-    constructor(yVals: List<BubbleEntry?>?, label: String?) {
-        super(yVals, label)
+    constructor(yVals: MutableList<BubbleEntry>?, label: String?) : super(yVals, label) {
     }
 
     override fun setHighlightCircleWidth(width: Float) {
@@ -21,9 +20,9 @@ class BubbleDataSet : BarLineScatterCandleBubbleDataSet<BubbleEntry>, IBubbleDat
         return mHighlightCircleWidth
     }
 
-    protected override fun calcMinMax(e: BubbleEntry?) {
+    override fun calcMinMax(e: BubbleEntry?) {
         super.calcMinMax(e)
-        val size = e!!.size
+        val size = e!!.getSize()
         if (size > mMaxSize) {
             mMaxSize = size
         }
@@ -32,14 +31,14 @@ class BubbleDataSet : BarLineScatterCandleBubbleDataSet<BubbleEntry>, IBubbleDat
     override fun copy(): DataSet<BubbleEntry> {
         val entries: MutableList<BubbleEntry> = ArrayList()
         for (i in mEntries!!.indices) {
-            entries.add(mEntries!![i]!!.copy())
+            entries.add(mEntries!![i].copy())
         }
-        val copied = BubbleDataSet(entries, label)
+        val copied = BubbleDataSet(entries, getLabel())
         copy(copied)
         return copied
     }
 
-    protected fun copy(bubbleDataSet: BubbleDataSet) {
+    private fun copy(bubbleDataSet: BubbleDataSet) {
         bubbleDataSet.mHighlightCircleWidth = mHighlightCircleWidth
         bubbleDataSet.mNormalizeSize = mNormalizeSize
     }
