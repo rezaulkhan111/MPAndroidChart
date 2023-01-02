@@ -12,5 +12,5 @@ abstract class BarLineScatterCandleBubbleData<T : IBarLineScatterCandleBubbleDat
 
     constructor() : super() {}
     constructor(vararg sets: T) : super(*sets) {}
-    constructor(sets: MutableList<T>?) : super(sets) {}
+    constructor(sets: MutableList<T>) : super(sets) {}
 }

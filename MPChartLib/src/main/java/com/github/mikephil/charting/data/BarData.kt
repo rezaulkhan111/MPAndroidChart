@@ -47,8 +47,8 @@ class BarData : BarLineScatterCandleBubbleData<IBarDataSet> {
         if (setCount <= 1) {
             throw RuntimeException("BarData needs to hold at least 2 BarDataSets to allow grouping.")
         }
-        val max = maxEntryCountSet!!
-        val maxEntryCount = max.entryCount
+        val max = getMaxEntryCountSet()
+        val maxEntryCount = max!!.getEntryCount()
         val groupSpaceWidthHalf = groupSpace / 2f
         val barSpaceHalf = barSpace / 2f
         val barWidthHalf = mBarWidth / 2f
@@ -59,10 +59,10 @@ class BarData : BarLineScatterCandleBubbleData<IBarDataSet> {
             for (set in mDataSets!!) {
                 fromX += barSpaceHalf
                 fromX += barWidthHalf
-                if (i < set.entryCount) {
+                if (i < set.getEntryCount()) {
                     val entry = set.getEntryForIndex(i)
                     if (entry != null) {
-                        entry.x = fromX
+                        entry.setX(fromX)
                     }
                 }
                 fromX += barWidthHalf

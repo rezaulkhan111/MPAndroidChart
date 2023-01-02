@@ -7,34 +7,44 @@ package com.github.mikephil.charting.buffer
  * @author Philipp Jahoda
  * @param <T> The data the buffer accepts to be fed with.
 </T> */
-abstract class AbstractBuffer<T>(size: Int) {
+abstract class AbstractBuffer<T> {
     /** index in the buffer  */
-     var index = 0
+    protected var index = 0
 
     /** float-buffer that holds the data points to draw, order: x,y,x,y,...  */
-    val buffer: FloatArray
+    var buffer: FloatArray
 
     /** animation phase x-axis  */
-     var phaseX = 1f
+    protected var phaseX = 1f
 
     /** animation phase y-axis  */
-     var phaseY = 1f
+    protected var phaseY = 1f
 
     /** indicates from which x-index the visible data begins  */
-     var mFrom = 0
+    private var mFrom = 0
 
     /** indicates to which x-index the visible data ranges  */
-     var mTo = 0
+    private var mTo = 0
+
+    /**
+     * Initialization with buffer-size.
+     *
+     * @param size
+     */
+    constructor(size: Int) {
+        index = 0
+        buffer = FloatArray(size)
+    }
 
     /** limits the drawing on the x-axis  */
-    fun limitFrom(from: Int) {
+    open fun limitFrom(from: Int) {
         var from = from
         if (from < 0) from = 0
         mFrom = from
     }
 
     /** limits the drawing on the x-axis  */
-    fun limitTo(to: Int) {
+    open fun limitTo(to: Int) {
         var to = to
         if (to < 0) to = 0
         mTo = to
@@ -43,7 +53,7 @@ abstract class AbstractBuffer<T>(size: Int) {
     /**
      * Resets the buffer index to 0 and makes the buffer reusable.
      */
-    fun reset() {
+    open fun reset() {
         index = 0
     }
 
@@ -52,7 +62,7 @@ abstract class AbstractBuffer<T>(size: Int) {
      *
      * @return
      */
-    fun size(): Int {
+    open fun size(): Int {
         return buffer.size
     }
 
@@ -62,7 +72,7 @@ abstract class AbstractBuffer<T>(size: Int) {
      * @param phaseX
      * @param phaseY
      */
-    fun setPhases(phaseX: Float, phaseY: Float) {
+    open fun setPhases(phaseX: Float, phaseY: Float) {
         this.phaseX = phaseX
         this.phaseY = phaseY
     }
@@ -74,14 +84,4 @@ abstract class AbstractBuffer<T>(size: Int) {
      * @param data
      */
     abstract fun feed(data: T)
-
-    /**
-     * Initialization with buffer-size.
-     *
-     * @param size
-     */
-    init {
-        index = 0
-        buffer = FloatArray(size)
-    }
 }

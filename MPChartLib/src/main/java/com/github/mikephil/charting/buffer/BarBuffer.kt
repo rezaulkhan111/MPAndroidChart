@@ -2,28 +2,34 @@ package com.github.mikephil.charting.buffer
 
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
 
-open class BarBuffer(size: Int, dataSetCount: Int, containsStacks: Boolean) :
-    AbstractBuffer<IBarDataSet>(size) {
-    var mDataSetIndex = 0
-    var mDataSetCount = 1
-    var mContainsStacks = false
-    var mInverted = false
+open class BarBuffer : AbstractBuffer<IBarDataSet> {
+
+    private var mDataSetIndex = 0
+    private var mDataSetCount = 1
+    protected var mContainsStacks = false
+    protected var mInverted = false
 
     /** width of the bar on the x-axis, in values (not pixels)  */
-     var mBarWidth = 1f
-    fun setBarWidth(barWidth: Float) {
+    protected var mBarWidth = 1f
+
+    constructor(size: Int, dataSetCount: Int, containsStacks: Boolean) : super(size) {
+        mDataSetCount = dataSetCount
+        mContainsStacks = containsStacks
+    }
+
+    open fun setBarWidth(barWidth: Float) {
         mBarWidth = barWidth
     }
 
-    fun setDataSet(index: Int) {
+    open fun setDataSet(index: Int) {
         mDataSetIndex = index
     }
 
-    fun setInverted(inverted: Boolean) {
+    open fun setInverted(inverted: Boolean) {
         mInverted = inverted
     }
 
-     fun addBar(left: Float, top: Float, right: Float, bottom: Float) {
+    protected open fun addBar(left: Float, top: Float, right: Float, bottom: Float) {
         buffer[index++] = left
         buffer[index++] = top
         buffer[index++] = right
@@ -31,7 +37,7 @@ open class BarBuffer(size: Int, dataSetCount: Int, containsStacks: Boolean) :
     }
 
     override fun feed(data: IBarDataSet) {
-        val size = data.entryCount * phaseX
+        val size = data.getEntryCount() * phaseX
         val barWidthHalf = mBarWidth / 2f
         var i = 0
         while (i < size) {
@@ -40,20 +46,20 @@ open class BarBuffer(size: Int, dataSetCount: Int, containsStacks: Boolean) :
                 i++
                 continue
             }
-            val x = e.x
-            var y = e.y
-            val vals = e.yVals
+            val x = e.getX()
+            var y = e.getY()
+            val vals = e.getYVals()
             if (!mContainsStacks || vals == null) {
                 val left = x - barWidthHalf
                 val right = x + barWidthHalf
                 var bottom: Float
                 var top: Float
                 if (mInverted) {
-                    bottom = if (y >= 0) y else 0F
-                    top = if (y <= 0) y else 0F
+                    bottom = if (y >= 0) y else 0f
+                    top = if (y <= 0) y else 0f
                 } else {
-                    top = if (y >= 0) y else 0F
-                    bottom = if (y <= 0) y else 0F
+                    top = if (y >= 0) y else 0f
+                    bottom = if (y <= 0) y else 0f
                 }
 
                 // multiply the height of the rect with the phase
@@ -61,7 +67,7 @@ open class BarBuffer(size: Int, dataSetCount: Int, containsStacks: Boolean) :
                 addBar(left, top, right, bottom)
             } else {
                 var posY = 0f
-                var negY = -e.negativeSum
+                var negY = -e.getNegativeSum()
                 var yStart = 0f
 
                 // fill the stack
@@ -101,10 +107,5 @@ open class BarBuffer(size: Int, dataSetCount: Int, containsStacks: Boolean) :
             i++
         }
         reset()
-    }
-
-    init {
-        mDataSetCount = dataSetCount
-        mContainsStacks = containsStacks
     }
 }

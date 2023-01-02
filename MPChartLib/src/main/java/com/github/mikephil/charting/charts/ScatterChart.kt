@@ -2,6 +2,8 @@ package com.github.mikephil.charting.charts
 
 import android.content.Context
 import android.util.AttributeSet
+import com.github.mikephil.charting.data.ScatterData
+import com.github.mikephil.charting.interfaces.dataprovider.ScatterDataProvider
 import com.github.mikephil.charting.renderer.ScatterChartRenderer
 
 /**
@@ -24,12 +26,13 @@ class ScatterChart : BarLineChartBase<ScatterData?>, ScatterDataProvider {
     override fun init() {
         super.init()
         mRenderer = ScatterChartRenderer(this, mAnimator, mViewPortHandler)
-        xAxis.spaceMin = 0.5f
-        xAxis.spaceMax = 0.5f
+        getXAxis()!!.setSpaceMin(0.5f)
+        getXAxis()!!.setSpaceMax(0.5f)
     }
 
-    val scatterData: ScatterData
-        get() = mData
+    fun getScatterData(): ScatterData? {
+        return mData
+    }
 
     /**
      * Predefined ScatterShapes that allow the specification of a shape a ScatterDataSet should be drawn with.
@@ -46,7 +49,6 @@ class ScatterChart : BarLineChartBase<ScatterData?>, ScatterDataProvider {
         }
 
         companion object {
-            @JvmStatic
             val allDefaultShapes: Array<ScatterShape>
                 get() = arrayOf(SQUARE, CIRCLE, TRIANGLE, CROSS, X, CHEVRON_UP, CHEVRON_DOWN)
         }

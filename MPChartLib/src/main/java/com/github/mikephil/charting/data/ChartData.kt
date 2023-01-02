@@ -13,7 +13,7 @@ import com.github.mikephil.charting.interfaces.datasets.IDataSet
  *
  * @author Philipp Jahoda
  */
-abstract class ChartData<T : IDataSet<out Entry?>?> {
+abstract class ChartData<T : IDataSet<out Entry>> {
     /**
      * Returns the greatest y-value the data object contains.
      *
@@ -76,7 +76,7 @@ abstract class ChartData<T : IDataSet<out Entry?>?> {
      *
      * @param dataSets
      */
-    constructor(vararg dataSets: T) {
+    constructor(dataSets: Array<T>) {
         mDataSets = arrayToList(dataSets)
         notifyDataChanged()
     }
@@ -349,7 +349,7 @@ abstract class ChartData<T : IDataSet<out Entry?>?> {
      */
     fun addEntry(e: Entry, dataSetIndex: Int) {
         if (mDataSets!!.size > dataSetIndex && dataSetIndex >= 0) {
-            val set: IDataSet<*> = mDataSets!![dataSetIndex]
+            val set: IDataSet<*> = mDataSets!![dataSetIndex]!!
             // add the entry to the dataset
             if (!set.addEntry(e)) return
             calcMinMax(e, set.getAxisDependency())
@@ -428,7 +428,7 @@ abstract class ChartData<T : IDataSet<out Entry?>?> {
      */
     open fun removeEntry(xValue: Float, dataSetIndex: Int): Boolean {
         if (dataSetIndex >= mDataSets!!.size) return false
-        val dataSet: IDataSet<*> = mDataSets!![dataSetIndex]
+        val dataSet: IDataSet<*> = mDataSets!![dataSetIndex]!!
         val e = dataSet.getEntryForXValue(xValue, Float.NaN) ?: return false
         return removeEntry(e, dataSetIndex)
     }
@@ -543,9 +543,9 @@ abstract class ChartData<T : IDataSet<out Entry?>?> {
      *
      * @param colors
      */
-    fun setValueTextColors(colors: MutableList<Int>?) {
+    fun setValueTextColors(colors: MutableList<Int>) {
         for (set in mDataSets!!) {
-            set?.setValueTextColors(colors)
+            set.setValueTextColors(colors)
         }
     }
 
@@ -555,9 +555,9 @@ abstract class ChartData<T : IDataSet<out Entry?>?> {
      *
      * @param tf
      */
-    fun setValueTypeface(tf: Typeface?) {
+    fun setValueTypeface(tf: Typeface) {
         for (set in mDataSets!!) {
-            set?.setValueTypeface(tf)
+            set.setValueTypeface(tf)
         }
     }
 

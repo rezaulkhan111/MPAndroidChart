@@ -7,7 +7,7 @@ import com.github.mikephil.charting.utils.Fill
  * Created by philipp on 21/10/15.
  */
 interface IBarDataSet : IBarLineScatterCandleBubbleDataSet<BarEntry> {
-    fun getFills(): List<Fill>
+    fun getFills(): MutableList<Fill>
 
     fun getFill(index: Int): Fill
 
@@ -16,7 +16,7 @@ interface IBarDataSet : IBarLineScatterCandleBubbleDataSet<BarEntry> {
      *
      * @return
      */
-    val isStacked: Boolean
+    fun isStacked(): Boolean
 
     /**
      * Returns the maximum number of bars that can be stacked upon another in
@@ -24,7 +24,7 @@ interface IBarDataSet : IBarLineScatterCandleBubbleDataSet<BarEntry> {
      *
      * @return
      */
-    val stackSize: Int
+    fun getStackSize(): Int
 
     /**
      * Returns the color used for drawing the bar-shadows. The bar shadows is a
@@ -32,7 +32,7 @@ interface IBarDataSet : IBarLineScatterCandleBubbleDataSet<BarEntry> {
      *
      * @return
      */
-    val barShadowColor: Int
+    fun getBarShadowColor(): Int
 
     /**
      * Returns the width used for drawing borders around the bars.
@@ -40,14 +40,14 @@ interface IBarDataSet : IBarLineScatterCandleBubbleDataSet<BarEntry> {
      *
      * @return
      */
-    val barBorderWidth: Float
+    fun getBarBorderWidth(): Float
 
     /**
      * Returns the color drawing borders around the bars.
      *
      * @return
      */
-    val barBorderColor: Int
+    fun getBarBorderColor(): Int
 
     /**
      * Returns the alpha value (transparency) that is used for drawing the
@@ -55,7 +55,8 @@ interface IBarDataSet : IBarLineScatterCandleBubbleDataSet<BarEntry> {
      *
      * @return
      */
-    val highLightAlpha: Int
+    fun getHighLightAlpha(): Int
+
 
     /**
      * Returns the labels used for the different value-stacks in the legend.
@@ -63,5 +64,5 @@ interface IBarDataSet : IBarLineScatterCandleBubbleDataSet<BarEntry> {
      *
      * @return
      */
-    val stackLabels: Array<String?>?
+    fun getStackLabels(): Array<String>
 }

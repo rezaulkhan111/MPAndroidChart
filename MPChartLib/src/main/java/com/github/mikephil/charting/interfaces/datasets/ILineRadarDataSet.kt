@@ -6,20 +6,20 @@ import com.github.mikephil.charting.data.Entry
 /**
  * Created by Philipp Jahoda on 21/10/15.
  */
-interface ILineRadarDataSet<T : Entry?> : ILineScatterCandleRadarDataSet<T> {
+interface ILineRadarDataSet<T : Entry> : ILineScatterCandleRadarDataSet<T> {
     /**
      * Returns the color that is used for filling the line surface area.
      *
      * @return
      */
-    val fillColor: Int
+    fun getFillColor(): Int
 
     /**
      * Returns the drawable used for filling the area below the line.
      *
      * @return
      */
-    val fillDrawable: Drawable?
+    fun getFillDrawable(): Drawable
 
     /**
      * Returns the alpha value that is used for filling the line surface,
@@ -27,21 +27,21 @@ interface ILineRadarDataSet<T : Entry?> : ILineScatterCandleRadarDataSet<T> {
      *
      * @return
      */
-    val fillAlpha: Int
+    fun getFillAlpha(): Int
 
     /**
      * Returns the stroke-width of the drawn line
      *
      * @return
      */
-    val lineWidth: Float
+    fun getLineWidth(): Float
 
     /**
      * Returns true if filled drawing is enabled, false if not
      *
      * @return
      */
-    val isDrawFilledEnabled: Boolean
+    fun isDrawFilledEnabled(): Boolean
 
     /**
      * Set to true if the DataSet should be drawn filled (surface), and not just

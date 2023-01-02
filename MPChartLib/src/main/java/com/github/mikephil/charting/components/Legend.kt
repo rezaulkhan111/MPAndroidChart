@@ -12,8 +12,6 @@ import com.github.mikephil.charting.utils.Utils.convertDpToPixel
 import com.github.mikephil.charting.utils.Utils.getLineHeight
 import com.github.mikephil.charting.utils.Utils.getLineSpacing
 import com.github.mikephil.charting.utils.ViewPortHandler
-import kotlin.math.max
-import kotlin.math.min
 
 /**
  * Class representing the legend of the chart. The legend will contain one entry
@@ -22,7 +20,8 @@ import kotlin.math.min
  *
  * @author Philipp Jahoda
  */
-class Legend() : ComponentBase() {
+class Legend : ComponentBase {
+
     enum class LegendForm {
         /**
          * Avoid drawing a form
@@ -80,7 +79,7 @@ class Legend() : ComponentBase() {
      * Entries that will be appended to the end of the auto calculated entries after calculating the legend.
      * (if the legend has already been calculated, you will need to call notifyDataSetChanged() to let the changes take effect)
      */
-    private lateinit var mExtraEntries: Array<LegendEntry>
+    private lateinit var mExtraEntries: Array<LegendEntry?>
 
     /**
      * Are the legend labels/colors a custom value or auto calculated? If false,
@@ -148,7 +147,7 @@ class Legend() : ComponentBase() {
     /**
      * default constructor
      */
-    init {
+    constructor() {
         mTextSize = convertDpToPixel(10f)
         mXOffset = convertDpToPixel(5f)
         mYOffset = convertDpToPixel(3f) // 2
@@ -159,7 +158,8 @@ class Legend() : ComponentBase() {
      *
      * @param entries
      */
-    constructor(entries: Array<LegendEntry>) : this() {
+    constructor(entries: Array<LegendEntry>?) : super() {
+        requireNotNull(entries) { "entries array is NULL" }
         mEntries = entries
     }
 
@@ -172,7 +172,7 @@ class Legend() : ComponentBase() {
         mEntries = entries.toTypedArray()
     }
 
-    fun getEntries(): Array<LegendEntry> {
+    fun getEntries(): Array<LegendEntry>? {
         return mEntries
     }
 
@@ -215,15 +215,15 @@ class Legend() : ComponentBase() {
         return max
     }
 
-    fun getExtraEntries(): Array<LegendEntry> {
+    fun getExtraEntries(): Array<LegendEntry?>? {
         return mExtraEntries
     }
 
-    fun setExtra(entries: List<LegendEntry>) {
+    fun setExtra(entries: List<LegendEntry?>) {
         mExtraEntries = entries.toTypedArray()
     }
 
-    fun setExtra(entries: Array<LegendEntry>) {
+    fun setExtra(entries: Array<LegendEntry?>?) {
         var entries = entries
         if (entries == null) entries = arrayOf()
         mExtraEntries = entries
@@ -235,12 +235,12 @@ class Legend() : ComponentBase() {
      * (if the legend has already been calculated, you will need to call notifyDataSetChanged()
      * to let the changes take effect)
      */
-    fun setExtra(colors: IntArray, labels: Array<String>) {
-        val entries: MutableList<LegendEntry> = ArrayList()
-        for (i in 0 until min(colors.size, labels.size)) {
+    fun setExtra(colors: IntArray, labels: Array<String?>) {
+        val entries: MutableList<LegendEntry?> = ArrayList()
+        for (i in 0 until Math.min(colors.size, labels.size)) {
             val entry = LegendEntry()
             entry.formColor = colors[i]
-            entry.label = labels[i]
+            entry.label = labels[i]!!
             if (entry.formColor == ColorTemplate.COLOR_SKIP ||
                 entry.formColor == 0
             ) entry.form =
@@ -299,7 +299,7 @@ class Legend() : ComponentBase() {
      *
      * @return
      */
-    fun getHorizontalAlignment(): LegendHorizontalAlignment {
+    fun getHorizontalAlignment(): LegendHorizontalAlignment? {
         return mHorizontalAlignment
     }
 
@@ -317,7 +317,7 @@ class Legend() : ComponentBase() {
      *
      * @return
      */
-    fun getVerticalAlignment(): LegendVerticalAlignment {
+    fun getVerticalAlignment(): LegendVerticalAlignment? {
         return mVerticalAlignment
     }
 
@@ -335,7 +335,7 @@ class Legend() : ComponentBase() {
      *
      * @return
      */
-    fun getOrientation(): LegendOrientation {
+    fun getOrientation(): LegendOrientation? {
         return mOrientation
     }
 
@@ -371,7 +371,7 @@ class Legend() : ComponentBase() {
      *
      * @return
      */
-    fun getDirection(): LegendDirection {
+    fun getDirection(): LegendDirection? {
         return mDirection
     }
 
@@ -389,7 +389,7 @@ class Legend() : ComponentBase() {
      *
      * @return
      */
-    fun getForm(): LegendForm {
+    fun getForm(): LegendForm? {
         return mShape
     }
 
@@ -602,15 +602,15 @@ class Legend() : ComponentBase() {
     private val mCalculatedLabelBreakPoints: MutableList<Boolean> = ArrayList(16)
     private val mCalculatedLineSizes: MutableList<FSize> = ArrayList(16)
 
-    fun getCalculatedLabelSizes(): List<FSize> {
+    fun getCalculatedLabelSizes(): List<FSize>? {
         return mCalculatedLabelSizes
     }
 
-    fun getCalculatedLabelBreakPoints(): List<Boolean> {
+    fun getCalculatedLabelBreakPoints(): List<Boolean>? {
         return mCalculatedLabelBreakPoints
     }
 
-    fun getCalculatedLineSizes(): List<FSize> {
+    fun getCalculatedLineSizes(): List<FSize>? {
         return mCalculatedLineSizes
     }
 
@@ -619,9 +619,9 @@ class Legend() : ComponentBase() {
      * and height of a single entry, as well as the total width and height of
      * the Legend.
      *
-     * @param labeling
+     * @param labelpaint
      */
-    fun calculateDimensions(labeling: Paint, viewPortHandler: ViewPortHandler) {
+    fun calculateDimensions(labelpaint: Paint?, viewPortHandler: ViewPortHandler) {
         val defaultFormSize = convertDpToPixel(mFormSize)
         val stackSpace = convertDpToPixel(mStackSpace)
         val formToTextSpace = convertDpToPixel(mFormToTextSpace)
@@ -630,15 +630,15 @@ class Legend() : ComponentBase() {
         val wordWrapEnabled = mWordWrapEnabled
         val entries = mEntries
         val entryCount = entries.size
-        mTextWidthMax = getMaximumEntryWidth(labeling)
-        mTextHeightMax = getMaximumEntryHeight(labeling)
+        mTextWidthMax = getMaximumEntryWidth(labelpaint)
+        mTextHeightMax = getMaximumEntryHeight(labelpaint)
         when (mOrientation) {
             LegendOrientation.VERTICAL -> {
                 var maxWidth = 0f
                 var maxHeight = 0f
                 var width = 0f
                 val labelLineHeight = getLineHeight(
-                    labeling
+                    labelpaint!!
                 )
                 var wasStacked = false
                 var i = 0
@@ -661,19 +661,19 @@ class Legend() : ComponentBase() {
 
                         // make a step to the left
                         if (drawingForm && !wasStacked) width += formToTextSpace else if (wasStacked) {
-                            maxWidth = max(maxWidth, width)
+                            maxWidth = Math.max(maxWidth, width)
                             maxHeight += labelLineHeight + yEntrySpace
                             width = 0f
                             wasStacked = false
                         }
-                        width += calcTextWidth(labeling, label).toFloat()
+                        width += calcTextWidth(labelpaint, label).toFloat()
                         maxHeight += labelLineHeight + yEntrySpace
                     } else {
                         wasStacked = true
                         width += formSize
                         if (i < entryCount - 1) width += stackSpace
                     }
-                    maxWidth = max(maxWidth, width)
+                    maxWidth = Math.max(maxWidth, width)
                     i++
                 }
                 mNeededWidth = maxWidth
@@ -681,10 +681,10 @@ class Legend() : ComponentBase() {
             }
             LegendOrientation.HORIZONTAL -> {
                 val labelLineHeight = getLineHeight(
-                    labeling
+                    labelpaint!!
                 )
                 val labelLineSpacing = getLineSpacing(
-                    labeling
+                    labelpaint
                 ) + yEntrySpace
                 val contentWidth = viewPortHandler.contentWidth() * mMaxSizePercent
 
@@ -719,7 +719,7 @@ class Legend() : ComponentBase() {
                     if (label != null) {
                         mCalculatedLabelSizes.add(
                             calcTextSize(
-                                labeling, label
+                                labelpaint, label
                             )
                         )
                         requiredWidth += if (drawingForm) formToTextSpace + formSize else 0f

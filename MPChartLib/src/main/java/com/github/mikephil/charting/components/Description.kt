@@ -8,10 +8,7 @@ import com.github.mikephil.charting.utils.Utils.convertDpToPixel
 /**
  * Created by Philipp Jahoda on 17/09/16.
  */
-class Description() : ComponentBase() {
-    init {
-        mTextSize = convertDpToPixel(8f)
-    }
+class Description : ComponentBase {
 
     /**
      * the text used in the description
@@ -21,13 +18,17 @@ class Description() : ComponentBase() {
     /**
      * the custom position of the description text
      */
-    private lateinit var mPosition: MPPointF
+    private var mPosition: MPPointF? = null
 
     /**
      * the alignment of the description text
      */
     private var mTextAlign = Align.RIGHT
 
+    constructor() : super() {
+        // default size
+        mTextSize = convertDpToPixel(8f)
+    }
 
     /**
      * Sets the text to be shown as the description.
@@ -44,7 +45,7 @@ class Description() : ComponentBase() {
      *
      * @return
      */
-    fun getText(): String {
+    fun getText(): String? {
         return text
     }
 
@@ -58,8 +59,8 @@ class Description() : ComponentBase() {
         if (mPosition == null) {
             mPosition = getInstance(x, y)
         } else {
-            mPosition.x = x
-            mPosition.y = y
+            mPosition!!.x = x
+            mPosition!!.y = y
         }
     }
 
@@ -68,7 +69,7 @@ class Description() : ComponentBase() {
      *
      * @return
      */
-    fun getPosition(): MPPointF {
+    fun getPosition(): MPPointF? {
         return mPosition
     }
 
@@ -86,7 +87,7 @@ class Description() : ComponentBase() {
      *
      * @return
      */
-    fun getTextAlign(): Align {
+    fun getTextAlign(): Align? {
         return mTextAlign
     }
 }

@@ -11,6 +11,7 @@ import android.graphics.Color
  * @author Philipp Jahoda
  */
 object ColorTemplate {
+
     /**
      * an "invalid" color that indicates that no color is set
      */
@@ -26,32 +27,26 @@ object ColorTemplate {
      * THE COLOR THEMES ARE PREDEFINED (predefined color integer arrays), FEEL
      * FREE TO CREATE YOUR OWN WITH AS MANY DIFFERENT COLORS AS YOU WANT
      */
-    @JvmField
     val LIBERTY_COLORS = intArrayOf(
         Color.rgb(207, 248, 246), Color.rgb(148, 212, 212), Color.rgb(136, 180, 187),
         Color.rgb(118, 174, 175), Color.rgb(42, 109, 130)
     )
-    @JvmField
     val JOYFUL_COLORS = intArrayOf(
         Color.rgb(217, 80, 138), Color.rgb(254, 149, 7), Color.rgb(254, 247, 120),
         Color.rgb(106, 167, 134), Color.rgb(53, 194, 209)
     )
-    @JvmField
     val PASTEL_COLORS = intArrayOf(
         Color.rgb(64, 89, 128), Color.rgb(149, 165, 124), Color.rgb(217, 184, 162),
         Color.rgb(191, 134, 134), Color.rgb(179, 48, 80)
     )
-    @JvmField
     val COLORFUL_COLORS = intArrayOf(
         Color.rgb(193, 37, 82), Color.rgb(255, 102, 0), Color.rgb(245, 199, 0),
         Color.rgb(106, 150, 31), Color.rgb(179, 100, 53)
     )
-    @JvmField
     val VORDIPLOM_COLORS = intArrayOf(
         Color.rgb(192, 255, 140), Color.rgb(255, 247, 140), Color.rgb(255, 208, 140),
         Color.rgb(140, 234, 255), Color.rgb(255, 140, 157)
     )
-    @JvmField
     val MATERIAL_COLORS = intArrayOf(
         rgb("#2ecc71"), rgb("#f1c40f"), rgb("#e74c3c"), rgb("#3498db")
     )
@@ -75,9 +70,9 @@ object ColorTemplate {
      *
      * @return
      */
-    @JvmStatic
-    val holoBlue: Int
-        get() = Color.rgb(51, 181, 229)
+    fun getHoloBlue(): Int {
+        return Color.rgb(51, 181, 229)
+    }
 
     /**
      * Sets the alpha component of the given color.
@@ -86,7 +81,6 @@ object ColorTemplate {
      * @param alpha 0 - 255
      * @return
      */
-    @JvmStatic
     fun colorWithAlpha(color: Int, alpha: Int): Int {
         return color and 0xffffff or (alpha and 0xff shl 24)
     }
@@ -99,7 +93,7 @@ object ColorTemplate {
      * @param colors an integer array of resource id's of colors
      * @return
      */
-    fun createColors(r: Resources, colors: IntArray): List<Int> {
+    fun createColors(r: Resources, colors: IntArray): List<Int>? {
         val result: MutableList<Int> = ArrayList()
         for (i in colors) {
             result.add(r.getColor(i))
@@ -114,8 +108,7 @@ object ColorTemplate {
      * @param colors
      * @return
      */
-    @JvmStatic
-    fun createColors(colors: IntArray): MutableList<Int> {
+    fun createColors(colors: IntArray): MutableList<Int>? {
         val result: MutableList<Int> = ArrayList()
         for (i in colors) {
             result.add(i)

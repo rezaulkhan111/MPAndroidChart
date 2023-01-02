@@ -6,28 +6,28 @@ import com.github.mikephil.charting.data.Entry
 /**
  * Created by Philipp Jahoda on 21/10/15.
  */
-interface ILineScatterCandleRadarDataSet<T : Entry?> : IBarLineScatterCandleBubbleDataSet<T> {
+interface ILineScatterCandleRadarDataSet<T : Entry> : IBarLineScatterCandleBubbleDataSet<T> {
     /**
      * Returns true if vertical highlight indicator lines are enabled (drawn)
      * @return
      */
-    val isVerticalHighlightIndicatorEnabled: Boolean
+    fun isVerticalHighlightIndicatorEnabled(): Boolean
 
     /**
      * Returns true if vertical highlight indicator lines are enabled (drawn)
      * @return
      */
-    val isHorizontalHighlightIndicatorEnabled: Boolean
+    fun isHorizontalHighlightIndicatorEnabled(): Boolean
 
     /**
      * Returns the line-width in which highlight lines are to be drawn.
      * @return
      */
-    val highlightLineWidth: Float
+    fun getHighlightLineWidth(): Float
 
     /**
      * Returns the DashPathEffect that is used for highlighting.
      * @return
      */
-    val dashPathEffectHighlight: DashPathEffect?
+    fun getDashPathEffectHighlight(): DashPathEffect
 }

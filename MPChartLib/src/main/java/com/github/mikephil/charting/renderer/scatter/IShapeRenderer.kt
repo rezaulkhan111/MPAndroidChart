@@ -21,7 +21,7 @@ interface IShapeRenderer {
      * @param renderPaint     Paint object used for styling and drawing
      */
     fun renderShape(
-        c: Canvas, dataSet: IScatterDataSet, viewPortHandler: ViewPortHandler?,
+        c: Canvas, dataSet: IScatterDataSet, viewPortHandler: ViewPortHandler,
         posX: Float, posY: Float, renderPaint: Paint
     )
 }

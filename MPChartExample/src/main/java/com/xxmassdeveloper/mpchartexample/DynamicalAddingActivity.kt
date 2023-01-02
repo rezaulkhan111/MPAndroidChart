@@ -28,14 +28,14 @@ class DynamicalAddingActivity : DemoBase(), OnChartValueSelectedListener {
         setContentView(R.layout.activity_linechart_noseekbar)
         title = "DynamicalAddingActivity"
         chart = findViewById(R.id.chart1)
-        chart.setOnChartValueSelectedListener(this)
-        chart.setDrawGridBackground(false)
-        chart.description!!.isEnabled = false
-        chart.setNoDataText("No chart data available. Use the menu to add entries and data sets!")
+        chart?.setOnChartValueSelectedListener(this)
+        chart?.setDrawGridBackground(false)
+        chart?.description!!.setEnabled(false)
+        chart?.setNoDataText("No chart data available. Use the menu to add entries and data sets!")
 
 //        chart.getXAxis().setDrawLabels(false);
 //        chart.getXAxis().setDrawGridLines(false);
-        chart.invalidate()
+        chart?.invalidate()
     }
 
     private val colors = ColorTemplate.VORDIPLOM_COLORS
@@ -56,7 +56,7 @@ class DynamicalAddingActivity : DemoBase(), OnChartValueSelectedListener {
         val randomDataSetIndex = (Math.random() * data.dataSetCount).toInt()
         val randomSet = data.getDataSetByIndex(randomDataSetIndex)
         val value = (Math.random() * 50).toFloat() + 50f * (randomDataSetIndex + 1)
-        data.addEntry(Entry(randomSet!!.entryCount.toFloat(), value), randomDataSetIndex)
+        data.addEntry(Entry(randomSet!!.getEntryCount().toFloat(), value), randomDataSetIndex)
         data.notifyDataChanged()
 
         // let the chart know it's data has changed
@@ -65,7 +65,7 @@ class DynamicalAddingActivity : DemoBase(), OnChartValueSelectedListener {
         //chart.setVisibleYRangeMaximum(15, AxisDependency.LEFT);
 //
 //            // this automatically refreshes the chart (calls invalidate())
-        chart!!.moveViewTo(data.getEntryCount() - 7, 50f, AxisDependency.LEFT)
+        chart!!.moveViewTo(data.getEntryCount().toFloat() - 7, 50f, AxisDependency.LEFT)
     }
 
     private fun removeLastEntry() {
@@ -73,13 +73,13 @@ class DynamicalAddingActivity : DemoBase(), OnChartValueSelectedListener {
         if (data != null) {
             val set = data.getDataSetByIndex(0)
             if (set != null) {
-                val e = set.getEntryForXValue((set.entryCount - 1).toFloat(), Float.NaN)
+                val e = set.getEntryForXValue((set.getEntryCount() - 1).toFloat(), Float.NaN)
                 data.removeEntry(e, 0)
                 // or remove by index
                 // mData.removeEntryByXValue(xIndex, dataSetIndex);
                 data.notifyDataChanged()
-                chart!!.notifyDataSetChanged()
-                chart.invalidate()
+                chart?.notifyDataSetChanged()
+                chart?.invalidate()
             }
         }
     }
@@ -90,7 +90,7 @@ class DynamicalAddingActivity : DemoBase(), OnChartValueSelectedListener {
             chart!!.data = LineData()
         } else {
             val count = data.dataSetCount + 1
-            val amount = data.getDataSetByIndex(0)!!.entryCount
+            val amount = data.getDataSetByIndex(0)!!.getEntryCount()
             val values = ArrayList<Entry?>()
             for (i in 0 until amount) {
                 values.add(Entry(i.toFloat(), (Math.random() * 50f).toFloat() + 50f * count))
@@ -99,15 +99,15 @@ class DynamicalAddingActivity : DemoBase(), OnChartValueSelectedListener {
             set.lineWidth = 2.5f
             set.circleRadius = 4.5f
             val color = colors[count % colors.size]
-            set.color = color
+            set.setColor(color)
             set.setCircleColor(color)
-            set.highLightColor = color
-            set.valueTextSize = 10f
-            set.valueTextColor = color
+            set.setHighLightColor(color)
+            set.setValueTextSize(10f)
+            set.setValueTextColor(color)
             data.addDataSet(set)
             data.notifyDataChanged()
             chart!!.notifyDataSetChanged()
-            chart.invalidate()
+            chart?.invalidate()
         }
     }
 
@@ -116,7 +116,7 @@ class DynamicalAddingActivity : DemoBase(), OnChartValueSelectedListener {
         if (data != null) {
             data.removeDataSet(data.getDataSetByIndex(data.dataSetCount - 1))
             chart!!.notifyDataSetChanged()
-            chart.invalidate()
+            chart?.invalidate()
         }
     }
 
@@ -124,11 +124,11 @@ class DynamicalAddingActivity : DemoBase(), OnChartValueSelectedListener {
         val set = LineDataSet(null, "DataSet 1")
         set.lineWidth = 2.5f
         set.circleRadius = 4.5f
-        set.color = Color.rgb(240, 99, 99)
+        set.setColor(Color.rgb(240, 99, 99))
         set.setCircleColor(Color.rgb(240, 99, 99))
-        set.highLightColor = Color.rgb(190, 190, 190)
-        set.axisDependency = AxisDependency.LEFT
-        set.valueTextSize = 10f
+        set.setHighLightColor(Color.rgb(190, 190, 190))
+        set.setAxisDependency(AxisDependency.LEFT)
+        set.setValueTextSize(10f)
         return set
     }
 

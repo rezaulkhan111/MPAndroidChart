@@ -13,7 +13,7 @@ interface ICandleDataSet : ILineScatterCandleRadarDataSet<CandleEntry?> {
      *
      * @return
      */
-    val barSpace: Float
+    fun getBarSpace(): Float
 
     /**
      * Returns whether the candle bars should show?
@@ -23,61 +23,61 @@ interface ICandleDataSet : ILineScatterCandleRadarDataSet<CandleEntry?> {
      *
      * @return
      */
-    val showCandleBar: Boolean
+    fun getShowCandleBar(): Boolean
 
     /**
      * Returns the width of the candle-shadow-line in pixels.
      *
      * @return
      */
-    val shadowWidth: Float
+    fun getShadowWidth(): Float
 
     /**
      * Returns shadow color for all entries
      *
      * @return
      */
-    val shadowColor: Int
+    fun getShadowColor(): Int
 
     /**
      * Returns the neutral color (for open == close)
      *
      * @return
      */
-    val neutralColor: Int
+    fun getNeutralColor(): Int
 
     /**
      * Returns the increasing color (for open < close).
      *
      * @return
      */
-    val increasingColor: Int
+    fun getIncreasingColor(): Int
 
     /**
      * Returns the decreasing color (for open > close).
      *
      * @return
      */
-    val decreasingColor: Int
+    fun getDecreasingColor(): Int
 
     /**
      * Returns paint style when open < close
      *
      * @return
      */
-    val increasingPaintStyle: Paint.Style?
+    fun getIncreasingPaintStyle(): Paint.Style
 
     /**
      * Returns paint style when open > close
      *
      * @return
      */
-    val decreasingPaintStyle: Paint.Style?
+    fun getDecreasingPaintStyle(): Paint.Style
 
     /**
      * Is the shadow color same as the candle color?
      *
      * @return
      */
-    val shadowColorSameAsCandle: Boolean
+    fun getShadowColorSameAsCandle(): Boolean
 }

@@ -242,7 +242,7 @@ abstract class DataSet<T : Entry> : BaseDataSet<T> {
         return removed
     }
 
-    open fun getEntryIndex(e: Entry): Int? {
+    override fun getEntryIndex(e: T): Int {
         return mEntries!!.indexOf(e)
     }
 

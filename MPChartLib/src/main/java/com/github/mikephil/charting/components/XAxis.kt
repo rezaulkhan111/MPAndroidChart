@@ -10,6 +10,7 @@ import com.github.mikephil.charting.utils.Utils.convertDpToPixel
  * @author Philipp Jahoda
  */
 class XAxis : AxisBase {
+
     /**
      * width of the x-axis labels in pixels - this is automatically
      * calculated by the computeSize() methods in the renderers
@@ -64,7 +65,7 @@ class XAxis : AxisBase {
     /**
      * returns the position of the x-labels
      */
-    fun getPosition(): XAxisPosition {
+    fun getPosition(): XAxisPosition? {
         return mPosition
     }
 

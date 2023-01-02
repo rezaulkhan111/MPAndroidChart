@@ -19,6 +19,7 @@ import java.lang.ref.WeakReference
  * @author Philipp Jahoda
  */
 open class MarkerImage : IMarker {
+
     private var mContext: Context
     private var mDrawable: Drawable
 
@@ -44,46 +45,48 @@ open class MarkerImage : IMarker {
         }
     }
 
-    fun setOffset(offset: MPPointF) {
+    open fun setOffset(offset: MPPointF) {
         mOffset = offset
         if (mOffset == null) {
             mOffset = MPPointF()
         }
     }
 
-    fun setOffset(offsetX: Float, offsetY: Float) {
+    open fun setOffset(offsetX: Float, offsetY: Float) {
         mOffset.x = offsetX
         mOffset.y = offsetY
     }
 
-    override val offset: MPPointF = mOffset
+    override fun getOffset(): MPPointF {
+        return mOffset
+    }
 
-    fun setSize(size: FSize) {
+    open fun setSize(size: FSize) {
         mSize = size
         if (mSize == null) {
             mSize = FSize()
         }
     }
 
-    fun getSize(): FSize {
+    open fun getSize(): FSize? {
         return mSize
     }
 
-    fun setChartView(chart: Chart<*>) {
+    open fun setChartView(chart: Chart<*>) {
         mWeakChart = WeakReference(chart)
     }
 
-    private fun getChartView(): Chart<*>? {
+    open fun getChartView(): Chart<*>? {
         return if (mWeakChart == null) null else mWeakChart.get()
     }
 
     override fun getOffsetForDrawingAtPoint(posX: Float, posY: Float): MPPointF {
-        val offset = offset
+        val offset = getOffset()
         mOffset2.x = offset.x
         mOffset2.y = offset.y
         val chart = getChartView()
-        var width = mSize!!.width
-        var height = mSize!!.height
+        var width = mSize.width
+        var height = mSize.height
         if (width == 0f && mDrawable != null) {
             width = mDrawable.intrinsicWidth.toFloat()
         }
@@ -92,26 +95,24 @@ open class MarkerImage : IMarker {
         }
         if (posX + mOffset2.x < 0) {
             mOffset2.x = -posX
-        } else if (chart != null && posX + width + mOffset2.x > chart.getWidth()) {
-            mOffset2.x = chart.getWidth() - posX - width
+        } else if (chart != null && posX + width + mOffset2.x > chart.width) {
+            mOffset2.x = chart.width - posX - width
         }
         if (posY + mOffset2.y < 0) {
             mOffset2.y = -posY
-        } else if (chart != null && posY + height + mOffset2.y > chart.getHeight()) {
-            mOffset2.y = chart.getHeight() - posY - height
+        } else if (chart != null && posY + height + mOffset2.y > chart.height) {
+            mOffset2.y = chart.height - posY - height
         }
         return mOffset2
     }
 
-    override fun refreshContent(e: Entry, highlight: Highlight) {
-
-    }
+    override fun refreshContent(e: Entry, highlight: Highlight) {}
 
     override fun draw(canvas: Canvas, posX: Float, posY: Float) {
         if (mDrawable == null) return
         val offset = getOffsetForDrawingAtPoint(posX, posY)
-        var width = mSize!!.width
-        var height = mSize!!.height
+        var width = mSize.width
+        var height = mSize.height
         if (width == 0f) {
             width = mDrawable.intrinsicWidth.toFloat()
         }

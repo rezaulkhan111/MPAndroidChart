@@ -6,15 +6,14 @@ import android.graphics.drawable.Drawable
  * Created by Philipp Jahoda on 02/06/16.
  */
 abstract class BaseEntry {
-
     /** the y value  */
     private var y = 0f
 
     /** optional spot for additional data this Entry represents  */
-    private var mData: Any? = null
+    private lateinit var mData: Any
 
     /** optional icon image  */
-    private var mIcon: Drawable? = null
+    private lateinit var mIcon: Drawable
 
     constructor() {}
 
@@ -23,17 +22,17 @@ abstract class BaseEntry {
     }
 
     constructor(y: Float, data: Any?) {
-//        this(y)
+        this(y)
         mData = data
     }
 
     constructor(y: Float, icon: Drawable?) {
-//        this(y)
+        this(y)
         mIcon = icon
     }
 
     constructor(y: Float, icon: Drawable?, data: Any?) {
-//        this(y)
+        this(y)
         mIcon = icon
         mData = data
     }
@@ -80,7 +79,7 @@ abstract class BaseEntry {
      *
      * @return
      */
-    open fun getData(): Any? {
+    open fun getData(): Any {
         return mData
     }
 
@@ -89,7 +88,7 @@ abstract class BaseEntry {
      *
      * @param data
      */
-    open fun setData(data: Any?) {
+    open fun setData(data: Any) {
         mData = data
     }
 }

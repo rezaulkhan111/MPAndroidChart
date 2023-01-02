@@ -12,10 +12,10 @@ import com.github.mikephil.charting.utils.MPPointF
 /**
  * Created by Philipp Jahoda on 21/10/15.
  */
-interface IDataSet<T : Entry?> {
-    /** ###### ###### DATA RELATED METHODS ###### ###### */
+interface IDataSet<T : Entry> {
 
     /** ###### ###### DATA RELATED METHODS ###### ######  */
+
     /**
      * returns the minimum y-value this DataSet holds
      *
@@ -80,7 +80,7 @@ interface IDataSet<T : Entry?> {
      * if there is no Entry matching the provided x-value
      * @return
      */
-    fun getEntryForXValue(xValue: Float, closestToY: Float, rounding: Rounding?): T?
+    fun getEntryForXValue(xValue: Float, closestToY: Float, rounding: Rounding): T?
 
     /**
      * Returns the first Entry object found at the given x-value with binary
@@ -106,7 +106,7 @@ interface IDataSet<T : Entry?> {
      * @param xValue
      * @return
      */
-    fun getEntriesForXValue(xValue: Float): List<T>?
+    fun getEntriesForXValue(xValue: Float): List<T>
 
     /**
      * Returns the Entry object found at the given index (NOT xIndex) in the values array.
@@ -130,7 +130,7 @@ interface IDataSet<T : Entry?> {
      * if there is no Entry matching the provided x-value
      * @return
      */
-    fun getEntryIndex(xValue: Float, closestToY: Float, rounding: Rounding?): Int
+    fun getEntryIndex(xValue: Float, closestToY: Float, rounding: Rounding): Int
 
     /**
      * Returns the position of the provided entry in the DataSets Entry array.
@@ -241,21 +241,21 @@ interface IDataSet<T : Entry?> {
      *
      * @return
      */
-    fun getLabel(): String?
+    fun getLabel(): String
 
     /**
      * Sets the label string that describes the DataSet.
      *
      * @param label
      */
-    fun setLabel(label: String?)
+    fun setLabel(label: String)
 
     /**
      * Returns the axis this DataSet should be plotted against.
      *
      * @return
      */
-    fun getAxisDependency(): AxisDependency?
+    fun getAxisDependency(): AxisDependency
 
     /**
      * Set the y-axis this DataSet should be plotted against (either LEFT or
@@ -263,14 +263,14 @@ interface IDataSet<T : Entry?> {
      *
      * @param dependency
      */
-    fun setAxisDependency(dependency: AxisDependency?)
+    fun setAxisDependency(dependency: AxisDependency)
 
     /**
      * returns all the colors that are set for this DataSet
      *
      * @return
      */
-    fun getColors(): List<Int?>?
+    fun getColors(): MutableList<Int>
 
     /**
      * Returns the first color (index 0) of the colors-array this DataSet
@@ -313,14 +313,14 @@ interface IDataSet<T : Entry?> {
      *
      * @param f
      */
-    fun setValueFormatter(f: IValueFormatter?)
+    fun setValueFormatter(f: IValueFormatter)
 
     /**
      * Returns the formatter used for drawing the values inside the chart.
      *
      * @return
      */
-    fun getValueFormatter(): IValueFormatter?
+    fun getValueFormatter(): IValueFormatter
 
     /**
      * Returns true if the valueFormatter object of this DataSet is null.
@@ -341,14 +341,14 @@ interface IDataSet<T : Entry?> {
      *
      * @param colors
      */
-    fun setValueTextColors(colors: MutableList<Int>?)
+    fun setValueTextColors(colors: MutableList<Int>)
 
     /**
      * Sets a Typeface for the value-labels of this DataSet.
      *
      * @param tf
      */
-    fun setValueTypeface(tf: Typeface?)
+    fun setValueTypeface(tf: Typeface)
 
     /**
      * Sets the text-size of the value-labels of this DataSet in dp.
@@ -378,7 +378,7 @@ interface IDataSet<T : Entry?> {
      *
      * @return
      */
-    fun getValueTypeface(): Typeface?
+    fun getValueTypeface(): Typeface
 
     /**
      * Returns the text size that is used for drawing the values inside the chart
@@ -393,7 +393,7 @@ interface IDataSet<T : Entry?> {
      *
      * Return `DEFAULT` to use the default legend form.
      */
-    fun getForm(): LegendForm?
+    fun getForm(): LegendForm
 
     /**
      * The form size to draw for this dataset in the legend.
@@ -417,7 +417,7 @@ interface IDataSet<T : Entry?> {
      *
      * Return `null` to use the default legend form line dash effect.
      */
-    fun getFormLineDashEffect(): DashPathEffect?
+    fun getFormLineDashEffect(): DashPathEffect
 
     /**
      * set this to true to draw y-values on the chart.
@@ -460,12 +460,12 @@ interface IDataSet<T : Entry?> {
      * For Pie and Radar chart it will be (y offset, distance from center offset); so if you want icon to be rendered under value, you should increase X component of CGPoint, and if you want icon to be rendered closet to center, you should decrease height component of CGPoint.
      * @param offset
      */
-    fun setIconsOffset(offset: MPPointF?)
+    fun setIconsOffset(offset: MPPointF)
 
     /**
      * Get the offset for drawing icons.
      */
-    fun getIconsOffset(): MPPointF?
+    fun getIconsOffset(): MPPointF
 
     /**
      * Set the visibility of this DataSet. If not visible, the DataSet will not

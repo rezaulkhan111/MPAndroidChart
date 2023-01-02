@@ -8,7 +8,6 @@ import com.github.mikephil.charting.components.Legend.LegendForm
 import com.github.mikephil.charting.components.YAxis.AxisDependency
 import com.github.mikephil.charting.formatter.IValueFormatter
 import com.github.mikephil.charting.interfaces.datasets.IDataSet
-import com.github.mikephil.charting.utils.ColorTemplate
 import com.github.mikephil.charting.utils.ColorTemplate.createColors
 import com.github.mikephil.charting.utils.MPPointF
 import com.github.mikephil.charting.utils.Utils.convertDpToPixel
@@ -19,43 +18,43 @@ import com.github.mikephil.charting.utils.Utils.defaultValueFormatter
  * This is the base dataset of all DataSets. It's purpose is to implement critical methods
  * provided by the IDataSet interface.
  */
-abstract class BaseDataSet<T : Entry?> : IDataSet<T> {
+abstract class BaseDataSet<T : Entry> : IDataSet<T> {
 
     /**
      * List representing all colors that are used for this DataSet
      */
-    private var mColors: MutableList<Int>? = null
+    protected lateinit var mColors: MutableList<Int>
 
     /**
      * List representing all colors that are used for drawing the actual values for this DataSet
      */
-    private var mValueColors: MutableList<Int>? = null
+    protected lateinit var mValueColors: MutableList<Int>
 
     /**
      * label that describes the DataSet or the data the DataSet represents
      */
-    private var mLabel: String? = "DataSet"
+    private var mLabel = "DataSet"
 
     /**
      * this specifies which axis this DataSet should be plotted against
      */
-    private var mAxisDependency = AxisDependency.LEFT
+    protected var mAxisDependency = AxisDependency.LEFT
 
     /**
      * if true, value highlightning is enabled
      */
-    private var mHighlightEnabled = true
+    protected var mHighlightEnabled = true
 
     /**
      * custom formatter that is used instead of the auto-formatter if set
      */
     @Transient
-    private var mValueFormatter: IValueFormatter? = null
+    protected lateinit var mValueFormatter: IValueFormatter
 
     /**
      * the typeface used for the value text
      */
-    private var mValueTypeface: Typeface? = null
+    protected var mValueTypeface: Typeface? = null
 
     private var mForm = LegendForm.DEFAULT
     private var mFormSize = Float.NaN
@@ -65,27 +64,27 @@ abstract class BaseDataSet<T : Entry?> : IDataSet<T> {
     /**
      * if true, y-values are drawn on the chart
      */
-    private var mDrawValues = true
+    protected var mDrawValues = true
 
     /**
      * if true, y-icons are drawn on the chart
      */
-    private var mDrawIcons = true
+    protected var mDrawIcons = true
 
     /**
      * the offset for drawing icons (in dp)
      */
-    private var mIconsOffset = MPPointF()
+    protected var mIconsOffset = MPPointF()
 
     /**
      * the size of the value-text labels
      */
-    private var mValueTextSize = 17f
+    protected var mValueTextSize = 17f
 
     /**
      * flag that indicates if the DataSet is visible or not
      */
-    private var mVisible = true
+    protected var mVisible = true
 
     /**
      * Default constructor.
@@ -95,8 +94,8 @@ abstract class BaseDataSet<T : Entry?> : IDataSet<T> {
         mValueColors = ArrayList()
 
         // default color
-        mColors?.add(Color.rgb(140, 234, 255))
-        mValueColors?.add(Color.BLACK)
+        mColors.add(Color.rgb(140, 234, 255))
+        mValueColors.add(Color.BLACK)
     }
 
     /**
@@ -104,8 +103,8 @@ abstract class BaseDataSet<T : Entry?> : IDataSet<T> {
      *
      * @param label
      */
-    constructor(label: String?) {
-//        this()
+    constructor(label: String) {
+        this()
         mLabel = label
     }
 
@@ -120,11 +119,11 @@ abstract class BaseDataSet<T : Entry?> : IDataSet<T> {
     /**
      * ###### ###### COLOR GETTING RELATED METHODS ##### ######
      */
-    override fun getColors(): MutableList<Int>? {
+    override fun getColors(): MutableList<Int> {
         return mColors
     }
 
-    open fun getValueColors(): MutableList<Int>? {
+    open fun getValueColors(): MutableList<Int> {
         return mValueColors
     }
 
@@ -152,7 +151,7 @@ abstract class BaseDataSet<T : Entry?> : IDataSet<T> {
      *
      * @param colors
      */
-    open fun setColors(colors: MutableList<Int>?) {
+    open fun setColors(colors: MutableList<Int>) {
         mColors = colors
     }
 
@@ -165,7 +164,7 @@ abstract class BaseDataSet<T : Entry?> : IDataSet<T> {
      *
      * @param colors
      */
-    open fun setColors(colors: IntArray) {
+    open fun setColors(vararg colors: Int) {
         mColors = createColors(colors)
     }
 
@@ -183,9 +182,9 @@ abstract class BaseDataSet<T : Entry?> : IDataSet<T> {
         if (mColors == null) {
             mColors = ArrayList()
         }
-        mColors?.clear()
+        mColors!!.clear()
         for (color in colors) {
-            mColors?.add(c.resources.getColor(color))
+            mColors!!.add(c.resources.getColor(color))
         }
     }
 
@@ -196,7 +195,7 @@ abstract class BaseDataSet<T : Entry?> : IDataSet<T> {
      */
     open fun addColor(color: Int) {
         if (mColors == null) mColors = ArrayList()
-        mColors?.add(color)
+        mColors!!.add(color)
     }
 
     /**
@@ -207,7 +206,7 @@ abstract class BaseDataSet<T : Entry?> : IDataSet<T> {
      */
     open fun setColor(color: Int) {
         resetColors()
-        mColors?.add(color)
+        mColors!!.add(color)
     }
 
     /**
@@ -240,17 +239,17 @@ abstract class BaseDataSet<T : Entry?> : IDataSet<T> {
         if (mColors == null) {
             mColors = ArrayList()
         }
-        mColors?.clear()
+        mColors!!.clear()
     }
 
     /**
      * ###### ###### OTHER STYLING RELATED METHODS ##### ######
      */
-    override fun setLabel(label: String?) {
+    override fun setLabel(label: String) {
         mLabel = label
     }
 
-    override fun getLabel(): String? {
+    override fun getLabel(): String {
         return mLabel
     }
 
@@ -262,11 +261,11 @@ abstract class BaseDataSet<T : Entry?> : IDataSet<T> {
         return mHighlightEnabled
     }
 
-    override fun setValueFormatter(f: IValueFormatter?) {
+    override fun setValueFormatter(f: IValueFormatter) {
         mValueFormatter = (f ?: return)
     }
 
-    override fun getValueFormatter(): IValueFormatter? {
+    override fun getValueFormatter(): IValueFormatter {
         return if (needsFormatter()) defaultValueFormatter else mValueFormatter
     }
 
@@ -279,11 +278,11 @@ abstract class BaseDataSet<T : Entry?> : IDataSet<T> {
         mValueColors!!.add(color)
     }
 
-    override fun setValueTextColors(colors: MutableList<Int>?) {
+    open fun setValueTextColors(colors: MutableList<Int>) {
         mValueColors = colors
     }
 
-    override fun setValueTypeface(tf: Typeface?) {
+    open fun setValueTypeface(tf: Typeface) {
         mValueTypeface = tf
     }
 
@@ -331,11 +330,11 @@ abstract class BaseDataSet<T : Entry?> : IDataSet<T> {
         return mFormLineWidth
     }
 
-    open fun setFormLineDashEffect(dashPathEffect: DashPathEffect?) {
+    open fun setFormLineDashEffect(dashPathEffect: DashPathEffect) {
         mFormLineDashEffect = dashPathEffect
     }
 
-    override fun getFormLineDashEffect(): DashPathEffect? {
+    override fun getFormLineDashEffect(): DashPathEffect {
         return mFormLineDashEffect
     }
 
@@ -355,12 +354,12 @@ abstract class BaseDataSet<T : Entry?> : IDataSet<T> {
         return mDrawIcons
     }
 
-    override fun setIconsOffset(offsetDp: MPPointF?) {
-        mIconsOffset.x = offsetDp!!.x
+    override fun setIconsOffset(offsetDp: MPPointF) {
+        mIconsOffset.x = MPPointF.x
         mIconsOffset.y = offsetDp.y
     }
 
-    override fun getIconsOffset(): MPPointF? {
+    override fun getIconsOffset(): MPPointF {
         return mIconsOffset
     }
 
@@ -372,12 +371,12 @@ abstract class BaseDataSet<T : Entry?> : IDataSet<T> {
         return mVisible
     }
 
-    override fun getAxisDependency(): AxisDependency? {
+    override fun getAxisDependency(): AxisDependency {
         return mAxisDependency
     }
 
-    override fun setAxisDependency(dependency: AxisDependency?) {
-        mAxisDependency = dependency!!
+    override fun setAxisDependency(dependency: AxisDependency) {
+        mAxisDependency = dependency
     }
 
 
@@ -386,7 +385,7 @@ abstract class BaseDataSet<T : Entry?> : IDataSet<T> {
      */
     override fun getIndexInEntries(xIndex: Int): Int {
         for (i in 0 until getEntryCount()) {
-            if (xIndex.toFloat() == getEntryForIndex(i)!!.getX()) return i
+            if (xIndex.toFloat() == getEntryForIndex(i).getX()) return i
         }
         return -1
     }
@@ -406,8 +405,8 @@ abstract class BaseDataSet<T : Entry?> : IDataSet<T> {
     }
 
     override fun removeEntryByXValue(xValue: Float): Boolean {
-        val e = getEntryForXValue(xValue, Float.NaN)!!
-        return removeEntry(e)
+        val e = getEntryForXValue(xValue, Float.NaN)
+        return removeEntry(e!!)
     }
 
     override fun removeEntry(index: Int): Boolean {

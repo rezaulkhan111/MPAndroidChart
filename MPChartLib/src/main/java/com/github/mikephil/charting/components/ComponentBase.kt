@@ -13,35 +13,35 @@ abstract class ComponentBase {
     /**
      * flag that indicates if this axis / legend is enabled or not
      */
-    var mEnabled = true
+    protected var mEnabled = true
 
     /**
      * the offset in pixels this component has on the x-axis
      */
-    var mXOffset = 5f
+    protected var mXOffset = 5f
 
     /**
      * the offset in pixels this component has on the Y-axis
      */
-    var mYOffset = 5f
+    protected var mYOffset = 5f
 
     /**
      * the typeface used for the labels
      */
-    private var mTypeface: Typeface? = null
+    protected var mTypeface: Typeface? = null
 
     /**
      * the text size of the labels
      */
-    var mTextSize = convertDpToPixel(10f)
+    protected var mTextSize = convertDpToPixel(10f)
 
     /**
      * the text color to use for the labels
      */
-    private var mTextColor = Color.BLACK
+    protected var mTextColor = Color.BLACK
 
 
-    open fun ComponentBase() {}
+    constructor() {}
 
     /**
      * Returns the used offset on the x-axis for drawing the axis or legend
@@ -97,7 +97,7 @@ abstract class ComponentBase {
      *
      * @param tf
      */
-    open fun setTypeface(tf: Typeface?) {
+    open fun setTypeface(tf: Typeface) {
         mTypeface = tf
     }
 

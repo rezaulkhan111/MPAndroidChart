@@ -6,7 +6,6 @@ import android.util.Log
 import com.github.mikephil.charting.formatter.DefaultAxisValueFormatter
 import com.github.mikephil.charting.formatter.IAxisValueFormatter
 import com.github.mikephil.charting.utils.Utils.convertDpToPixel
-import kotlin.math.abs
 
 /**
  * Base-class of all axes (previously called labels).
@@ -17,7 +16,7 @@ abstract class AxisBase : ComponentBase {
     /**
      * custom formatter that is used instead of the auto-formatter if set
      */
-    private var mAxisValueFormatter: IAxisValueFormatter? = null
+    protected var mAxisValueFormatter: IAxisValueFormatter? = null
 
     private var mGridColor = Color.GRAY
 
@@ -55,7 +54,7 @@ abstract class AxisBase : ComponentBase {
     /**
      * the minimum interval between axis values
      */
-    private var mGranularity = 1.0f
+    protected var mGranularity = 1.0f
 
     /**
      * When true, axis labels are controlled by the `granularity` property.
@@ -63,29 +62,29 @@ abstract class AxisBase : ComponentBase {
      * This could happen if two adjacent axis values are rounded to same value.
      * If using granularity this could be avoided by having fewer axis values visible.
      */
-    private var mGranularityEnabled = false
+    protected var mGranularityEnabled = false
 
     /**
      * if true, the set number of y-labels will be forced
      */
-    private var mForceLabels = false
+    protected var mForceLabels = false
 
     /**
      * flag indicating if the grid lines for this axis should be drawn
      */
-    private var mDrawGridLines = true
+    protected var mDrawGridLines = true
 
     /**
      * flag that indicates if the line alongside the axis is drawn or not
      */
-    private var mDrawAxisLine = true
+    protected var mDrawAxisLine = true
 
     /**
      * flag that indicates of the labels of this axis should be drawn or not
      */
-    private var mDrawLabels = true
+    protected var mDrawLabels = true
 
-    private var mCenterAxisLabels = false
+    protected var mCenterAxisLabels = false
 
     /**
      * the path effect of the axis line that makes dashed lines possible
@@ -100,27 +99,27 @@ abstract class AxisBase : ComponentBase {
     /**
      * array of limit lines that can be set for the axis
      */
-    private var mLimitLines: MutableList<LimitLine>? = null
+    protected var mLimitLines: List<LimitLine>? = null
 
     /**
      * flag indicating the limit lines layer depth
      */
-    private var mDrawLimitLineBehindData = false
+    protected var mDrawLimitLineBehindData = false
 
     /**
      * flag indicating the grid lines layer depth
      */
-    private var mDrawGridLinesBehindData = true
+    protected var mDrawGridLinesBehindData = true
 
     /**
      * Extra spacing for `axisMinimum` to be added to automatically calculated `axisMinimum`
      */
-    private var mSpaceMin = 0f
+    protected var mSpaceMin = 0f
 
     /**
      * Extra spacing for `axisMaximum` to be added to automatically calculated `axisMaximum`
      */
-    private var mSpaceMax = 0f
+    protected var mSpaceMax = 0f
 
     /**
      * flag indicating that the axis-min value has been customized
@@ -422,8 +421,8 @@ abstract class AxisBase : ComponentBase {
      *
      * @param l
      */
-    open fun addLimitLine(l: LimitLine) {
-        mLimitLines!!.add(l)
+    open fun addLimitLine(l: LimitLine?) {
+        mLimitLines.add(l)
         if (mLimitLines!!.size > 6) {
             Log.e(
                 "MPAndroiChart",
@@ -438,15 +437,15 @@ abstract class AxisBase : ComponentBase {
      *
      * @param l
      */
-    open fun removeLimitLine(l: LimitLine) {
-        mLimitLines!!.remove(l)
+    open fun removeLimitLine(l: LimitLine?) {
+        mLimitLines.remove(l)
     }
 
     /**
      * Removes all LimitLines from the axis.
      */
     open fun removeAllLimitLines() {
-        mLimitLines!!.clear()
+        mLimitLines.clear()
     }
 
     /**
@@ -454,7 +453,7 @@ abstract class AxisBase : ComponentBase {
      *
      * @return
      */
-    open fun getLimitLines(): List<LimitLine>? {
+    open fun getLimitLines(): List<LimitLine?>? {
         return mLimitLines
     }
 
@@ -532,7 +531,7 @@ abstract class AxisBase : ComponentBase {
             mAxisValueFormatter is DefaultAxisValueFormatter &&
             (mAxisValueFormatter as DefaultAxisValueFormatter).decimalDigits != mDecimals
         ) mAxisValueFormatter = DefaultAxisValueFormatter(mDecimals)
-        return mAxisValueFormatter!!
+        return mAxisValueFormatter
     }
 
     /**
@@ -559,7 +558,7 @@ abstract class AxisBase : ComponentBase {
      *
      * @param effect the DashPathEffect
      */
-    open fun setGridDashedLine(effect: DashPathEffect?) {
+    open fun setGridDashedLine(effect: DashPathEffect) {
         mGridDashPathEffect = effect
     }
 
@@ -613,7 +612,7 @@ abstract class AxisBase : ComponentBase {
      *
      * @param effect the DashPathEffect
      */
-    open fun setAxisLineDashedLine(effect: DashPathEffect?) {
+    open fun setAxisLineDashedLine(effect: DashPathEffect) {
         mAxisLineDashPathEffect = effect
     }
 
@@ -630,7 +629,7 @@ abstract class AxisBase : ComponentBase {
      * @return
      */
     open fun isAxisLineDashedLineEnabled(): Boolean {
-        return mAxisLineDashPathEffect != null
+        return if (mAxisLineDashPathEffect == null) false else true
     }
 
     /**
@@ -751,18 +750,18 @@ abstract class AxisBase : ComponentBase {
         var max = if (mCustomAxisMax) mAxisMaximum else (dataMax + mSpaceMax)
 
         // temporary range (before calculations)
-        val range = abs(max - min)
+        val range = Math.abs(max - min)
 
         // in case all values are equal
         if (range == 0f) {
-            max += 1f
-            min -= 1f
+            max = max + 1f
+            min = min - 1f
         }
         mAxisMinimum = min
         mAxisMaximum = max
 
         // actual range
-        mAxisRange = abs(max - min)
+        mAxisRange = Math.abs(max - min)
     }
 
     /**

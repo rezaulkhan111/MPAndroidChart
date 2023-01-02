@@ -15,13 +15,19 @@ import com.github.mikephil.charting.renderer.BubbleChartRenderer
  * @author Philipp Jahoda
  */
 class BubbleChart : BarLineChartBase<BubbleData?>, BubbleDataProvider {
-    constructor(context: Context?) : super(context) {}
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {}
+
+    constructor(context: Context?) : super(context) {
+    }
+
+    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
+    }
+
     constructor(context: Context?, attrs: AttributeSet?, defStyle: Int) : super(
         context,
         attrs,
         defStyle
     ) {
+
     }
 
     override fun init() {
@@ -29,6 +35,7 @@ class BubbleChart : BarLineChartBase<BubbleData?>, BubbleDataProvider {
         mRenderer = BubbleChartRenderer(this, mAnimator, mViewPortHandler)
     }
 
-    val bubbleData: BubbleData
-        get() = mData
+    override fun getBubbleData(): BubbleData? {
+        return mData
+    }
 }

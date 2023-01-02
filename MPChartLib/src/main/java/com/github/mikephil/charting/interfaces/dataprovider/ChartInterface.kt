@@ -17,42 +17,51 @@ interface ChartInterface {
      *
      * @return
      */
-    val xChartMin: Float
+    fun getXChartMin(): Float
 
     /**
      * Returns the maximum x value of the chart, regardless of zoom or translation.
      *
      * @return
      */
-    val xChartMax: Float
-    val xRange: Float
+    fun getXChartMax(): Float
+
+    fun getXRange(): Float
 
     /**
      * Returns the minimum y value of the chart, regardless of zoom or translation.
      *
      * @return
      */
-    val yChartMin: Float
+    fun getYChartMin(): Float
 
     /**
      * Returns the maximum y value of the chart, regardless of zoom or translation.
      *
      * @return
      */
-    val yChartMax: Float
+    fun getYChartMax(): Float
 
     /**
      * Returns the maximum distance in scren dp a touch can be away from an entry to cause it to get highlighted.
      *
      * @return
      */
-    val maxHighlightDistance: Float
-    val width: Int
-    val height: Int
-    val centerOfView: MPPointF?
-    val centerOffsets: MPPointF?
-    val contentRect: RectF?
-    val defaultValueFormatter: IValueFormatter?
-    val data: ChartData<*>?
-    val maxVisibleCount: Int
+    fun getMaxHighlightDistance(): Float
+
+    fun getWidth(): Int
+
+    fun getHeight(): Int
+
+    fun getCenterOfView(): MPPointF
+
+    fun getCenterOffsets(): MPPointF
+
+    fun getContentRect(): RectF
+
+    fun getDefaultValueFormatter(): IValueFormatter
+
+    fun getData(): ChartData<*>
+
+    fun getMaxVisibleCount(): Int
 }

@@ -2,10 +2,17 @@ package com.github.mikephil.charting.buffer
 
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
 
-class HorizontalBarBuffer(size: Int, dataSetCount: Int, containsStacks: Boolean) :
-    BarBuffer(size, dataSetCount, containsStacks) {
+class HorizontalBarBuffer : BarBuffer {
+
+    constructor(size: Int, dataSetCount: Int, containsStacks: Boolean) : super(
+        size,
+        dataSetCount,
+        containsStacks
+    ) {
+    }
+
     override fun feed(data: IBarDataSet) {
-        val size = data.entryCount * phaseX
+        val size = data.getEntryCount() * phaseX
         val barWidthHalf = mBarWidth / 2f
         var i = 0
         while (i < size) {
@@ -14,20 +21,20 @@ class HorizontalBarBuffer(size: Int, dataSetCount: Int, containsStacks: Boolean)
                 i++
                 continue
             }
-            val x = e.x
-            var y = e.y
-            val vals = e.yVals
+            val x = e.getX()
+            var y = e.getY()
+            val vals = e.getYVals()
             if (!mContainsStacks || vals == null) {
                 val bottom = x - barWidthHalf
                 val top = x + barWidthHalf
                 var left: Float
                 var right: Float
                 if (mInverted) {
-                    left = if (y >= 0) y else 0F
-                    right = if (y <= 0) y else 0F
+                    left = if (y >= 0) y else 0f
+                    right = if (y <= 0) y else 0f
                 } else {
-                    right = if (y >= 0) y else 0F
-                    left = if (y <= 0) y else 0F
+                    right = if (y >= 0) y else 0f
+                    left = if (y <= 0) y else 0f
                 }
 
                 // multiply the height of the rect with the phase
@@ -35,7 +42,7 @@ class HorizontalBarBuffer(size: Int, dataSetCount: Int, containsStacks: Boolean)
                 addBar(left, top, right, bottom)
             } else {
                 var posY = 0f
-                var negY = -e.negativeSum
+                var negY = -e.getNegativeSum()
                 var yStart = 0f
 
                 // fill the stack

@@ -17,7 +17,7 @@ interface OnChartValueSelectedListener {
      * @param h The corresponding highlight object that contains information
      * about the highlighted position such as dataSetIndex, ...
      */
-    fun onValueSelected(e: Entry?, h: Highlight?)
+    fun onValueSelected(e: Entry, h: Highlight)
 
     /**
      * Called when nothing has been selected or an "un-select" has been made.

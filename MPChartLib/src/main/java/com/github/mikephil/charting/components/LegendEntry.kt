@@ -35,7 +35,7 @@ class LegendEntry {
      * The legend entry text.
      * A `null` label will start a group.
      */
-    lateinit var label: String
+    var label: String? = null
 
     /**
      * The form to draw for this entry.
@@ -65,7 +65,7 @@ class LegendEntry {
      *
      * Set to null to use the legend's default
      */
-    lateinit var formLineDashEffect: DashPathEffect
+    var formLineDashEffect: DashPathEffect? = null
 
     /**
      * The color for drawing the form

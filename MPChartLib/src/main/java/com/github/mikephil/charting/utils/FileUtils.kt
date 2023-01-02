@@ -183,7 +183,7 @@ object FileUtils {
             // BufferedWriter for performance, true to set append to file flag
             val buf = BufferedWriter(FileWriter(saved, true))
             for (e in entries) {
-                buf.append(e.y.toString() + "#" + e.x)
+                buf.append(e.getY().toString() + "#" + e.getX())
                 buf.newLine()
             }
             buf.close()

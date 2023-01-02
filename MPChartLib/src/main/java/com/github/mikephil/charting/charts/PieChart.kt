@@ -5,18 +5,13 @@ import android.graphics.Canvas
 import android.graphics.RectF
 import android.graphics.Typeface
 import android.util.AttributeSet
-import com.github.mikephil.charting.components.Description.text
 import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.data.ChartData.entryCount
-import com.github.mikephil.charting.data.Entry.x
 import com.github.mikephil.charting.data.PieData
-import com.github.mikephil.charting.data.PieData.yValueSum
 import com.github.mikephil.charting.highlight.*
-import com.github.mikephil.charting.highlight.Highlight.x
-import com.github.mikephil.charting.interfaces.datasets.IDataSet.entryCount
 import com.github.mikephil.charting.interfaces.datasets.IPieDataSet
 import com.github.mikephil.charting.renderer.PieChartRenderer
 import com.github.mikephil.charting.utils.MPPointF
+import com.github.mikephil.charting.utils.MPPointF.Companion.getInstance
 import com.github.mikephil.charting.utils.MPPointF.Companion.recycleInstance
 import com.github.mikephil.charting.utils.Utils.convertDpToPixel
 import com.github.mikephil.charting.utils.Utils.getNormalizedAngle
@@ -28,150 +23,71 @@ import com.github.mikephil.charting.utils.Utils.getNormalizedAngle
  */
 class PieChart : PieRadarChartBase<PieData?> {
     /**
-     * returns the circlebox, the boundingbox of the pie-chart slices
-     *
-     * @return
-     */
-    /**
      * rect object that represents the bounds of the piechart, needed for
      * drawing the circle
      */
-    val circleBox: RectF? = RectF()
-    /**
-     * Returns true if drawing the entry labels is enabled, false if not.
-     *
-     * @return
-     */
+    private val mCircleBox: RectF? = RectF()
+
     /**
      * flag indicating if entry labels should be drawn or not
      */
-    var isDrawEntryLabelsEnabled = true
-        private set
-    /**
-     * returns an integer array of all the different angles the chart slices
-     * have the angles in the returned array determine how much space (of 360°)
-     * each slice takes
-     *
-     * @return
-     */
+    private var mDrawEntryLabels = true
+
     /**
      * array that holds the width of each pie-slice in degrees
      */
-    var drawAngles = FloatArray(1)
-        private set
-    /**
-     * returns the absolute angles of the different chart slices (where the
-     * slices end)
-     *
-     * @return
-     */
+    private var mDrawAngles = FloatArray(1)
+
     /**
      * array that holds the absolute angle in degrees of each slice
      */
-    var absoluteAngles = FloatArray(1)
-        private set
-    /**
-     * returns true if the hole in the center of the pie-chart is set to be
-     * visible, false if not
-     *
-     * @return
-     */
-    /**
-     * set this to true to draw the pie center empty
-     *
-     * @param enabled
-     */
+    private var mAbsoluteAngles = FloatArray(1)
+
     /**
      * if true, the white hole inside the chart will be drawn
      */
-    var isDrawHoleEnabled = true
-    /**
-     * Returns true if the inner tips of the slices are visible behind the hole,
-     * false if not.
-     *
-     * @return true if slices are visible behind the hole.
-     */
+    private var mDrawHole = true
+
     /**
      * if true, the hole will see-through to the inner tips of the slices
      */
-    var isDrawSlicesUnderHoleEnabled = false
-        private set
-    /**
-     * Returns true if using percentage values is enabled for the chart.
-     *
-     * @return
-     */
+    private var mDrawSlicesUnderHole = false
+
     /**
      * if true, the values inside the piechart are drawn as percent values
      */
-    var isUsePercentValuesEnabled = false
-        private set
-    /**
-     * Returns true if the chart is set to draw each end of a pie-slice
-     * "rounded".
-     *
-     * @return
-     */
+    private var mUsePercentValues = false
+
     /**
      * if true, the slices of the piechart are rounded
      */
-    var isDrawRoundedSlicesEnabled = false
-        private set
+    private var mDrawRoundedSlices = false
 
     /**
      * variable for the text that is drawn in the center of the pie-chart
      */
     private var mCenterText: CharSequence = ""
-    private val mCenterTextOffset = MPPointF.getInstance(0F, 0F)
-    /**
-     * Returns the size of the hole radius in percent of the total radius.
-     *
-     * @return
-     */
-    /**
-     * sets the radius of the hole in the center of the piechart in percent of
-     * the maximum radius (max = the radius of the whole chart), default 50%
-     *
-     * @param percent
-     */
+
+    private val mCenterTextOffset = getInstance(0, 0)
+
     /**
      * indicates the size of the hole in the center of the piechart, default:
      * radius / 2
      */
-    var holeRadius = 50f
-    /**
-     * sets the radius of the transparent circle that is drawn next to the hole
-     * in the piechart in percent of the maximum radius (max = the radius of the
-     * whole chart), default 55% -> means 5% larger than the center-hole by
-     * default
-     *
-     * @param percent
-     */
+    private var mHoleRadiusPercent = 50f
+
     /**
      * the radius of the transparent circle next to the chart-hole in the center
      */
-    var transparentCircleRadius = 55f
-    /**
-     * returns true if drawing the center text is enabled
-     *
-     * @return
-     */
+    protected var mTransparentCircleRadiusPercent = 55f
+
     /**
      * if enabled, centertext is drawn
      */
-    var isDrawCenterTextEnabled = true
-        private set
-    /**
-     * the rectangular radius of the bounding box for the center text, as a percentage of the pie
-     * hole
-     * default 1.f (100%)
-     */
-    /**
-     * the rectangular radius of the bounding box for the center text, as a percentage of the pie
-     * hole
-     * default 1.f (100%)
-     */
-    var centerTextRadiusPercent = 100f
+    private var mDrawCenterText = true
+
+    private var mCenterTextRadiusPercent = 100f
+
     protected var mMaxAngle = 360f
 
     /**
@@ -180,8 +96,14 @@ class PieChart : PieRadarChartBase<PieData?> {
      */
     private var mMinAngleForSlices = 0f
 
-    constructor(context: Context?) : super(context) {}
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {}
+    constructor(context: Context?) : super(context) {
+
+    }
+
+    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
+
+    }
+
     constructor(context: Context?, attrs: AttributeSet?, defStyle: Int) : super(
         context,
         attrs,
@@ -196,14 +118,14 @@ class PieChart : PieRadarChartBase<PieData?> {
         mHighlighter = PieHighlighter(this)
     }
 
-    override fun onDraw(canvas: Canvas) {
-        super.onDraw(canvas)
+    protected fun onDraw(canvas: Canvas?) {
+        super.onDraw(canvas!!)
         if (mData == null) return
-        mRenderer.drawData(canvas)
-        if (valuesToHighlight()) mRenderer.drawHighlighted(canvas, mIndicesToHighlight)
-        mRenderer.drawExtras(canvas)
-        mRenderer.drawValues(canvas)
-        mLegendRenderer.renderLegend(canvas)
+        mRenderer!!.drawData(canvas)
+        if (valuesToHighlight()) mRenderer!!.drawHighlighted(canvas, mIndicesToHighlight)
+        mRenderer!!.drawExtras(canvas)
+        mRenderer!!.drawValues(canvas)
+        mLegendRenderer!!.renderLegend(canvas)
         drawDescription(canvas)
         drawMarkers(canvas)
     }
@@ -215,12 +137,12 @@ class PieChart : PieRadarChartBase<PieData?> {
         if (mData == null) return
         val diameter = diameter
         val radius = diameter / 2f
-        val c: MPPointF = getCenterOffsets()
-        val shift = mData!!.dataSet!!.selectionShift
+        val c = getCenterOffsets()
+        val shift = mData!!.dataSet!!.getSelectionShift()
 
         // create the circle box that will contain the pie-chart (the bounds of
         // the pie-chart)
-        circleBox!![c.x - radius + shift, c.y - radius + shift, c.x + radius - shift] =
+        mCircleBox!![c!!.x - radius + shift, c.y - radius + shift, c.x + radius - shift] =
             c.y + radius - shift
         recycleInstance(c)
     }
@@ -229,33 +151,33 @@ class PieChart : PieRadarChartBase<PieData?> {
         calcAngles()
     }
 
-    override fun getMarkerPosition(high: Highlight?): FloatArray {
-        val center = centerCircleBox
-        var r = radius
+    protected fun getMarkerPosition(highlight: Highlight): FloatArray? {
+        val center = getCenterCircleBox()
+        var r = getRadius()
         var off = r / 10f * 3.6f
-        if (isDrawHoleEnabled) {
-            off = (r - r / 100f * holeRadius) / 2f
+        if (isDrawHoleEnabled()) {
+            off = (r - r / 100f * getHoleRadius()) / 2f
         }
         r -= off // offset to keep things inside the chart
         val rotationAngle = rotationAngle
-        val entryIndex = high!!.x.toInt()
+        val entryIndex = highlight.x.toInt()
 
         // offset needed to center the drawn text in the slice
-        val offset = drawAngles[entryIndex] / 2
+        val offset = mDrawAngles[entryIndex] / 2
 
         // calculate the text position
         val x = (r
                 * Math.cos(
             Math.toRadians(
-                ((rotationAngle + absoluteAngles[entryIndex] - offset)
-                        * mAnimator.phaseY).toDouble()
+                ((rotationAngle + mAbsoluteAngles[entryIndex] - offset)
+                        * mAnimator!!.getPhaseY()).toDouble()
             )
         ) + center.x).toFloat()
         val y = (r
                 * Math.sin(
             Math.toRadians(
-                ((rotationAngle + absoluteAngles[entryIndex] - offset)
-                        * mAnimator.phaseY).toDouble()
+                ((rotationAngle + mAbsoluteAngles[entryIndex] - offset)
+                        * mAnimator!!.getPhaseY()).toDouble()
             )
         ) + center.y).toFloat()
         recycleInstance(center)
@@ -266,19 +188,19 @@ class PieChart : PieRadarChartBase<PieData?> {
      * calculates the needed angles for the chart slices
      */
     private fun calcAngles() {
-        val entryCount: Int = mData.entryCount
-        if (drawAngles.size != entryCount) {
-            drawAngles = FloatArray(entryCount)
+        val entryCount = mData!!.getEntryCount()
+        if (mDrawAngles.size != entryCount) {
+            mDrawAngles = FloatArray(entryCount)
         } else {
             for (i in 0 until entryCount) {
-                drawAngles[i] = 0F
+                mDrawAngles[i] = 0
             }
         }
-        if (absoluteAngles.size != entryCount) {
-            absoluteAngles = FloatArray(entryCount)
+        if (mAbsoluteAngles.size != entryCount) {
+            mAbsoluteAngles = FloatArray(entryCount)
         } else {
             for (i in 0 until entryCount) {
-                absoluteAngles[i] = 0F
+                mAbsoluteAngles[i] = 0
             }
         }
         val yValueSum = mData!!.yValueSum
@@ -290,8 +212,8 @@ class PieChart : PieRadarChartBase<PieData?> {
         var diff = 0f
         for (i in 0 until mData!!.dataSetCount) {
             val set = dataSets!![i]
-            for (j in 0 until set.entryCount) {
-                val drawAngle = calcAngle(Math.abs(set.getEntryForIndex(j)!!.y), yValueSum)
+            for (j in 0 until set.getEntryCount()) {
+                val drawAngle = calcAngle(Math.abs(set.getEntryForIndex(j)!!.getY()), yValueSum)
                 if (hasMinAngle) {
                     val temp = drawAngle - mMinAngleForSlices
                     if (temp <= 0) {
@@ -302,11 +224,11 @@ class PieChart : PieRadarChartBase<PieData?> {
                         diff += temp
                     }
                 }
-                drawAngles[cnt] = drawAngle
+                mDrawAngles[cnt] = drawAngle
                 if (cnt == 0) {
-                    absoluteAngles[cnt] = drawAngles[cnt]
+                    mAbsoluteAngles[cnt] = mDrawAngles[cnt]
                 } else {
-                    absoluteAngles[cnt] = absoluteAngles[cnt - 1] + drawAngles[cnt]
+                    mAbsoluteAngles[cnt] = mAbsoluteAngles[cnt - 1] + mDrawAngles[cnt]
                 }
                 cnt++
             }
@@ -317,12 +239,12 @@ class PieChart : PieRadarChartBase<PieData?> {
             for (i in 0 until entryCount) {
                 minAngles[i] -= (minAngles[i] - mMinAngleForSlices) / diff * offset
                 if (i == 0) {
-                    absoluteAngles[0] = minAngles[0]
+                    mAbsoluteAngles[0] = minAngles[0]
                 } else {
-                    absoluteAngles[i] = absoluteAngles[i - 1] + minAngles[i]
+                    mAbsoluteAngles[i] = mAbsoluteAngles[i - 1] + minAngles[i]
                 }
             }
-            drawAngles = minAngles
+            mDrawAngles = minAngles
         }
     }
 
@@ -333,12 +255,24 @@ class PieChart : PieRadarChartBase<PieData?> {
      * @return
      */
     fun needsHighlight(index: Int): Boolean {
+
         // no highlight
         if (!valuesToHighlight()) return false
-        for (i in mIndicesToHighlight.indices)  // check if the xvalue for the given dataset needs highlight
-            if (mIndicesToHighlight[i].x as Int == index) return true
+        for (i in 0 until mIndicesToHighlight.length)  // check if the xvalue for the given dataset needs highlight
+            if (mIndicesToHighlight!![i]!!.x.toInt() == index) return true
         return false
     }
+
+    /**
+     * calculates the needed angle for a given value
+     *
+     * @param value
+     * @return
+     */
+    private fun calcAngle(value: Float): Float {
+        return calcAngle(value, mData!!.yValueSum)
+    }
+
     /**
      * calculates the needed angle for a given value
      *
@@ -346,13 +280,7 @@ class PieChart : PieRadarChartBase<PieData?> {
      * @param yValueSum
      * @return
      */
-    /**
-     * calculates the needed angle for a given value
-     *
-     * @param value
-     * @return
-     */
-    private fun calcAngle(value: Float, yValueSum: Float = mData!!.yValueSum): Float {
+    private fun calcAngle(value: Float, yValueSum: Float): Float {
         return value / yValueSum * mMaxAngle
     }
 
@@ -361,17 +289,17 @@ class PieChart : PieRadarChartBase<PieData?> {
      *
      * @return
      */
-    @get:Deprecated("")
-    override val xAxis: XAxis?
-        get() {
-            throw RuntimeException("PieChart has no XAxis")
-        }
+    @Deprecated("")
+    override fun getXAxis(): XAxis? {
+        throw RuntimeException("PieChart has no XAxis")
+    }
 
     override fun getIndexForAngle(angle: Float): Int {
+
         // take the current angle of the chart into consideration
         val a = getNormalizedAngle(angle - rotationAngle)
-        for (i in absoluteAngles.indices) {
-            if (absoluteAngles[i] > a) return i
+        for (i in mAbsoluteAngles.indices) {
+            if (mAbsoluteAngles[i] > a) return i
         }
         return -1 // return -1 if no index found
     }
@@ -391,6 +319,27 @@ class PieChart : PieRadarChartBase<PieData?> {
     }
 
     /**
+     * returns an integer array of all the different angles the chart slices
+     * have the angles in the returned array determine how much space (of 360°)
+     * each slice takes
+     *
+     * @return
+     */
+    fun getDrawAngles(): FloatArray? {
+        return mDrawAngles
+    }
+
+    /**
+     * returns the absolute angles of the different chart slices (where the
+     * slices end)
+     *
+     * @return
+     */
+    fun getAbsoluteAngles(): FloatArray? {
+        return mAbsoluteAngles
+    }
+
+    /**
      * Sets the color for the hole that is drawn in the center of the PieChart
      * (if enabled).
      *
@@ -404,23 +353,55 @@ class PieChart : PieRadarChartBase<PieData?> {
      * Enable or disable the visibility of the inner tips of the slices behind the hole
      */
     fun setDrawSlicesUnderHole(enable: Boolean) {
-        isDrawSlicesUnderHoleEnabled = enable
+        mDrawSlicesUnderHole = enable
     }
+
     /**
-     * returns the text that is drawn in the center of the pie-chart
+     * Returns true if the inner tips of the slices are visible behind the hole,
+     * false if not.
+     *
+     * @return true if slices are visible behind the hole.
+     */
+    fun isDrawSlicesUnderHoleEnabled(): Boolean {
+        return mDrawSlicesUnderHole
+    }
+
+    /**
+     * set this to true to draw the pie center empty
+     *
+     * @param enabled
+     */
+    fun setDrawHoleEnabled(enabled: Boolean) {
+        mDrawHole = enabled
+    }
+
+    /**
+     * returns true if the hole in the center of the pie-chart is set to be
+     * visible, false if not
      *
      * @return
      */
+    fun isDrawHoleEnabled(): Boolean {
+        return mDrawHole
+    }
+
     /**
      * Sets the text String that is displayed in the center of the PieChart.
      *
      * @param text
      */
-    var centerText: CharSequence?
-        get() = mCenterText
-        set(text) {
-            mCenterText = text ?: ""
-        }
+    fun setCenterText(text: CharSequence?) {
+        mCenterText = text ?: ""
+    }
+
+    /**
+     * returns the text that is drawn in the center of the pie-chart
+     *
+     * @return
+     */
+    fun getCenterText(): CharSequence? {
+        return mCenterText
+    }
 
     /**
      * set this to true to draw the text that is displayed in the center of the
@@ -429,26 +410,50 @@ class PieChart : PieRadarChartBase<PieData?> {
      * @param enabled
      */
     fun setDrawCenterText(enabled: Boolean) {
-        isDrawCenterTextEnabled = enabled
+        mDrawCenterText = enabled
     }
 
-    override val requiredLegendOffset: Float
-        get() = mLegendRenderer.labelPaint.textSize * 2f
-    override val requiredBaseOffset: Float
-        get() = 0F
-    override val radius: Float
-        get() = if (circleBox == null) 0F else Math.min(
-            circleBox.width() / 2f,
-            circleBox.height() / 2f
+    /**
+     * returns true if drawing the center text is enabled
+     *
+     * @return
+     */
+    fun isDrawCenterTextEnabled(): Boolean {
+        return mDrawCenterText
+    }
+
+    protected fun getRequiredLegendOffset(): Float {
+        return mLegendRenderer!!.labelPaint.textSize * 2f
+    }
+
+    protected fun getRequiredBaseOffset(): Float {
+        return 0
+    }
+
+    fun getRadius(): Float {
+        return if (mCircleBox == null) 0 else Math.min(
+            mCircleBox.width() / 2f,
+            mCircleBox.height() / 2f
         )
+    }
+
+    /**
+     * returns the circlebox, the boundingbox of the pie-chart slices
+     *
+     * @return
+     */
+    fun getCircleBox(): RectF? {
+        return mCircleBox
+    }
 
     /**
      * returns the center of the circlebox
      *
      * @return
      */
-    val centerCircleBox: MPPointF
-        get() = MPPointF.getInstance(circleBox!!.centerX(), circleBox.centerY())
+    fun getCenterCircleBox(): MPPointF {
+        return getInstance(mCircleBox!!.centerX(), mCircleBox.centerY())
+    }
 
     /**
      * sets the typeface for the center-text paint
@@ -493,8 +498,9 @@ class PieChart : PieRadarChartBase<PieData?> {
      *
      * @return
      */
-    val centerTextOffset: MPPointF
-        get() = MPPointF.getInstance(mCenterTextOffset.x, mCenterTextOffset.y)
+    fun getCenterTextOffset(): MPPointF? {
+        return getInstance(mCenterTextOffset.x, mCenterTextOffset.y)
+    }
 
     /**
      * Sets the color of the center text of the PieChart.
@@ -503,6 +509,25 @@ class PieChart : PieRadarChartBase<PieData?> {
      */
     fun setCenterTextColor(color: Int) {
         (mRenderer as PieChartRenderer).paintCenterText.color = color
+    }
+
+    /**
+     * sets the radius of the hole in the center of the piechart in percent of
+     * the maximum radius (max = the radius of the whole chart), default 50%
+     *
+     * @param percent
+     */
+    fun setHoleRadius(percent: Float) {
+        mHoleRadiusPercent = percent
+    }
+
+    /**
+     * Returns the size of the hole radius in percent of the total radius.
+     *
+     * @return
+     */
+    fun getHoleRadius(): Float {
+        return mHoleRadiusPercent
     }
 
     /**
@@ -515,6 +540,22 @@ class PieChart : PieRadarChartBase<PieData?> {
         val alpha = p.alpha
         p.color = color
         p.alpha = alpha
+    }
+
+    /**
+     * sets the radius of the transparent circle that is drawn next to the hole
+     * in the piechart in percent of the maximum radius (max = the radius of the
+     * whole chart), default 55% -> means 5% larger than the center-hole by
+     * default
+     *
+     * @param percent
+     */
+    fun setTransparentCircleRadius(percent: Float) {
+        mTransparentCircleRadiusPercent = percent
+    }
+
+    fun getTransparentCircleRadius(): Float {
+        return mTransparentCircleRadiusPercent
     }
 
     /**
@@ -536,7 +577,7 @@ class PieChart : PieRadarChartBase<PieData?> {
      */
     @Deprecated("")
     fun setDrawSliceText(enabled: Boolean) {
-        isDrawEntryLabelsEnabled = enabled
+        mDrawEntryLabels = enabled
     }
 
     /**
@@ -545,7 +586,16 @@ class PieChart : PieRadarChartBase<PieData?> {
      * @param enabled
      */
     fun setDrawEntryLabels(enabled: Boolean) {
-        isDrawEntryLabelsEnabled = enabled
+        mDrawEntryLabels = enabled
+    }
+
+    /**
+     * Returns true if drawing the entry labels is enabled, false if not.
+     *
+     * @return
+     */
+    fun isDrawEntryLabelsEnabled(): Boolean {
+        return mDrawEntryLabels
     }
 
     /**
@@ -572,8 +622,7 @@ class PieChart : PieRadarChartBase<PieData?> {
      * @param size
      */
     fun setEntryLabelTextSize(size: Float) {
-        (mRenderer as PieChartRenderer).paintEntryLabels.textSize =
-            convertDpToPixel(size)
+        (mRenderer as PieChartRenderer).paintEntryLabels.textSize = convertDpToPixel(size)
     }
 
     /**
@@ -583,7 +632,17 @@ class PieChart : PieRadarChartBase<PieData?> {
      * @param enabled draw curved ends of slices
      */
     fun setDrawRoundedSlices(enabled: Boolean) {
-        isDrawRoundedSlicesEnabled = enabled
+        mDrawRoundedSlices = enabled
+    }
+
+    /**
+     * Returns true if the chart is set to draw each end of a pie-slice
+     * "rounded".
+     *
+     * @return
+     */
+    fun isDrawRoundedSlicesEnabled(): Boolean {
+        return mDrawRoundedSlices
     }
 
     /**
@@ -594,7 +653,38 @@ class PieChart : PieRadarChartBase<PieData?> {
      * @param enabled
      */
     fun setUsePercentValues(enabled: Boolean) {
-        isUsePercentValuesEnabled = enabled
+        mUsePercentValues = enabled
+    }
+
+    /**
+     * Returns true if using percentage values is enabled for the chart.
+     *
+     * @return
+     */
+    fun isUsePercentValuesEnabled(): Boolean {
+        return mUsePercentValues
+    }
+
+    /**
+     * the rectangular radius of the bounding box for the center text, as a percentage of the pie
+     * hole
+     * default 1.f (100%)
+     */
+    fun setCenterTextRadiusPercent(percent: Float) {
+        mCenterTextRadiusPercent = percent
+    }
+
+    /**
+     * the rectangular radius of the bounding box for the center text, as a percentage of the pie
+     * hole
+     * default 1.f (100%)
+     */
+    fun getCenterTextRadiusPercent(): Float {
+        return mCenterTextRadiusPercent
+    }
+
+    fun getMaxAngle(): Float {
+        return mMaxAngle
     }
 
     /**
@@ -603,19 +693,22 @@ class PieChart : PieRadarChartBase<PieData?> {
      *
      * @param maxangle min 90, max 360
      */
-    var maxAngle: Float
-        get() = mMaxAngle
-        set(maxangle) {
-            var maxangle = maxangle
-            if (maxangle > 360) maxangle = 360f
-            if (maxangle < 90) maxangle = 90f
-            mMaxAngle = maxangle
-        }
+    fun setMaxAngle(maxangle: Float) {
+        var maxangle = maxangle
+        if (maxangle > 360) maxangle = 360f
+        if (maxangle < 90) maxangle = 90f
+        mMaxAngle = maxangle
+    }
+
     /**
      * The minimum angle slices on the chart are rendered with, default is 0f.
      *
      * @return minimum angle for slices
      */
+    fun getMinAngleForSlices(): Float {
+        return mMinAngleForSlices
+    }
+
     /**
      * Set the angle to set minimum size for slices, you must call [.notifyDataSetChanged]
      * and [.invalidate] when changing this, only works if there is enough room for all
@@ -623,14 +716,12 @@ class PieChart : PieRadarChartBase<PieData?> {
      *
      * @param minAngle minimum 0, maximum is half of [.setMaxAngle]
      */
-    var minAngleForSlices: Float
-        get() = mMinAngleForSlices
-        set(minAngle) {
-            var minAngle = minAngle
-            if (minAngle > mMaxAngle / 2f) minAngle =
-                mMaxAngle / 2f else if (minAngle < 0) minAngle = 0f
-            mMinAngleForSlices = minAngle
-        }
+    fun setMinAngleForSlices(minAngle: Float) {
+        var minAngle = minAngle
+        if (minAngle > mMaxAngle / 2f) minAngle = mMaxAngle / 2f else if (minAngle < 0) minAngle =
+            0f
+        mMinAngleForSlices = minAngle
+    }
 
     override fun onDetachedFromWindow() {
         // releases the bitmap in the renderer to avoid oom error

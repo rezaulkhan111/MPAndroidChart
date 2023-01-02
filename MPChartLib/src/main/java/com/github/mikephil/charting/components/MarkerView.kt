@@ -17,6 +17,7 @@ import java.lang.ref.WeakReference
  * @author Philipp Jahoda
  */
 open class MarkerView : RelativeLayout, IMarker {
+
     private var mOffset: MPPointF = MPPointF()
     private val mOffset2 = MPPointF()
     private var mWeakChart: WeakReference<Chart<*>>? = null
@@ -61,7 +62,9 @@ open class MarkerView : RelativeLayout, IMarker {
         mOffset.y = offsetY
     }
 
-    override val offset: MPPointF = mOffset
+    override fun getOffset(): MPPointF {
+        return mOffset
+    }
 
     open fun setChartView(chart: Chart<*>) {
         mWeakChart = WeakReference(chart)
@@ -72,7 +75,7 @@ open class MarkerView : RelativeLayout, IMarker {
     }
 
     override fun getOffsetForDrawingAtPoint(posX: Float, posY: Float): MPPointF {
-        val offset = offset
+        val offset = getOffset()
         mOffset2.x = offset.x
         mOffset2.y = offset.y
         val chart = getChartView()
@@ -80,13 +83,13 @@ open class MarkerView : RelativeLayout, IMarker {
         val height = height.toFloat()
         if (posX + mOffset2.x < 0) {
             mOffset2.x = -posX
-        } else if (chart != null && posX + width + mOffset2.x > chart.getWidth()) {
-            mOffset2.x = chart.getWidth() - posX - width
+        } else if (chart != null && posX + width + mOffset2.x > chart.width) {
+            mOffset2.x = chart.width - posX - width
         }
         if (posY + mOffset2.y < 0) {
             mOffset2.y = -posY
-        } else if (chart != null && posY + height + mOffset2.y > chart.getHeight()) {
-            mOffset2.y = chart.getHeight() - posY - height
+        } else if (chart != null && posY + height + mOffset2.y > chart.height) {
+            mOffset2.y = chart.height - posY - height
         }
         return mOffset2
     }

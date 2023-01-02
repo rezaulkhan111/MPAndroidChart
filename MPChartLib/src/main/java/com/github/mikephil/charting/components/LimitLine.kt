@@ -141,7 +141,7 @@ class LimitLine : ComponentBase {
      * @return
      */
     fun isDashedLineEnabled(): Boolean {
-        return mDashPathEffect != null
+        return if (mDashPathEffect == null) false else true
     }
 
     /**
@@ -149,8 +149,8 @@ class LimitLine : ComponentBase {
      *
      * @return
      */
-    fun getDashPathEffect(): DashPathEffect {
-        return mDashPathEffect!!
+    fun getDashPathEffect(): DashPathEffect? {
+        return mDashPathEffect
     }
 
     /**
@@ -159,8 +159,8 @@ class LimitLine : ComponentBase {
      *
      * @param style
      */
-    fun setTextStyle(style: Paint.Style) {
-        mTextStyle = style
+    fun setTextStyle(style: Paint.Style?) {
+        mTextStyle = style!!
     }
 
     /**
@@ -168,7 +168,7 @@ class LimitLine : ComponentBase {
      *
      * @return
      */
-    fun getTextStyle(): Paint.Style {
+    fun getTextStyle(): Paint.Style? {
         return mTextStyle
     }
 
@@ -187,7 +187,7 @@ class LimitLine : ComponentBase {
      *
      * @return
      */
-    fun getLabelPosition(): LimitLabelPosition {
+    fun getLabelPosition(): LimitLabelPosition? {
         return mLabelPosition
     }
 
@@ -206,7 +206,7 @@ class LimitLine : ComponentBase {
      *
      * @return
      */
-    fun getLabel(): String {
+    fun getLabel(): String? {
         return mLabel
     }
 }

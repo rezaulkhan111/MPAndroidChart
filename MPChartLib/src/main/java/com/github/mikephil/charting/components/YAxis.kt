@@ -5,9 +5,6 @@ import android.graphics.Paint
 import com.github.mikephil.charting.utils.Utils.calcTextHeight
 import com.github.mikephil.charting.utils.Utils.calcTextWidth
 import com.github.mikephil.charting.utils.Utils.convertDpToPixel
-import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.min
 
 /**
  * Class representing the y-axis labels settings and its entries. Only use the setter methods to
@@ -34,12 +31,12 @@ class YAxis : AxisBase {
     /**
      * flag that indicates if the axis is inverted or not
      */
-    private var mInverted = false
+    protected var mInverted = false
 
     /**
      * flag that indicates if the zero-line should be drawn regardless of other grid lines
      */
-    private var mDrawZeroLine = false
+    protected var mDrawZeroLine = false
 
     /**
      * flag indicating that auto scale min restriction should be used
@@ -54,22 +51,22 @@ class YAxis : AxisBase {
     /**
      * Color of the zero line
      */
-    private var mZeroLineColor = Color.GRAY
+    protected var mZeroLineColor = Color.GRAY
 
     /**
      * Width of the zero line in pixels
      */
-    private var mZeroLineWidth = 1f
+    protected var mZeroLineWidth = 1f
 
     /**
      * axis space from the largest value to the top in percent of the total axis range
      */
-    private var mSpacePercentTop = 10f
+    protected var mSpacePercentTop = 10f
 
     /**
      * axis space from the smallest value to the bottom in percent of the total axis range
      */
-    private var mSpacePercentBottom = 10f
+    protected var mSpacePercentBottom = 10f
 
     /**
      * the position of the y-labels relative to the chart
@@ -91,7 +88,7 @@ class YAxis : AxisBase {
     /**
      * the side this axis object represents
      */
-    private var mAxisDependency: AxisDependency
+    private var mAxisDependency: AxisDependency? = null
 
     /**
      * the minimum width that the axis should take (in dp).
@@ -99,14 +96,14 @@ class YAxis : AxisBase {
      *
      * default: 0.0
      */
-    private var mMinWidth = 0f
+    protected var mMinWidth = 0f
 
     /**
      * the maximum width that the axis can take (in dp).
      * use Inifinity for disabling the maximum
      * default: Float.POSITIVE_INFINITY (no maximum specified)
      */
-    private var mMaxWidth = Float.POSITIVE_INFINITY
+    protected var mMaxWidth = Float.POSITIVE_INFINITY
 
     /**
      * Enum that specifies the axis a DataSet should be plotted against, either LEFT or RIGHT.
@@ -118,8 +115,6 @@ class YAxis : AxisBase {
     }
 
     constructor() : super() {
-
-
         // default left
         mAxisDependency = AxisDependency.LEFT
         mYOffset = 0f
@@ -130,14 +125,14 @@ class YAxis : AxisBase {
         mYOffset = 0f
     }
 
-    fun getAxisDependency(): AxisDependency {
+    fun getAxisDependency(): AxisDependency? {
         return mAxisDependency
     }
 
     /**
      * @return the minimum width that the axis should take (in dp).
      */
-    private fun getMinWidth(): Float {
+    fun getMinWidth(): Float {
         return mMinWidth
     }
 
@@ -153,7 +148,7 @@ class YAxis : AxisBase {
     /**
      * @return the maximum width that the axis can take (in dp).
      */
-    private fun getMaxWidth(): Float {
+    fun getMaxWidth(): Float {
         return mMaxWidth
     }
 
@@ -169,7 +164,7 @@ class YAxis : AxisBase {
     /**
      * returns the position of the y-labels
      */
-    private fun getLabelPosition(): YAxisLabelPosition {
+    fun getLabelPosition(): YAxisLabelPosition {
         return mPosition
     }
 
@@ -253,7 +248,7 @@ class YAxis : AxisBase {
      *
      * @param startAtZero
      */
-//    @Deprecated("")
+    @Deprecated("")
     fun setStartAtZero(startAtZero: Boolean) {
         if (startAtZero) setAxisMinimum(0f) else resetAxisMinimum()
     }
@@ -272,7 +267,7 @@ class YAxis : AxisBase {
      *
      * @return
      */
-    private fun getSpaceTop(): Float {
+    fun getSpaceTop(): Float {
         return mSpacePercentTop
     }
 
@@ -290,7 +285,7 @@ class YAxis : AxisBase {
      *
      * @return
      */
-    private fun getSpaceBottom(): Float {
+    fun getSpaceBottom(): Float {
         return mSpacePercentBottom
     }
 
@@ -349,7 +344,7 @@ class YAxis : AxisBase {
         if (minWidth > 0f) minWidth = convertDpToPixel(minWidth)
         if (maxWidth > 0f && maxWidth != Float.POSITIVE_INFINITY) maxWidth =
             convertDpToPixel(maxWidth)
-        width = max(minWidth, min(width, if (maxWidth > 0.0) maxWidth else width))
+        width = Math.max(minWidth, Math.min(width, if (maxWidth > 0.0) maxWidth else width))
         return width
     }
 
@@ -371,7 +366,7 @@ class YAxis : AxisBase {
      * @return
      */
     fun needsOffset(): Boolean {
-        return isEnabled() && isDrawLabelsEnabled() && getLabelPosition() == YAxisLabelPosition.OUTSIDE_CHART
+        return if (isEnabled() && isDrawLabelsEnabled() && getLabelPosition() == YAxisLabelPosition.OUTSIDE_CHART) true else false
     }
 
     /**
@@ -406,6 +401,7 @@ class YAxis : AxisBase {
         mUseAutoScaleRestrictionMax = isEnabled
     }
 
+
     override fun calculate(dataMin: Float, dataMax: Float) {
         var min = dataMin
         var max = dataMax
@@ -423,20 +419,20 @@ class YAxis : AxisBase {
                 max = if (min < 0f) min * 0.5f else min * 1.5f
             }
         }
-        var range = abs(max - min)
+        var range = Math.abs(max - min)
 
         // in case all values are equal
         if (range == 0f) {
-            max += 1f
-            min -= 1f
+            max = max + 1f
+            min = min - 1f
         }
 
         // recalculate
-        range = abs(max - min)
+        range = Math.abs(max - min)
 
         // calc extra spacing
         mAxisMinimum = if (mCustomAxisMin) mAxisMinimum else min - range / 100f * getSpaceBottom()
         mAxisMaximum = if (mCustomAxisMax) mAxisMaximum else max + range / 100f * getSpaceTop()
-        mAxisRange = abs(mAxisMinimum - mAxisMaximum)
+        mAxisRange = Math.abs(mAxisMinimum - mAxisMaximum)
     }
 }

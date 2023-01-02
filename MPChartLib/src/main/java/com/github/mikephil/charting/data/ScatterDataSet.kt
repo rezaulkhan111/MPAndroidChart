@@ -1,14 +1,12 @@
 package com.github.mikephil.charting.data
 
+import com.github.mikephil.charting.charts.ScatterChart.ScatterShape
 import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet
-import com.github.mikephil.charting.renderer.scatter.ChevronDownShapeRenderer
-import com.github.mikephil.charting.renderer.scatter.IShapeRenderer
-import com.github.mikephil.charting.renderer.scatter.SquareShapeRenderer
+import com.github.mikephil.charting.renderer.scatter.*
 import com.github.mikephil.charting.utils.ColorTemplate
-import java.util.ArrayList
 
-class ScatterDataSet(yVals: MutableList<Entry?>?, label: String?) :
-    LineScatterCandleRadarDataSet<Entry?>(yVals, label), IScatterDataSet {
+class ScatterDataSet : LineScatterCandleRadarDataSet<Entry>, IScatterDataSet {
+
     /**
      * the size the scattershape will have, in density pixels
      */
@@ -17,7 +15,7 @@ class ScatterDataSet(yVals: MutableList<Entry?>?, label: String?) :
     /**
      * Renderer responsible for rendering this DataSet, default: square
      */
-     var mShapeRenderer: IShapeRenderer? = SquareShapeRenderer()
+    private var mShapeRenderer: IShapeRenderer? = SquareShapeRenderer()
 
     /**
      * The radius of the hole in the shape (applies to Square, Circle and Triangle)
@@ -30,18 +28,23 @@ class ScatterDataSet(yVals: MutableList<Entry?>?, label: String?) :
      * Setting to `ColorTemplate.COLOR_NONE` will behave as transparent.
      * - default: ColorTemplate.COLOR_NONE
      */
-    private var mScatterShapeHoleColor: Int = ColorTemplate.COLOR_NONE
-    override fun copy(): DataSet<Entry?>? {
-        val entries: MutableList<Entry?> = ArrayList()
+    private var mScatterShapeHoleColor = ColorTemplate.COLOR_NONE
+
+    constructor(yVals: MutableList<Entry>, label: String?) : super(yVals, label) {
+
+    }
+
+    override fun copy(): DataSet<Entry>? {
+        val entries: MutableList<Entry> = ArrayList()
         for (i in mEntries!!.indices) {
-            entries.add(mEntries!![i]!!.copy())
+            entries.add(mEntries!![i].copy()!!)
         }
         val copied = ScatterDataSet(entries, getLabel())
         copy(copied)
-        return copied
+        return copied.copy()
     }
 
-     fun copy(scatterDataSet: ScatterDataSet) {
+    private fun copy(scatterDataSet: ScatterDataSet) {
         super.copy(scatterDataSet)
         scatterDataSet.mShapeSize = mShapeSize
         scatterDataSet.mShapeRenderer = mShapeRenderer
@@ -58,6 +61,7 @@ class ScatterDataSet(yVals: MutableList<Entry?>?, label: String?) :
     fun setScatterShapeSize(size: Float) {
         mShapeSize = size
     }
+
 
     override fun getScatterShapeSize(): Float {
         return mShapeSize
@@ -114,18 +118,17 @@ class ScatterDataSet(yVals: MutableList<Entry?>?, label: String?) :
         return mScatterShapeHoleColor
     }
 
-    companion object {
-        fun getRendererForShape(shape: ScatterShape?): IShapeRenderer? {
-            when (shape) {
-                ScatterShape.SQUARE -> return SquareShapeRenderer()
-                ScatterShape.CIRCLE -> return CircleShapeRenderer()
-                ScatterShape.TRIANGLE -> return TriangleShapeRenderer()
-                ScatterShape.CROSS -> return CrossShapeRenderer()
-                ScatterShape.X -> return XShapeRenderer()
-                ScatterShape.CHEVRON_UP -> return ChevronUpShapeRenderer()
-                ScatterShape.CHEVRON_DOWN -> return ChevronDownShapeRenderer()
-            }
-            return null
+    private fun getRendererForShape(shape: ScatterShape?): IShapeRenderer? {
+        when (shape) {
+            ScatterShape.SQUARE -> return SquareShapeRenderer()
+            ScatterShape.CIRCLE -> return CircleShapeRenderer()
+            ScatterShape.TRIANGLE -> return TriangleShapeRenderer()
+            ScatterShape.CROSS -> return CrossShapeRenderer()
+            ScatterShape.X -> return XShapeRenderer()
+            ScatterShape.CHEVRON_UP -> return ChevronUpShapeRenderer()
+            ScatterShape.CHEVRON_DOWN -> return ChevronDownShapeRenderer()
+            else -> {}
         }
+        return null
     }
 }

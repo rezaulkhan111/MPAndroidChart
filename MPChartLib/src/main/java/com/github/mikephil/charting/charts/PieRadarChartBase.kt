@@ -7,13 +7,12 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
 import com.github.mikephil.charting.animation.Easing.EasingFunction
-import com.github.mikephil.charting.components.AxisBase.isDrawLabelsEnabled
-import com.github.mikephil.charting.components.ComponentBase.isEnabled
 import com.github.mikephil.charting.components.Legend.*
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.interfaces.datasets.IDataSet
 import com.github.mikephil.charting.listener.PieRadarChartTouchListener
 import com.github.mikephil.charting.utils.MPPointF
+import com.github.mikephil.charting.utils.MPPointF.Companion.getInstance
 import com.github.mikephil.charting.utils.MPPointF.Companion.recycleInstance
 import com.github.mikephil.charting.utils.Utils.convertDpToPixel
 import com.github.mikephil.charting.utils.Utils.getNormalizedAngle
@@ -28,44 +27,21 @@ abstract class PieRadarChartBase<T : ChartData<out IDataSet<out Entry?>?>?> : Ch
      * holds the normalized version of the current rotation angle of the chart
      */
     private var mRotationAngle = 270f
-    /**
-     * gets the raw version of the current rotation angle of the pie chart the
-     * returned value could be any value, negative or positive, outside of the
-     * 360 degrees. this is used when working with rotation direction, mainly by
-     * gestures and animations.
-     *
-     * @return
-     */
+
     /**
      * holds the raw version of the current rotation angle of the chart
      */
-    var rawRotationAngle = 270f
-        private set
-    /**
-     * Returns true if rotation of the chart by touch is enabled, false if not.
-     *
-     * @return
-     */
-    /**
-     * Set this to true to enable the rotation / spinning of the chart by touch.
-     * Set it to false to disable it. Default: true
-     *
-     * @param enabled
-     */
+    private var mRawRotationAngle = 270f
+
     /**
      * flag that indicates if rotation is enabled or not
      */
-    var isRotationEnabled = true
-    /**
-     * Gets the minimum offset (padding) around the chart, defaults to 0.f
-     */
+    protected var mRotateEnabled = true
+
     /**
      * Sets the minimum offset (padding) around the chart, defaults to 0.f
      */
-    /**
-     * Sets the minimum offset (padding) around the chart, defaults to 0.f
-     */
-    var minOffset = 0f
+    protected var mMinOffset = 0f
 
     constructor(context: Context?) : super(context) {}
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {}
@@ -85,9 +61,13 @@ abstract class PieRadarChartBase<T : ChartData<out IDataSet<out Entry?>?>?> : Ch
         //mXAxis.mAxisRange = mData.getXVals().size() - 1;
     }
 
-    override fun onTouchEvent(event: MotionEvent): Boolean {
+    override fun getMaxVisibleCount(): Int {
+        return mData!!.getEntryCount()
+    }
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
         // use the pie- and radarchart listener own listener
-        return if (mTouchEnabled && mChartTouchListener != null) mChartTouchListener.onTouch(
+        return if (mTouchEnabled && mChartTouchListener != null) mChartTouchListener!!.onTouch(
             this,
             event
         ) else super.onTouchEvent(event)
@@ -100,27 +80,27 @@ abstract class PieRadarChartBase<T : ChartData<out IDataSet<out Entry?>?>?> : Ch
     override fun notifyDataSetChanged() {
         if (mData == null) return
         calcMinMax()
-        if (mLegend != null) mLegendRenderer.computeLegend(mData!!)
+        if (mLegend != null) mLegendRenderer!!.computeLegend(mData!!)
         calculateOffsets()
     }
 
-    public override fun calculateOffsets() {
+    override fun calculateOffsets() {
         var legendLeft = 0f
         var legendRight = 0f
         var legendBottom = 0f
         var legendTop = 0f
-        if (mLegend != null && mLegend!!.isEnabled && !mLegend!!.isDrawInsideEnabled) {
+        if (mLegend != null && mLegend!!.isEnabled() && !mLegend!!.isDrawInsideEnabled()) {
             val fullLegendWidth = Math.min(
                 mLegend!!.mNeededWidth,
-                mViewPortHandler.chartWidth * mLegend!!.maxSizePercent
+                mViewPortHandler.chartWidth * mLegend!!.getMaxSizePercent()
             )
-            when (mLegend!!.orientation) {
+            when (mLegend!!.getOrientation()) {
                 LegendOrientation.VERTICAL -> {
                     var xLegendOffset = 0f
-                    if (mLegend.horizontalAlignment === LegendHorizontalAlignment.LEFT
-                        || mLegend.horizontalAlignment === LegendHorizontalAlignment.RIGHT
+                    if (mLegend!!.getHorizontalAlignment() === LegendHorizontalAlignment.LEFT
+                        || mLegend!!.getHorizontalAlignment() === LegendHorizontalAlignment.RIGHT
                     ) {
-                        if (mLegend.verticalAlignment === LegendVerticalAlignment.CENTER) {
+                        if (mLegend!!.getVerticalAlignment() === LegendVerticalAlignment.CENTER) {
                             // this is the space between the legend and the chart
                             val spacing = convertDpToPixel(13f)
                             xLegendOffset = fullLegendWidth + spacing
@@ -128,20 +108,20 @@ abstract class PieRadarChartBase<T : ChartData<out IDataSet<out Entry?>?>?> : Ch
                             // this is the space between the legend and the chart
                             val spacing = convertDpToPixel(8f)
                             val legendWidth = fullLegendWidth + spacing
-                            val legendHeight = mLegend.mNeededHeight + mLegend.mTextHeightMax
-                            val center = center
-                            val bottomX = if (mLegend.horizontalAlignment ===
+                            val legendHeight = mLegend!!.mNeededHeight + mLegend!!.mTextHeightMax
+                            val center = getCenter()
+                            val bottomX = if (mLegend!!.getHorizontalAlignment() ===
                                 LegendHorizontalAlignment.RIGHT
-                            ) getWidth() - legendWidth + 15f else legendWidth - 15f
+                            ) width - legendWidth + 15f else legendWidth - 15f
                             val bottomY = legendHeight + 15f
                             val distLegend = distanceToCenter(bottomX, bottomY)
                             val reference = getPosition(
-                                center, radius,
+                                center, getRadius(),
                                 getAngleForPoint(bottomX, bottomY)
                             )
                             val distReference = distanceToCenter(reference.x, reference.y)
                             val minOffset = convertDpToPixel(5f)
-                            if (bottomY >= center.y && getHeight() - legendWidth > getWidth()) {
+                            if (bottomY >= center.y && height - legendWidth > width) {
                                 xLegendOffset = legendWidth
                             } else if (distLegend < distReference) {
                                 val diff = distReference - distLegend
@@ -151,71 +131,67 @@ abstract class PieRadarChartBase<T : ChartData<out IDataSet<out Entry?>?>?> : Ch
                             recycleInstance(reference)
                         }
                     }
-                    when (mLegend!!.horizontalAlignment) {
+                    when (mLegend!!.getHorizontalAlignment()) {
                         LegendHorizontalAlignment.LEFT -> legendLeft = xLegendOffset
                         LegendHorizontalAlignment.RIGHT -> legendRight = xLegendOffset
-                        LegendHorizontalAlignment.CENTER -> when (mLegend!!.verticalAlignment) {
+                        LegendHorizontalAlignment.CENTER -> when (mLegend!!.getVerticalAlignment()) {
                             LegendVerticalAlignment.TOP -> legendTop = Math.min(
-                                mLegend.mNeededHeight,
-                                mViewPortHandler.chartHeight * mLegend.maxSizePercent
+                                mLegend!!.mNeededHeight,
+                                mViewPortHandler.chartHeight * mLegend!!.getMaxSizePercent()
                             )
                             LegendVerticalAlignment.BOTTOM -> legendBottom = Math.min(
-                                mLegend.mNeededHeight,
-                                mViewPortHandler.chartHeight * mLegend.maxSizePercent
+                                mLegend!!.mNeededHeight,
+                                mViewPortHandler.chartHeight * mLegend!!.getMaxSizePercent()
                             )
+                            else -> {}
                         }
                     }
                 }
                 LegendOrientation.HORIZONTAL -> {
                     var yLegendOffset = 0f
-                    if (mLegend.verticalAlignment === LegendVerticalAlignment.TOP ||
-                        mLegend.verticalAlignment === LegendVerticalAlignment.BOTTOM
+                    if (mLegend!!.getVerticalAlignment() === LegendVerticalAlignment.TOP ||
+                        mLegend!!.getVerticalAlignment() === LegendVerticalAlignment.BOTTOM
                     ) {
 
                         // It's possible that we do not need this offset anymore as it
                         //   is available through the extraOffsets, but changing it can mean
                         //   changing default visibility for existing apps.
-                        val yOffset = requiredLegendOffset
+                        val yOffset = getRequiredLegendOffset()
                         yLegendOffset = Math.min(
-                            mLegend.mNeededHeight + yOffset,
-                            mViewPortHandler.chartHeight * mLegend.maxSizePercent
+                            mLegend!!.mNeededHeight + yOffset,
+                            mViewPortHandler.chartHeight * mLegend!!.getMaxSizePercent()
                         )
-                        when (mLegend.verticalAlignment) {
+                        when (mLegend!!.getVerticalAlignment()) {
                             LegendVerticalAlignment.TOP -> legendTop = yLegendOffset
                             LegendVerticalAlignment.BOTTOM -> legendBottom = yLegendOffset
+                            else -> {}
                         }
                     }
                 }
             }
-            legendLeft += requiredBaseOffset
-            legendRight += requiredBaseOffset
-            legendTop += requiredBaseOffset
-            legendBottom += requiredBaseOffset
+            legendLeft += getRequiredBaseOffset()
+            legendRight += getRequiredBaseOffset()
+            legendTop += getRequiredBaseOffset()
+            legendBottom += getRequiredBaseOffset()
         }
-        var minOffset = convertDpToPixel(
-            minOffset
-        )
+        var minOffset = convertDpToPixel(mMinOffset)
         if (this is RadarChart) {
             val x = getXAxis()
-            if (x!!.isEnabled && x!!.isDrawLabelsEnabled) {
-                minOffset = Math.max(minOffset, x!!.mLabelRotatedWidth)
+            if (x!!.isEnabled() && x.isDrawLabelsEnabled()) {
+                minOffset = Math.max(minOffset, x.mLabelRotatedWidth)
             }
         }
-        legendTop += extraTopOffset
-        legendRight += extraRightOffset
-        legendBottom += extraBottomOffset
-        legendLeft += extraLeftOffset
+        legendTop += getExtraTopOffset()
+        legendRight += getExtraRightOffset()
+        legendBottom += getExtraBottomOffset()
+        legendLeft += getExtraLeftOffset()
         val offsetLeft = Math.max(minOffset, legendLeft)
         val offsetTop = Math.max(minOffset, legendTop)
         val offsetRight = Math.max(minOffset, legendRight)
-        val offsetBottom = Math.max(
-            minOffset, Math.max(
-                requiredBaseOffset, legendBottom
-            )
-        )
+        val offsetBottom = Math.max(minOffset, Math.max(getRequiredBaseOffset(), legendBottom))
         mViewPortHandler.restrainViewPort(offsetLeft, offsetTop, offsetRight, offsetBottom)
         if (mLogEnabled) Log.i(
-            Chart.Companion.LOG_TAG, "offsetLeft: " + offsetLeft + ", offsetTop: " + offsetTop
+            LOG_TAG, "offsetLeft: " + offsetLeft + ", offsetTop: " + offsetTop
                     + ", offsetRight: " + offsetRight + ", offsetBottom: " + offsetBottom
         )
     }
@@ -229,9 +205,9 @@ abstract class PieRadarChartBase<T : ChartData<out IDataSet<out Entry?>?>?> : Ch
      * @param y
      * @return
      */
-    fun getAngleForPoint(x: Float, y: Float): Float {
-        val c: MPPointF = getCenterOffsets()
-        val tx = (x - c.x).toDouble()
+    open fun getAngleForPoint(x: Float, y: Float): Float {
+        val c = getCenterOffsets()
+        val tx = (x - c!!.x).toDouble()
         val ty = (y - c.y).toDouble()
         val length = Math.sqrt(tx * tx + ty * ty)
         val r = Math.acos(ty / length)
@@ -257,13 +233,13 @@ abstract class PieRadarChartBase<T : ChartData<out IDataSet<out Entry?>?>?> : Ch
      * @param angle  in degrees, converted to radians internally
      * @return
      */
-    fun getPosition(center: MPPointF, dist: Float, angle: Float): MPPointF {
-        val p = MPPointF.getInstance(0, 0)
+    open fun getPosition(center: MPPointF, dist: Float, angle: Float): MPPointF {
+        val p = getInstance(0f, 0f)
         getPosition(center, dist, angle, p)
         return p
     }
 
-    fun getPosition(center: MPPointF, dist: Float, angle: Float, outputPoint: MPPointF) {
+    open fun getPosition(center: MPPointF, dist: Float, angle: Float, outputPoint: MPPointF) {
         outputPoint.x = (center.x + dist * Math.cos(Math.toRadians(angle.toDouble()))).toFloat()
         outputPoint.y = (center.y + dist * Math.sin(Math.toRadians(angle.toDouble()))).toFloat()
     }
@@ -276,12 +252,12 @@ abstract class PieRadarChartBase<T : ChartData<out IDataSet<out Entry?>?>?> : Ch
      * @param y
      * @return
      */
-    fun distanceToCenter(x: Float, y: Float): Float {
-        val c: MPPointF = getCenterOffsets()
+    open fun distanceToCenter(x: Float, y: Float): Float {
+        val c = getCenterOffsets()
         var dist = 0f
         var xDist = 0f
         var yDist = 0f
-        xDist = if (x > c.x) {
+        xDist = if (x > c!!.x) {
             x - c.x
         } else {
             c.x - x
@@ -307,55 +283,100 @@ abstract class PieRadarChartBase<T : ChartData<out IDataSet<out Entry?>?>?> : Ch
      * @return
      */
     abstract fun getIndexForAngle(angle: Float): Int
-    /**
-     * gets a normalized version of the current rotation angle of the pie chart,
-     * which will always be between 0.0 < 360.0
-     *
-     * @return
-     */
+
     /**
      * Set an offset for the rotation of the RadarChart in degrees. Default 270f
      * --> top (NORTH)
      *
      * @param angle
      */
-    var rotationAngle: Float
-        get() = mRotationAngle
-        set(angle) {
-            rawRotationAngle = angle
-            mRotationAngle = getNormalizedAngle(
-                rawRotationAngle
-            )
-        }
+    open fun setRotationAngle(angle: Float) {
+        mRawRotationAngle = angle
+        mRotationAngle = getNormalizedAngle(mRawRotationAngle)
+    }
+
+    /**
+     * gets the raw version of the current rotation angle of the pie chart the
+     * returned value could be any value, negative or positive, outside of the
+     * 360 degrees. this is used when working with rotation direction, mainly by
+     * gestures and animations.
+     *
+     * @return
+     */
+    open fun getRawRotationAngle(): Float {
+        return mRawRotationAngle
+    }
+
+    /**
+     * gets a normalized version of the current rotation angle of the pie chart,
+     * which will always be between 0.0 < 360.0
+     *
+     * @return
+     */
+    open fun getRotationAngle(): Float {
+        return mRotationAngle
+    }
+
+    /**
+     * Set this to true to enable the rotation / spinning of the chart by touch.
+     * Set it to false to disable it. Default: true
+     *
+     * @param enabled
+     */
+    open fun setRotationEnabled(enabled: Boolean) {
+        mRotateEnabled = enabled
+    }
+
+    /**
+     * Returns true if rotation of the chart by touch is enabled, false if not.
+     *
+     * @return
+     */
+    open fun isRotationEnabled(): Boolean {
+        return mRotateEnabled
+    }
+
+    /**
+     * Gets the minimum offset (padding) around the chart, defaults to 0.f
+     */
+    open fun getMinOffset(): Float {
+        return mMinOffset
+    }
+
+    /**
+     * Sets the minimum offset (padding) around the chart, defaults to 0.f
+     */
+    open fun setMinOffset(minOffset: Float) {
+        mMinOffset = minOffset
+    }
 
     /**
      * returns the diameter of the pie- or radar-chart
      *
      * @return
      */
-    val diameter: Float
-        get() {
-            val content = mViewPortHandler.contentRect
-            content.left += extraLeftOffset
-            content.top += extraTopOffset
-            content.right -= extraRightOffset
-            content.bottom -= extraBottomOffset
-            return Math.min(content.width(), content.height())
-        }
+    open fun getDiameter(): Float {
+        val content = mViewPortHandler.contentRect
+        content.left += getExtraLeftOffset()
+        content.top += getExtraTopOffset()
+        content.right -= getExtraRightOffset()
+        content.bottom -= getExtraBottomOffset()
+        return Math.min(content.width(), content.height())
+    }
 
     /**
      * Returns the radius of the chart in pixels.
      *
      * @return
      */
-    abstract val radius: Float
+    abstract fun getRadius(): Float
 
     /**
      * Returns the required offset for the chart legend.
      *
      * @return
      */
-    protected abstract val requiredLegendOffset: Float
+    protected abstract fun getRequiredLegendOffset(): Float
 
     /**
      * Returns the base offset needed for the chart without calculating the
@@ -363,18 +384,23 @@ abstract class PieRadarChartBase<T : ChartData<out IDataSet<out Entry?>?>?> : Ch
      *
      * @return
      */
-    abstract val requiredBaseOffset: Float
-        protected get
+    protected abstract fun getRequiredBaseOffset(): Float
 
-    // TODO Auto-generated method stub
-    val yChartMax: Float
-        get() =// TODO Auto-generated method stub
-            0
+    override fun getYChartMax(): Float {
+        // TODO Auto-generated method stub
+        return 0f
+    }
 
-    // TODO Auto-generated method stub
-    val yChartMin: Float
-        get() =// TODO Auto-generated method stub
-            0
+    override fun getYChartMin(): Float {
+        // TODO Auto-generated method stub
+        return 0f
+    }
+
+    /**
+     * ################ ################ ################ ################
+     */
+    /** CODE BELOW THIS RELATED TO ANIMATION */
+
     /**
      * ################ ################ ################ ################
      */
@@ -387,8 +413,8 @@ abstract class PieRadarChartBase<T : ChartData<out IDataSet<out Entry?>?>?> : Ch
      * @param toangle
      */
     @SuppressLint("NewApi")
-    fun spin(durationmillis: Int, fromangle: Float, toangle: Float, easing: EasingFunction?) {
-        rotationAngle = fromangle
+    open fun spin(durationmillis: Int, fromangle: Float, toangle: Float, easing: EasingFunction?) {
+        setRotationAngle(fromangle)
         val spinAnimator = ObjectAnimator.ofFloat(
             this, "rotationAngle", fromangle,
             toangle

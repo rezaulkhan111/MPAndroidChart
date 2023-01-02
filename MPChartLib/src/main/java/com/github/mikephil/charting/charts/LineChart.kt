@@ -12,6 +12,7 @@ import com.github.mikephil.charting.renderer.LineChartRenderer
  * @author Philipp Jahoda
  */
 class LineChart : BarLineChartBase<LineData?>, LineDataProvider {
+
     constructor(context: Context?) : super(context) {}
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {}
     constructor(context: Context?, attrs: AttributeSet?, defStyle: Int) : super(
@@ -26,8 +27,9 @@ class LineChart : BarLineChartBase<LineData?>, LineDataProvider {
         mRenderer = LineChartRenderer(this, mAnimator, mViewPortHandler)
     }
 
-    override val lineData: LineData
-        get() = mData!!
+    override fun getLineData(): LineData? {
+        return mData
+    }
 
     override fun onDetachedFromWindow() {
         // releases the bitmap in the renderer to avoid oom error

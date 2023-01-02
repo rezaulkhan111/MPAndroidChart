@@ -4,8 +4,14 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.util.AttributeSet
+import com.github.mikephil.charting.components.YAxis
+import com.github.mikephil.charting.components.YAxis.AxisDependency
+import com.github.mikephil.charting.highlight.RadarHighlighter
+import com.github.mikephil.charting.renderer.RadarChartRenderer
 import com.github.mikephil.charting.renderer.XAxisRendererRadarChart
-import com.github.mikephil.charting.utils.Utils
+import com.github.mikephil.charting.renderer.YAxisRendererRadarChart
+import com.github.mikephil.charting.utils.Utils.convertDpToPixel
+import com.github.mikephil.charting.utils.Utils.getNormalizedAngle
 
 /**
  * Implementation of the RadarChart, a "spidernet"-like chart. It works best
@@ -23,43 +29,21 @@ class RadarChart : PieRadarChartBase<RadarData?> {
      * width of the inner web lines
      */
     private var mInnerWebLineWidth = 1.5f
-    /**
-     * Sets the color for the web lines that come from the center. Don't forget
-     * to use getResources().getColor(...) when loading a color from the
-     * resources. Default: Color.rgb(122, 122, 122)
-     *
-     * @param color
-     */
+
     /**
      * color for the main web lines
      */
-    var webColor = Color.rgb(122, 122, 122)
-    /**
-     * Sets the color for the web lines in between the lines that come from the
-     * center. Don't forget to use getResources().getColor(...) when loading a
-     * color from the resources. Default: Color.rgb(122, 122, 122)
-     *
-     * @param color
-     */
+    private var mWebColor = Color.rgb(122, 122, 122)
+
     /**
      * color for the inner web
      */
-    var webColorInner = Color.rgb(122, 122, 122)
-    /**
-     * Returns the alpha value for all web lines.
-     *
-     * @return
-     */
-    /**
-     * Sets the transparency (alpha) value for all web lines, default: 150, 255
-     * = 100% opaque, 0 = 100% transparent
-     *
-     * @param alpha
-     */
+    private var mWebColorInner = Color.rgb(122, 122, 122)
+
     /**
      * transparency the grid is drawn with (0-255)
      */
-    var webAlpha = 150
+    private var mWebAlpha = 150
 
     /**
      * flag indicating if the web lines should be drawn or not
@@ -75,8 +59,9 @@ class RadarChart : PieRadarChartBase<RadarData?> {
      * the object reprsenting the y-axis labels
      */
     private var mYAxis: YAxis? = null
-     var mYAxisRenderer: YAxisRendererRadarChart? = null
-     var mXAxisRenderer: XAxisRendererRadarChart? = null
+
+    protected var mYAxisRenderer: YAxisRendererRadarChart? = null
+    protected var mXAxisRenderer: XAxisRendererRadarChart? = null
 
     constructor(context: Context?) : super(context) {}
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {}
@@ -90,54 +75,58 @@ class RadarChart : PieRadarChartBase<RadarData?> {
     override fun init() {
         super.init()
         mYAxis = YAxis(AxisDependency.LEFT)
-        mYAxis.labelXOffset = 10f
-        mWebLineWidth = Utils.convertDpToPixel(1.5f)
-        mInnerWebLineWidth = Utils.convertDpToPixel(0.75f)
+        mYAxis!!.setLabelXOffset(10f)
+        mWebLineWidth = convertDpToPixel(1.5f)
+        mInnerWebLineWidth = convertDpToPixel(0.75f)
         mRenderer = RadarChartRenderer(this, mAnimator, mViewPortHandler)
-        mYAxisRenderer = YAxisRendererRadarChart(mViewPortHandler, mYAxis, this)
-        mXAxisRenderer = XAxisRendererRadarChart(mViewPortHandler, mXAxis, this)
+        mYAxisRenderer = YAxisRendererRadarChart(mViewPortHandler, mYAxis!!, this)
+        mXAxisRenderer = XAxisRendererRadarChart(mViewPortHandler, mXAxis!!, this)
         mHighlighter = RadarHighlighter(this)
     }
 
     override fun calcMinMax() {
         super.calcMinMax()
-        mYAxis.calculate(mData.getYMin(AxisDependency.LEFT), mData.getYMax(AxisDependency.LEFT))
-        mXAxis.calculate(0f, mData.maxEntryCountSet.entryCount.toFloat())
+        mYAxis!!.calculate(mData.getYMin(AxisDependency.LEFT), mData.getYMax(AxisDependency.LEFT))
+        mXAxis!!.calculate(0f, mData.getMaxEntryCountSet().getEntryCount().toFloat())
     }
 
     override fun notifyDataSetChanged() {
         if (mData == null) return
         calcMinMax()
-        mYAxisRenderer.computeAxis(mYAxis.mAxisMinimum, mYAxis.mAxisMaximum, mYAxis.isInverted)
-        mXAxisRenderer.computeAxis(mXAxis.mAxisMinimum, mXAxis.mAxisMaximum, false)
-        if (mLegend != null && !mLegend.isLegendCustom) mLegendRenderer.computeLegend(mData)
+        mYAxisRenderer!!.computeAxis(
+            mYAxis!!.mAxisMinimum,
+            mYAxis!!.mAxisMaximum,
+            mYAxis!!.isInverted()
+        )
+        mXAxisRenderer!!.computeAxis(mXAxis!!.mAxisMinimum, mXAxis!!.mAxisMaximum, false)
+        if (mLegend != null && !mLegend!!.isLegendCustom()) mLegendRenderer!!.computeLegend(mData)
         calculateOffsets()
     }
 
-    override fun onDraw(canvas: Canvas) {
-        super.onDraw(canvas)
+    protected fun onDraw(canvas: Canvas?) {
+        super.onDraw(canvas!!)
         if (mData == null) return
 
 //        if (mYAxis.isEnabled())
 //            mYAxisRenderer.computeAxis(mYAxis.mAxisMinimum, mYAxis.mAxisMaximum, mYAxis.isInverted());
-        if (mXAxis.isEnabled) mXAxisRenderer.computeAxis(
-            mXAxis.mAxisMinimum,
-            mXAxis.mAxisMaximum,
+        if (mXAxis!!.isEnabled()) mXAxisRenderer!!.computeAxis(
+            mXAxis!!.mAxisMinimum,
+            mXAxis!!.mAxisMaximum,
             false
         )
-        mXAxisRenderer.renderAxisLabels(canvas)
-        if (mDrawWeb) mRenderer.drawExtras(canvas)
-        if (mYAxis.isEnabled && mYAxis.isDrawLimitLinesBehindDataEnabled) mYAxisRenderer.renderLimitLines(
+        mXAxisRenderer!!.renderAxisLabels(canvas)
+        if (mDrawWeb) mRenderer!!.drawExtras(canvas)
+        if (mYAxis!!.isEnabled() && mYAxis!!.isDrawLimitLinesBehindDataEnabled()) mYAxisRenderer!!.renderLimitLines(
             canvas
         )
-        mRenderer.drawData(canvas)
-        if (valuesToHighlight()) mRenderer.drawHighlighted(canvas, mIndicesToHighlight)
-        if (mYAxis.isEnabled && !mYAxis.isDrawLimitLinesBehindDataEnabled) mYAxisRenderer.renderLimitLines(
+        mRenderer!!.drawData(canvas)
+        if (valuesToHighlight()) mRenderer!!.drawHighlighted(canvas, mIndicesToHighlight)
+        if (mYAxis!!.isEnabled() && !mYAxis!!.isDrawLimitLinesBehindDataEnabled()) mYAxisRenderer!!.renderLimitLines(
             canvas
         )
-        mYAxisRenderer.renderAxisLabels(canvas)
-        mRenderer.drawValues(canvas)
-        mLegendRenderer.renderLegend(canvas)
+        mYAxisRenderer!!.renderAxisLabels(canvas)
+        mRenderer!!.drawValues(canvas)
+        mLegendRenderer!!.renderLegend(canvas)
         drawDescription(canvas)
         drawMarkers(canvas)
     }
@@ -147,26 +136,26 @@ class RadarChart : PieRadarChartBase<RadarData?> {
      *
      * @return
      */
-    val factor: Float
-        get() {
-            val content: RectF = mViewPortHandler.contentRect
-            return Math.min(content.width() / 2f, content.height() / 2f) / mYAxis.mAxisRange
-        }
+    fun getFactor(): Float {
+        val content = mViewPortHandler.contentRect
+        return Math.min(content.width() / 2f, content.height() / 2f) / mYAxis!!.mAxisRange
+    }
 
     /**
      * Returns the angle that each slice in the radar chart occupies.
      *
      * @return
      */
-    val sliceAngle: Float
-        get() = 360f / mData.maxEntryCountSet.entryCount.toFloat()
+    fun getSliceAngle(): Float {
+        return 360f / mData.getMaxEntryCountSet().getEntryCount().toFloat()
+    }
 
     override fun getIndexForAngle(angle: Float): Int {
 
         // take the current angle of the chart into consideration
-        val a = Utils.getNormalizedAngle(angle - rotationAngle)
-        val sliceangle = sliceAngle
-        val max: Int = mData.maxEntryCountSet.entryCount
+        val a = getNormalizedAngle(angle - getRotationAngle())
+        val sliceangle = getSliceAngle()
+        val max: Int = mData.getMaxEntryCountSet().getEntryCount()
         var index = 0
         for (i in 0 until max) {
             val referenceAngle = sliceangle * (i + 1) - sliceangle / 2f
@@ -183,19 +172,22 @@ class RadarChart : PieRadarChartBase<RadarData?> {
      *
      * @return
      */
-    val yAxis: YAxis?
-        get() = mYAxis
+    fun getYAxis(): YAxis? {
+        return mYAxis
+    }
 
     /**
      * Sets the width of the web lines that come from the center.
      *
      * @param width
      */
-    var webLineWidth: Float
-        get() = mWebLineWidth
-        set(width) {
-            mWebLineWidth = Utils.convertDpToPixel(width)
-        }
+    fun setWebLineWidth(width: Float) {
+        mWebLineWidth = convertDpToPixel(width)
+    }
+
+    fun getWebLineWidth(): Float {
+        return mWebLineWidth
+    }
 
     /**
      * Sets the width of the web lines that are in between the lines coming from
@@ -203,11 +195,62 @@ class RadarChart : PieRadarChartBase<RadarData?> {
      *
      * @param width
      */
-    var webLineWidthInner: Float
-        get() = mInnerWebLineWidth
-        set(width) {
-            mInnerWebLineWidth = Utils.convertDpToPixel(width)
-        }
+    fun setWebLineWidthInner(width: Float) {
+        mInnerWebLineWidth = convertDpToPixel(width)
+    }
+
+    fun getWebLineWidthInner(): Float {
+        return mInnerWebLineWidth
+    }
+
+    /**
+     * Sets the transparency (alpha) value for all web lines, default: 150, 255
+     * = 100% opaque, 0 = 100% transparent
+     *
+     * @param alpha
+     */
+    fun setWebAlpha(alpha: Int) {
+        mWebAlpha = alpha
+    }
+
+    /**
+     * Returns the alpha value for all web lines.
+     *
+     * @return
+     */
+    fun getWebAlpha(): Int {
+        return mWebAlpha
+    }
+
+    /**
+     * Sets the color for the web lines that come from the center. Don't forget
+     * to use getResources().getColor(...) when loading a color from the
+     * resources. Default: Color.rgb(122, 122, 122)
+     *
+     * @param color
+     */
+    fun setWebColor(color: Int) {
+        mWebColor = color
+    }
+
+    fun getWebColor(): Int {
+        return mWebColor
+    }
+
+    /**
+     * Sets the color for the web lines in between the lines that come from the
+     * center. Don't forget to use getResources().getColor(...) when loading a
+     * color from the resources. Default: Color.rgb(122, 122, 122)
+     *
+     * @param color
+     */
+    fun setWebColorInner(color: Int) {
+        mWebColorInner = color
+    }
+
+    fun getWebColorInner(): Int {
+        return mWebColorInner
+    }
 
     /**
      * If set to true, drawing the web is enabled, if set to false, drawing the
@@ -218,51 +261,61 @@ class RadarChart : PieRadarChartBase<RadarData?> {
     fun setDrawWeb(enabled: Boolean) {
         mDrawWeb = enabled
     }
-    /**
-     * Returns the modulus that is used for skipping web-lines.
-     *
-     * @return
-     */
+
     /**
      * Sets the number of web-lines that should be skipped on chart web before the
      * next one is drawn. This targets the lines that come from the center of the RadarChart.
      *
      * @param count if count = 1 -> 1 line is skipped in between
      */
-    var skipWebLineCount: Int
-        get() = mSkipWebLineCount
-        set(count) {
-            mSkipWebLineCount = Math.max(0, count)
-        }
-    protected override val requiredLegendOffset: Float
-        protected get() = mLegendRenderer.labelPaint.textSize * 4f
-    protected override val requiredBaseOffset: Float
-        protected get() = if (mXAxis.isEnabled && mXAxis.isDrawLabelsEnabled) mXAxis.mLabelRotatedWidth else Utils.convertDpToPixel(
+    fun setSkipWebLineCount(count: Int) {
+        mSkipWebLineCount = Math.max(0, count)
+    }
+
+    /**
+     * Returns the modulus that is used for skipping web-lines.
+     *
+     * @return
+     */
+    fun getSkipWebLineCount(): Int {
+        return mSkipWebLineCount
+    }
+
+    override fun getRequiredLegendOffset(): Float {
+        return mLegendRenderer!!.labelPaint.textSize * 4f
+    }
+
+    override fun getRequiredBaseOffset(): Float {
+        return if (mXAxis!!.isEnabled() && mXAxis!!.isDrawLabelsEnabled()) mXAxis!!.mLabelRotatedWidth.toFloat() else convertDpToPixel(
             10f
         )
-    override val radius: Float
-        get() {
-            val content: RectF = mViewPortHandler.contentRect
-            return Math.min(content.width() / 2f, content.height() / 2f)
-        }
+    }
+
+    override fun getRadius(): Float {
+        val content = mViewPortHandler.contentRect
+        return Math.min(content.width() / 2f, content.height() / 2f)
+    }
 
     /**
      * Returns the maximum value this chart can display on it's y-axis.
      */
-    override val yChartMax: Float
-        get() = mYAxis.mAxisMaximum
+    override fun getYChartMax(): Float {
+        return mYAxis!!.mAxisMaximum
+    }
 
     /**
      * Returns the minimum value this chart can display on it's y-axis.
      */
-    override val yChartMin: Float
-        get() = mYAxis.mAxisMinimum
+    override fun getYChartMin(): Float {
+        return mYAxis!!.mAxisMinimum
+    }
 
     /**
      * Returns the range of y-values this chart can display.
      *
      * @return
      */
-    val yRange: Float
-        get() = mYAxis.mAxisRange
+    fun getYRange(): Float {
+        return mYAxis!!.mAxisRange
+    }
 }

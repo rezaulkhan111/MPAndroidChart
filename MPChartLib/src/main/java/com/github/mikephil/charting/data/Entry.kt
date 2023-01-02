@@ -97,7 +97,7 @@ open class Entry : BaseEntry, Parcelable {
      *
      * @return
      */
-    open fun copy(): Entry {
+    open fun copy(): Entry? {
         return Entry(x, getY(), getData())
     }
 
