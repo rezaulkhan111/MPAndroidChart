@@ -1,7 +1,6 @@
 package com.github.mikephil.charting.highlight
 
 import com.github.mikephil.charting.data.DataSet.Rounding
-import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.interfaces.dataprovider.BarDataProvider
 import com.github.mikephil.charting.interfaces.datasets.IDataSet
 import com.github.mikephil.charting.utils.MPPointD.Companion.recycleInstance
@@ -9,13 +8,17 @@ import com.github.mikephil.charting.utils.MPPointD.Companion.recycleInstance
 /**
  * Created by Philipp Jahoda on 22/07/15.
  */
-class HorizontalBarHighlighter(chart: BarDataProvider) : BarHighlighter(chart) {
+class HorizontalBarHighlighter : BarHighlighter {
+
+    constructor(chart: BarDataProvider) : super(chart) {
+    }
+
     override fun getHighlight(x: Float, y: Float): Highlight? {
-        val barData = mChart!!.barData
+        val barData = mChart!!.getBarData()
         val pos = getValsForTouch(y, x)
-        val high = getHighlightForX(pos!!.y.toFloat(), y, x) ?: return null
-        val set = barData!!.getDataSetByIndex(high.dataSetIndex)
-        if (set.isStacked) {
+        val high = getHighlightForX(pos.y.toFloat(), y, x) ?: return null
+        val set = barData.getDataSetByIndex(high.getDataSetIndex())
+        if (set!!.isStacked()) {
             return getStackedHighlight(
                 high,
                 set, pos.y.toFloat(), pos.x.toFloat()
@@ -25,30 +28,33 @@ class HorizontalBarHighlighter(chart: BarDataProvider) : BarHighlighter(chart) {
         return high
     }
 
-    override fun buildHighlights(
+    protected fun buildHighlights(
         set: IDataSet<*>,
         dataSetIndex: Int,
         xVal: Float,
         rounding: Rounding?
-    ): List<Highlight> {
+    ): List<Highlight>? {
         val highlights = ArrayList<Highlight>()
-        var entries: List<Entry>? = set.getEntriesForXValue(xVal)
-        if (entries!!.size == 0) {
+        var entries = set.getEntriesForXValue(xVal)
+        if (entries.size == 0) {
             // Try to find closest x-value and take all entries for that x-value
-            val closest = set.getEntryForXValue(xVal, Float.NaN, rounding)
+            val closest = set.getEntryForXValue(
+                xVal, Float.NaN,
+                rounding!!
+            )
             if (closest != null) {
-                entries = set.getEntriesForXValue(closest.x)
+                entries = set.getEntriesForXValue(closest.getX())
             }
         }
-        if (entries!!.size == 0) return highlights
+        if (entries.size == 0) return highlights
         for (e in entries) {
             val pixels = mChart!!.getTransformer(
-                set.axisDependency
-            )!!.getPixelForValues(e.y, e.x)
+                set.getAxisDependency()
+            ).getPixelForValues(e.getY(), e.getX())
             highlights.add(
                 Highlight(
-                    e.x, e.y, pixels.x.toFloat(), pixels.y.toFloat(),
-                    dataSetIndex, set.axisDependency
+                    e.getX(), e.getY(), pixels.x.toFloat(), pixels.y.toFloat(),
+                    dataSetIndex, set.getAxisDependency()
                 )
             )
         }

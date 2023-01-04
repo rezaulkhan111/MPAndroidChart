@@ -5,8 +5,8 @@ import android.graphics.Paint
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.github.mikephil.charting.utils.FSize
 import com.github.mikephil.charting.utils.FSize.Companion.getInstance
+import com.github.mikephil.charting.utils.Utils
 import com.github.mikephil.charting.utils.Utils.calcTextHeight
-import com.github.mikephil.charting.utils.Utils.calcTextSize
 import com.github.mikephil.charting.utils.Utils.calcTextWidth
 import com.github.mikephil.charting.utils.Utils.convertDpToPixel
 import com.github.mikephil.charting.utils.Utils.getLineHeight
@@ -168,7 +168,7 @@ class Legend : ComponentBase {
      *
      * @param entries
      */
-    fun setEntries(entries: List<LegendEntry>) {
+    fun setEntries(entries: MutableList<LegendEntry>) {
         mEntries = entries.toTypedArray()
     }
 
@@ -215,7 +215,7 @@ class Legend : ComponentBase {
         return max
     }
 
-    fun getExtraEntries(): Array<LegendEntry?>? {
+    fun getExtraEntries(): Array<LegendEntry?> {
         return mExtraEntries
     }
 
@@ -718,9 +718,9 @@ class Legend : ComponentBase {
                     // grouped forms have null labels
                     if (label != null) {
                         mCalculatedLabelSizes.add(
-                            calcTextSize(
+                            Utils.calcTextSize(
                                 labelpaint, label
-                            )
+                            )!!
                         )
                         requiredWidth += if (drawingForm) formToTextSpace + formSize else 0f
                         requiredWidth += mCalculatedLabelSizes[i].width

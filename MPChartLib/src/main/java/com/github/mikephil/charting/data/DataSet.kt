@@ -1,7 +1,5 @@
 package com.github.mikephil.charting.data
 
-import kotlin.math.abs
-
 /**
  * The DataSet class represents one group or type of entries (Entry) in the
  * Chart that belong together. It is designed to logically separate different
@@ -46,8 +44,7 @@ abstract class DataSet<T : Entry> : BaseDataSet<T> {
      * @param entries
      * @param label
      */
-    constructor(entries: MutableList<T>?, label: String?) {
-//        super(label)
+    constructor(entries: MutableList<T>?, label: String) : super(label) {
         mEntries = entries
         if (mEntries == null) mEntries = ArrayList()
         calcMinMax()
@@ -155,8 +152,8 @@ abstract class DataSet<T : Entry> : BaseDataSet<T> {
      *
      * @param dataSet
      */
-    protected open fun copy(dataSet: DataSet<*>?) {
-        super.copy(dataSet!!)
+    protected open fun copy(dataSet: DataSet<*>) {
+        super.copy(dataSet)
     }
 
     override fun toString(): String {
@@ -199,7 +196,7 @@ abstract class DataSet<T : Entry> : BaseDataSet<T> {
         return mXMax
     }
 
-    override fun addEntryOrdered(e: T) {
+    override fun addEntryOrdered(e: T?) {
         if (e == null) return
         if (mEntries == null) {
             mEntries = ArrayList()
@@ -218,7 +215,7 @@ abstract class DataSet<T : Entry> : BaseDataSet<T> {
         notifyDataSetChanged()
     }
 
-    override fun addEntry(e: T): Boolean {
+    override fun addEntry(e: T?): Boolean {
         if (e == null) return false
         var values = getEntries()
         if (values == null) {
@@ -230,7 +227,7 @@ abstract class DataSet<T : Entry> : BaseDataSet<T> {
         return values.add(e)
     }
 
-    override fun removeEntry(e: T): Boolean {
+    override fun removeEntry(e: T?): Boolean {
         if (e == null) return false
         if (mEntries == null) return false
 
@@ -246,9 +243,9 @@ abstract class DataSet<T : Entry> : BaseDataSet<T> {
         return mEntries!!.indexOf(e)
     }
 
-    override fun getEntryForXValue(xValue: Float, closestToY: Float, rounding: Rounding?): T? {
-        val index: Int = getEntryIndex(xValue, closestToY, rounding)
-        return if (index > -1) mEntries!![index] else null
+    override fun getEntryForXValue(xValue: Float, closestToY: Float, rounding: Rounding): T? {
+        val index = getEntryIndex(xValue, closestToY, rounding)
+        return if (index > -1) mEntries!!.get(index) else null
     }
 
     override fun getEntryForXValue(xValue: Float, closestToY: Float): T? {
@@ -259,7 +256,7 @@ abstract class DataSet<T : Entry> : BaseDataSet<T> {
         return mEntries!![index]
     }
 
-    override fun getEntryIndex(xValue: Float, closestToY: Float, rounding: Rounding?): Int {
+    override fun getEntryIndex(xValue: Float, closestToY: Float, rounding: Rounding): Int {
         if (mEntries == null || mEntries!!.isEmpty()) return -1
         var low = 0
         var high = mEntries!!.size - 1
@@ -268,8 +265,8 @@ abstract class DataSet<T : Entry> : BaseDataSet<T> {
             val m = (low + high) / 2
             val d1 = mEntries!![m].getX() - xValue
             val d2 = mEntries!![m + 1].getX() - xValue
-            val ad1 = abs(d1)
-            val ad2 = abs(d2)
+            val ad1 = Math.abs(d1)
+            val ad2 = Math.abs(d2)
             if (ad2 < ad1) {
                 // [m + 1] is closer to xValue
                 // Search in an higher place
@@ -314,7 +311,7 @@ abstract class DataSet<T : Entry> : BaseDataSet<T> {
                     if (closest >= mEntries!!.size) break
                     val value: Entry = mEntries!![closest]
                     if (value.getX() != closestXValue) break
-                    if (abs(value.getY() - closestToY) <= abs(closestYValue - closestToY)) {
+                    if (Math.abs(value.getY() - closestToY) <= Math.abs(closestYValue - closestToY)) {
                         closestYValue = closestToY
                         closestYIndex = closest
                     }
@@ -325,7 +322,7 @@ abstract class DataSet<T : Entry> : BaseDataSet<T> {
         return closest
     }
 
-    override fun getEntriesForXValue(xValue: Float): List<T>? {
+    override fun getEntriesForXValue(xValue: Float): MutableList<T> {
         val entries: MutableList<T> = ArrayList()
         var low = 0
         var high = mEntries!!.size - 1

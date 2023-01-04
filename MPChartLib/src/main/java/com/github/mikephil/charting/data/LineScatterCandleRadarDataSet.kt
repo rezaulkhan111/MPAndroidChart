@@ -20,7 +20,8 @@ abstract class LineScatterCandleRadarDataSet<T : Entry> :
     /** the path effect for dashed highlight-lines  */
     private var mHighlightDashPathEffect: DashPathEffect? = null
 
-    constructor(yVals: MutableList<T>?, label: String?) : super(yVals, label) {
+
+    constructor(yVals: MutableList<T>, label: String) : super(yVals, label) {
         mHighlightLineWidth = convertDpToPixel(0.5f)
     }
 
@@ -101,8 +102,8 @@ abstract class LineScatterCandleRadarDataSet<T : Entry> :
         return if (mHighlightDashPathEffect == null) false else true
     }
 
-    override fun getDashPathEffectHighlight(): DashPathEffect? {
-        return mHighlightDashPathEffect
+    override fun getDashPathEffectHighlight(): DashPathEffect {
+        return mHighlightDashPathEffect!!
     }
 
     protected open fun copy(lineScatterCandleRadarDataSet: LineScatterCandleRadarDataSet<*>) {

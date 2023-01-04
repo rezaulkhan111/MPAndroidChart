@@ -8,19 +8,23 @@ import com.github.mikephil.charting.utils.MPPointD.Companion.recycleInstance
 /**
  * Created by Philipp Jahoda on 22/07/15.
  */
-open class BarHighlighter(chart: BarDataProvider) : ChartHighlighter<BarDataProvider?>(chart) {
+open class BarHighlighter : ChartHighlighter<BarDataProvider> {
+
+    constructor(chart: BarDataProvider) : super(chart) {
+    }
+
     override fun getHighlight(x: Float, y: Float): Highlight? {
         val high = super.getHighlight(x, y) ?: return null
         val pos = getValsForTouch(x, y)
-        val barData = mChart!!.barData
-        val set = barData!!.getDataSetByIndex(high.dataSetIndex)
-        if (set.isStacked) {
+        val barData = mChart.getBarData()
+        val set = barData.getDataSetByIndex(high.dataSetIndex)
+        if (set!!.isStacked()) {
             return getStackedHighlight(
                 high,
-                set, pos!!.x.toFloat(), pos.y.toFloat()
+                set, pos.x.toFloat(), pos.y.toFloat()
             )
         }
-        recycleInstance(pos!!)
+        recycleInstance(pos)
         return high
     }
 
@@ -34,26 +38,26 @@ open class BarHighlighter(chart: BarDataProvider) : ChartHighlighter<BarDataProv
      * @param yVal
      * @return
      */
-    fun getStackedHighlight(
+    open fun getStackedHighlight(
         high: Highlight,
-        set: IBarDataSet,
+        set: IBarDataSet?,
         xVal: Float,
         yVal: Float
     ): Highlight? {
-        val entry = set.getEntryForXValue(xVal, yVal) ?: return null
+        val entry = set!!.getEntryForXValue(xVal, yVal) ?: return null
 
         // not stacked
-        if (entry.yVals == null) {
+        if (entry.getYVals() == null) {
             return high
         } else {
-            val ranges = entry.ranges
+            val ranges = entry.getRanges()
             if (ranges.size > 0) {
                 val stackIndex = getClosestStackIndex(ranges, yVal)
-                val pixels = mChart!!.getTransformer(set.axisDependency)!!
+                val pixels = mChart.getTransformer(set.getAxisDependency())
                     .getPixelForValues(high.x, ranges[stackIndex].to)
                 val stackedHigh = Highlight(
-                    entry.x,
-                    entry.y, pixels.x.toFloat(), pixels.y.toFloat(),
+                    entry.getX(),
+                    entry.getY(), pixels.x.toFloat(), pixels.y.toFloat(),
                     high.dataSetIndex,
                     stackIndex,
                     high.axis
@@ -74,7 +78,7 @@ open class BarHighlighter(chart: BarDataProvider) : ChartHighlighter<BarDataProv
      * @param value
      * @return
      */
-     fun getClosestStackIndex(ranges: Array<Range>?, value: Float): Int {
+    protected open fun getClosestStackIndex(ranges: Array<Range>?, value: Float): Int {
         if (ranges == null || ranges.size == 0) return 0
         var stackIndex = 0
         for (range in ranges) {
@@ -84,43 +88,11 @@ open class BarHighlighter(chart: BarDataProvider) : ChartHighlighter<BarDataProv
         return if (value > ranges[length].to) length else 0
     }
 
-    //    /**
-    //     * Splits up the stack-values of the given bar-entry into Range objects.
-    //     *
-    //     * @param entry
-    //     * @return
-    //     */
-    //    protected Range[] getRanges(BarEntry entry) {
-    //
-    //        float[] values = entry.getYVals();
-    //
-    //        if (values == null || values.length == 0)
-    //            return new Range[0];
-    //
-    //        Range[] ranges = new Range[values.length];
-    //
-    //        float negRemain = -entry.getNegativeSum();
-    //        float posRemain = 0f;
-    //
-    //        for (int i = 0; i < ranges.length; i++) {
-    //
-    //            float value = values[i];
-    //
-    //            if (value < 0) {
-    //                ranges[i] = new Range(negRemain, negRemain + Math.abs(value));
-    //                negRemain += Math.abs(value);
-    //            } else {
-    //                ranges[i] = new Range(posRemain, posRemain + value);
-    //                posRemain += value;
-    //            }
-    //        }
-    //
-    //        return ranges;
-    //    }
     override fun getDistance(x1: Float, y1: Float, x2: Float, y2: Float): Float {
         return Math.abs(x1 - x2)
     }
 
-     override val data: BarLineScatterCandleBubbleData<*>?
-         get() = mChart!!.barData
+    protected open fun getData(): BarLineScatterCandleBubbleData<*>? {
+        return mChart.getBarData()
+    }
 }

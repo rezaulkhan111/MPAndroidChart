@@ -10,19 +10,22 @@ import java.text.DecimalFormat
  *
  * @author Philipp Jahoda
  */
-class DefaultValueFormatter(digits: Int) : IValueFormatter {
+class DefaultValueFormatter : IValueFormatter {
     /**
      * DecimalFormat for formatting
      */
-     var mFormat: DecimalFormat? = null
+    private var mFormat: DecimalFormat? = null
+    private var mDecimalDigits = 0
 
     /**
-     * Returns the number of decimal digits this formatter uses.
+     * Constructor that specifies to how many digits the value should be
+     * formatted.
      *
-     * @return
+     * @param digits
      */
-    var decimalDigits = 0
-         set
+    constructor(digits: Int) {
+        setup(digits)
+    }
 
     /**
      * Sets up the formatter with a given number of decimal digits.
@@ -30,7 +33,7 @@ class DefaultValueFormatter(digits: Int) : IValueFormatter {
      * @param digits
      */
     fun setup(digits: Int) {
-        decimalDigits = digits
+        mDecimalDigits = digits
         val b = StringBuffer()
         for (i in 0 until digits) {
             if (i == 0) b.append(".")
@@ -52,12 +55,11 @@ class DefaultValueFormatter(digits: Int) : IValueFormatter {
     }
 
     /**
-     * Constructor that specifies to how many digits the value should be
-     * formatted.
+     * Returns the number of decimal digits this formatter uses.
      *
-     * @param digits
+     * @return
      */
-    init {
-        setup(digits)
+    fun getDecimalDigits(): Int {
+        return mDecimalDigits
     }
 }

@@ -2,9 +2,9 @@ package com.github.mikephil.charting.utils
 
 import android.graphics.*
 import android.graphics.drawable.Drawable
-import java.lang.RuntimeException
 
 open class Fill {
+
     enum class Type {
         EMPTY, COLOR, LINEAR_GRADIENT, DRAWABLE
     }
@@ -16,21 +16,23 @@ open class Fill {
     /**
      * the type of fill
      */
-    var type = Type.EMPTY
+    private var mType = Type.EMPTY
 
     /**
      * the color that is used for filling
      */
-    var color: Int? = null
-        private set
+    private var mColor: Int? = null
+
     private var mFinalColor: Int? = null
 
     /**
      * the drawable to be used for filling
      */
-     var mDrawable: Drawable? = null
-    var gradientColors: IntArray? = null
-    var gradientPositions: FloatArray? = null
+    protected var mDrawable: Drawable? = null
+
+    private var mGradientColors: IntArray? = null
+
+    private var mGradientPositions: FloatArray? = null
 
     /**
      * transparency used for filling
@@ -38,69 +40,99 @@ open class Fill {
     private var mAlpha = 255
 
     constructor() {}
+
     constructor(color: Int) {
-        type = Type.COLOR
-        this.color = color
+        mType = Type.COLOR
+        mColor = color
         calculateFinalColor()
     }
 
     constructor(startColor: Int, endColor: Int) {
-        type = Type.LINEAR_GRADIENT
-        gradientColors = intArrayOf(startColor, endColor)
+        mType = Type.LINEAR_GRADIENT
+        mGradientColors = intArrayOf(startColor, endColor)
     }
 
     constructor(gradientColors: IntArray) {
-        type = Type.LINEAR_GRADIENT
-        this.gradientColors = gradientColors
+        mType = Type.LINEAR_GRADIENT
+        mGradientColors = gradientColors
     }
 
     constructor(gradientColors: IntArray, gradientPositions: FloatArray) {
-        type = Type.LINEAR_GRADIENT
-        this.gradientColors = gradientColors
-        this.gradientPositions = gradientPositions
+        mType = Type.LINEAR_GRADIENT
+        mGradientColors = gradientColors
+        mGradientPositions = gradientPositions
     }
 
     constructor(drawable: Drawable) {
-        type = Type.DRAWABLE
+        mType = Type.DRAWABLE
         mDrawable = drawable
     }
 
-    fun setColor(color: Int) {
-        this.color = color
+    open fun getType(): Type? {
+        return mType
+    }
+
+    open fun setType(type: Type) {
+        mType = type
+    }
+
+    open fun getColor(): Int? {
+        return mColor
+    }
+
+    open fun setColor(color: Int) {
+        mColor = color
         calculateFinalColor()
     }
 
-    fun setGradientColors(startColor: Int, endColor: Int) {
-        gradientColors = intArrayOf(startColor, endColor)
+    open fun getGradientColors(): IntArray? {
+        return mGradientColors
     }
 
-    var alpha: Int
-        get() = mAlpha
-        set(alpha) {
-            mAlpha = alpha
-            calculateFinalColor()
-        }
+    open fun setGradientColors(colors: IntArray?) {
+        mGradientColors = colors
+    }
+
+    open fun getGradientPositions(): FloatArray? {
+        return mGradientPositions
+    }
+
+    open fun setGradientPositions(positions: FloatArray?) {
+        mGradientPositions = positions
+    }
+
+    open fun setGradientColors(startColor: Int, endColor: Int) {
+        mGradientColors = intArrayOf(startColor, endColor)
+    }
+
+    open fun getAlpha(): Int {
+        return mAlpha
+    }
+
+    open fun setAlpha(alpha: Int) {
+        mAlpha = alpha
+        calculateFinalColor()
+    }
 
     private fun calculateFinalColor() {
-        mFinalColor = if (color == null) {
+        mFinalColor = if (mColor == null) {
             null
         } else {
-            val alpha =
-                Math.floor((color!! shr 24) / 255.0 * (mAlpha / 255.0) * 255.0).toInt()
-            alpha shl 24 or (color!! and 0xffffff)
+            val alpha = Math.floor((mColor!! shr 24) / 255.0 * (mAlpha / 255.0) * 255.0).toInt()
+            alpha shl 24 or (mColor!! and 0xffffff)
         }
     }
 
-    fun fillRect(
+    open fun fillRect(
         c: Canvas, paint: Paint,
         left: Float, top: Float, right: Float, bottom: Float,
         gradientDirection: Direction
     ) {
-        when (type) {
+        when (mType) {
             Type.EMPTY -> return
             Type.COLOR -> {
                 if (mFinalColor == null) return
-                if (isClipPathSupported) {
+                if (isClipPathSupported()) {
                     val save = c.save()
                     c.clipRect(left, top, right, bottom)
                     c.drawColor(mFinalColor!!)
@@ -121,14 +153,18 @@ open class Fill {
                 }
             }
             Type.LINEAR_GRADIENT -> {
-                if (gradientColors == null) return
-                val gradient = LinearGradient(
-                    (if (gradientDirection == Direction.RIGHT) right else if (gradientDirection == Direction.LEFT) left else left).toFloat(),
-                    (if (gradientDirection == Direction.UP) bottom else if (gradientDirection == Direction.DOWN) top else top).toFloat(),
-                    (if (gradientDirection == Direction.RIGHT) left else if (gradientDirection == Direction.LEFT) right else left).toFloat(),
-                    (if (gradientDirection == Direction.UP) top else if (gradientDirection == Direction.DOWN) bottom else top).toFloat(),
-                    gradientColors!!,
-                    gradientPositions,
+                if (mGradientColors == null) return
+                val gradient: LinearGradient = LinearGradient(
+                    (if (gradientDirection == Direction.RIGHT) right else if (gradientDirection == Direction.LEFT) left else left).toInt()
+                        .toFloat(),
+                    (if (gradientDirection == Direction.UP) bottom else if (gradientDirection == Direction.DOWN) top else top).toInt()
+                        .toFloat(),
+                    (if (gradientDirection == Direction.RIGHT) left else if (gradientDirection == Direction.LEFT) right else left).toInt()
+                        .toFloat(),
+                    (if (gradientDirection == Direction.UP) top else if (gradientDirection == Direction.DOWN) bottom else top).toInt()
+                        .toFloat(),
+                    mGradientColors!!,
+                    mGradientPositions,
                     Shader.TileMode.MIRROR
                 )
                 paint.shader = gradient
@@ -142,15 +178,15 @@ open class Fill {
         }
     }
 
-    fun fillPath(
+    open fun fillPath(
         c: Canvas, path: Path?, paint: Paint,
         clipRect: RectF?
     ) {
-        when (type) {
+        when (mType) {
             Type.EMPTY -> return
             Type.COLOR -> {
                 if (mFinalColor == null) return
-                if (clipRect != null && isClipPathSupported) {
+                if (clipRect != null && isClipPathSupported()) {
                     val save = c.save()
                     c.clipPath(path!!)
                     c.drawColor(mFinalColor!!)
@@ -171,14 +207,14 @@ open class Fill {
                 }
             }
             Type.LINEAR_GRADIENT -> {
-                if (gradientColors == null) return
+                if (mGradientColors == null) return
                 val gradient = LinearGradient(
-                    0F,
-                    0F,
+                    0f,
+                    0f,
                     c.width.toFloat(),
                     c.height.toFloat(),
-                    gradientColors!!,
-                    gradientPositions,
+                    mGradientColors!!,
+                    mGradientPositions,
                     Shader.TileMode.MIRROR
                 )
                 paint.shader = gradient
@@ -201,14 +237,15 @@ open class Fill {
         }
     }
 
-    private val isClipPathSupported: Boolean
-        private get() = Utils.sDKInt >= 18
+    private fun isClipPathSupported(): Boolean {
+        return Utils.getSDKInt() >= 18
+    }
 
     private fun ensureClipPathSupported() {
-        if (Utils.sDKInt < 18) {
+        if (Utils.getSDKInt() < 18) {
             throw RuntimeException(
                 "Fill-drawables not (yet) supported below API level 18, " +
-                        "this code was run on API level " + Utils.sDKInt + "."
+                        "this code was run on API level " + Utils.getSDKInt() + "."
             )
         }
     }

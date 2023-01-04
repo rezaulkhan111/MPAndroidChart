@@ -7,6 +7,13 @@ import com.github.mikephil.charting.utils.ViewPortHandler
  *
  * @author Philipp Jahoda
  */
-abstract class Renderer(viewPortHandler: ViewPortHandler?) {
-    protected var mViewPortHandler: ViewPortHandler = viewPortHandler
+abstract class Renderer {
+    /**
+     * the component that handles the drawing area of the chart and it's offsets
+     */
+    protected var mViewPortHandler: ViewPortHandler? = null
+
+    constructor(viewPortHandler: ViewPortHandler?) {
+        mViewPortHandler = viewPortHandler
+    }
 }

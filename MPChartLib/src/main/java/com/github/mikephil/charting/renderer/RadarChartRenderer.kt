@@ -3,45 +3,62 @@ package com.github.mikephil.charting.renderer
 import android.graphics.*
 import com.github.mikephil.charting.animation.ChartAnimator
 import com.github.mikephil.charting.charts.RadarChart
+import com.github.mikephil.charting.data.RadarData
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.interfaces.datasets.IRadarDataSet
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.github.mikephil.charting.utils.ColorTemplate.colorWithAlpha
-import com.github.mikephil.charting.utils.FSize.Companion.recycleInstance
-import com.github.mikephil.charting.utils.MPPointD.Companion.recycleInstance
 import com.github.mikephil.charting.utils.MPPointF
+import com.github.mikephil.charting.utils.MPPointF.Companion.getInstance
 import com.github.mikephil.charting.utils.MPPointF.Companion.recycleInstance
 import com.github.mikephil.charting.utils.Utils.convertDpToPixel
 import com.github.mikephil.charting.utils.Utils.drawImage
 import com.github.mikephil.charting.utils.Utils.getPosition
 import com.github.mikephil.charting.utils.ViewPortHandler
-import com.github.mikephil.charting.utils.ViewPortHandler.isInBoundsX
 
-class RadarChartRenderer(
-     var mChart: RadarChart, animator: ChartAnimator?,
-    viewPortHandler: ViewPortHandler?
-) : LineRadarRenderer(animator, viewPortHandler) {
+class RadarChartRenderer : LineRadarRenderer {
+    protected var mChart: RadarChart? = null
+
     /**
      * paint for drawing the web
      */
-    var webPaint: Paint
-         set
-     var mHighlightCirclePaint: Paint
+    protected var mWebPaint: Paint? = null
+    protected var mHighlightCirclePaint: Paint? = null
+
+    constructor(
+        chart: RadarChart?,
+        animator: ChartAnimator?,
+        viewPortHandler: ViewPortHandler?
+    ) : super(animator, viewPortHandler) {
+        mChart = chart
+        mHighlightPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        mHighlightPaint!!.style = Paint.Style.STROKE
+        mHighlightPaint!!.strokeWidth = 2f
+        mHighlightPaint!!.color = Color.rgb(255, 187, 115)
+        mWebPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        mWebPaint!!.style = Paint.Style.STROKE
+        mHighlightCirclePaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    }
+
+    fun getWebPaint(): Paint? {
+        return mWebPaint
+    }
+
     override fun initBuffers() {
         // TODO Auto-generated method stub
     }
 
-    override fun drawData(c: Canvas) {
-        val radarData = mChart.data
-        val mostEntries = radarData.maxEntryCountSet.entryCount
-        for (set in radarData.dataSets) {
-            if (set.isVisible) {
-                drawDataSet(c, set, mostEntries)
+    override fun drawData(c: Canvas?) {
+        val radarData: RadarData? = mChart!!.getData()
+        val mostEntries = radarData!!.getMaxEntryCountSet()!!.getEntryCount()
+        for (set in radarData.getDataSets()!!) {
+            if (set.isVisible()) {
+                drawDataSet(c!!, set, mostEntries)
             }
         }
     }
 
-     var mDrawDataSetSurfacePathBuffer = Path()
+    protected var mDrawDataSetSurfacePathBuffer = Path()
 
     /**
      * Draws the RadarDataSet
@@ -50,26 +67,26 @@ class RadarChartRenderer(
      * @param dataSet
      * @param mostEntries the entry count of the dataset with the most entries
      */
-     fun drawDataSet(c: Canvas, dataSet: IRadarDataSet, mostEntries: Int) {
-        val phaseX = mAnimator.phaseX
-        val phaseY = mAnimator.phaseY
-        val sliceangle = mChart.sliceAngle
+    protected fun drawDataSet(c: Canvas, dataSet: IRadarDataSet, mostEntries: Int) {
+        val phaseX = mAnimator!!.getPhaseX()
+        val phaseY = mAnimator!!.getPhaseY()
+        val sliceangle = mChart!!.getSliceAngle()
 
         // calculate the factor that is needed for transforming the value to
         // pixels
-        val factor = mChart.factor
-        val center = mChart.centerOffsets
-        val pOut = MPPointF.getInstance(0, 0)
+        val factor = mChart!!.getFactor()
+        val center = mChart!!.getCenterOffsets()
+        val pOut = getInstance(0f, 0f)
         val surface = mDrawDataSetSurfacePathBuffer
         surface.reset()
         var hasMovedToPoint = false
-        for (j in 0 until dataSet.entryCount) {
-            mRenderPaint.color = dataSet.getColor(j)
+        for (j in 0 until dataSet.getEntryCount()) {
+            mRenderPaint!!.color = dataSet.getColor(j)
             val e = dataSet.getEntryForIndex(j)
             getPosition(
-                center,
-                (e.y - mChart.yChartMin) * factor * phaseY,
-                sliceangle * j * phaseX + mChart.rotationAngle, pOut
+                center!!,
+                (e.getY() - mChart!!.getYChartMin()) * factor * phaseY,
+                sliceangle * j * phaseX + mChart!!.getRotationAngle(), pOut
             )
             if (java.lang.Float.isNaN(pOut.x)) continue
             if (!hasMovedToPoint) {
@@ -77,65 +94,65 @@ class RadarChartRenderer(
                 hasMovedToPoint = true
             } else surface.lineTo(pOut.x, pOut.y)
         }
-        if (dataSet.entryCount > mostEntries) {
+        if (dataSet.getEntryCount() > mostEntries) {
             // if this is not the largest set, draw a line to the center before closing
-            surface.lineTo(center.x, center.y)
+            surface.lineTo(center!!.x, center.y)
         }
         surface.close()
-        if (dataSet.isDrawFilledEnabled) {
-            val drawable = dataSet.fillDrawable
+        if (dataSet.isDrawFilledEnabled()) {
+            val drawable = dataSet.getFillDrawable()
             if (drawable != null) {
                 drawFilledPath(c, surface, drawable)
             } else {
-                drawFilledPath(c, surface, dataSet.fillColor, dataSet.fillAlpha)
+                drawFilledPath(c, surface, dataSet.getFillColor(), dataSet.getFillAlpha())
             }
         }
-        mRenderPaint.strokeWidth = dataSet.lineWidth
-        mRenderPaint.style = Paint.Style.STROKE
+        mRenderPaint!!.strokeWidth = dataSet.getLineWidth()
+        mRenderPaint!!.style = Paint.Style.STROKE
 
         // draw the line (only if filled is disabled or alpha is below 255)
-        if (!dataSet.isDrawFilledEnabled || dataSet.fillAlpha < 255) c.drawPath(
+        if (!dataSet.isDrawFilledEnabled() || dataSet.getFillAlpha() < 255) c.drawPath(
             surface,
-            mRenderPaint
+            mRenderPaint!!
         )
-        recycleInstance(center)
+        recycleInstance(center!!)
         recycleInstance(pOut)
     }
 
-    override fun drawValues(c: Canvas) {
-        val phaseX = mAnimator.phaseX
-        val phaseY = mAnimator.phaseY
-        val sliceangle = mChart.sliceAngle
+    override fun drawValues(c: Canvas?) {
+        val phaseX = mAnimator!!.getPhaseX()
+        val phaseY = mAnimator!!.getPhaseY()
+        val sliceangle = mChart!!.getSliceAngle()
 
         // calculate the factor that is needed for transforming the value to
         // pixels
-        val factor = mChart.factor
-        val center = mChart.centerOffsets
-        val pOut = MPPointF.getInstance(0, 0)
-        val pIcon = MPPointF.getInstance(0, 0)
+        val factor = mChart!!.getFactor()
+        val center = mChart!!.getCenterOffsets()
+        val pOut = getInstance(0f, 0f)
+        val pIcon = getInstance(0f, 0f)
         val yoffset = convertDpToPixel(5f)
-        for (i in 0 until mChart.data.dataSetCount) {
-            val dataSet = mChart.data.getDataSetByIndex(i)
+        for (i in 0 until mChart!!.getData().getDataSetCount()) {
+            val dataSet: IRadarDataSet = mChart!!.getData().getDataSetByIndex(i)
             if (!shouldDrawValues(dataSet)) continue
 
             // apply the text-styling defined by the DataSet
             applyValueTextStyle(dataSet)
-            val iconsOffset = MPPointF.getInstance(dataSet.iconsOffset)
+            val iconsOffset = getInstance(dataSet.getIconsOffset())
             iconsOffset.x = convertDpToPixel(iconsOffset.x)
             iconsOffset.y = convertDpToPixel(iconsOffset.y)
-            for (j in 0 until dataSet.entryCount) {
+            for (j in 0 until dataSet.getEntryCount()) {
                 val entry = dataSet.getEntryForIndex(j)
                 getPosition(
-                    center,
-                    (entry.y - mChart.yChartMin) * factor * phaseY,
-                    sliceangle * j * phaseX + mChart.rotationAngle,
+                    center!!,
+                    (entry.getY() - mChart!!.getYChartMin()) * factor * phaseY,
+                    sliceangle * j * phaseX + mChart!!.getRotationAngle(),
                     pOut
                 )
-                if (dataSet.isDrawValuesEnabled) {
+                if (dataSet.isDrawValuesEnabled()) {
                     drawValue(
-                        c,
-                        dataSet.valueFormatter,
-                        entry.y,
+                        c!!,
+                        dataSet.getValueFormatter(),
+                        entry.getY(),
                         entry,
                         i,
                         pOut.x,
@@ -143,18 +160,18 @@ class RadarChartRenderer(
                         dataSet.getValueTextColor(j)
                     )
                 }
-                if (entry.icon != null && dataSet.isDrawIconsEnabled) {
-                    val icon = entry.icon
+                if (entry.getIcon() != null && dataSet.isDrawIconsEnabled()) {
+                    val icon = entry.getIcon()
                     getPosition(
                         center,
-                        entry.y * factor * phaseY + iconsOffset.y,
-                        sliceangle * j * phaseX + mChart.rotationAngle,
+                        entry.getY() * factor * phaseY + iconsOffset.y,
+                        sliceangle * j * phaseX + mChart!!.getRotationAngle(),
                         pIcon
                     )
                     pIcon.y += iconsOffset.x
                     drawImage(
-                        c,
-                        icon,
+                        c!!,
+                        icon!!,
                         pIcon.x.toInt(),
                         pIcon.y.toInt(),
                         icon.intrinsicWidth,
@@ -164,114 +181,115 @@ class RadarChartRenderer(
             }
             recycleInstance(iconsOffset)
         }
-        recycleInstance(center)
+        recycleInstance(center!!)
         recycleInstance(pOut)
         recycleInstance(pIcon)
     }
 
-    override fun drawExtras(c: Canvas) {
-        drawWeb(c)
+    override fun drawExtras(c: Canvas?) {
+        drawWeb(c!!)
     }
 
-     fun drawWeb(c: Canvas) {
-        val sliceangle = mChart.sliceAngle
+    protected fun drawWeb(c: Canvas) {
+        val sliceangle = mChart!!.getSliceAngle()
 
         // calculate the factor that is needed for transforming the value to
         // pixels
-        val factor = mChart.factor
-        val rotationangle = mChart.rotationAngle
-        val center = mChart.centerOffsets
+        val factor = mChart!!.getFactor()
+        val rotationangle = mChart!!.getRotationAngle()
+        val center = mChart!!.getCenterOffsets()
 
         // draw the web lines that come from the center
-        webPaint.strokeWidth = mChart.webLineWidth
-        webPaint.color = mChart.webColor
-        webPaint.alpha = mChart.webAlpha
-        val xIncrements = 1 + mChart.skipWebLineCount
-        val maxEntryCount = mChart.data.maxEntryCountSet.entryCount
-        val p = MPPointF.getInstance(0, 0)
+        mWebPaint!!.strokeWidth = mChart!!.getWebLineWidth()
+        mWebPaint!!.color = mChart!!.getWebColor()
+        mWebPaint!!.alpha = mChart!!.getWebAlpha()
+        val xIncrements = 1 + mChart!!.getSkipWebLineCount()
+        val maxEntryCount: Int = mChart!!.getData().getMaxEntryCountSet().getEntryCount()
+        val p = getInstance(0f, 0f)
         var i = 0
         while (i < maxEntryCount) {
             getPosition(
-                center,
-                mChart.yRange * factor,
+                center!!,
+                mChart!!.getYRange() * factor,
                 sliceangle * i + rotationangle,
                 p
             )
-            c.drawLine(center.x, center.y, p.x, p.y, webPaint)
+            c.drawLine(center.x, center.y, p.x, p.y, mWebPaint!!)
             i += xIncrements
         }
         recycleInstance(p)
 
         // draw the inner-web
-        webPaint.strokeWidth = mChart.webLineWidthInner
-        webPaint.color = mChart.webColorInner
-        webPaint.alpha = mChart.webAlpha
-        val labelCount = mChart.yAxis.mEntryCount
-        val p1out = MPPointF.getInstance(0, 0)
-        val p2out = MPPointF.getInstance(0, 0)
+        mWebPaint!!.strokeWidth = mChart!!.getWebLineWidthInner()
+        mWebPaint!!.color = mChart!!.getWebColorInner()
+        mWebPaint!!.alpha = mChart!!.getWebAlpha()
+        val labelCount = mChart!!.getYAxis()!!.mEntryCount
+        val p1out = getInstance(0f, 0f)
+        val p2out = getInstance(0f, 0f)
         for (j in 0 until labelCount) {
-            for (i in 0 until mChart.data.entryCount) {
-                val r = (mChart.yAxis.mEntries[j] - mChart.yChartMin) * factor
-                getPosition(center, r, sliceangle * i + rotationangle, p1out)
+            for (i in 0 until mChart!!.getData().getEntryCount()) {
+                val r = (mChart!!.getYAxis()!!.mEntries[j] - mChart!!.getYChartMin()) * factor
+                getPosition(center!!, r, sliceangle * i + rotationangle, p1out)
                 getPosition(center, r, sliceangle * (i + 1) + rotationangle, p2out)
-                c.drawLine(p1out.x, p1out.y, p2out.x, p2out.y, webPaint)
+                c.drawLine(p1out.x, p1out.y, p2out.x, p2out.y, mWebPaint!!)
             }
         }
         recycleInstance(p1out)
         recycleInstance(p2out)
     }
 
-    override fun drawHighlighted(c: Canvas, indices: Array<Highlight>) {
-        val sliceangle = mChart.sliceAngle
+    override fun drawHighlighted(c: Canvas?, indices: Array<Highlight>?) {
+        val sliceangle = mChart!!.getSliceAngle()
 
         // calculate the factor that is needed for transforming the value to
         // pixels
-        val factor = mChart.factor
-        val center = mChart.centerOffsets
-        val pOut = MPPointF.getInstance(0, 0)
-        val radarData = mChart.data
-        for (high in indices) {
-            val set = radarData.getDataSetByIndex(high.dataSetIndex)
-            if (set == null || !set.isHighlightEnabled) continue
-            val e = set.getEntryForIndex(high.x.toInt())
+        val factor = mChart!!.getFactor()
+        val center = mChart!!.getCenterOffsets()
+        val pOut = getInstance(0f, 0f)
+        val radarData: RadarData? = mChart!!.getData()
+        for (high in indices!!) {
+            val set = radarData!!.getDataSetByIndex(high.getDataSetIndex())
+            if (set == null || !set.isHighlightEnabled()) continue
+            val e = set.getEntryForIndex(high.getX().toInt())
             if (!isInBoundsX(e, set)) continue
-            val y = e.y - mChart.yChartMin
+            val y = e.getY() - mChart!!.getYChartMin()
             getPosition(
-                center,
-                y * factor * mAnimator.phaseY,
-                sliceangle * high.x * mAnimator.phaseX + mChart.rotationAngle,
+                center!!,
+                y * factor * mAnimator!!.getPhaseY(),
+                sliceangle * high.getX() * mAnimator!!.getPhaseX() + mChart!!.getRotationAngle(),
                 pOut
             )
             high.setDraw(pOut.x, pOut.y)
 
             // draw the lines
-            drawHighlightLines(c, pOut.x, pOut.y, set)
-            if (set.isDrawHighlightCircleEnabled) {
+            drawHighlightLines(c!!, pOut.x, pOut.y, set)
+            if (set.isDrawHighlightCircleEnabled()) {
                 if (!java.lang.Float.isNaN(pOut.x) && !java.lang.Float.isNaN(pOut.y)) {
-                    var strokeColor = set.highlightCircleStrokeColor
+                    var strokeColor = set.getHighlightCircleStrokeColor()
                     if (strokeColor == ColorTemplate.COLOR_NONE) {
                         strokeColor = set.getColor(0)
                     }
-                    if (set.highlightCircleStrokeAlpha < 255) {
-                        strokeColor = colorWithAlpha(strokeColor, set.highlightCircleStrokeAlpha)
+                    if (set.getHighlightCircleStrokeAlpha() < 255) {
+                        strokeColor =
+                            colorWithAlpha(strokeColor, set.getHighlightCircleStrokeAlpha())
                     }
                     drawHighlightCircle(
                         c,
                         pOut,
-                        set.highlightCircleInnerRadius,
-                        set.highlightCircleOuterRadius,
-                        set.highlightCircleFillColor,
+                        set.getHighlightCircleInnerRadius(),
+                        set.getHighlightCircleOuterRadius(),
+                        set.getHighlightCircleFillColor(),
                         strokeColor,
-                        set.highlightCircleStrokeWidth
+                        set.getHighlightCircleStrokeWidth()
                     )
                 }
             }
         }
-        recycleInstance(center)
+        recycleInstance(center!!)
         recycleInstance(pOut)
     }
 
-     var mDrawHighlightCirclePathBuffer = Path()
+    protected var mDrawHighlightCirclePathBuffer = Path()
     fun drawHighlightCircle(
         c: Canvas,
         point: MPPointF,
@@ -293,27 +311,16 @@ class RadarChartRenderer(
             if (innerRadius > 0f) {
                 p.addCircle(point.x, point.y, innerRadius, Path.Direction.CCW)
             }
-            mHighlightCirclePaint.color = fillColor
-            mHighlightCirclePaint.style = Paint.Style.FILL
-            c.drawPath(p, mHighlightCirclePaint)
+            mHighlightCirclePaint!!.color = fillColor
+            mHighlightCirclePaint!!.style = Paint.Style.FILL
+            c.drawPath(p, mHighlightCirclePaint!!)
         }
         if (strokeColor != ColorTemplate.COLOR_NONE) {
-            mHighlightCirclePaint.color = strokeColor
-            mHighlightCirclePaint.style = Paint.Style.STROKE
-            mHighlightCirclePaint.strokeWidth =
-                convertDpToPixel(strokeWidth)
-            c.drawCircle(point.x, point.y, outerRadius, mHighlightCirclePaint)
+            mHighlightCirclePaint!!.color = strokeColor
+            mHighlightCirclePaint!!.style = Paint.Style.STROKE
+            mHighlightCirclePaint!!.strokeWidth = convertDpToPixel(strokeWidth)
+            c.drawCircle(point.x, point.y, outerRadius, mHighlightCirclePaint!!)
         }
         c.restore()
-    }
-
-    init {
-        mHighlightPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        mHighlightPaint.style = Paint.Style.STROKE
-        mHighlightPaint.strokeWidth = 2f
-        mHighlightPaint.color = Color.rgb(255, 187, 115)
-        webPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        webPaint.style = Paint.Style.STROKE
-        mHighlightCirclePaint = Paint(Paint.ANTI_ALIAS_FLAG)
     }
 }

@@ -10,56 +10,87 @@ import com.github.mikephil.charting.interfaces.dataprovider.ChartInterface
 import com.github.mikephil.charting.interfaces.datasets.IDataSet
 import com.github.mikephil.charting.renderer.*
 import com.github.mikephil.charting.utils.*
+import com.github.mikephil.charting.utils.Utils.convertDpToPixel
 
 /**
  * Superclass of all render classes for the different data types (line, bar, ...).
  *
  * @author Philipp Jahoda
  */
-abstract class DataRenderer(
+abstract class DataRenderer : Renderer {
     /**
      * the animator object used to perform animations on the chart data
      */
-    protected var mAnimator: ChartAnimator, viewPortHandler: ViewPortHandler?
-) : Renderer(viewPortHandler) {
-    /**
-     * Returns the Paint object used for rendering.
-     *
-     * @return
-     */
+    protected var mAnimator: ChartAnimator? = null
+
     /**
      * main paint object used for rendering
      */
-    var paintRender: Paint
-        protected set
-    /**
-     * Returns the Paint object this renderer uses for drawing highlight
-     * indicators.
-     *
-     * @return
-     */
+    protected var mRenderPaint: Paint? = null
+
     /**
      * paint used for highlighting values
      */
-    var paintHighlight: Paint
-        protected set
-    protected var mDrawPaint: Paint
+    protected var mHighlightPaint: Paint? = null
+
+    protected var mDrawPaint: Paint? = null
+
+    /**
+     * paint object for drawing values (text representing values of chart
+     * entries)
+     */
+    protected var mValuePaint: Paint? = null
+
+    constructor(
+        animator: ChartAnimator?,
+        viewPortHandler: ViewPortHandler?
+    ) : super(viewPortHandler) {
+        mAnimator = animator
+        mRenderPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        mRenderPaint!!.style = Paint.Style.FILL
+        mDrawPaint = Paint(Paint.DITHER_FLAG)
+        mValuePaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        mValuePaint!!.color = Color.rgb(63, 63, 63)
+        mValuePaint!!.textAlign = Align.CENTER
+        mValuePaint!!.textSize = convertDpToPixel(9f)
+        mHighlightPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        mHighlightPaint!!.style = Paint.Style.STROKE
+        mHighlightPaint!!.strokeWidth = 2f
+        mHighlightPaint!!.color = Color.rgb(255, 187, 115)
+    }
+
+    protected open fun isDrawingValuesAllowed(chart: ChartInterface): Boolean {
+        return chart.getData()
+            .getEntryCount() < chart.getMaxVisibleCount() * mViewPortHandler!!.getScaleX()
+    }
+
     /**
      * Returns the Paint object this renderer uses for drawing the values
      * (value-text).
      *
      * @return
      */
-    /**
-     * paint object for drawing values (text representing values of chart
-     * entries)
-     */
-    var paintValues: Paint
-        protected set
+    open fun getPaintValues(): Paint? {
+        return mValuePaint
+    }
 
-    protected open fun isDrawingValuesAllowed(chart: ChartInterface): Boolean {
-        return chart.data.entryCount < chart.maxVisibleCount
-        * mViewPortHandler.scaleX
+    /**
+     * Returns the Paint object this renderer uses for drawing highlight
+     * indicators.
+     *
+     * @return
+     */
+    open fun getPaintHighlight(): Paint? {
+        return mHighlightPaint
+    }
+
+    /**
+     * Returns the Paint object used for rendering.
+     *
+     * @return
+     */
+    open fun getPaintRender(): Paint? {
+        return mRenderPaint
     }
 
     /**
@@ -68,9 +99,9 @@ abstract class DataRenderer(
      *
      * @param set
      */
-    protected fun applyValueTextStyle(set: IDataSet<*>) {
-        paintValues.typeface = set.valueTypeface
-        paintValues.textSize = set.valueTextSize
+    protected open fun applyValueTextStyle(set: IDataSet<*>) {
+        mValuePaint!!.typeface = set.getValueTypeface()
+        mValuePaint!!.textSize = set.getValueTextSize()
     }
 
     /**
@@ -85,14 +116,14 @@ abstract class DataRenderer(
      *
      * @param c
      */
-    abstract fun drawData(c: Canvas)
+    abstract fun drawData(c: Canvas?)
 
     /**
      * Loops over all Entrys and draws their values.
      *
      * @param c
      */
-    abstract fun drawValues(c: Canvas)
+    abstract fun drawValues(c: Canvas?)
 
     /**
      * Draws the value of the given entry by using the provided IValueFormatter.
@@ -106,7 +137,7 @@ abstract class DataRenderer(
      * @param y            position
      * @param color
      */
-    fun drawValue(
+    open fun drawValue(
         c: Canvas,
         formatter: IValueFormatter,
         value: Float,
@@ -116,12 +147,10 @@ abstract class DataRenderer(
         y: Float,
         color: Int
     ) {
-        paintValues.color = color
+        mValuePaint!!.color = color
         c.drawText(
-            formatter.getFormattedValue(value, entry, dataSetIndex, mViewPortHandler),
-            x,
-            y,
-            paintValues
+            formatter.getFormattedValue(value, entry, dataSetIndex, mViewPortHandler), x, y,
+            mValuePaint!!
         )
     }
 
@@ -130,7 +159,7 @@ abstract class DataRenderer(
      *
      * @param c
      */
-    abstract fun drawExtras(c: Canvas)
+    abstract fun drawExtras(c: Canvas?)
 
     /**
      * Draws all highlight indicators for the values that are currently highlighted.
@@ -138,19 +167,5 @@ abstract class DataRenderer(
      * @param c
      * @param indices the highlighted values
      */
-    abstract fun drawHighlighted(c: Canvas, indices: Array<Highlight>)
-
-    init {
-        paintRender = Paint(Paint.ANTI_ALIAS_FLAG)
-        paintRender.style = Paint.Style.FILL
-        mDrawPaint = Paint(Paint.DITHER_FLAG)
-        paintValues = Paint(Paint.ANTI_ALIAS_FLAG)
-        paintValues.color = Color.rgb(63, 63, 63)
-        paintValues.textAlign = Align.CENTER
-        paintValues.textSize = Utils.convertDpToPixel(9f)
-        paintHighlight = Paint(Paint.ANTI_ALIAS_FLAG)
-        paintHighlight.style = Paint.Style.STROKE
-        paintHighlight.strokeWidth = 2f
-        paintHighlight.color = Color.rgb(255, 187, 115)
-    }
+    abstract fun drawHighlighted(c: Canvas?, indices: Array<Highlight>?)
 }

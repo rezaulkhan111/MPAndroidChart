@@ -1,16 +1,19 @@
 package com.github.mikephil.charting.highlight
 
 import com.github.mikephil.charting.charts.PieChart
-import com.github.mikephil.charting.data.*
-import com.github.mikephil.charting.interfaces.datasets.IPieDataSet
+import com.github.mikephil.charting.data.Entry
 
 /**
  * Created by philipp on 12/06/16.
  */
-class PieHighlighter(chart: PieChart) : PieRadarHighlighter<PieChart?>(chart) {
-    override fun getClosestHighlight(index: Int, x: Float, y: Float): Highlight? {
-        val set: IPieDataSet = mChart.getData().getDataSet()
-        val entry: Entry? = set.getEntryForIndex(index)
-        return Highlight(index.toFloat(), entry!!.y, x, y, 0, set.axisDependency)
+class PieHighlighter : PieRadarHighlighter<PieChart> {
+
+    constructor(chart: PieChart) : super(chart) {
+    }
+
+    override fun getClosestHighlight(index: Int, x: Float, y: Float): Highlight {
+        val set = mChart.getData()!!.getDataSet()
+        val entry: Entry = set.getEntryForIndex(index)
+        return Highlight(index.toFloat(), entry.getY(), x, y, 0, set.getAxisDependency())
     }
 }

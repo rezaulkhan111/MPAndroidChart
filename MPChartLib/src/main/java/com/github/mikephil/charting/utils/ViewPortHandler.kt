@@ -3,6 +3,7 @@ package com.github.mikephil.charting.utils
 import android.graphics.Matrix
 import android.graphics.RectF
 import android.view.View
+import com.github.mikephil.charting.utils.MPPointF.Companion.getInstance
 import com.github.mikephil.charting.utils.Utils.convertDpToPixel
 
 /**
@@ -11,90 +12,59 @@ import com.github.mikephil.charting.utils.Utils.convertDpToPixel
  *
  * @author Philipp Jahoda
  */
-open class ViewPortHandler
-/**
- * Constructor - don't forget calling setChartDimens(...)
- */
-{
-    /**
-     * Returns the charts-touch matrix used for translation and scale on touch.
-     *
-     * @return
-     */
+open class ViewPortHandler {
     /**
      * matrix used for touch events
      */
-    val matrixTouch = Matrix()
+    protected val mMatrixTouch = Matrix()
 
     /**
      * this rectangle defines the area in which graph values can be drawn
      */
-    var contentRect = RectF()
-         set
-    var chartWidth = 0f
-         set
-    var chartHeight = 0f
-         set
+    protected var mContentRect = RectF()
+
+    protected var mChartWidth = 0f
+    protected var mChartHeight = 0f
 
     /**
      * minimum scale value on the y-axis
      */
-    var minScaleY = 1f
-        private set
+    private var mMinScaleY = 1f
 
     /**
      * maximum scale value on the y-axis
      */
-    var maxScaleY = Float.MAX_VALUE
-        private set
+    private var mMaxScaleY = Float.MAX_VALUE
 
     /**
      * minimum scale value on the x-axis
      */
-    var minScaleX = 1f
-        private set
+    private var mMinScaleX = 1f
 
     /**
      * maximum scale value on the x-axis
      */
-    var maxScaleX = Float.MAX_VALUE
-        private set
-    /**
-     * returns the current x-scale factor
-     */
+    private var mMaxScaleX = Float.MAX_VALUE
+
     /**
      * contains the current scale factor of the x-axis
      */
-    var scaleX = 1f
-        private set
-    /**
-     * returns the current y-scale factor
-     */
+    private var mScaleX = 1f
+
     /**
      * contains the current scale factor of the y-axis
      */
-    var scaleY = 1f
-        private set
-    /**
-     * Returns the translation (drag / pan) distance on the x-axis
-     *
-     * @return
-     */
+    private var mScaleY = 1f
+
     /**
      * current translation (drag distance) on the x-axis
      */
-    var transX = 0f
-        private set
-    /**
-     * Returns the translation (drag / pan) distance on the y-axis
-     *
-     * @return
-     */
+    private var mTransX = 0f
+
     /**
      * current translation (drag distance) on the y-axis
      */
-    var transY = 0f
-        private set
+    private var mTransY = 0f
 
     /**
      * offset that allows the chart to be dragged over its bounds on the x-axis
@@ -107,71 +77,92 @@ open class ViewPortHandler
     private var mTransOffsetY = 0f
 
     /**
+     * Constructor - don't forget calling setChartDimens(...)
+     */
+    constructor() {}
+
+    /**
      * Sets the width and height of the chart.
      *
      * @param width
      * @param height
      */
-    fun setChartDimens(width: Float, height: Float) {
+    open fun setChartDimens(width: Float, height: Float) {
         val offsetLeft = offsetLeft()
         val offsetTop = offsetTop()
         val offsetRight = offsetRight()
         val offsetBottom = offsetBottom()
-        chartHeight = height
-        chartWidth = width
+        mChartHeight = height
+        mChartWidth = width
         restrainViewPort(offsetLeft, offsetTop, offsetRight, offsetBottom)
     }
 
-    fun hasChartDimens(): Boolean {
-        return if (chartHeight > 0 && chartWidth > 0) true else false
+    open fun hasChartDimens(): Boolean {
+        return if (mChartHeight > 0 && mChartWidth > 0) true else false
     }
 
-    fun restrainViewPort(
+    open fun restrainViewPort(
         offsetLeft: Float, offsetTop: Float, offsetRight: Float,
         offsetBottom: Float
     ) {
-        contentRect[offsetLeft, offsetTop, chartWidth - offsetRight] = (chartHeight
+        mContentRect[offsetLeft, offsetTop, mChartWidth - offsetRight] = (mChartHeight
                 - offsetBottom)
     }
 
-    fun offsetLeft(): Float {
-        return contentRect.left
+    open fun offsetLeft(): Float {
+        return mContentRect.left
     }
 
-    fun offsetRight(): Float {
-        return chartWidth - contentRect.right
+    open fun offsetRight(): Float {
+        return mChartWidth - mContentRect.right
     }
 
-    fun offsetTop(): Float {
-        return contentRect.top
+    open fun offsetTop(): Float {
+        return mContentRect.top
     }
 
-    fun offsetBottom(): Float {
-        return chartHeight - contentRect.bottom
+    open fun offsetBottom(): Float {
+        return mChartHeight - mContentRect.bottom
     }
 
-    fun contentTop(): Float {
-        return contentRect.top
+    open fun contentTop(): Float {
+        return mContentRect.top
     }
 
-    fun contentLeft(): Float {
-        return contentRect.left
+    open fun contentLeft(): Float {
+        return mContentRect.left
     }
 
-    fun contentRight(): Float {
-        return contentRect.right
+    open fun contentRight(): Float {
+        return mContentRect.right
     }
 
-    fun contentBottom(): Float {
-        return contentRect.bottom
+    open fun contentBottom(): Float {
+        return mContentRect.bottom
     }
 
-    fun contentWidth(): Float {
-        return contentRect.width()
+    open fun contentWidth(): Float {
+        return mContentRect.width()
     }
 
-    fun contentHeight(): Float {
-        return contentRect.height()
+    open fun contentHeight(): Float {
+        return mContentRect.height()
+    }
+
+    open fun getContentRect(): RectF? {
+        return mContentRect
+    }
+
+    open fun getContentCenter(): MPPointF? {
+        return getInstance(mContentRect.centerX(), mContentRect.centerY())
+    }
+
+    open fun getChartHeight(): Float {
+        return mChartHeight
+    }
+
+    open fun getChartWidth(): Float {
+        return mChartWidth
     }
 
     /**
@@ -179,8 +170,15 @@ open class ViewPortHandler
      *
      * @return
      */
-    val smallestContentExtension: Float
-        get() = Math.min(contentRect.width(), contentRect.height())
+    open fun getSmallestContentExtension(): Float {
+        return Math.min(mContentRect.width(), mContentRect.height())
+    }
+
+    /**
+     * ################ ################ ################ ################
+     */
+    /** CODE BELOW THIS RELATED TO SCALING AND GESTURES */
+
     /**
      * ################ ################ ################ ################
      */
@@ -192,15 +190,15 @@ open class ViewPortHandler
      * @param x
      * @param y
      */
-    fun zoomIn(x: Float, y: Float): Matrix {
+    open fun zoomIn(x: Float, y: Float): Matrix? {
         val save = Matrix()
         zoomIn(x, y, save)
         return save
     }
 
-    fun zoomIn(x: Float, y: Float, outputMatrix: Matrix) {
+    open fun zoomIn(x: Float, y: Float, outputMatrix: Matrix) {
         outputMatrix.reset()
-        outputMatrix.set(matrixTouch)
+        outputMatrix.set(mMatrixTouch)
         outputMatrix.postScale(1.4f, 1.4f, x, y)
     }
 
@@ -208,15 +206,15 @@ open class ViewPortHandler
      * Zooms out by 0.7f, x and y are the coordinates (in pixels) of the zoom
      * center.
      */
-    fun zoomOut(x: Float, y: Float): Matrix {
+    open fun zoomOut(x: Float, y: Float): Matrix? {
         val save = Matrix()
         zoomOut(x, y, save)
         return save
     }
 
-    fun zoomOut(x: Float, y: Float, outputMatrix: Matrix) {
+    open fun zoomOut(x: Float, y: Float, outputMatrix: Matrix) {
         outputMatrix.reset()
-        outputMatrix.set(matrixTouch)
+        outputMatrix.set(mMatrixTouch)
         outputMatrix.postScale(0.7f, 0.7f, x, y)
     }
 
@@ -224,9 +222,9 @@ open class ViewPortHandler
      * Zooms out to original size.
      * @param outputMatrix
      */
-    fun resetZoom(outputMatrix: Matrix) {
+    open fun resetZoom(outputMatrix: Matrix) {
         outputMatrix.reset()
-        outputMatrix.set(matrixTouch)
+        outputMatrix.set(mMatrixTouch)
         outputMatrix.postScale(1.0f, 1.0f, 0.0f, 0.0f)
     }
 
@@ -237,15 +235,15 @@ open class ViewPortHandler
      * @param scaleY
      * @return
      */
-    fun zoom(scaleX: Float, scaleY: Float): Matrix {
+    open fun zoom(scaleX: Float, scaleY: Float): Matrix? {
         val save = Matrix()
         zoom(scaleX, scaleY, save)
         return save
     }
 
-    fun zoom(scaleX: Float, scaleY: Float, outputMatrix: Matrix) {
+    open fun zoom(scaleX: Float, scaleY: Float, outputMatrix: Matrix) {
         outputMatrix.reset()
-        outputMatrix.set(matrixTouch)
+        outputMatrix.set(mMatrixTouch)
         outputMatrix.postScale(scaleX, scaleY)
     }
 
@@ -258,15 +256,15 @@ open class ViewPortHandler
      * @param y
      * @return
      */
-    fun zoom(scaleX: Float, scaleY: Float, x: Float, y: Float): Matrix {
+    open fun zoom(scaleX: Float, scaleY: Float, x: Float, y: Float): Matrix? {
         val save = Matrix()
         zoom(scaleX, scaleY, x, y, save)
         return save
     }
 
-    fun zoom(scaleX: Float, scaleY: Float, x: Float, y: Float, outputMatrix: Matrix) {
+    open fun zoom(scaleX: Float, scaleY: Float, x: Float, y: Float, outputMatrix: Matrix) {
         outputMatrix.reset()
-        outputMatrix.set(matrixTouch)
+        outputMatrix.set(mMatrixTouch)
         outputMatrix.postScale(scaleX, scaleY, x, y)
     }
 
@@ -277,15 +275,15 @@ open class ViewPortHandler
      * @param scaleY
      * @return
      */
-    fun setZoom(scaleX: Float, scaleY: Float): Matrix {
+    open fun setZoom(scaleX: Float, scaleY: Float): Matrix? {
         val save = Matrix()
         setZoom(scaleX, scaleY, save)
         return save
     }
 
-    fun setZoom(scaleX: Float, scaleY: Float, outputMatrix: Matrix) {
+    open fun setZoom(scaleX: Float, scaleY: Float, outputMatrix: Matrix) {
         outputMatrix.reset()
-        outputMatrix.set(matrixTouch)
+        outputMatrix.set(mMatrixTouch)
         outputMatrix.setScale(scaleX, scaleY)
     }
 
@@ -298,20 +296,20 @@ open class ViewPortHandler
      * @param y
      * @return
      */
-    fun setZoom(scaleX: Float, scaleY: Float, x: Float, y: Float): Matrix {
+    open fun setZoom(scaleX: Float, scaleY: Float, x: Float, y: Float): Matrix? {
         val save = Matrix()
-        save.set(matrixTouch)
+        save.set(mMatrixTouch)
         save.setScale(scaleX, scaleY, x, y)
         return save
     }
 
-     var valsBufferForFitScreen = FloatArray(9)
+    protected var valsBufferForFitScreen = FloatArray(9)
 
     /**
      * Resets all zooming and dragging and makes the chart fit exactly it's
      * bounds.
      */
-    fun fitScreen(): Matrix {
+    open fun fitScreen(): Matrix? {
         val save = Matrix()
         fitScreen(save)
         return save
@@ -321,13 +319,13 @@ open class ViewPortHandler
      * Resets all zooming and dragging and makes the chart fit exactly it's
      * bounds.  Output Matrix is available for those who wish to cache the object.
      */
-    fun fitScreen(outputMatrix: Matrix) {
-        minScaleX = 1f
-        minScaleY = 1f
-        outputMatrix.set(matrixTouch)
+    open fun fitScreen(outputMatrix: Matrix) {
+        mMinScaleX = 1f
+        mMinScaleY = 1f
+        outputMatrix.set(mMatrixTouch)
         val vals = valsBufferForFitScreen
         for (i in 0..8) {
-            vals[i] = 0F
+            vals[i] = 0f
         }
         outputMatrix.getValues(vals)
 
@@ -345,7 +343,7 @@ open class ViewPortHandler
      * @param transformedPts
      * @return
      */
-    fun translate(transformedPts: FloatArray): Matrix {
+    open fun translate(transformedPts: FloatArray): Matrix? {
         val save = Matrix()
         translate(transformedPts, save)
         return save
@@ -357,15 +355,15 @@ open class ViewPortHandler
      * @param transformedPts
      * @return
      */
-    fun translate(transformedPts: FloatArray, outputMatrix: Matrix) {
+    open fun translate(transformedPts: FloatArray, outputMatrix: Matrix) {
         outputMatrix.reset()
-        outputMatrix.set(matrixTouch)
+        outputMatrix.set(mMatrixTouch)
         val x = transformedPts[0] - offsetLeft()
         val y = transformedPts[1] - offsetTop()
         outputMatrix.postTranslate(-x, -y)
     }
 
-     var mCenterViewPortMatrixBuffer = Matrix()
+    protected var mCenterViewPortMatrixBuffer = Matrix()
 
     /**
      * Centers the viewport around the specified position (x-index and y-value)
@@ -377,10 +375,10 @@ open class ViewPortHandler
      * @param view
      * @return save
      */
-    fun centerViewPort(transformedPts: FloatArray, view: View) {
+    open fun centerViewPort(transformedPts: FloatArray, view: View) {
         val save = mCenterViewPortMatrixBuffer
         save.reset()
-        save.set(matrixTouch)
+        save.set(mMatrixTouch)
         val x = transformedPts[0] - offsetLeft()
         val y = transformedPts[1] - offsetTop()
         save.postTranslate(-x, -y)
@@ -390,7 +388,7 @@ open class ViewPortHandler
     /**
      * buffer for storing the 9 matrix values of a 3x3 matrix
      */
-     val matrixBuffer = FloatArray(9)
+    protected val matrixBuffer = FloatArray(9)
 
     /**
      * call this method to refresh the graph with a given matrix
@@ -398,13 +396,13 @@ open class ViewPortHandler
      * @param newMatrix
      * @return
      */
-    fun refresh(newMatrix: Matrix, chart: View, invalidate: Boolean): Matrix {
-        matrixTouch.set(newMatrix)
+    open fun refresh(newMatrix: Matrix, chart: View, invalidate: Boolean): Matrix? {
+        mMatrixTouch.set(newMatrix)
 
         // make sure scale and translation are within their bounds
-        limitTransAndScale(matrixTouch, contentRect)
+        limitTransAndScale(mMatrixTouch, mContentRect)
         if (invalidate) chart.invalidate()
-        newMatrix.set(matrixTouch)
+        newMatrix.set(mMatrixTouch)
         return newMatrix
     }
 
@@ -413,7 +411,7 @@ open class ViewPortHandler
      *
      * @param matrix
      */
-    fun limitTransAndScale(matrix: Matrix, content: RectF?) {
+    open fun limitTransAndScale(matrix: Matrix, content: RectF?) {
         matrix.getValues(matrixBuffer)
         val curTransX = matrixBuffer[Matrix.MTRANS_X]
         val curScaleX = matrixBuffer[Matrix.MSCALE_X]
@@ -421,24 +419,24 @@ open class ViewPortHandler
         val curScaleY = matrixBuffer[Matrix.MSCALE_Y]
 
         // min scale-x is 1f
-        scaleX = Math.min(Math.max(minScaleX, curScaleX), maxScaleX)
+        mScaleX = Math.min(Math.max(mMinScaleX, curScaleX), mMaxScaleX)
 
         // min scale-y is 1f
-        scaleY = Math.min(Math.max(minScaleY, curScaleY), maxScaleY)
+        mScaleY = Math.min(Math.max(mMinScaleY, curScaleY), mMaxScaleY)
         var width = 0f
         var height = 0f
         if (content != null) {
             width = content.width()
             height = content.height()
         }
-        val maxTransX = -width * (scaleX - 1f)
-        transX = Math.min(Math.max(curTransX, maxTransX - mTransOffsetX), mTransOffsetX)
-        val maxTransY = height * (scaleY - 1f)
-        transY = Math.max(Math.min(curTransY, maxTransY + mTransOffsetY), -mTransOffsetY)
-        matrixBuffer[Matrix.MTRANS_X] = transX
-        matrixBuffer[Matrix.MSCALE_X] = scaleX
-        matrixBuffer[Matrix.MTRANS_Y] = transY
-        matrixBuffer[Matrix.MSCALE_Y] = scaleY
+        val maxTransX = -width * (mScaleX - 1f)
+        mTransX = Math.min(Math.max(curTransX, maxTransX - mTransOffsetX), mTransOffsetX)
+        val maxTransY = height * (mScaleY - 1f)
+        mTransY = Math.max(Math.min(curTransY, maxTransY + mTransOffsetY), -mTransOffsetY)
+        matrixBuffer[Matrix.MTRANS_X] = mTransX
+        matrixBuffer[Matrix.MSCALE_X] = mScaleX
+        matrixBuffer[Matrix.MTRANS_Y] = mTransY
+        matrixBuffer[Matrix.MSCALE_Y] = mScaleY
         matrix.setValues(matrixBuffer)
     }
 
@@ -447,11 +445,11 @@ open class ViewPortHandler
      *
      * @param xScale
      */
-    fun setMinimumScaleX(xScale: Float) {
+    open fun setMinimumScaleX(xScale: Float) {
         var xScale = xScale
         if (xScale < 1f) xScale = 1f
-        minScaleX = xScale
-        limitTransAndScale(matrixTouch, contentRect)
+        mMinScaleX = xScale
+        limitTransAndScale(mMatrixTouch, mContentRect)
     }
 
     /**
@@ -459,11 +457,11 @@ open class ViewPortHandler
      *
      * @param xScale
      */
-    fun setMaximumScaleX(xScale: Float) {
+    open fun setMaximumScaleX(xScale: Float) {
         var xScale = xScale
         if (xScale == 0f) xScale = Float.MAX_VALUE
-        maxScaleX = xScale
-        limitTransAndScale(matrixTouch, contentRect)
+        mMaxScaleX = xScale
+        limitTransAndScale(mMatrixTouch, mContentRect)
     }
 
     /**
@@ -472,14 +470,14 @@ open class ViewPortHandler
      * @param minScaleX
      * @param maxScaleX
      */
-    fun setMinMaxScaleX(minScaleX: Float, maxScaleX: Float) {
+    open fun setMinMaxScaleX(minScaleX: Float, maxScaleX: Float) {
         var minScaleX = minScaleX
         var maxScaleX = maxScaleX
         if (minScaleX < 1f) minScaleX = 1f
         if (maxScaleX == 0f) maxScaleX = Float.MAX_VALUE
-        this.minScaleX = minScaleX
-        this.maxScaleX = maxScaleX
-        limitTransAndScale(matrixTouch, contentRect)
+        mMinScaleX = minScaleX
+        mMaxScaleX = maxScaleX
+        limitTransAndScale(mMatrixTouch, mContentRect)
     }
 
     /**
@@ -487,11 +485,11 @@ open class ViewPortHandler
      *
      * @param yScale
      */
-    fun setMinimumScaleY(yScale: Float) {
+    open fun setMinimumScaleY(yScale: Float) {
         var yScale = yScale
         if (yScale < 1f) yScale = 1f
-        minScaleY = yScale
-        limitTransAndScale(matrixTouch, contentRect)
+        mMinScaleY = yScale
+        limitTransAndScale(mMatrixTouch, mContentRect)
     }
 
     /**
@@ -499,58 +497,119 @@ open class ViewPortHandler
      *
      * @param yScale
      */
-    fun setMaximumScaleY(yScale: Float) {
+    open fun setMaximumScaleY(yScale: Float) {
         var yScale = yScale
         if (yScale == 0f) yScale = Float.MAX_VALUE
-        maxScaleY = yScale
-        limitTransAndScale(matrixTouch, contentRect)
+        mMaxScaleY = yScale
+        limitTransAndScale(mMatrixTouch, mContentRect)
     }
 
-    fun setMinMaxScaleY(minScaleY: Float, maxScaleY: Float) {
+    open fun setMinMaxScaleY(minScaleY: Float, maxScaleY: Float) {
         var minScaleY = minScaleY
         var maxScaleY = maxScaleY
         if (minScaleY < 1f) minScaleY = 1f
         if (maxScaleY == 0f) maxScaleY = Float.MAX_VALUE
-        this.minScaleY = minScaleY
-        this.maxScaleY = maxScaleY
-        limitTransAndScale(matrixTouch, contentRect)
+        mMinScaleY = minScaleY
+        mMaxScaleY = maxScaleY
+        limitTransAndScale(mMatrixTouch, mContentRect)
     }
+
+    /**
+     * Returns the charts-touch matrix used for translation and scale on touch.
+     *
+     * @return
+     */
+    open fun getMatrixTouch(): Matrix? {
+        return mMatrixTouch
+    }
+
+    /**
+     * ################ ################ ################ ################
+     */
     /**
      * ################ ################ ################ ################
      */
     /**
      * BELOW METHODS FOR BOUNDS CHECK
      */
-    fun isInBoundsX(x: Float): Boolean {
+    open fun isInBoundsX(x: Float): Boolean {
         return isInBoundsLeft(x) && isInBoundsRight(x)
     }
 
-    fun isInBoundsY(y: Float): Boolean {
+    open fun isInBoundsY(y: Float): Boolean {
         return isInBoundsTop(y) && isInBoundsBottom(y)
     }
 
-    fun isInBounds(x: Float, y: Float): Boolean {
+    open fun isInBounds(x: Float, y: Float): Boolean {
         return isInBoundsX(x) && isInBoundsY(y)
     }
 
-    fun isInBoundsLeft(x: Float): Boolean {
-        return contentRect.left <= x + 1
+    open fun isInBoundsLeft(x: Float): Boolean {
+        return mContentRect.left <= x + 1
     }
 
-    fun isInBoundsRight(x: Float): Boolean {
+    open fun isInBoundsRight(x: Float): Boolean {
         var x = x
         x = (x * 100f).toInt().toFloat() / 100f
-        return contentRect.right >= x - 1
+        return mContentRect.right >= x - 1
     }
 
-    fun isInBoundsTop(y: Float): Boolean {
-        return contentRect.top <= y
+    open fun isInBoundsTop(y: Float): Boolean {
+        return mContentRect.top <= y
     }
 
-    fun isInBoundsBottom(y: Float): Boolean {
+    open fun isInBoundsBottom(y: Float): Boolean {
         var y = y
         y = (y * 100f).toInt().toFloat() / 100f
-        return contentRect.bottom >= y
+        return mContentRect.bottom >= y
+    }
+
+    /**
+     * returns the current x-scale factor
+     */
+    open fun getScaleX(): Float {
+        return mScaleX
+    }
+
+    /**
+     * returns the current y-scale factor
+     */
+    open fun getScaleY(): Float {
+        return mScaleY
+    }
+
+    open fun getMinScaleX(): Float {
+        return mMinScaleX
+    }
+
+    open fun getMaxScaleX(): Float {
+        return mMaxScaleX
+    }
+
+    open fun getMinScaleY(): Float {
+        return mMinScaleY
+    }
+
+    open fun getMaxScaleY(): Float {
+        return mMaxScaleY
+    }
+
+    /**
+     * Returns the translation (drag / pan) distance on the x-axis
+     *
+     * @return
+     */
+    open fun getTransX(): Float {
+        return mTransX
+    }
+
+    /**
+     * Returns the translation (drag / pan) distance on the y-axis
+     *
+     * @return
+     */
+    open fun getTransY(): Float {
+        return mTransY
     }
 
     /**
@@ -558,16 +617,18 @@ open class ViewPortHandler
      *
      * @return
      */
-    val isFullyZoomedOut: Boolean
-        get() = isFullyZoomedOutX && isFullyZoomedOutY
+    open fun isFullyZoomedOut(): Boolean {
+        return isFullyZoomedOutX() && isFullyZoomedOutY()
+    }
 
     /**
      * Returns true if the chart is fully zoomed out on it's y-axis (vertical).
      *
      * @return
      */
-    val isFullyZoomedOutY: Boolean
-        get() = !(scaleY > minScaleY || minScaleY > 1f)
+    open fun isFullyZoomedOutY(): Boolean {
+        return !(mScaleY > mMinScaleY || mMinScaleY > 1f)
+    }
 
     /**
      * Returns true if the chart is fully zoomed out on it's x-axis
@@ -575,8 +636,9 @@ open class ViewPortHandler
      *
      * @return
      */
-    val isFullyZoomedOutX: Boolean
-        get() = !(scaleX > minScaleX || minScaleX > 1f)
+    open fun isFullyZoomedOutX(): Boolean {
+        return !(mScaleX > mMinScaleX || mMinScaleX > 1f)
+    }
 
     /**
      * Set an offset in dp that allows the user to drag the chart over it's
@@ -584,7 +646,7 @@ open class ViewPortHandler
      *
      * @param offset
      */
-    fun setDragOffsetX(offset: Float) {
+    open fun setDragOffsetX(offset: Float) {
         mTransOffsetX = convertDpToPixel(offset)
     }
 
@@ -594,7 +656,7 @@ open class ViewPortHandler
      *
      * @param offset
      */
-    fun setDragOffsetY(offset: Float) {
+    open fun setDragOffsetY(offset: Float) {
         mTransOffsetY = convertDpToPixel(offset)
     }
 
@@ -603,7 +665,7 @@ open class ViewPortHandler
      *
      * @return
      */
-    fun hasNoDragOffset(): Boolean {
+    open fun hasNoDragOffset(): Boolean {
         return mTransOffsetX <= 0 && mTransOffsetY <= 0
     }
 
@@ -612,8 +674,8 @@ open class ViewPortHandler
      *
      * @return
      */
-    fun canZoomOutMoreX(): Boolean {
-        return scaleX > minScaleX
+    open fun canZoomOutMoreX(): Boolean {
+        return mScaleX > mMinScaleX
     }
 
     /**
@@ -621,8 +683,8 @@ open class ViewPortHandler
      *
      * @return
      */
-    fun canZoomInMoreX(): Boolean {
-        return scaleX < maxScaleX
+    open fun canZoomInMoreX(): Boolean {
+        return mScaleX < mMaxScaleX
     }
 
     /**
@@ -630,8 +692,8 @@ open class ViewPortHandler
      *
      * @return
      */
-    fun canZoomOutMoreY(): Boolean {
-        return scaleY > minScaleY
+    open fun canZoomOutMoreY(): Boolean {
+        return mScaleY > mMinScaleY
     }
 
     /**
@@ -639,7 +701,7 @@ open class ViewPortHandler
      *
      * @return
      */
-    fun canZoomInMoreY(): Boolean {
-        return scaleY < maxScaleY
+    open fun canZoomInMoreY(): Boolean {
+        return mScaleY < mMaxScaleY
     }
 }

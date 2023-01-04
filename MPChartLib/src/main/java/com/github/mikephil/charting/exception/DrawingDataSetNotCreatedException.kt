@@ -1,7 +1,5 @@
 package com.github.mikephil.charting.exception
 
-import java.lang.RuntimeException
-
 object DrawingDataSetNotCreatedException : RuntimeException() {
     /**
      *

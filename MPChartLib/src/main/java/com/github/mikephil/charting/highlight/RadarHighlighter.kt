@@ -2,21 +2,24 @@ package com.github.mikephil.charting.highlight
 
 import com.github.mikephil.charting.charts.RadarChart
 import com.github.mikephil.charting.interfaces.datasets.IDataSet
-import com.github.mikephil.charting.utils.MPPointF
+import com.github.mikephil.charting.utils.MPPointF.Companion.getInstance
 import com.github.mikephil.charting.utils.Utils.getPosition
 
 /**
  * Created by philipp on 12/06/16.
  */
-class RadarHighlighter(chart: RadarChart) : PieRadarHighlighter<RadarChart?>(chart) {
+class RadarHighlighter : PieRadarHighlighter<RadarChart> {
+
+    constructor(chart: RadarChart) : super(chart) {}
+
     override fun getClosestHighlight(index: Int, x: Float, y: Float): Highlight? {
         val highlights = getHighlightsAtIndex(index)
-        val distanceToCenter = mChart!!.distanceToCenter(x, y) / mChart!!.factor
+        val distanceToCenter = mChart!!.distanceToCenter(x, y) / mChart!!.getFactor()
         var closest: Highlight? = null
         var distance = Float.MAX_VALUE
         for (i in highlights.indices) {
             val high = highlights[i]
-            val cdistance = Math.abs(high.y - distanceToCenter)
+            val cdistance = Math.abs(high.getY() - distanceToCenter)
             if (cdistance < distance) {
                 closest = high
                 distance = cdistance
@@ -34,29 +37,29 @@ class RadarHighlighter(chart: RadarChart) : PieRadarHighlighter<RadarChart?>(cha
      * @param index
      * @return
      */
-     fun getHighlightsAtIndex(index: Int): List<Highlight> {
+    private fun getHighlightsAtIndex(index: Int): List<Highlight> {
         mHighlightBuffer.clear()
-        val phaseX = mChart!!.animator.phaseX
-        val phaseY = mChart!!.animator.phaseY
-        val sliceangle = mChart!!.sliceAngle
-        val factor = mChart!!.factor
-        val pOut = MPPointF.getInstance(0, 0)
-        for (i in 0 until mChart.getData().getDataSetCount()) {
-            val dataSet: IDataSet<*> = mChart.getData().getDataSetByIndex(i)
-            val entry = dataSet.getEntryForIndex(index)!!
-            val y: Float = entry.y - mChart.getYChartMin()
+        val phaseX = mChart!!.getAnimator()!!.getPhaseX()
+        val phaseY = mChart!!.getAnimator()!!.getPhaseY()
+        val sliceangle = mChart!!.getSliceAngle()
+        val factor = mChart!!.getFactor()
+        val pOut = getInstance(0f, 0f)
+        for (i in 0 until mChart!!.getData().getDataSetCount()) {
+            val dataSet: IDataSet<*> = mChart!!.getData().getDataSetByIndex(i)
+            val entry = dataSet.getEntryForIndex(index)
+            val y = entry.getY() - mChart!!.getYChartMin()
             getPosition(
-                mChart.getCenterOffsets(), y * factor * phaseY,
-                sliceangle * index * phaseX + mChart!!.rotationAngle, pOut
+                mChart!!.getCenterOffsets()!!, y * factor * phaseY,
+                sliceangle * index * phaseX + mChart!!.getRotationAngle(), pOut
             )
             mHighlightBuffer.add(
                 Highlight(
                     index.toFloat(),
-                    entry.y,
+                    entry.getY(),
                     pOut.x,
                     pOut.y,
                     i,
-                    dataSet.axisDependency
+                    dataSet.getAxisDependency()
                 )
             )
         }

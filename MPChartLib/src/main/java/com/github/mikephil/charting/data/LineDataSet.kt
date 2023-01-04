@@ -6,45 +6,20 @@ import android.graphics.DashPathEffect
 import android.util.Log
 import com.github.mikephil.charting.formatter.DefaultFillFormatter
 import com.github.mikephil.charting.formatter.IFillFormatter
-import com.github.mikephil.charting.interfaces.datasets.IDataSet.colors
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.github.mikephil.charting.utils.ColorTemplate.createColors
 import com.github.mikephil.charting.utils.Utils.convertDpToPixel
 
-class LineDataSet(yVals: MutableList<Entry?>?, label: String?) :
-    LineRadarDataSet<Entry?>(yVals, label), ILineDataSet {
-    /**
-     * Returns the drawing mode for this line dataset
-     *
-     * @return
-     */
-    /**
-     * Returns the drawing mode for this LineDataSet
-     *
-     * @return
-     */
+class LineDataSet : LineRadarDataSet<Entry>, ILineDataSet {
     /**
      * Drawing mode for this line dataset
      */
-    override var mode = Mode.LINEAR
-    /**
-     * returns all colors specified for the circles
-     *
-     * @return
-     */
-    /**
-     * Sets the colors that should be used for the circles of this DataSet.
-     * Colors are reused as soon as the number of Entries the DataSet represents
-     * is higher than the size of the colors array. Make sure that the colors
-     * are already prepared (by calling getResources().getColor(...)) before
-     * adding them to the DataSet.
-     *
-     * @param colors
-     */
+    private var mMode = Mode.LINEAR
+
     /**
      * List representing all colors that are used for the circles
      */
-    var circleColors: List<Int>? = null
+    private var mCircleColors: MutableList<Int>? = null
 
     /**
      * the color of the inner circles
@@ -69,8 +44,7 @@ class LineDataSet(yVals: MutableList<Entry?>?, label: String?) :
     /**
      * the path effect of this DataSet that makes dashed lines possible
      */
-    override var dashPathEffect: DashPathEffect? = null
-        private set
+    private var mDashPathEffect: DashPathEffect? = null
 
     /**
      * formatter for customizing the position of the fill-line
@@ -80,31 +54,65 @@ class LineDataSet(yVals: MutableList<Entry?>?, label: String?) :
     /**
      * if true, drawing circles is enabled
      */
-    override var isDrawCirclesEnabled = true
-        private set
+    private var mDrawCircles = true
+
     private var mDrawCircleHole = true
-    override fun copy(): DataSet<Entry?>? {
-        val entries: MutableList<Entry?> = ArrayList()
+
+
+    constructor(yVals: MutableList<Entry>, label: String?) : super(yVals, label) {
+        // mCircleRadius = Utils.convertDpToPixel(4f);
+        // mLineWidth = Utils.convertDpToPixel(1f);
+        if (mCircleColors == null) {
+            mCircleColors = ArrayList()
+        }
+        mCircleColors!!.clear()
+
+        // default colors
+        // mColors.add(Color.rgb(192, 255, 140));
+        // mColors.add(Color.rgb(255, 247, 140));
+        mCircleColors!!.add(Color.rgb(140, 234, 255))
+    }
+
+    override fun copy(): DataSet<Entry> {
+        val entries: MutableList<Entry> = ArrayList()
         for (i in mEntries!!.indices) {
-            entries.add(mEntries!![i]!!.copy())
+            entries.add(mEntries!![i].copy())
         }
         val copied = LineDataSet(entries, getLabel())
         copy(copied)
         return copied
     }
 
-     fun copy(lineDataSet: LineDataSet) {
+    protected fun copy(lineDataSet: LineDataSet) {
         super.copy(lineDataSet)
-        lineDataSet.circleColors = circleColors
+        lineDataSet.mCircleColors = mCircleColors
         lineDataSet.mCircleHoleColor = mCircleHoleColor
         lineDataSet.mCircleHoleRadius = mCircleHoleRadius
         lineDataSet.mCircleRadius = mCircleRadius
         lineDataSet.mCubicIntensity = mCubicIntensity
-        lineDataSet.dashPathEffect = dashPathEffect
+        lineDataSet.mDashPathEffect = mDashPathEffect
         lineDataSet.mDrawCircleHole = mDrawCircleHole
-        lineDataSet.isDrawCirclesEnabled = mDrawCircleHole
+        lineDataSet.mDrawCircles = mDrawCircleHole
         lineDataSet.mFillFormatter = mFillFormatter
-        lineDataSet.mode = mode
+        lineDataSet.mMode = mMode
+    }
+
+    /**
+     * Returns the drawing mode for this line dataset
+     *
+     * @return
+     */
+    override fun getMode(): Mode {
+        return mMode
+    }
+
+    /**
+     * Returns the drawing mode for this LineDataSet
+     *
+     * @return
+     */
+    fun setMode(mode: Mode) {
+        mMode = mode
     }
 
     /**
@@ -113,14 +121,17 @@ class LineDataSet(yVals: MutableList<Entry?>?, label: String?) :
      *
      * @param intensity
      */
-    override var cubicIntensity: Float
-        get() = mCubicIntensity
-        set(intensity) {
-            var intensity = intensity
-            if (intensity > 1f) intensity = 1f
-            if (intensity < 0.05f) intensity = 0.05f
-            mCubicIntensity = intensity
-        }
+    fun setCubicIntensity(intensity: Float) {
+        var intensity = intensity
+        if (intensity > 1f) intensity = 1f
+        if (intensity < 0.05f) intensity = 0.05f
+        mCubicIntensity = intensity
+    }
+
+    override fun getCubicIntensity(): Float {
+        return mCubicIntensity
+    }
+
 
     /**
      * Sets the radius of the drawn circles.
@@ -128,15 +139,17 @@ class LineDataSet(yVals: MutableList<Entry?>?, label: String?) :
      *
      * @param radius
      */
-    override var circleRadius: Float
-        get() = mCircleRadius
-        set(radius) {
-            if (radius >= 1f) {
-                mCircleRadius = convertDpToPixel(radius)
-            } else {
-                Log.e("LineDataSet", "Circle radius cannot be < 1")
-            }
+    fun setCircleRadius(radius: Float) {
+        if (radius >= 1f) {
+            mCircleRadius = convertDpToPixel(radius)
+        } else {
+            Log.e("LineDataSet", "Circle radius cannot be < 1")
         }
+    }
+
+    override fun getCircleRadius(): Float {
+        return mCircleRadius
+    }
 
     /**
      * Sets the hole radius of the drawn circles.
@@ -144,18 +157,18 @@ class LineDataSet(yVals: MutableList<Entry?>?, label: String?) :
      *
      * @param holeRadius
      */
-    override var circleHoleRadius: Float
-        get() = mCircleHoleRadius
-        set(holeRadius) {
-            if (holeRadius >= 0.5f) {
-                mCircleHoleRadius = convertDpToPixel(holeRadius)
-            } else {
-                Log.e("LineDataSet", "Circle radius cannot be < 0.5")
-            }
+    fun setCircleHoleRadius(holeRadius: Float) {
+        if (holeRadius >= 0.5f) {
+            mCircleHoleRadius = convertDpToPixel(holeRadius)
+        } else {
+            Log.e("LineDataSet", "Circle radius cannot be < 0.5")
         }
-    /**
-     * This function is deprecated because of unclarity. Use getCircleRadius instead.
-     */
+    }
+
+    override fun getCircleHoleRadius(): Float {
+        return mCircleHoleRadius
+    }
+
     /**
      * sets the size (radius) of the circle shpaed value indicators,
      * default size = 4f
@@ -165,13 +178,18 @@ class LineDataSet(yVals: MutableList<Entry?>?, label: String?) :
      *
      * @param size
      */
-    @get:Deprecated("")
-    @set:Deprecated("")
-    var circleSize: Float
-        get() = circleRadius
-        set(size) {
-            circleRadius = size
-        }
+    @Deprecated("")
+    fun setCircleSize(size: Float) {
+        setCircleRadius(size)
+    }
+
+    /**
+     * This function is deprecated because of unclarity. Use getCircleRadius instead.
+     */
+    @Deprecated("")
+    fun getCircleSize(): Float {
+        return getCircleRadius()
+    }
 
     /**
      * Enables the line to be drawn in dashed mode, e.g. like this
@@ -183,7 +201,7 @@ class LineDataSet(yVals: MutableList<Entry?>?, label: String?) :
      * @param phase       offset, in degrees (normally, use 0)
      */
     fun enableDashedLine(lineLength: Float, spaceLength: Float, phase: Float) {
-        dashPathEffect = DashPathEffect(
+        mDashPathEffect = DashPathEffect(
             floatArrayOf(
                 lineLength, spaceLength
             ), phase
@@ -194,11 +212,16 @@ class LineDataSet(yVals: MutableList<Entry?>?, label: String?) :
      * Disables the line to be drawn in dashed mode.
      */
     fun disableDashedLine() {
-        dashPathEffect = null
+        mDashPathEffect = null
     }
 
-    override val isDashedLineEnabled: Boolean
-        get() = if (dashPathEffect == null) false else true
+    override fun isDashedLineEnabled(): Boolean {
+        return if (mDashPathEffect == null) false else true
+    }
+
+    override fun getDashPathEffect(): DashPathEffect {
+        return mDashPathEffect
+    }
 
     /**
      * set this to true to enable the drawing of circle indicators for this
@@ -207,24 +230,54 @@ class LineDataSet(yVals: MutableList<Entry?>?, label: String?) :
      * @param enabled
      */
     fun setDrawCircles(enabled: Boolean) {
-        isDrawCirclesEnabled = enabled
+        mDrawCircles = enabled
     }
 
-    @get:Deprecated("")
-    override val isDrawCubicEnabled: Boolean
-        get() = mode == Mode.CUBIC_BEZIER
+    override fun isDrawCirclesEnabled(): Boolean {
+        return mDrawCircles
+    }
 
-    @get:Deprecated("")
-    override val isDrawSteppedEnabled: Boolean
-        get() = mode == Mode.STEPPED
+    @Deprecated("")
+    override fun isDrawCubicEnabled(): Boolean {
+        return mMode == Mode.CUBIC_BEZIER
+    }
+
+    @Deprecated("")
+    override fun isDrawSteppedEnabled(): Boolean {
+        return mMode == Mode.STEPPED
+    }
+
+    /** ALL CODE BELOW RELATED TO CIRCLE-COLORS */
 
     /** ALL CODE BELOW RELATED TO CIRCLE-COLORS  */
+    /**
+     * returns all colors specified for the circles
+     *
+     * @return
+     */
+    fun getCircleColors(): List<Int>? {
+        return mCircleColors
+    }
+
     override fun getCircleColor(index: Int): Int {
-        return circleColors!![index]
+        return mCircleColors!![index]
     }
 
     override fun getCircleColorCount(): Int {
-        return circleColors!!.size
+        return mCircleColors!!.size
+    }
+
+    /**
+     * Sets the colors that should be used for the circles of this DataSet.
+     * Colors are reused as soon as the number of Entries the DataSet represents
+     * is higher than the size of the colors array. Make sure that the colors
+     * are already prepared (by calling getResources().getColor(...)) before
+     * adding them to the DataSet.
+     *
+     * @param colors
+     */
+    fun setCircleColors(colors: MutableList<Int>?) {
+        mCircleColors = colors
     }
 
     /**
@@ -237,7 +290,7 @@ class LineDataSet(yVals: MutableList<Entry?>?, label: String?) :
      * @param colors
      */
     fun setCircleColors(vararg colors: Int) {
-        circleColors = createColors(colors)
+        mCircleColors = createColors(colors)
     }
 
     /**
@@ -251,7 +304,7 @@ class LineDataSet(yVals: MutableList<Entry?>?, label: String?) :
      * @param colors
      */
     fun setCircleColors(colors: IntArray, c: Context) {
-        var clrs = circleColors
+        var clrs = mCircleColors
         if (clrs == null) {
             clrs = ArrayList()
         }
@@ -259,7 +312,7 @@ class LineDataSet(yVals: MutableList<Entry?>?, label: String?) :
         for (color in colors) {
             clrs.add(c.resources.getColor(color))
         }
-        circleColors = clrs
+        mCircleColors = clrs
     }
 
     /**
@@ -270,17 +323,17 @@ class LineDataSet(yVals: MutableList<Entry?>?, label: String?) :
      */
     fun setCircleColor(color: Int) {
         resetCircleColors()
-        circleColors.add(color)
+        mCircleColors!!.add(color)
     }
 
     /**
      * resets the circle-colors array and creates a new one
      */
     fun resetCircleColors() {
-        if (circleColors == null) {
-            circleColors = ArrayList()
+        if (mCircleColors == null) {
+            mCircleColors = ArrayList()
         }
-        circleColors.clear()
+        mCircleColors!!.clear()
     }
 
     /**
@@ -325,20 +378,5 @@ class LineDataSet(yVals: MutableList<Entry?>?, label: String?) :
 
     enum class Mode {
         LINEAR, STEPPED, CUBIC_BEZIER, HORIZONTAL_BEZIER
-    }
-
-    init {
-
-        // mCircleRadius = Utils.convertDpToPixel(4f);
-        // mLineWidth = Utils.convertDpToPixel(1f);
-        if (circleColors == null) {
-            circleColors = ArrayList()
-        }
-        circleColors.clear()
-
-        // default colors
-        // mColors.add(Color.rgb(192, 255, 140));
-        // mColors.add(Color.rgb(255, 247, 140));
-        circleColors.add(Color.rgb(140, 234, 255))
     }
 }

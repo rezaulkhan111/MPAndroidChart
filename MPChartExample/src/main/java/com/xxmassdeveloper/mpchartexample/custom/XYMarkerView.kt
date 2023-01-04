@@ -24,20 +24,18 @@ class XYMarkerView(context: Context?, private val xAxisValueFormatter: IAxisValu
 
     // runs every time the MarkerView is redrawn, can be used to update the
     // content (user-interface)
-    override fun refreshContent(e: Entry?, highlight: Highlight?) {
+    override fun refreshContent(e: Entry, highlight: Highlight) {
         tvContent.text = String.format(
-            "x: %s, y: %s", xAxisValueFormatter.getFormattedValue(
-                e!!.x, null
-            ), format.format(e.y)
+            "x: %s, y: %s",
+            xAxisValueFormatter.getFormattedValue(e.getX(), null),
+            format.format(e.getY().toDouble())
         )
         super.refreshContent(e, highlight)
     }
 
-    override var offset: MPPointF
-        get() = MPPointF((-(width / 2)).toFloat(), (-height).toFloat())
-        set(offset) {
-            super.offset = offset
-        }
+    override fun getOffset(): MPPointF {
+        return MPPointF((-(width / 2)).toFloat(), (-height).toFloat())
+    }
 
     init {
         tvContent = findViewById(R.id.tvContent)

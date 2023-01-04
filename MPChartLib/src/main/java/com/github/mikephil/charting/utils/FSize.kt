@@ -7,11 +7,8 @@ import com.github.mikephil.charting.utils.ObjectPool.Poolable
  * unit. Replacement for the android.Util.SizeF which is available only on API >= 21.
  */
 class FSize : Poolable {
-    // TODO : Encapsulate width & height
-    @JvmField
-    var width = 0f
 
-    @JvmField
+    var width = 0f
     var height = 0f
 
     companion object {
@@ -45,6 +42,7 @@ class FSize : Poolable {
     }
 
     constructor() {}
+
     constructor(width: Float, height: Float) {
         this.width = width
         this.height = height

@@ -4,7 +4,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet
 import com.github.mikephil.charting.utils.ColorTemplate
-import com.github.mikephil.charting.utils.Utils
+import com.github.mikephil.charting.utils.Utils.convertDpToPixel
 import com.github.mikephil.charting.utils.ViewPortHandler
 
 /**
@@ -12,17 +12,23 @@ import com.github.mikephil.charting.utils.ViewPortHandler
  * Created at Time 09:08
  */
 class SquareShapeRenderer : IShapeRenderer {
+
     override fun renderShape(
-        c: Canvas, dataSet: IScatterDataSet, viewPortHandler: ViewPortHandler?,
-        posX: Float, posY: Float, renderPaint: Paint
+        c: Canvas,
+        dataSet: IScatterDataSet,
+        viewPortHandler: ViewPortHandler,
+        posX: Float,
+        posY: Float,
+        renderPaint: Paint
     ) {
-        val shapeSize = dataSet.scatterShapeSize
+        val shapeSize = dataSet.getScatterShapeSize()
         val shapeHalf = shapeSize / 2f
-        val shapeHoleSizeHalf = Utils.convertDpToPixel(dataSet.scatterShapeHoleRadius)
+        val shapeHoleSizeHalf = convertDpToPixel(dataSet.getScatterShapeHoleRadius())
         val shapeHoleSize = shapeHoleSizeHalf * 2f
         val shapeStrokeSize = (shapeSize - shapeHoleSize) / 2f
         val shapeStrokeSizeHalf = shapeStrokeSize / 2f
-        val shapeHoleColor = dataSet.scatterShapeHoleColor
+        val shapeHoleColor = dataSet.getScatterShapeHoleColor()
+
         if (shapeSize > 0.0) {
             renderPaint.style = Paint.Style.STROKE
             renderPaint.strokeWidth = shapeStrokeSize

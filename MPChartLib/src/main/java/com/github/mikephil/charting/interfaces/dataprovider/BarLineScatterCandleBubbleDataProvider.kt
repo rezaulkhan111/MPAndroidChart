@@ -11,5 +11,5 @@ interface BarLineScatterCandleBubbleDataProvider : ChartInterface {
     fun getLowestVisibleX(): Float
     fun getHighestVisibleX(): Float
 
-    fun getData(): BarLineScatterCandleBubbleData<*>
+    override fun getData(): BarLineScatterCandleBubbleData<*>
 }

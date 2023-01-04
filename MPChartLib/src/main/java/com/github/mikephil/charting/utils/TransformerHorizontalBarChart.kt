@@ -5,35 +5,28 @@ package com.github.mikephil.charting.utils
  *
  * @author Philipp Jahoda
  */
-class TransformerHorizontalBarChart(viewPortHandler: ViewPortHandler?) : Transformer(
-    viewPortHandler!!
-) {
+class TransformerHorizontalBarChart : Transformer {
+
+    constructor(viewPortHandler: ViewPortHandler?) : super(viewPortHandler) {
+    }
+
     /**
      * Prepares the matrix that contains all offsets.
      *
      * @param inverted
      */
     override fun prepareMatrixOffset(inverted: Boolean) {
-        offsetMatrix.reset()
-
-        // offset.postTranslate(mOffsetLeft, getHeight() - mOffsetBottom);
-        if (!inverted) offsetMatrix.postTranslate(
-            mViewPortHandler.offsetLeft(),
-            mViewPortHandler.chartHeight - mViewPortHandler.offsetBottom()
+        mMatrixOffset.reset()
+        if (!inverted) mMatrixOffset.postTranslate(
+            mViewPortHandler!!.offsetLeft(),
+            mViewPortHandler!!.chartHeight - mViewPortHandler!!.offsetBottom()
         ) else {
-            offsetMatrix
+            mMatrixOffset
                 .setTranslate(
-                    -(mViewPortHandler.chartWidth - mViewPortHandler.offsetRight()),
-                    mViewPortHandler.chartHeight - mViewPortHandler.offsetBottom()
+                    -(mViewPortHandler!!.chartWidth - mViewPortHandler!!.offsetRight()),
+                    mViewPortHandler!!.chartHeight - mViewPortHandler!!.offsetBottom()
                 )
-            offsetMatrix.postScale(-1.0f, 1.0f)
+            mMatrixOffset.postScale(-1.0f, 1.0f)
         }
-
-        // mMatrixOffset.set(offset);
-
-        // mMatrixOffset.reset();
-        //
-        // mMatrixOffset.postTranslate(mOffsetLeft, getHeight() -
-        // mOffsetBottom);
     }
 }

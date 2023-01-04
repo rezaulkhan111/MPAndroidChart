@@ -9,12 +9,14 @@ import android.util.Log
  */
 @SuppressLint("ParcelCreator")
 class PieEntry : Entry {
-    var label: String? = null
+
+    private var label: String? = null
 
     constructor(value: Float) : super(0f, value) {}
     constructor(value: Float, data: Any?) : super(0f, value, data) {}
     constructor(value: Float, icon: Drawable?) : super(0f, value, icon) {}
     constructor(value: Float, icon: Drawable?, data: Any?) : super(0f, value, icon, data) {}
+
     constructor(value: Float, label: String?) : super(0f, value) {
         this.label = label
     }
@@ -41,22 +43,31 @@ class PieEntry : Entry {
      *
      * @return
      */
-    val value: Float
-        get() = y
+    fun getValue(): Float {
+        return getY()
+    }
 
-    @get:Deprecated("")
-    @set:Deprecated("")
-    override var x: Float
-        get() {
-            Log.i("DEPRECATED", "Pie entries do not have x values")
-            return super.getX()
-        }
-        set(x) {
-            super.setX(x)
-            Log.i("DEPRECATED", "Pie entries do not have x values")
-        }
+    fun getLabel(): String? {
+        return label
+    }
+
+    fun setLabel(label: String?) {
+        this.label = label
+    }
+
+    @Deprecated("")
+    override fun setX(x: Float) {
+        super.setX(x)
+        Log.i("DEPRECATED", "Pie entries do not have x values")
+    }
+
+    @Deprecated("")
+    override fun getX(): Float {
+        Log.i("DEPRECATED", "Pie entries do not have x values")
+        return super.getX()
+    }
 
     override fun copy(): PieEntry {
-        return PieEntry(y, label, data)
+        return PieEntry(getY(), label, getData())
     }
 }

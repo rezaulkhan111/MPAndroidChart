@@ -10,34 +10,17 @@ import android.graphics.drawable.Drawable
  */
 @SuppressLint("ParcelCreator")
 class CandleEntry : Entry {
-    /**
-     * Returns the upper shadows highest value.
-     *
-     * @return
-     */
     /** shadow-high value  */
-    var high = 0f
-    /**
-     * Returns the lower shadows lowest value.
-     *
-     * @return
-     */
+    private var mShadowHigh = 0f
+
     /** shadow-low value  */
-    var low = 0f
-    /**
-     * Returns the bodys close value.
-     *
-     * @return
-     */
+    private var mShadowLow = 0f
+
     /** close value  */
-    var close = 0f
-    /**
-     * Returns the bodys open value.
-     *
-     * @return
-     */
+    private var mClose = 0f
+
     /** open value  */
-    var open = 0f
+    private var mOpen = 0f
 
     /**
      * Constructor.
@@ -52,10 +35,10 @@ class CandleEntry : Entry {
         x,
         (shadowH + shadowL) / 2f
     ) {
-        high = shadowH
-        low = shadowL
-        this.open = open
-        this.close = close
+        mShadowHigh = shadowH
+        mShadowLow = shadowL
+        mOpen = open
+        mClose = close
     }
 
     /**
@@ -72,10 +55,10 @@ class CandleEntry : Entry {
         x: Float, shadowH: Float, shadowL: Float, open: Float, close: Float,
         data: Any?
     ) : super(x, (shadowH + shadowL) / 2f, data) {
-        high = shadowH
-        low = shadowL
-        this.open = open
-        this.close = close
+        mShadowHigh = shadowH
+        mShadowLow = shadowL
+        mOpen = open
+        mClose = close
     }
 
     /**
@@ -92,10 +75,10 @@ class CandleEntry : Entry {
         x: Float, shadowH: Float, shadowL: Float, open: Float, close: Float,
         icon: Drawable?
     ) : super(x, (shadowH + shadowL) / 2f, icon) {
-        high = shadowH
-        low = shadowL
-        this.open = open
-        this.close = close
+        mShadowHigh = shadowH
+        mShadowLow = shadowL
+        mOpen = open
+        mClose = close
     }
 
     /**
@@ -113,10 +96,10 @@ class CandleEntry : Entry {
         x: Float, shadowH: Float, shadowL: Float, open: Float, close: Float,
         icon: Drawable?, data: Any?
     ) : super(x, (shadowH + shadowL) / 2f, icon, data) {
-        high = shadowH
-        low = shadowL
-        this.open = open
-        this.close = close
+        mShadowHigh = shadowH
+        mShadowLow = shadowL
+        mOpen = open
+        mClose = close
     }
 
     /**
@@ -125,31 +108,83 @@ class CandleEntry : Entry {
      *
      * @return
      */
-    val shadowRange: Float
-        get() = Math.abs(high - low)
+    fun getShadowRange(): Float {
+        return Math.abs(mShadowHigh - mShadowLow)
+    }
 
     /**
      * Returns the body size (difference between open and close).
      *
      * @return
      */
-    val bodyRange: Float
-        get() = Math.abs(open - close)
+    fun getBodyRange(): Float {
+        return Math.abs(mOpen - mClose)
+    }
 
     /**
      * Returns the center value of the candle. (Middle value between high and
      * low)
      */
-    override var y: Float
-        get() = super.getY()
-        set(y) {
-            super.y = y
-        }
+    override fun getY(): Float {
+        return super.getY()
+    }
 
     override fun copy(): CandleEntry {
         return CandleEntry(
-            x, high, low, open,
-            close, data
+            getX(), mShadowHigh, mShadowLow, mOpen,
+            mClose, getData()
         )
+    }
+
+    /**
+     * Returns the upper shadows highest value.
+     *
+     * @return
+     */
+    fun getHigh(): Float {
+        return mShadowHigh
+    }
+
+    fun setHigh(mShadowHigh: Float) {
+        this.mShadowHigh = mShadowHigh
+    }
+
+    /**
+     * Returns the lower shadows lowest value.
+     *
+     * @return
+     */
+    fun getLow(): Float {
+        return mShadowLow
+    }
+
+    fun setLow(mShadowLow: Float) {
+        this.mShadowLow = mShadowLow
+    }
+
+    /**
+     * Returns the bodys close value.
+     *
+     * @return
+     */
+    fun getClose(): Float {
+        return mClose
+    }
+
+    fun setClose(mClose: Float) {
+        this.mClose = mClose
+    }
+
+    /**
+     * Returns the bodys open value.
+     *
+     * @return
+     */
+    fun getOpen(): Float {
+        return mOpen
+    }
+
+    fun setOpen(mOpen: Float) {
+        this.mOpen = mOpen
     }
 }

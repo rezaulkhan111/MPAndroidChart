@@ -8,6 +8,7 @@ import com.github.mikephil.charting.utils.ObjectPool.Poolable
  * Created by Tony Patino on 6/24/16.
  */
 class MPPointF : Poolable {
+
     @JvmField
     var x = 0f
 
@@ -68,6 +69,7 @@ class MPPointF : Poolable {
     }
 
     constructor() {}
+
     constructor(x: Float, y: Float) {
         this.x = x
         this.y = y
@@ -78,11 +80,19 @@ class MPPointF : Poolable {
      * parcel. To write a point to a parcel, call writeToParcel().
      * Provided to support older Android devices.
      *
-     * @param in The parcel to read the point's coordinates from
+     * @param `in` The parcel to read the point's coordinates from
      */
-    fun my_readFromParcel(`in`: Parcel) {
-        x = `in`.readFloat()
-        y = `in`.readFloat()
+    fun my_readFromParcel(parcel: Parcel) {
+        x = parcel.readFloat()
+        y = parcel.readFloat()
+    }
+
+    fun getX(): Float {
+        return x
+    }
+
+    fun getY(): Float {
+        return y
     }
 
     override fun instantiate(): Poolable {

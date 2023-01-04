@@ -13,25 +13,36 @@ import com.github.mikephil.charting.utils.ViewPortHandler
  * Created at Time 09:08
  */
 class TriangleShapeRenderer : IShapeRenderer {
-    protected var mTrianglePathBuffer = Path()
+
+    private var mTrianglePathBuffer = Path()
+
     override fun renderShape(
-        c: Canvas, dataSet: IScatterDataSet, viewPortHandler: ViewPortHandler?,
-        posX: Float, posY: Float, renderPaint: Paint
+        c: Canvas,
+        dataSet: IScatterDataSet,
+        viewPortHandler: ViewPortHandler,
+        posX: Float,
+        posY: Float,
+        renderPaint: Paint
     ) {
-        val shapeSize = dataSet.scatterShapeSize
+        val shapeSize = dataSet.getScatterShapeSize()
         val shapeHalf = shapeSize / 2f
-        val shapeHoleSizeHalf = convertDpToPixel(dataSet.scatterShapeHoleRadius)
+        val shapeHoleSizeHalf = convertDpToPixel(dataSet.getScatterShapeHoleRadius())
         val shapeHoleSize = shapeHoleSizeHalf * 2f
         val shapeStrokeSize = (shapeSize - shapeHoleSize) / 2f
-        val shapeHoleColor = dataSet.scatterShapeHoleColor
+        val shapeHoleColor = dataSet.getScatterShapeHoleColor()
+
         renderPaint.style = Paint.Style.FILL
+
+        // create a triangle path
 
         // create a triangle path
         val tri = mTrianglePathBuffer
         tri.reset()
+
         tri.moveTo(posX, posY - shapeHalf)
         tri.lineTo(posX + shapeHalf, posY + shapeHalf)
         tri.lineTo(posX - shapeHalf, posY + shapeHalf)
+
         if (shapeSize > 0.0) {
             tri.lineTo(posX, posY - shapeHalf)
             tri.moveTo(
@@ -51,9 +62,12 @@ class TriangleShapeRenderer : IShapeRenderer {
                 posY + shapeHalf - shapeStrokeSize
             )
         }
+
         tri.close()
+
         c.drawPath(tri, renderPaint)
         tri.reset()
+
         if (shapeSize > 0.0 &&
             shapeHoleColor != ColorTemplate.COLOR_NONE
         ) {

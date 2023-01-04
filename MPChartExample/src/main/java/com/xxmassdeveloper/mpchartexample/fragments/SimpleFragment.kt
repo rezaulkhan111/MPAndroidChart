@@ -1,10 +1,11 @@
 package com.xxmassdeveloper.mpchartexample.fragments
 
-import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.github.mikephil.charting.charts.ScatterChart.ScatterShape.Companion.allDefaultShapes
 import com.github.mikephil.charting.data.*
@@ -15,28 +16,29 @@ import com.github.mikephil.charting.utils.ColorTemplate
 import com.github.mikephil.charting.utils.FileUtils.loadEntriesFromAssets
 
 abstract class SimpleFragment : Fragment() {
+
     private var tf: Typeface? = null
-     var context: Context? = null
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        this.context = context
-    }
+//    var context: Context? = null
+//    override fun onAttach(context: Context) {
+//        super.onAttach(context)
+//        this.context = context
+//    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        tf = Typeface.createFromAsset(context!!.assets, "OpenSans-Regular.ttf")
+        tf = Typeface.createFromAsset(requireContext().assets, "OpenSans-Regular.ttf")
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
-     fun generateBarData(dataSets: Int, range: Float, count: Int): BarData {
+    fun generateBarData(dataSets: Int, range: Float, count: Int): BarData {
         val sets = ArrayList<IBarDataSet>()
         for (i in 0 until dataSets) {
             val entries = ArrayList<BarEntry?>()
             for (j in 0 until count) {
-                entries.add(BarEntry(j, (Math.random() * range).toFloat() + range / 4))
+                entries.add(BarEntry(j.toFloat(), (Math.random() * range).toFloat() + range / 4))
             }
             val ds = BarDataSet(entries, getLabel(i))
             ds.setColors(*ColorTemplate.VORDIPLOM_COLORS)
@@ -47,11 +49,11 @@ abstract class SimpleFragment : Fragment() {
         return d
     }
 
-     fun generateScatterData(dataSets: Int, range: Float, count: Int): ScatterData {
+    fun generateScatterData(dataSets: Int, range: Float, count: Int): ScatterData {
         val sets = ArrayList<IScatterDataSet>()
         val shapes = allDefaultShapes
         for (i in 0 until dataSets) {
-            val entries = ArrayList<Entry?>()
+            val entries = ArrayList<Entry>()
             for (j in 0 until count) {
                 entries.add(Entry(j.toFloat(), (Math.random() * range).toFloat() + range / 4))
             }
@@ -71,40 +73,44 @@ abstract class SimpleFragment : Fragment() {
      * generates less data (1 DataSet, 4 values)
      * @return PieData
      */
-     fun generatePieData(): PieData {
+    fun generatePieData(): PieData {
         val count = 4
-        val entries1 = ArrayList<PieEntry?>()
+        val entries1 = ArrayList<PieEntry>()
         for (i in 0 until count) {
             entries1.add(PieEntry((Math.random() * 60 + 40).toFloat(), "Quarter " + (i + 1)))
         }
         val ds1 = PieDataSet(entries1, "Quarterly Revenues 2015")
         ds1.setColors(*ColorTemplate.VORDIPLOM_COLORS)
-        ds1.sliceSpace = 2f
-        ds1.valueTextColor = Color.WHITE
-        ds1.valueTextSize = 12f
+        ds1.setSliceSpace(2f)
+        ds1.setValueTextColor(Color.WHITE)
+        ds1.setValueTextSize(12f)
         val d = PieData(ds1)
         d.setValueTypeface(tf)
         return d
     }
 
-     fun generateLineData(): LineData {
+    fun generateLineData(): LineData {
         val sets = ArrayList<ILineDataSet>()
         val ds1 = LineDataSet(
             loadEntriesFromAssets(
-                context!!.assets, "sine.txt"
-            ), "Sine function"
+                requireContext().assets, "sine.txt"
+            ).toMutableList(), "Sine function"
         )
         val ds2 = LineDataSet(
             loadEntriesFromAssets(
-                context!!.assets, "cosine.txt"
-            ), "Cosine function"
+                requireContext().assets, "cosine.txt"
+            ).toMutableList(), "Cosine function"
         )
-        ds1.lineWidth = 2f
-        ds2.lineWidth = 2f
+
+        ds1.setLineWidth(2f)
+        ds2.setLineWidth(2f)
+
         ds1.setDrawCircles(false)
         ds2.setDrawCircles(false)
-        ds1.color = ColorTemplate.VORDIPLOM_COLORS[0]
-        ds2.color = ColorTemplate.VORDIPLOM_COLORS[1]
+
+        ds1.setColor(ColorTemplate.VORDIPLOM_COLORS[0])
+        ds2.setColor(ColorTemplate.VORDIPLOM_COLORS[1])
+
 
         // load DataSets from files in assets folder
         sets.add(ds1)
@@ -115,45 +121,47 @@ abstract class SimpleFragment : Fragment() {
     }
 
     // load DataSets from files in assets folder
-     val complexity: LineData
-         get() {
+    val complexity: LineData
+        get() {
             val sets = ArrayList<ILineDataSet>()
             val ds1 = LineDataSet(
                 loadEntriesFromAssets(
-                    context!!.assets, "n.txt"
-                ), "O(n)"
+                   requireContext().assets, "n.txt"
+                ).toMutableList(), "O(n)"
             )
             val ds2 = LineDataSet(
                 loadEntriesFromAssets(
-                    context!!.assets, "nlogn.txt"
-                ), "O(nlogn)"
+                    requireContext().assets, "nlogn.txt"
+                ).toMutableList(), "O(nlogn)"
             )
             val ds3 = LineDataSet(
                 loadEntriesFromAssets(
-                    context!!.assets, "square.txt"
-                ), "O(n\u00B2)"
+                    requireContext().assets, "square.txt"
+                ).toMutableList(), "O(n\u00B2)"
             )
             val ds4 = LineDataSet(
                 loadEntriesFromAssets(
-                    context!!.assets, "three.txt"
-                ), "O(n\u00B3)"
+                    requireContext().assets, "three.txt"
+                ).toMutableList(), "O(n\u00B3)"
             )
-            ds1.color = ColorTemplate.VORDIPLOM_COLORS[0]
-            ds2.color = ColorTemplate.VORDIPLOM_COLORS[1]
-            ds3.color = ColorTemplate.VORDIPLOM_COLORS[2]
-            ds4.color = ColorTemplate.VORDIPLOM_COLORS[3]
+            ds1.setColor(ColorTemplate.VORDIPLOM_COLORS[0])
+            ds2.setColor(ColorTemplate.VORDIPLOM_COLORS[1])
+            ds3.setColor(ColorTemplate.VORDIPLOM_COLORS[2])
+            ds4.setColor(ColorTemplate.VORDIPLOM_COLORS[3])
+
             ds1.setCircleColor(ColorTemplate.VORDIPLOM_COLORS[0])
             ds2.setCircleColor(ColorTemplate.VORDIPLOM_COLORS[1])
             ds3.setCircleColor(ColorTemplate.VORDIPLOM_COLORS[2])
             ds4.setCircleColor(ColorTemplate.VORDIPLOM_COLORS[3])
-            ds1.lineWidth = 2.5f
-            ds1.circleRadius = 3f
-            ds2.lineWidth = 2.5f
-            ds2.circleRadius = 3f
-            ds3.lineWidth = 2.5f
-            ds3.circleRadius = 3f
-            ds4.lineWidth = 2.5f
-            ds4.circleRadius = 3f
+
+            ds1.setLineWidth(2.5f)
+            ds1.setCircleRadius(3f)
+            ds2.setLineWidth(2.5f)
+            ds2.setCircleRadius(3f)
+            ds3.setLineWidth(2.5f)
+            ds3.setCircleRadius(3f)
+            ds4.setLineWidth(2.5f)
+            ds4.setCircleRadius(3f)
 
 
             // load DataSets from files in assets folder

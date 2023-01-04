@@ -16,11 +16,11 @@ class LegendEntry {
      * @param formColor The color for drawing the form.
      */
     constructor(
-        label: String,
+        label: String?,
         form: LegendForm,
         formSize: Float,
         formLineWidth: Float,
-        formLineDashEffect: DashPathEffect,
+        formLineDashEffect: DashPathEffect?,
         formColor: Int
     ) {
         this.label = label

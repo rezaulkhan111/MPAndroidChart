@@ -6,7 +6,6 @@ import android.os.ParcelFormatException
 import android.os.Parcelable
 import android.os.Parcelable.Creator
 import com.github.mikephil.charting.utils.Utils
-import kotlin.math.abs
 
 /**
  * Class representing one entry in the chart. Might contain multiple values.
@@ -15,16 +14,6 @@ import kotlin.math.abs
  * @author Philipp Jahoda
  */
 open class Entry : BaseEntry, Parcelable {
-    /**
-     * Returns the x-value of this Entry object.
-     *
-     * @return
-     */
-    /**
-     * Sets the x-value of this Entry object.
-     *
-     * @param x
-     */
     /** the x value  */
     private var x = 0f
 
@@ -97,7 +86,7 @@ open class Entry : BaseEntry, Parcelable {
      *
      * @return
      */
-    open fun copy(): Entry? {
+    open fun copy(): Entry {
         return Entry(x, getY(), getData())
     }
 
@@ -109,24 +98,18 @@ open class Entry : BaseEntry, Parcelable {
      * @param e
      * @return
      */
-    fun equalTo(e: Entry?): Boolean {
-        if (e == null) {
-            return false
-        }
-        if (e.getData() !== this.getData()) {
-            return false
-        }
-        if (abs(e.x - x) > Utils.FLOAT_EPSILON) {
-            return false
-        }
-        return abs(e.getY() - getY()) <= Utils.FLOAT_EPSILON
+    open fun equalTo(e: Entry?): Boolean {
+        if (e == null) return false
+        if (e.getData() !== getData()) return false
+        if (Math.abs(e.x - x) > Utils.FLOAT_EPSILON) return false
+        return if (Math.abs(e.getY() - getY()) > Utils.FLOAT_EPSILON) false else true
     }
 
     /**
      * returns a string representation of the entry containing x-index and value
      */
     override fun toString(): String {
-        return "Entry, x: $x y: ${getY()}"
+        return "Entry, x: " + x + " y: " + getY()
     }
 
     override fun describeContents(): Int {
@@ -139,7 +122,7 @@ open class Entry : BaseEntry, Parcelable {
         if (getData() != null) {
             if (getData() is Parcelable) {
                 dest.writeInt(1)
-                dest.writeParcelable(this.getData() as Parcelable, flags)
+                dest.writeParcelable(getData() as Parcelable, flags)
             } else {
                 throw ParcelFormatException("Cannot parcel an Entry with non-parcelable data")
             }
@@ -148,24 +131,22 @@ open class Entry : BaseEntry, Parcelable {
         }
     }
 
-    constructor(parcelIn: Parcel) {
-        this.x = parcelIn.readFloat()
-        this.setY(parcelIn.readFloat())
+    private constructor(parcelIn: Parcel) {
+        x = parcelIn.readFloat()
+        setY(parcelIn.readFloat())
         if (parcelIn.readInt() == 1) {
-            this.setData(parcelIn.readParcelable(Any::class.java.classLoader))
+            setData(parcelIn.readParcelable(Any::class.java.classLoader)!!)
         }
     }
 
-    companion object {
-        @JvmField
-        val CREATOR: Creator<Entry> = object : Creator<Entry> {
-            override fun createFromParcel(source: Parcel): Entry {
-                return Entry(source)
-            }
+    @JvmField
+    val CREATOR: Creator<Entry> = object : Creator<Entry> {
+        override fun createFromParcel(source: Parcel): Entry {
+            return Entry(source)
+        }
 
-            override fun newArray(size: Int): Array<Entry?> {
-                return arrayOfNulls(size)
-            }
+        override fun newArray(size: Int): Array<Entry?> {
+            return arrayOfNulls(size)
         }
     }
 }

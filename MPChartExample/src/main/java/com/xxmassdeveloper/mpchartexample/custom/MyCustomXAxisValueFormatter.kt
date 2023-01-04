@@ -14,11 +14,7 @@ class MyCustomXAxisValueFormatter(private val mViewPortHandler: ViewPortHandler)
     IAxisValueFormatter {
     private val mFormat: DecimalFormat
     override fun getFormattedValue(value: Float, axis: AxisBase?): String {
-
-        //Log.i("TRANS", "x: " + viewPortHandler.getTransX() + ", y: " + viewPortHandler.getTransY());
-
-        // e.g. adjust the x-axis values depending on scale / zoom level
-        val xScale = mViewPortHandler.scaleX
+        val xScale = mViewPortHandler.getScaleX()
         return if (xScale > 5) "4" else if (xScale > 3) "3" else if (xScale > 1) "2" else mFormat.format(
             value.toDouble()
         )

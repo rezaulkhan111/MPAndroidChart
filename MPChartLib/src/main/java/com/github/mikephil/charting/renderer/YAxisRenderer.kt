@@ -2,283 +2,226 @@ package com.github.mikephil.charting.renderer
 
 import android.graphics.*
 import android.graphics.Paint.Align
-import com.github.mikephil.charting.components.LimitLine
 import com.github.mikephil.charting.components.LimitLine.LimitLabelPosition
-import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.components.XAxis.XAxisPosition
 import com.github.mikephil.charting.components.YAxis
+import com.github.mikephil.charting.components.YAxis.AxisDependency
+import com.github.mikephil.charting.components.YAxis.YAxisLabelPosition
 import com.github.mikephil.charting.utils.*
-import com.github.mikephil.charting.utils.FSize.Companion.recycleInstance
-import com.github.mikephil.charting.utils.MPPointD.Companion.recycleInstance
-import com.github.mikephil.charting.utils.MPPointF.Companion.getInstance
-import com.github.mikephil.charting.utils.MPPointF.Companion.recycleInstance
-import com.github.mikephil.charting.utils.Transformer.pointValuesToPixel
 import com.github.mikephil.charting.utils.Utils.calcTextHeight
-import com.github.mikephil.charting.utils.Utils.calcTextSize
-import com.github.mikephil.charting.utils.Utils.calcTextWidth
 import com.github.mikephil.charting.utils.Utils.convertDpToPixel
-import com.github.mikephil.charting.utils.Utils.drawXAxisValue
-import com.github.mikephil.charting.utils.Utils.getSizeOfRotatedRectangleByDegrees
 
 open class YAxisRenderer : AxisRenderer {
 
-    var mXAxis: XAxis? = null
+    protected var mYAxis: YAxis? = null
 
-    constructor(viewPortHandler: ViewPortHandler?, xAxis: XAxis?, trans: Transformer?) :
-            super(
-                viewPortHandler,
-                trans,
-                xAxis
-            ) {
-        mXAxis = xAxis
-        mAxisLabelPaint.setColor(Color.BLACK)
-        mAxisLabelPaint.setTextAlign(Align.CENTER)
-        mAxisLabelPaint.setTextSize(convertDpToPixel(10f))
+    protected var mZeroLinePaint: Paint? = null
+
+    constructor(viewPortHandler: ViewPortHandler?, yAxis: YAxis?, trans: Transformer?) : super(
+        viewPortHandler,
+        trans,
+        yAxis
+    ) {
+        mYAxis = yAxis
+        if (mViewPortHandler != null) {
+            mAxisLabelPaint!!.color = Color.BLACK
+            mAxisLabelPaint!!.textSize = convertDpToPixel(10f)
+            mZeroLinePaint = Paint(Paint.ANTI_ALIAS_FLAG)
+            mZeroLinePaint!!.color = Color.GRAY
+            mZeroLinePaint!!.strokeWidth = 1f
+            mZeroLinePaint!!.style = Paint.Style.STROKE
+        }
     }
 
-    protected open fun setupGridPaint() {
-        mGridPaint.setColor(mXAxis!!.gridColor)
-        mGridPaint.setStrokeWidth(mXAxis!!.gridLineWidth)
-        mGridPaint.setPathEffect(mXAxis!!.gridDashPathEffect)
-    }
-
-    override fun computeAxis(min: Float, max: Float, inverted: Boolean) {
-
-        // calculate the starting and entry point of the y-labels (depending on
-        // zoom / contentrect bounds)
-        var min = min
-        var max = max
-        if (mViewPortHandler.contentWidth() > 10 && !mViewPortHandler.isFullyZoomedOutX) {
-            val p1: MPPointD = mTrans.getValuesByTouchPoint(
-                mViewPortHandler.contentLeft(),
-                mViewPortHandler.contentTop()
-            )
-            val p2: MPPointD = mTrans.getValuesByTouchPoint(
-                mViewPortHandler.contentRight(),
-                mViewPortHandler.contentTop()
-            )
-            if (inverted) {
-                min = p2.x.toFloat()
-                max = p1.x.toFloat()
+    /**
+     * draws the y-axis labels to the screen
+     */
+    override fun renderAxisLabels(c: Canvas?) {
+        if (!mYAxis!!.isEnabled() || !mYAxis!!.isDrawLabelsEnabled()) return
+        val positions = getTransformedPositions()
+        mAxisLabelPaint!!.typeface = mYAxis!!.getTypeface()
+        mAxisLabelPaint!!.textSize = mYAxis!!.getTextSize()
+        mAxisLabelPaint!!.color = mYAxis!!.getTextColor()
+        val xoffset = mYAxis!!.getXOffset()
+        val yoffset = calcTextHeight(mAxisLabelPaint!!, "A") / 2.5f + mYAxis!!.getYOffset()
+        val dependency = mYAxis!!.getAxisDependency()
+        val labelPosition = mYAxis!!.getLabelPosition()
+        var xPos = 0f
+        if (dependency === AxisDependency.LEFT) {
+            if (labelPosition === YAxisLabelPosition.OUTSIDE_CHART) {
+                mAxisLabelPaint!!.textAlign = Align.RIGHT
+                xPos = mViewPortHandler!!.offsetLeft() - xoffset
             } else {
-                min = p1.x.toFloat()
-                max = p2.x.toFloat()
+                mAxisLabelPaint!!.textAlign = Align.LEFT
+                xPos = mViewPortHandler!!.offsetLeft() + xoffset
             }
-            recycleInstance(p1)
-            recycleInstance(p2)
+        } else {
+            if (labelPosition === YAxisLabelPosition.OUTSIDE_CHART) {
+                mAxisLabelPaint!!.textAlign = Align.LEFT
+                xPos = mViewPortHandler!!.contentRight() + xoffset
+            } else {
+                mAxisLabelPaint!!.textAlign = Align.RIGHT
+                xPos = mViewPortHandler!!.contentRight() - xoffset
+            }
         }
-        computeAxisValues(min, max)
+        drawYLabels(c!!, xPos, positions, yoffset)
     }
 
-    protected override fun computeAxisValues(min: Float, max: Float) {
-        super.computeAxisValues(min, max)
-        computeSize()
-    }
-
-    protected open fun computeSize() {
-        val longest = mXAxis!!.longestLabel
-        mAxisLabelPaint.setTypeface(mXAxis!!.typeface)
-        mAxisLabelPaint.setTextSize(mXAxis!!.textSize)
-        val labelSize = calcTextSize(mAxisLabelPaint, longest)
-        val labelWidth = labelSize.width
-        val labelHeight = calcTextHeight(mAxisLabelPaint, "Q").toFloat()
-        val labelRotatedSize = getSizeOfRotatedRectangleByDegrees(
-            labelWidth,
-            labelHeight,
-            mXAxis!!.labelRotationAngle
-        )
-        mXAxis!!.mLabelWidth = Math.round(labelWidth)
-        mXAxis!!.mLabelHeight = Math.round(labelHeight)
-        mXAxis!!.mLabelRotatedWidth = Math.round(labelRotatedSize.width)
-        mXAxis!!.mLabelRotatedHeight = Math.round(labelRotatedSize.height)
-        recycleInstance(labelRotatedSize)
-        recycleInstance(labelSize)
-    }
-
-    open fun renderAxisLabels(c: Canvas?) {
-        if (!mXAxis!!.isEnabled || !mXAxis!!.isDrawLabelsEnabled) return
-        val yoffset = mXAxis!!.yOffset
-        mAxisLabelPaint.setTypeface(mXAxis!!.typeface)
-        mAxisLabelPaint.setTextSize(mXAxis!!.textSize)
-        mAxisLabelPaint.setColor(mXAxis!!.textColor)
-        val pointF = getInstance(0, 0)
-        if (mXAxis!!.position === XAxisPosition.TOP) {
-            pointF.x = 0.5f
-            pointF.y = 1.0f
-            drawLabels(c, mViewPortHandler.contentTop() - yoffset, pointF)
-        } else if (mXAxis!!.position === XAxisPosition.TOP_INSIDE) {
-            pointF.x = 0.5f
-            pointF.y = 1.0f
-            drawLabels(
-                c,
-                mViewPortHandler.contentTop() + yoffset + mXAxis!!.mLabelRotatedHeight,
-                pointF
+    override fun renderAxisLine(c: Canvas?) {
+        if (!mYAxis!!.isEnabled() || !mYAxis!!.isDrawAxisLineEnabled()) return
+        mAxisLinePaint!!.color = mYAxis!!.getAxisLineColor()
+        mAxisLinePaint!!.strokeWidth = mYAxis!!.getAxisLineWidth()
+        if (mYAxis!!.getAxisDependency() === AxisDependency.LEFT) {
+            c!!.drawLine(
+                mViewPortHandler!!.contentLeft(),
+                mViewPortHandler!!.contentTop(),
+                mViewPortHandler!!.contentLeft(),
+                mViewPortHandler!!.contentBottom(),
+                mAxisLinePaint!!
             )
-        } else if (mXAxis!!.position === XAxisPosition.BOTTOM) {
-            pointF.x = 0.5f
-            pointF.y = 0.0f
-            drawLabels(c, mViewPortHandler.contentBottom() + yoffset, pointF)
-        } else if (mXAxis!!.position === XAxisPosition.BOTTOM_INSIDE) {
-            pointF.x = 0.5f
-            pointF.y = 0.0f
-            drawLabels(
-                c,
-                mViewPortHandler.contentBottom() - yoffset - mXAxis!!.mLabelRotatedHeight,
-                pointF
-            )
-        } else { // BOTH SIDED
-            pointF.x = 0.5f
-            pointF.y = 1.0f
-            drawLabels(c, mViewPortHandler.contentTop() - yoffset, pointF)
-            pointF.x = 0.5f
-            pointF.y = 0.0f
-            drawLabels(c, mViewPortHandler.contentBottom() + yoffset, pointF)
-        }
-        recycleInstance(pointF)
-    }
-
-    override fun renderAxisLine(c: Canvas) {
-        if (!mXAxis!!.isDrawAxisLineEnabled || !mXAxis!!.isEnabled) return
-        mAxisLinePaint.setColor(mXAxis!!.axisLineColor)
-        mAxisLinePaint.setStrokeWidth(mXAxis!!.axisLineWidth)
-        mAxisLinePaint.setPathEffect(mXAxis!!.axisLineDashPathEffect)
-        if (mXAxis!!.position === XAxisPosition.TOP || mXAxis!!.position === XAxisPosition.TOP_INSIDE || mXAxis!!.position === XAxisPosition.BOTH_SIDED) {
-            c.drawLine(
-                mViewPortHandler.contentLeft(),
-                mViewPortHandler.contentTop(), mViewPortHandler.contentRight(),
-                mViewPortHandler.contentTop(), mAxisLinePaint
-            )
-        }
-        if (mXAxis!!.position === XAxisPosition.BOTTOM || mXAxis!!.position === XAxisPosition.BOTTOM_INSIDE || mXAxis!!.position === XAxisPosition.BOTH_SIDED) {
-            c.drawLine(
-                mViewPortHandler.contentLeft(),
-                mViewPortHandler.contentBottom(), mViewPortHandler.contentRight(),
-                mViewPortHandler.contentBottom(), mAxisLinePaint
+        } else {
+            c!!.drawLine(
+                mViewPortHandler!!.contentRight(),
+                mViewPortHandler!!.contentTop(),
+                mViewPortHandler!!.contentRight(),
+                mViewPortHandler!!.contentBottom(),
+                mAxisLinePaint!!
             )
         }
     }
 
     /**
-     * draws the x-labels on the specified y-position
+     * draws the y-labels on the specified x-position
      *
-     * @param pos
+     * @param fixedPosition
+     * @param positions
      */
-    protected open fun drawLabels(c: Canvas?, pos: Float, anchor: MPPointF?) {
-        val labelRotationAngleDegrees = mXAxis!!.labelRotationAngle
-        val centeringEnabled = mXAxis!!.isCenterAxisLabelsEnabled
-        val positions = FloatArray(mXAxis!!.mEntryCount * 2)
-        run {
-            var i = 0
-            while (i < positions.size) {
-
-
-                // only fill x values
-                if (centeringEnabled) {
-                    positions[i] = mXAxis!!.mCenteredEntries[i / 2]
-                } else {
-                    positions[i] = mXAxis!!.mEntries[i / 2]
-                }
-                i += 2
-            }
-        }
-        mTrans.pointValuesToPixel(positions)
-        var i = 0
-        while (i < positions.size) {
-            var x = positions[i]
-            if (mViewPortHandler.isInBoundsX(x)) {
-                val label =
-                    mXAxis!!.valueFormatter!!.getFormattedValue(mXAxis!!.mEntries[i / 2], mXAxis)
-                if (mXAxis!!.isAvoidFirstLastClippingEnabled) {
-
-                    // avoid clipping of the last
-                    if (i / 2 == mXAxis!!.mEntryCount - 1 && mXAxis!!.mEntryCount > 1) {
-                        val width = calcTextWidth(mAxisLabelPaint, label).toFloat()
-                        if (width > mViewPortHandler.offsetRight() * 2
-                            && x + width > mViewPortHandler.chartWidth
-                        ) x -= width / 2
-
-                        // avoid clipping of the first
-                    } else if (i == 0) {
-                        val width = calcTextWidth(mAxisLabelPaint, label).toFloat()
-                        x += width / 2
-                    }
-                }
-                drawLabel(c, label, x, pos, anchor, labelRotationAngleDegrees)
-            }
-            i += 2
-        }
-    }
-
-    protected open fun drawLabel(
-        c: Canvas?,
-        formattedLabel: String?,
-        x: Float,
-        y: Float,
-        anchor: MPPointF?,
-        angleDegrees: Float
+    protected open fun drawYLabels(
+        c: Canvas,
+        fixedPosition: Float,
+        positions: FloatArray,
+        offset: Float
     ) {
-        drawXAxisValue(
-            c!!,
-            formattedLabel!!, x, y, mAxisLabelPaint, anchor!!, angleDegrees
-        )
+        val from = if (mYAxis!!.isDrawBottomYLabelEntryEnabled()) 0 else 1
+        val to =
+            if (mYAxis!!.isDrawTopYLabelEntryEnabled()) mYAxis!!.mEntryCount else mYAxis!!.mEntryCount - 1
+        val xOffset = mYAxis!!.getLabelXOffset()
+
+        // draw
+        for (i in from until to) {
+            val text = mYAxis!!.getFormattedLabel(i)
+            c.drawText(
+                text!!,
+                fixedPosition + xOffset,
+                positions[i * 2 + 1] + offset,
+                mAxisLabelPaint!!
+            )
+        }
     }
 
     protected var mRenderGridLinesPath = Path()
-    protected var mRenderGridLinesBuffer = FloatArray(2)
-    override fun renderGridLines(c: Canvas) {
-        if (!mXAxis!!.isDrawGridLinesEnabled || !mXAxis!!.isEnabled) return
-        val clipRestoreCount = c.save()
-        c.clipRect(getGridClippingRect()!!)
-        if (mRenderGridLinesBuffer.size != mAxis.mEntryCount * 2) {
-            mRenderGridLinesBuffer = FloatArray(mXAxis!!.mEntryCount * 2)
-        }
-        val positions = mRenderGridLinesBuffer
-        run {
+    override fun renderGridLines(c: Canvas?) {
+        if (!mYAxis!!.isEnabled()) return
+        if (mYAxis!!.isDrawGridLinesEnabled()) {
+            val clipRestoreCount = c!!.save()
+            c.clipRect(getGridClippingRect()!!)
+            val positions = getTransformedPositions()
+            mGridPaint!!.color = mYAxis!!.getGridColor()
+            mGridPaint!!.strokeWidth = mYAxis!!.getGridLineWidth()
+            mGridPaint!!.pathEffect = mYAxis!!.getGridDashPathEffect()
+            val gridLinePath = mRenderGridLinesPath
+            gridLinePath.reset()
+
+            // draw the grid
             var i = 0
             while (i < positions.size) {
-                positions[i] = mXAxis!!.mEntries[i / 2]
-                positions[i + 1] = mXAxis!!.mEntries[i / 2]
+
+
+                // draw a path because lines don't support dashing on lower android versions
+                c.drawPath(linePath(gridLinePath, i, positions)!!, mGridPaint!!)
+                gridLinePath.reset()
                 i += 2
             }
+            c.restoreToCount(clipRestoreCount)
         }
-        mTrans.pointValuesToPixel(positions)
-        setupGridPaint()
-        val gridLinePath = mRenderGridLinesPath
-        gridLinePath.reset()
-        var i = 0
-        while (i < positions.size) {
-            drawGridLine(c, positions[i], positions[i + 1], gridLinePath)
-            i += 2
+        if (mYAxis!!.isDrawZeroLineEnabled()) {
+            drawZeroLine(c!!)
         }
-        c.restoreToCount(clipRestoreCount)
     }
 
     protected var mGridClippingRect = RectF()
 
     open fun getGridClippingRect(): RectF? {
-        mGridClippingRect.set(mViewPortHandler.contentRect)
-        mGridClippingRect.inset(-mAxis.gridLineWidth, 0f)
+        mGridClippingRect.set(mViewPortHandler!!.getContentRect()!!)
+        mGridClippingRect.inset(0f, -mAxis!!.getGridLineWidth())
         return mGridClippingRect
     }
 
     /**
-     * Draws the grid line at the specified position using the provided path.
+     * Calculates the path for a grid line.
      *
-     * @param c
-     * @param x
-     * @param y
-     * @param gridLinePath
+     * @param p
+     * @param i
+     * @param positions
+     * @return
      */
-    protected open fun drawGridLine(c: Canvas, x: Float, y: Float, gridLinePath: Path) {
-        gridLinePath.moveTo(x, mViewPortHandler.contentBottom())
-        gridLinePath.lineTo(x, mViewPortHandler.contentTop())
-
-        // draw a path because lines don't support dashing on lower android versions
-        c.drawPath(gridLinePath, mGridPaint)
-        gridLinePath.reset()
+    protected open fun linePath(p: Path, i: Int, positions: FloatArray): Path? {
+        p.moveTo(mViewPortHandler!!.offsetLeft(), positions[i + 1])
+        p.lineTo(mViewPortHandler!!.contentRight(), positions[i + 1])
+        return p
     }
 
-    protected var mRenderLimitLinesBuffer = FloatArray(2)
+    protected var mGetTransformedPositionsBuffer = FloatArray(2)
+
+    /**
+     * Transforms the values contained in the axis entries to screen pixels and returns them in form of a float array
+     * of x- and y-coordinates.
+     *
+     * @return
+     */
+    protected open fun getTransformedPositions(): FloatArray {
+        if (mGetTransformedPositionsBuffer.size != mYAxis!!.mEntryCount * 2) {
+            mGetTransformedPositionsBuffer = FloatArray(mYAxis!!.mEntryCount * 2)
+        }
+        val positions = mGetTransformedPositionsBuffer
+        var i = 0
+        while (i < positions.size) {
+
+            // only fill y values, x values are not needed for y-labels
+            positions[i + 1] = mYAxis!!.mEntries[i / 2]
+            i += 2
+        }
+        mTrans!!.pointValuesToPixel(positions)
+        return positions
+    }
+
+    protected var mDrawZeroLinePath = Path()
+    protected var mZeroLineClippingRect = RectF()
+
+    /**
+     * Draws the zero line.
+     */
+    protected open fun drawZeroLine(c: Canvas) {
+        val clipRestoreCount = c.save()
+        mZeroLineClippingRect.set(mViewPortHandler!!.getContentRect()!!)
+        mZeroLineClippingRect.inset(0f, -mYAxis!!.getZeroLineWidth())
+        c.clipRect(mZeroLineClippingRect)
+
+        // draw zero line
+        val pos = mTrans!!.getPixelForValues(0f, 0f)!!
+        mZeroLinePaint!!.color = mYAxis!!.getZeroLineColor()
+        mZeroLinePaint!!.strokeWidth = mYAxis!!.getZeroLineWidth()
+        val zeroLinePath = mDrawZeroLinePath
+        zeroLinePath.reset()
+        zeroLinePath.moveTo(mViewPortHandler!!.contentLeft(), pos.y.toFloat())
+        zeroLinePath.lineTo(mViewPortHandler!!.contentRight(), pos.y.toFloat())
+
+        // draw a path because lines don't support dashing on lower android versions
+        c.drawPath(zeroLinePath, mZeroLinePaint!!)
+        c.restoreToCount(clipRestoreCount)
+    }
+
+    protected var mRenderLimitLines = Path()
+    private var mRenderLimitLinesBuffer = FloatArray(2)
     protected var mLimitLineClippingRect = RectF()
 
     /**
@@ -286,98 +229,79 @@ open class YAxisRenderer : AxisRenderer {
      *
      * @param c
      */
-    override fun renderLimitLines(c: Canvas) {
-        val limitLines = mXAxis!!.limitLines
+    override fun renderLimitLines(c: Canvas?) {
+        val limitLines = mYAxis!!.getLimitLines()
         if (limitLines == null || limitLines.size <= 0) return
-        val position = mRenderLimitLinesBuffer
-        position[0] = 0
-        position[1] = 0
+        val pts = mRenderLimitLinesBuffer
+        pts[0] = 0f
+        pts[1] = 0f
+        val limitLinePath = mRenderLimitLines
+        limitLinePath.reset()
         for (i in limitLines.indices) {
             val l = limitLines[i]
-            if (!l.isEnabled) continue
-            val clipRestoreCount = c.save()
-            mLimitLineClippingRect.set(mViewPortHandler.contentRect)
-            mLimitLineClippingRect.inset(-l.lineWidth, 0f)
+            if (!l!!.isEnabled()) continue
+            val clipRestoreCount = c!!.save()
+            mLimitLineClippingRect.set(mViewPortHandler!!.getContentRect()!!)
+            mLimitLineClippingRect.inset(0f, -l.getLineWidth())
             c.clipRect(mLimitLineClippingRect)
-            position[0] = l.limit
-            position[1] = 0f
-            mTrans.pointValuesToPixel(position)
-            renderLimitLineLine(c, l, position)
-            renderLimitLineLabel(c, l, position, 2f + l.yOffset)
-            c.restoreToCount(clipRestoreCount)
-        }
-    }
+            mLimitLinePaint!!.style = Paint.Style.STROKE
+            mLimitLinePaint!!.color = l.getLineColor()
+            mLimitLinePaint!!.strokeWidth = l.getLineWidth()
+            mLimitLinePaint!!.pathEffect = l.getDashPathEffect()
+            pts[1] = l.getLimit()
+            mTrans!!.pointValuesToPixel(pts)
+            limitLinePath.moveTo(mViewPortHandler!!.contentLeft(), pts[1])
+            limitLinePath.lineTo(mViewPortHandler!!.contentRight(), pts[1])
+            c.drawPath(limitLinePath, mLimitLinePaint!!)
+            limitLinePath.reset()
+            // c.drawLines(pts, mLimitLinePaint);
+            val label = l.getLabel()
 
-    var mLimitLineSegmentsBuffer = FloatArray(4)
-    private val mLimitLinePath = Path()
-
-    open fun renderLimitLineLine(c: Canvas, limitLine: LimitLine, position: FloatArray) {
-        mLimitLineSegmentsBuffer[0] = position[0]
-        mLimitLineSegmentsBuffer[1] = mViewPortHandler.contentTop()
-        mLimitLineSegmentsBuffer[2] = position[0]
-        mLimitLineSegmentsBuffer[3] = mViewPortHandler.contentBottom()
-        mLimitLinePath.reset()
-        mLimitLinePath.moveTo(mLimitLineSegmentsBuffer[0], mLimitLineSegmentsBuffer[1])
-        mLimitLinePath.lineTo(mLimitLineSegmentsBuffer[2], mLimitLineSegmentsBuffer[3])
-        mLimitLinePaint!!.style = Paint.Style.STROKE
-        mLimitLinePaint!!.color = limitLine.lineColor
-        mLimitLinePaint!!.strokeWidth = limitLine.lineWidth
-        mLimitLinePaint!!.pathEffect = limitLine.dashPathEffect
-        c.drawPath(mLimitLinePath, mLimitLinePaint!!)
-    }
-
-    open fun renderLimitLineLabel(
-        c: Canvas,
-        limitLine: LimitLine,
-        position: FloatArray,
-        yOffset: Float
-    ) {
-        val label = limitLine.label
-
-        // if drawing the limit-value label is enabled
-        if (label != null && label != "") {
-            mLimitLinePaint!!.style = limitLine.textStyle
-            mLimitLinePaint!!.pathEffect = null
-            mLimitLinePaint!!.color = limitLine.textColor
-            mLimitLinePaint!!.strokeWidth = 0.5f
-            mLimitLinePaint!!.textSize = limitLine.textSize
-            val xOffset = limitLine.lineWidth + limitLine.xOffset
-            val labelPosition = limitLine.labelPosition
-            if (labelPosition === LimitLabelPosition.RIGHT_TOP) {
+            // if drawing the limit-value label is enabled
+            if (label != null && label != "") {
+                mLimitLinePaint!!.style = l.getTextStyle()
+                mLimitLinePaint!!.pathEffect = null
+                mLimitLinePaint!!.color = l.getTextColor()
+                mLimitLinePaint!!.typeface = l.getTypeface()
+                mLimitLinePaint!!.strokeWidth = 0.5f
+                mLimitLinePaint!!.textSize = l.getTextSize()
                 val labelLineHeight = calcTextHeight(
                     mLimitLinePaint!!, label
                 ).toFloat()
-                mLimitLinePaint!!.textAlign = Align.LEFT
-                c.drawText(
-                    label,
-                    position[0] + xOffset,
-                    mViewPortHandler.contentTop() + yOffset + labelLineHeight,
-                    mLimitLinePaint!!
-                )
-            } else if (labelPosition === LimitLabelPosition.RIGHT_BOTTOM) {
-                mLimitLinePaint!!.textAlign = Align.LEFT
-                c.drawText(
-                    label, position[0] + xOffset, mViewPortHandler.contentBottom() - yOffset,
-                    mLimitLinePaint!!
-                )
-            } else if (labelPosition === LimitLabelPosition.LEFT_TOP) {
-                mLimitLinePaint!!.textAlign = Align.RIGHT
-                val labelLineHeight = calcTextHeight(
-                    mLimitLinePaint!!, label
-                ).toFloat()
-                c.drawText(
-                    label,
-                    position[0] - xOffset,
-                    mViewPortHandler.contentTop() + yOffset + labelLineHeight,
-                    mLimitLinePaint!!
-                )
-            } else {
-                mLimitLinePaint!!.textAlign = Align.RIGHT
-                c.drawText(
-                    label, position[0] - xOffset, mViewPortHandler.contentBottom() - yOffset,
-                    mLimitLinePaint!!
-                )
+                val xOffset = convertDpToPixel(4f) + l.getXOffset()
+                val yOffset = l.getLineWidth() + labelLineHeight + l.getYOffset()
+                val position = l.getLabelPosition()
+                if (position === LimitLabelPosition.RIGHT_TOP) {
+                    mLimitLinePaint!!.textAlign = Align.RIGHT
+                    c.drawText(
+                        label,
+                        mViewPortHandler!!.contentRight() - xOffset,
+                        pts[1] - yOffset + labelLineHeight, mLimitLinePaint!!
+                    )
+                } else if (position === LimitLabelPosition.RIGHT_BOTTOM) {
+                    mLimitLinePaint!!.textAlign = Align.RIGHT
+                    c.drawText(
+                        label,
+                        mViewPortHandler!!.contentRight() - xOffset,
+                        pts[1] + yOffset, mLimitLinePaint!!
+                    )
+                } else if (position === LimitLabelPosition.LEFT_TOP) {
+                    mLimitLinePaint!!.textAlign = Align.LEFT
+                    c.drawText(
+                        label,
+                        mViewPortHandler!!.contentLeft() + xOffset,
+                        pts[1] - yOffset + labelLineHeight, mLimitLinePaint!!
+                    )
+                } else {
+                    mLimitLinePaint!!.textAlign = Align.LEFT
+                    c.drawText(
+                        label,
+                        mViewPortHandler!!.offsetLeft() + xOffset,
+                        pts[1] + yOffset, mLimitLinePaint!!
+                    )
+                }
             }
+            c.restoreToCount(clipRestoreCount)
         }
     }
 }

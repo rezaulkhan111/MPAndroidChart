@@ -12,7 +12,8 @@ import java.text.DecimalFormat
  * @author Philipp Jahoda
  */
 class PercentFormatter : IValueFormatter, IAxisValueFormatter {
-    protected var mFormat: DecimalFormat
+
+    private var mFormat: DecimalFormat? = null
 
     constructor() {
         mFormat = DecimalFormat("###,###,##0.0")
@@ -23,7 +24,7 @@ class PercentFormatter : IValueFormatter, IAxisValueFormatter {
      *
      * @param format
      */
-    constructor(format: DecimalFormat) {
+    constructor(format: DecimalFormat?) {
         mFormat = format
     }
 
@@ -34,14 +35,15 @@ class PercentFormatter : IValueFormatter, IAxisValueFormatter {
         dataSetIndex: Int,
         viewPortHandler: ViewPortHandler?
     ): String {
-        return mFormat.format(value.toDouble()) + " %"
+        return mFormat!!.format(value.toDouble()) + " %"
     }
 
     // IAxisValueFormatter
     override fun getFormattedValue(value: Float, axis: AxisBase?): String {
-        return mFormat.format(value.toDouble()) + " %"
+        return mFormat!!.format(value.toDouble()) + " %"
     }
 
-    val decimalDigits: Int
-        get() = 1
+    fun getDecimalDigits(): Int {
+        return 1
+    }
 }

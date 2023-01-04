@@ -6,6 +6,7 @@ import android.view.View
 import android.view.View.OnTouchListener
 
 class OnDrawLineChartTouchListener : SimpleOnGestureListener(), OnTouchListener {
+
     override fun onTouch(v: View, event: MotionEvent): Boolean {
         return false
     }

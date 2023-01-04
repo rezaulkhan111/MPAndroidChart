@@ -15,20 +15,25 @@ import java.text.DecimalFormat
  * @author Philipp Jahoda
  * @author Oleksandr Tyshkovets <olexandr.tyshkovets></olexandr.tyshkovets>@gmail.com>
  */
-class LargeValueFormatter() : IValueFormatter, IAxisValueFormatter {
+class LargeValueFormatter : IValueFormatter, IAxisValueFormatter {
+
     private var mSuffix = arrayOf(
         "", "k", "m", "b", "t"
     )
     private var mMaxLength = 5
-    private val mFormat: DecimalFormat
+    private var mFormat: DecimalFormat? = null
     private var mText = ""
+
+    constructor() {
+        mFormat = DecimalFormat("###E00")
+    }
 
     /**
      * Creates a formatter that appends a specified text to the result string
      *
      * @param appendix a text that will be appended
      */
-    constructor(appendix: String) : this() {
+    constructor(appendix: String) : super() {
         mText = appendix
     }
 
@@ -75,21 +80,20 @@ class LargeValueFormatter() : IValueFormatter, IAxisValueFormatter {
      * (https://github.com/romangromov) for this piece of code.
      */
     private fun makePretty(number: Double): String {
-        var r = mFormat.format(number)
+        var r = mFormat!!.format(number)
         val numericValue1 = Character.getNumericValue(r[r.length - 1])
         val numericValue2 = Character.getNumericValue(r[r.length - 2])
         val combined = Integer.valueOf(numericValue2.toString() + "" + numericValue1)
+
         r = r.replace("E[0-9][0-9]".toRegex(), mSuffix[combined / 3])
-        while (r.length > mMaxLength || r.matches("[0-9]+\\.[a-z]")) {
+
+        while (r.length > mMaxLength || r.matches(Regex("[0-9]+\\.[a-z]"))) {
             r = r.substring(0, r.length - 2) + r.substring(r.length - 1)
         }
         return r
     }
 
-    val decimalDigits: Int
-        get() = 0
-
-    init {
-        mFormat = DecimalFormat("###E00")
+    fun getDecimalDigits(): Int {
+        return 0
     }
 }

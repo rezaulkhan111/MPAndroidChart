@@ -9,118 +9,72 @@ import com.github.mikephil.charting.components.YAxis.AxisDependency
  */
 class Highlight {
     /**
-     * returns the x-value of the highlighted value
-     *
-     * @return
-     */
-    /**
      * the x-value of the highlighted value
      */
-    var x = Float.NaN
-        private set
-    /**
-     * returns the y-value of the highlighted value
-     *
-     * @return
-     */
+    private var mX = Float.NaN
+
     /**
      * the y-value of the highlighted value
      */
-    var y = Float.NaN
-        private set
-    /**
-     * returns the x-position of the highlight in pixels
-     */
+    private var mY = Float.NaN
+
     /**
      * the x-pixel of the highlight
      */
-    var xPx = 0f
-        private set
-    /**
-     * returns the y-position of the highlight in pixels
-     */
+    private var mXPx = 0f
+
     /**
      * the y-pixel of the highlight
      */
-    var yPx = 0f
-        private set
-    /**
-     * the index of the data object - in case it refers to more than one
-     *
-     * @return
-     */
+    private var mYPx = 0f
+
     /**
      * the index of the data object - in case it refers to more than one
      */
-    var dataIndex = -1
-    /**
-     * returns the index of the DataSet the highlighted value is in
-     *
-     * @return
-     */
+    private var mDataIndex = -1
+
     /**
      * the index of the dataset the highlighted value is in
      */
-    var dataSetIndex: Int
-        private set
-    /**
-     * Only needed if a stacked-barchart entry was highlighted. References the
-     * selected value within the stacked-entry.
-     *
-     * @return
-     */
+    private var mDataSetIndex = 0
+
     /**
      * index which value of a stacked bar entry is highlighted, default -1
      */
-    var stackIndex = -1
-        private set
-    /**
-     * Returns the axis the highlighted value belongs to.
-     *
-     * @return
-     */
+    private var mStackIndex = -1
+
     /**
      * the axis the highlighted value belongs to
      */
-    var axis: AxisDependency? = null
-        private set
-    /**
-     * Returns the x-position in pixels where this highlight object was last drawn.
-     *
-     * @return
-     */
+    private var axis: AxisDependency? = null
+
     /**
      * the x-position (pixels) on which this highlight object was last drawn
      */
-    var drawX = 0f
-        private set
-    /**
-     * Returns the y-position in pixels where this highlight object was last drawn.
-     *
-     * @return
-     */
+    private var mDrawX = 0f
+
     /**
      * the y-position (pixels) on which this highlight object was last drawn
      */
-    var drawY = 0f
-        private set
+    private var mDrawY = 0f
 
     constructor(x: Float, y: Float, dataSetIndex: Int, dataIndex: Int) {
-        this.x = x
-        this.y = y
-        this.dataSetIndex = dataSetIndex
-        this.dataIndex = dataIndex
+        mX = x
+        mY = y
+        mDataSetIndex = dataSetIndex
+        mDataIndex = dataIndex
     }
 
     constructor(x: Float, y: Float, dataSetIndex: Int) {
-        this.x = x
-        this.y = y
-        this.dataSetIndex = dataSetIndex
-        dataIndex = -1
+        mX = x
+        mY = y
+        mDataSetIndex = dataSetIndex
+        mDataIndex = -1
     }
 
-    constructor(x: Float, dataSetIndex: Int, stackIndex: Int) : this(x, Float.NaN, dataSetIndex) {
-        this.stackIndex = stackIndex
+    constructor(x: Float, dataSetIndex: Int, stackIndex: Int) {
+        this(x, Float.NaN, dataSetIndex)
+        mStackIndex = stackIndex
     }
 
     /**
@@ -138,11 +92,11 @@ class Highlight {
         dataSetIndex: Int,
         axis: AxisDependency?
     ) {
-        this.x = x
-        this.y = y
-        this.xPx = xPx
-        this.yPx = yPx
-        this.dataSetIndex = dataSetIndex
+        mX = x
+        mY = y
+        mXPx = xPx
+        mYPx = yPx
+        mDataSetIndex = dataSetIndex
         this.axis = axis
     }
 
@@ -163,12 +117,87 @@ class Highlight {
         dataSetIndex: Int,
         stackIndex: Int,
         axis: AxisDependency?
-    ) : this(x, y, xPx, yPx, dataSetIndex, axis) {
-        this.stackIndex = stackIndex
+    ) {
+        this(x, y, xPx, yPx, dataSetIndex, axis)
+        mStackIndex = stackIndex
     }
 
-    val isStacked: Boolean
-        get() = stackIndex >= 0
+    /**
+     * returns the x-value of the highlighted value
+     *
+     * @return
+     */
+    fun getX(): Float {
+        return mX
+    }
+
+    /**
+     * returns the y-value of the highlighted value
+     *
+     * @return
+     */
+    fun getY(): Float {
+        return mY
+    }
+
+    /**
+     * returns the x-position of the highlight in pixels
+     */
+    fun getXPx(): Float {
+        return mXPx
+    }
+
+    /**
+     * returns the y-position of the highlight in pixels
+     */
+    fun getYPx(): Float {
+        return mYPx
+    }
+
+    /**
+     * the index of the data object - in case it refers to more than one
+     *
+     * @return
+     */
+    fun getDataIndex(): Int {
+        return mDataIndex
+    }
+
+    fun setDataIndex(mDataIndex: Int) {
+        this.mDataIndex = mDataIndex
+    }
+
+    /**
+     * returns the index of the DataSet the highlighted value is in
+     *
+     * @return
+     */
+    fun getDataSetIndex(): Int {
+        return mDataSetIndex
+    }
+
+    /**
+     * Only needed if a stacked-barchart entry was highlighted. References the
+     * selected value within the stacked-entry.
+     *
+     * @return
+     */
+    fun getStackIndex(): Int {
+        return mStackIndex
+    }
+
+    fun isStacked(): Boolean {
+        return mStackIndex >= 0
+    }
+
+    /**
+     * Returns the axis the highlighted value belongs to.
+     *
+     * @return
+     */
+    fun getAxis(): AxisDependency? {
+        return axis
+    }
 
     /**
      * Sets the x- and y-position (pixels) where this highlight was last drawn.
@@ -177,8 +206,26 @@ class Highlight {
      * @param y
      */
     fun setDraw(x: Float, y: Float) {
-        drawX = x
-        drawY = y
+        mDrawX = x
+        mDrawY = y
+    }
+
+    /**
+     * Returns the x-position in pixels where this highlight object was last drawn.
+     *
+     * @return
+     */
+    fun getDrawX(): Float {
+        return mDrawX
+    }
+
+    /**
+     * Returns the y-position in pixels where this highlight object was last drawn.
+     *
+     * @return
+     */
+    fun getDrawY(): Float {
+        return mDrawY
     }
 
     /**
@@ -190,13 +237,12 @@ class Highlight {
      */
     fun equalTo(h: Highlight?): Boolean {
         return if (h == null) false else {
-            if (dataSetIndex == h.dataSetIndex && x == h.x && stackIndex == h.stackIndex && dataIndex == h.dataIndex
-            ) true else false
+            if (mDataSetIndex == h.mDataSetIndex && mX == h.mX && mStackIndex == h.mStackIndex && mDataIndex == h.mDataIndex) true else false
         }
     }
 
     override fun toString(): String {
-        return ("Highlight, x: " + x + ", y: " + y + ", dataSetIndex: " + dataSetIndex
-                + ", stackIndex (only stacked barentry): " + stackIndex)
+        return ("Highlight, x: " + mX + ", y: " + mY + ", dataSetIndex: " + mDataSetIndex
+                + ", stackIndex (only stacked barentry): " + mStackIndex)
     }
 }

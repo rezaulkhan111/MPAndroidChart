@@ -25,9 +25,9 @@ import java.util.*
 
 class InvertedLineChartActivity : DemoBase(), OnSeekBarChangeListener,
     OnChartValueSelectedListener {
-    private var chart: LineChart? = null
-    private var seekBarX: SeekBar? = null
-    private var seekBarY: SeekBar? = null
+    private lateinit var chart: LineChart
+    private lateinit var seekBarX: SeekBar
+    private lateinit var seekBarY: SeekBar
     private var tvX: TextView? = null
     private var tvY: TextView? = null
     override fun onCreate(savedInstanceState: Bundle?) {

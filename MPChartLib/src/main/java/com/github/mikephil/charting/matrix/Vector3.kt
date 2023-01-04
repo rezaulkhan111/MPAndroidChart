@@ -8,7 +8,13 @@ class Vector3 {
     var y = 0f
     var z = 0f
 
+    val ZERO: Vector3 = Vector3(0f, 0f, 0f)
+    val UNIT_X: Vector3 = Vector3(1f, 0f, 0f)
+    val UNIT_Y: Vector3 = Vector3(0f, 1f, 0f)
+    val UNIT_Z: Vector3 = Vector3(0f, 0f, 1f)
+
     constructor() {}
+
     constructor(array: FloatArray) {
         set(array[0], array[1], array[2])
     }
@@ -106,7 +112,6 @@ class Vector3 {
 
     fun normalize(): Float {
         val magnitude = length()
-
         // TODO: I'm choosing safety over speed here.
         if (magnitude != 0.0f) {
             x /= magnitude
@@ -122,12 +127,5 @@ class Vector3 {
 
     fun pointsInSameDirection(other: Vector3): Boolean {
         return dot(other) > 0
-    }
-
-    companion object {
-        val ZERO = Vector3(0F, 0F, 0F)
-        val UNIT_X = Vector3(1F, 0F, 0F)
-        val UNIT_Y = Vector3(0F, 1F, 0F)
-        val UNIT_Z = Vector3(0F, 0F, 1F)
     }
 }

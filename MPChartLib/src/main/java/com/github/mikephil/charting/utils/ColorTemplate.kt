@@ -108,7 +108,7 @@ object ColorTemplate {
      * @param colors
      * @return
      */
-    fun createColors(colors: IntArray): MutableList<Int>? {
+    fun createColors(colors: IntArray): List<Int> {
         val result: MutableList<Int> = ArrayList()
         for (i in colors) {
             result.add(i)

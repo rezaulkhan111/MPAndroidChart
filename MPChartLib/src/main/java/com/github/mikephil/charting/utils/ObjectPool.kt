@@ -1,8 +1,6 @@
 package com.github.mikephil.charting.utils
 
 import com.github.mikephil.charting.utils.ObjectPool.Poolable
-import java.lang.IllegalArgumentException
-import kotlin.jvm.Synchronized
 
 /**
  * An object pool for recycling of object instances extending Poolable.
@@ -17,19 +15,51 @@ import kotlin.jvm.Synchronized
  *
  * Created by Tony Patino on 6/20/16.
  */
-class ObjectPool<T : Poolable?> private constructor(withCapacity: Int, customObject: T) {
+class ObjectPool<T : Poolable> {
+    private var ids = 0
+
+    private var poolId = 0
+    private var desiredCapacity = 0
+    private var objects: Array<Any?>
+    private var objectsPointer = 0
+    private var modelObject: T? = null
+    private var replenishPercentage = 0f
+
+
     /**
      * Returns the id of the given pool instance.
      *
      * @return an integer ID belonging to this pool instance.
      */
-    var poolId = 0
-        private set
-    private var desiredCapacity: Int
-    private var objects: Array<Any?>
-    private var objectsPointer: Int
-    private val modelObject: T
-    private var replenishPercentage: Float
+    fun getPoolId(): Int {
+        return poolId
+    }
+
+    /**
+     * Returns an ObjectPool instance, of a given starting capacity, that recycles instances of a given Poolable object.
+     *
+     * @param withCapacity A positive integer value.
+     * @param `object` An instance of the object that the pool should recycle.
+     * @return
+     */
+    @Synchronized
+    fun create(withCapacity: Int, poolableObj: T): ObjectPool<*> {
+        val result: ObjectPool<*> =
+            ObjectPool<T>(withCapacity, poolableObj)
+        result.poolId = ids
+        ids++
+        return result
+    }
+
+    constructor(withCapacity: Int, objectT: T) {
+        require(withCapacity > 0) { "Object Pool must be instantiated with a capacity greater than 0!" }
+        desiredCapacity = withCapacity
+        objects = arrayOfNulls(desiredCapacity)
+        objectsPointer = 0
+        modelObject = objectT
+        replenishPercentage = 1.0f
+        this.refillPool()
+    }
 
     /**
      * Set the percentage of the pool to replenish on empty.  Valid values are between
@@ -51,7 +81,11 @@ class ObjectPool<T : Poolable?> private constructor(withCapacity: Int, customObj
         return replenishPercentage
     }
 
-    private fun refillPool(percentage: Float = replenishPercentage) {
+    private fun refillPool() {
+        this.refillPool(replenishPercentage)
+    }
+
+    private fun refillPool(percentage: Float) {
         var portionOfCapacity = (desiredCapacity * percentage).toInt()
         if (portionOfCapacity < 1) {
             portionOfCapacity = 1
@@ -74,7 +108,7 @@ class ObjectPool<T : Poolable?> private constructor(withCapacity: Int, customObj
     @Synchronized
     fun get(): T? {
         if (objectsPointer == -1 && replenishPercentage > 0.0f) {
-            refillPool()
+            this.refillPool()
         }
         val result = objects[objectsPointer] as T?
         result!!.currentOwnerId = Poolable.NO_OWNER
@@ -90,7 +124,7 @@ class ObjectPool<T : Poolable?> private constructor(withCapacity: Int, customObj
      */
     @Synchronized
     fun recycle(`object`: T) {
-        if (`object`!!.currentOwnerId != Poolable.NO_OWNER) {
+        if (`object`.currentOwnerId != Poolable.NO_OWNER) {
             require(`object`.currentOwnerId != poolId) { "The object passed is already stored in this pool!" }
             throw IllegalArgumentException("The object to recycle already belongs to poolId " + `object`.currentOwnerId + ".  Object cannot belong to two different pool instances simultaneously!")
         }
@@ -118,7 +152,7 @@ class ObjectPool<T : Poolable?> private constructor(withCapacity: Int, customObj
         // Not relying on recycle(T object) because this is more performant.
         for (i in 0 until objectsListSize) {
             val `object` = objects[i]
-            if (`object`!!.currentOwnerId != Poolable.NO_OWNER) {
+            if (`object`.currentOwnerId != Poolable.NO_OWNER) {
                 require(`object`.currentOwnerId != poolId) { "The object passed is already stored in this pool!" }
                 throw IllegalArgumentException("The object to recycle already belongs to poolId " + `object`.currentOwnerId + ".  Object cannot belong to two different pool instances simultaneously!")
             }
@@ -158,6 +192,7 @@ class ObjectPool<T : Poolable?> private constructor(withCapacity: Int, customObj
         return objectsPointer + 1
     }
 
+
     abstract class Poolable {
         var currentOwnerId = NO_OWNER
         abstract fun instantiate(): Poolable?
@@ -165,35 +200,5 @@ class ObjectPool<T : Poolable?> private constructor(withCapacity: Int, customObj
         companion object {
             var NO_OWNER = -1
         }
-    }
-
-    companion object {
-        private var ids = 0
-
-        /**
-         * Returns an ObjectPool instance, of a given starting capacity, that recycles instances of a given Poolable object.
-         *
-         * @param withCapacity A positive integer value.
-         * @param object An instance of the object that the pool should recycle.
-         * @return
-         */
-        @JvmStatic
-        @Synchronized
-        fun create(withCapacity: Int, objectPolable: Poolable?): ObjectPool<*> {
-            val result: ObjectPool<*> = ObjectPool(withCapacity, objectPolable as Poolable)
-            result.poolId = ids
-            ids++
-            return result
-        }
-    }
-
-    init {
-        require(withCapacity > 0) { "Object Pool must be instantiated with a capacity greater than 0!" }
-        desiredCapacity = withCapacity
-        objects = arrayOfNulls(desiredCapacity)
-        objectsPointer = 0
-        modelObject = customObject
-        replenishPercentage = 1.0f
-        refillPool()
     }
 }

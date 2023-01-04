@@ -4,7 +4,6 @@ import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.view.View
 import com.github.mikephil.charting.utils.ObjectPool
-import com.github.mikephil.charting.utils.ObjectPool.Companion.create
 import com.github.mikephil.charting.utils.ObjectPool.Poolable
 import com.github.mikephil.charting.utils.Transformer
 import com.github.mikephil.charting.utils.ViewPortHandler
@@ -13,18 +12,11 @@ import com.github.mikephil.charting.utils.ViewPortHandler
  * Created by Philipp Jahoda on 19/02/16.
  */
 @SuppressLint("NewApi")
-class AnimatedMoveViewJob(
-    viewPortHandler: ViewPortHandler?,
-    xValue: Float,
-    yValue: Float,
-    trans: Transformer?,
-    v: View?,
-    xOrigin: Float,
-    yOrigin: Float,
-    duration: Long
-) : AnimatedViewPortJob(viewPortHandler, xValue, yValue, trans, v, xOrigin, yOrigin, duration) {
+class AnimatedMoveViewJob : AnimatedViewPortJob {
+
     companion object {
         private var pool: ObjectPool<AnimatedMoveViewJob?>? = null
+
         @JvmStatic
         fun getInstance(
             viewPortHandler: ViewPortHandler?,
@@ -35,7 +27,7 @@ class AnimatedMoveViewJob(
             xOrigin: Float,
             yOrigin: Float,
             duration: Long
-        ): AnimatedMoveViewJob? {
+        ): AnimatedMoveViewJob {
             val result = pool!!.get()
             result!!.mViewPortHandler = viewPortHandler
             result.xValue = xValue
@@ -52,11 +44,19 @@ class AnimatedMoveViewJob(
         fun recycleInstance(instance: AnimatedMoveViewJob?) {
             pool!!.recycle(instance)
         }
+    }
 
-        init {
-            pool = create(4, AnimatedMoveViewJob(null, 0, 0, null, null, 0, 0, 0))
-            pool!!.setReplenishPercentage(0.5f)
-        }
+    constructor(
+        viewPortHandler: ViewPortHandler?,
+        xValue: Float,
+        yValue: Float,
+        trans: Transformer?,
+        v: View?,
+        xOrigin: Float,
+        yOrigin: Float,
+        duration: Long
+    ) : super(viewPortHandler, xValue, yValue, trans, v, xOrigin, yOrigin, duration) {
+
     }
 
     override fun onAnimationUpdate(animation: ValueAnimator) {
@@ -70,7 +70,7 @@ class AnimatedMoveViewJob(
         recycleInstance(this)
     }
 
-     override fun instantiate(): Poolable? {
-        return AnimatedMoveViewJob(null, 0, 0, null, null, 0, 0, 0)
+    override fun instantiate(): Poolable {
+        return AnimatedMoveViewJob(null, 0f, 0f, null, null, 0f, 0f, 0)
     }
 }

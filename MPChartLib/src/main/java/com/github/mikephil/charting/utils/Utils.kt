@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.res.Resources
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.graphics.Paint.Align
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.os.Build
@@ -20,9 +19,6 @@ import android.view.View
 import android.view.ViewConfiguration
 import com.github.mikephil.charting.formatter.DefaultValueFormatter
 import com.github.mikephil.charting.formatter.IValueFormatter
-import com.github.mikephil.charting.utils.FSize.Companion.getInstance
-import com.github.mikephil.charting.utils.FSize.Companion.recycleInstance
-import com.github.mikephil.charting.utils.MPPointF.Companion.instance
 
 /**
  * Utilities class that has some helper methods. Needs to be initialized by
@@ -33,16 +29,15 @@ import com.github.mikephil.charting.utils.MPPointF.Companion.instance
  * @author Philipp Jahoda
  */
 object Utils {
+
     private var mMetrics: DisplayMetrics? = null
-    var minimumFlingVelocity = 50
-        private set
-    var maximumFlingVelocity = 8000
-        private set
-    const val DEG2RAD = Math.PI / 180.0
-    const val FDEG2RAD = Math.PI.toFloat() / 180f
+    private var mMinimumFlingVelocity = 50
+    private var mMaximumFlingVelocity = 8000
+    val DEG2RAD = Math.PI / 180.0
+    val FDEG2RAD = Math.PI.toFloat() / 180f
+
     val DOUBLE_EPSILON = java.lang.Double.longBitsToDouble(1)
 
-    @JvmField
     val FLOAT_EPSILON = java.lang.Float.intBitsToFloat(1)
 
     /**
@@ -53,16 +48,16 @@ object Utils {
     fun init(context: Context?) {
         if (context == null) {
             // noinspection deprecation
-            minimumFlingVelocity = ViewConfiguration.getMinimumFlingVelocity()
+            mMinimumFlingVelocity = ViewConfiguration.getMinimumFlingVelocity()
             // noinspection deprecation
-            maximumFlingVelocity = ViewConfiguration.getMaximumFlingVelocity()
+            mMaximumFlingVelocity = ViewConfiguration.getMaximumFlingVelocity()
             Log.e(
                 "MPChartLib-Utils", "Utils.init(...) PROVIDED CONTEXT OBJECT IS NULL"
             )
         } else {
             val viewConfiguration = ViewConfiguration.get(context)
-            minimumFlingVelocity = viewConfiguration.scaledMinimumFlingVelocity
-            maximumFlingVelocity = viewConfiguration.scaledMaximumFlingVelocity
+            mMinimumFlingVelocity = viewConfiguration.scaledMinimumFlingVelocity
+            mMaximumFlingVelocity = viewConfiguration.scaledMaximumFlingVelocity
             val res = context.resources
             mMetrics = res.displayMetrics
         }
@@ -79,9 +74,9 @@ object Utils {
         mMetrics = res.displayMetrics
 
         // noinspection deprecation
-        minimumFlingVelocity = ViewConfiguration.getMinimumFlingVelocity()
+        mMinimumFlingVelocity = ViewConfiguration.getMinimumFlingVelocity()
         // noinspection deprecation
-        maximumFlingVelocity = ViewConfiguration.getMaximumFlingVelocity()
+        mMaximumFlingVelocity = ViewConfiguration.getMaximumFlingVelocity()
     }
 
     /**
@@ -93,7 +88,6 @@ object Utils {
      * @return A float value to represent px equivalent to dp depending on
      * device density
      */
-    @JvmStatic
     fun convertDpToPixel(dp: Float): Float {
         if (mMetrics == null) {
             Log.e(
@@ -118,9 +112,9 @@ object Utils {
         if (mMetrics == null) {
             Log.e(
                 "MPChartLib-Utils",
-                "Utils NOT INITIALIZED. You need to call Utils.init(...) at least once before" +
+                ("Utils NOT INITIALIZED. You need to call Utils.init(...) at least once before" +
                         " calling Utils.convertPixelsToDp(...). Otherwise conversion does not" +
-                        " take place."
+                        " take place.")
             )
             return px
         }
@@ -135,7 +129,6 @@ object Utils {
      * @param demoText
      * @return
      */
-    @JvmStatic
     fun calcTextWidth(paint: Paint, demoText: String?): Int {
         return paint.measureText(demoText).toInt()
     }
@@ -150,7 +143,6 @@ object Utils {
      * @param demoText
      * @return
      */
-    @JvmStatic
     fun calcTextHeight(paint: Paint, demoText: String): Int {
         val r = mCalcTextHeightRect
         r[0, 0, 0] = 0
@@ -159,11 +151,11 @@ object Utils {
     }
 
     private val mFontMetrics = Paint.FontMetrics()
+
     fun getLineHeight(paint: Paint): Float {
         return getLineHeight(paint, mFontMetrics)
     }
 
-    @JvmStatic
     fun getLineHeight(paint: Paint, fontMetrics: Paint.FontMetrics): Float {
         paint.getFontMetrics(fontMetrics)
         return fontMetrics.descent - fontMetrics.ascent
@@ -173,7 +165,6 @@ object Utils {
         return getLineSpacing(paint, mFontMetrics)
     }
 
-    @JvmStatic
     fun getLineSpacing(paint: Paint, fontMetrics: Paint.FontMetrics): Float {
         paint.getFontMetrics(fontMetrics)
         return fontMetrics.ascent - fontMetrics.top + fontMetrics.bottom
@@ -188,8 +179,8 @@ object Utils {
      * @param demoText
      * @return A Recyclable FSize instance
      */
-    fun calcTextSize(paint: Paint, demoText: String): FSize {
-        val result = getInstance(0f, 0f)
+    fun calcTextSize(paint: Paint, demoText: String): FSize? {
+        val result = FSize.getInstance(0f, 0f)
         calcTextSize(paint, demoText, result)
         return result
     }
@@ -212,6 +203,7 @@ object Utils {
         outputFSize.height = r.height().toFloat()
     }
 
+
     /**
      * Math.pow(...) is very expensive, so avoid calling it and create it
      * yourself.
@@ -220,21 +212,17 @@ object Utils {
         1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000
     )
 
-    /// - returns: The default value formatter used for all chart components that needs a default
-    val defaultValueFormatter = generateDefaultValueFormatter()
+    private val mDefaultValueFormatter = generateDefaultValueFormatter()
+
     private fun generateDefaultValueFormatter(): IValueFormatter {
         return DefaultValueFormatter(1)
     }
-    /**
-     * Formats the given number to the given number of decimals, and returns the
-     * number as a string, maximum 35 characters.
-     *
-     * @param number
-     * @param digitCount
-     * @param separateThousands set this to true to separate thousands values
-     * @param separateChar      a caracter to be paced between the "thousands"
-     * @return
-     */
+
+    /// - returns: The default value formatter used for all chart components that needs a default
+    fun getDefaultValueFormatter(): IValueFormatter? {
+        return mDefaultValueFormatter
+    }
+
     /**
      * Formats the given number to the given number of decimals, and returns the
      * number as a string, maximum 35 characters. If thousands are separated, the separating
@@ -245,11 +233,24 @@ object Utils {
      * @param separateThousands set this to true to separate thousands values
      * @return
      */
-    @JvmOverloads
+    fun formatNumber(number: Float, digitCount: Int, separateThousands: Boolean): String? {
+        return formatNumber(number, digitCount, separateThousands, '.')
+    }
+
+    /**
+     * Formats the given number to the given number of decimals, and returns the
+     * number as a string, maximum 35 characters.
+     *
+     * @param number
+     * @param digitCount
+     * @param separateThousands set this to true to separate thousands values
+     * @param separateChar      a caracter to be paced between the "thousands"
+     * @return
+     */
     fun formatNumber(
         number: Float, digitCount: Int, separateThousands: Boolean,
-        separateChar: Char = '.'
-    ): String {
+        separateChar: Char
+    ): String? {
         var number = number
         var digitCount = digitCount
         val out = CharArray(35)
@@ -273,7 +274,7 @@ object Utils {
         var ind = out.size - 1
         var charCount = 0
         var decimalPointAdded = false
-        while (lval != 0L || charCount < digitCount + 1) {
+        while (lval != 0L || charCount < (digitCount + 1)) {
             val digit = (lval % 10).toInt()
             lval = lval / 10
             out[ind--] = (digit + '0'.code).toChar()
@@ -286,7 +287,7 @@ object Utils {
                 decimalPointAdded = true
 
                 // add thousand separators
-            } else if (separateThousands && lval != 0L && charCount > digitCount) {
+            } else if (separateThousands && (lval != 0L) && (charCount > digitCount)) {
                 if (decimalPointAdded) {
                     if ((charCount - digitCount) % 4 == 0) {
                         out[ind--] = separateChar
@@ -324,11 +325,11 @@ object Utils {
      * @param number
      * @return
      */
-    @JvmStatic
     fun roundToNextSignificant(number: Double): Float {
-        if (java.lang.Double.isInfinite(number) ||
-            java.lang.Double.isNaN(number) || number == 0.0
-        ) return 0F
+        if ((java.lang.Double.isInfinite(number) ||
+                    java.lang.Double.isNaN(number) || (
+                    number == 0.0))
+        ) return 0f
         val d = Math.ceil(Math.log10(if (number < 0) -number else number).toFloat().toDouble())
             .toFloat()
         val pw = 1 - d.toInt()
@@ -344,7 +345,6 @@ object Utils {
      * @param number
      * @return
      */
-    @JvmStatic
     fun getDecimals(number: Float): Int {
         val i = roundToNextSignificant(number.toDouble())
         return if (java.lang.Float.isInfinite(i)) 0 else Math.ceil(-Math.log10(i.toDouble()))
@@ -357,7 +357,7 @@ object Utils {
      * @param integers
      * @return
      */
-    fun convertIntegers(integers: List<Int>): IntArray {
+    fun convertIntegers(integers: List<Int>): IntArray? {
         val ret = IntArray(integers.size)
         copyIntegers(integers, ret)
         return ret
@@ -376,7 +376,7 @@ object Utils {
      * @param strings
      * @return
      */
-    fun convertStrings(strings: List<String?>): Array<String?> {
+    fun convertStrings(strings: List<String?>): Array<String?>? {
         val ret = arrayOfNulls<String>(strings.size)
         for (i in ret.indices) {
             ret[i] = strings[i]
@@ -398,14 +398,13 @@ object Utils {
      * @param d
      * @return
      */
-    @JvmStatic
     fun nextUp(d: Double): Double {
         var d = d
-        return if (d == Double.POSITIVE_INFINITY) d else {
+        if (d == Double.POSITIVE_INFINITY) return d else {
             d += 0.0
-            java.lang.Double.longBitsToDouble(
+            return java.lang.Double.longBitsToDouble(
                 java.lang.Double.doubleToRawLongBits(d) +
-                        if (d >= 0.0) +1L else -1L
+                        (if ((d >= 0.0)) +1L else -1L)
             )
         }
     }
@@ -421,18 +420,16 @@ object Utils {
      * @return
      */
     fun getPosition(center: MPPointF, dist: Float, angle: Float): MPPointF {
-        val p = instance
+        val p = MPPointF.getInstance(0f, 0f)
         getPosition(center, dist, angle, p)
         return p
     }
 
-    @JvmStatic
     fun getPosition(center: MPPointF, dist: Float, angle: Float, outputPoint: MPPointF) {
         outputPoint.x = (center.x + dist * Math.cos(Math.toRadians(angle.toDouble()))).toFloat()
         outputPoint.y = (center.y + dist * Math.sin(Math.toRadians(angle.toDouble()))).toFloat()
     }
 
-    @JvmStatic
     fun velocityTrackerPointerUpCleanUpIfNecessary(
         ev: MotionEvent,
         tracker: VelocityTracker
@@ -440,7 +437,7 @@ object Utils {
 
         // Check the dot product of current velocities.
         // If the pointer that left was opposing another velocity vector, clear.
-        tracker.computeCurrentVelocity(1000, maximumFlingVelocity.toFloat())
+        tracker.computeCurrentVelocity(1000, mMaximumFlingVelocity.toFloat())
         val upIndex = ev.actionIndex
         val id1 = ev.getPointerId(upIndex)
         val x1 = tracker.getXVelocity(id1)
@@ -470,7 +467,6 @@ object Utils {
      *
      * @param view
      */
-    @JvmStatic
     @SuppressLint("NewApi")
     fun postInvalidateOnAnimation(view: View) {
         if (Build.VERSION.SDK_INT >= 16) view.postInvalidateOnAnimation() else view.postInvalidateDelayed(
@@ -478,10 +474,17 @@ object Utils {
         )
     }
 
+    fun getMinimumFlingVelocity(): Int {
+        return mMinimumFlingVelocity
+    }
+
+    fun getMaximumFlingVelocity(): Int {
+        return mMaximumFlingVelocity
+    }
+
     /**
      * returns an angle between 0.f < 360.f (not less than zero, less than 360)
      */
-    @JvmStatic
     fun getNormalizedAngle(angle: Float): Float {
         var angle = angle
         while (angle < 0f) angle += 360f
@@ -490,16 +493,15 @@ object Utils {
 
     private val mDrawableBoundsCache = Rect()
 
-    @JvmStatic
     fun drawImage(
         canvas: Canvas,
         drawable: Drawable,
         x: Int, y: Int,
         width: Int, height: Int
     ) {
-        val drawOffset = instance
-        drawOffset.x = (x - width / 2).toFloat()
-        drawOffset.y = (y - height / 2).toFloat()
+        val drawOffset = MPPointF.getInstance()
+        drawOffset.x = (x - (width / 2)).toFloat()
+        drawOffset.y = (y - (height / 2)).toFloat()
         drawable.copyBounds(mDrawableBoundsCache)
         drawable.setBounds(
             mDrawableBoundsCache.left,
@@ -517,7 +519,6 @@ object Utils {
     private val mDrawTextRectBuffer = Rect()
     private val mFontMetricsBuffer = Paint.FontMetrics()
 
-    @JvmStatic
     fun drawXAxisValue(
         c: Canvas, text: String, x: Float, y: Float,
         paint: Paint,
@@ -538,7 +539,7 @@ object Utils {
 
         // To have a consistent point of reference, we always draw left-aligned
         val originalTextAlign = paint.textAlign
-        paint.textAlign = Align.LEFT
+        paint.textAlign = Paint.Align.LEFT
         if (angleDegrees != 0f) {
 
             // Move the text drawing rect in a way that it always rotates around its center
@@ -556,7 +557,7 @@ object Utils {
                 )
                 translateX -= rotatedSize.width * (anchor.x - 0.5f)
                 translateY -= rotatedSize.height * (anchor.y - 0.5f)
-                recycleInstance(rotatedSize)
+                FSize.recycleInstance(rotatedSize)
             }
             c.save()
             c.translate(translateX, translateY)
@@ -599,7 +600,7 @@ object Utils {
 
         // To have a consistent point of reference, we always draw left-aligned
         val originalTextAlign = paint.textAlign
-        paint.textAlign = Align.LEFT
+        paint.textAlign = Paint.Align.LEFT
         if (angleDegrees != 0f) {
 
             // Move the text drawing rect in a way that it always rotates around its center
@@ -617,7 +618,7 @@ object Utils {
                 )
                 translateX -= rotatedSize.width * (anchor.x - 0.5f)
                 translateY -= rotatedSize.height * (anchor.y - 0.5f)
-                recycleInstance(rotatedSize)
+                FSize.recycleInstance(rotatedSize)
             }
             c.save()
             c.translate(translateX, translateY)
@@ -663,7 +664,7 @@ object Utils {
      * @param degrees
      * @return A Recyclable FSize instance
      */
-    fun getSizeOfRotatedRectangleByDegrees(rectangleSize: FSize, degrees: Float): FSize {
+    fun getSizeOfRotatedRectangleByDegrees(rectangleSize: FSize, degrees: Float): FSize? {
         val radians = degrees * FDEG2RAD
         return getSizeOfRotatedRectangleByRadians(
             rectangleSize.width, rectangleSize.height,
@@ -679,7 +680,7 @@ object Utils {
      * @param radians
      * @return A Recyclable FSize instance
      */
-    fun getSizeOfRotatedRectangleByRadians(rectangleSize: FSize, radians: Float): FSize {
+    fun getSizeOfRotatedRectangleByRadians(rectangleSize: FSize, radians: Float): FSize? {
         return getSizeOfRotatedRectangleByRadians(
             rectangleSize.width, rectangleSize.height,
             radians
@@ -695,7 +696,6 @@ object Utils {
      * @param degrees
      * @return A Recyclable FSize instance
      */
-    @JvmStatic
     fun getSizeOfRotatedRectangleByDegrees(
         rectangleWidth: Float,
         rectangleHeight: Float,
@@ -719,7 +719,7 @@ object Utils {
         rectangleHeight: Float,
         radians: Float
     ): FSize {
-        return getInstance(
+        return FSize.getInstance(
             Math.abs(rectangleWidth * Math.cos(radians.toDouble()).toFloat()) + Math.abs(
                 rectangleHeight * Math.sin(radians.toDouble()).toFloat()
             ),
@@ -729,7 +729,7 @@ object Utils {
         )
     }
 
-    @JvmStatic
-    val sDKInt: Int
-        get() = Build.VERSION.SDK_INT
+    fun getSDKInt(): Int {
+        return Build.VERSION.SDK_INT
+    }
 }

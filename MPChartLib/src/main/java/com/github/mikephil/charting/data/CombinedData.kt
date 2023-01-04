@@ -12,12 +12,18 @@ import com.github.mikephil.charting.interfaces.datasets.IBarLineScatterCandleBub
  * @author Philipp Jahoda
  */
 class CombinedData :
-    BarLineScatterCandleBubbleData<IBarLineScatterCandleBubbleDataSet<out Entry?>?>() {
+    BarLineScatterCandleBubbleData<IBarLineScatterCandleBubbleDataSet<out Entry>>() {
+
     private var mLineData: LineData? = null
     private var mBarData: BarData? = null
     private var mScatterData: ScatterData? = null
     private var mCandleData: CandleData? = null
     private var mBubbleData: BubbleData? = null
+
+    fun CombinedData() {
+        super()
+    }
+
     fun setData(data: LineData?) {
         mLineData = data
         notifyDataChanged()
@@ -43,9 +49,9 @@ class CombinedData :
         notifyDataChanged()
     }
 
-    public override fun calcMinMax() {
+    override fun calcMinMax() {
         if (mDataSets == null) {
-            mDataSets = ArrayList<IBarLineScatterCandleBubbleDataSet<out Entry>>()
+            mDataSets = ArrayList()
         }
         mDataSets!!.clear()
         mYMax = -Float.MAX_VALUE
@@ -59,26 +65,26 @@ class CombinedData :
         val allData = getAllData()
         for (data in allData) {
             data.calcMinMax()
-            val sets = data.dataSets
-            mDataSets!!.addAll(sets!!)
-            if (data.yMax > mYMax) mYMax = data.yMax
-            if (data.yMin < mYMin) mYMin = data.yMin
-            if (data.xMax > mXMax) mXMax = data.xMax
-            if (data.xMin < mXMin) mXMin = data.xMin
-            for (dataset in sets) {
-                if (dataset!!.axisDependency == AxisDependency.LEFT) {
-                    if (dataset.yMax > mLeftAxisMax) {
-                        mLeftAxisMax = dataset.yMax
+            val sets: List<IBarLineScatterCandleBubbleDataSet<out Entry?>>? = data.getDataSets()
+            mDataSets!!.addAll(sets)
+            if (data.getYMax() > mYMax) mYMax = data.getYMax()
+            if (data.getYMin() < mYMin) mYMin = data.getYMin()
+            if (data.getXMax() > mXMax) mXMax = data.getXMax()
+            if (data.getXMin() < mXMin) mXMin = data.getXMin()
+            for (dataset in sets!!) {
+                if (dataset.getAxisDependency() === AxisDependency.LEFT) {
+                    if (dataset.getYMax() > mLeftAxisMax) {
+                        mLeftAxisMax = dataset.getYMax()
                     }
-                    if (dataset.yMin < mLeftAxisMin) {
-                        mLeftAxisMin = dataset.yMin
+                    if (dataset.getYMin() < mLeftAxisMin) {
+                        mLeftAxisMin = dataset.getYMin()
                     }
                 } else {
-                    if (dataset.yMax > mRightAxisMax) {
-                        mRightAxisMax = dataset.yMax
+                    if (dataset.getYMax() > mRightAxisMax) {
+                        mRightAxisMax = dataset.getYMax()
                     }
-                    if (dataset.yMin < mRightAxisMin) {
-                        mRightAxisMin = dataset.yMin
+                    if (dataset.getYMin() < mRightAxisMin) {
+                        mRightAxisMin = dataset.getYMin()
                     }
                 }
             }
@@ -142,13 +148,13 @@ class CombinedData :
     override fun getEntryForHighlight(highlight: Highlight): Entry? {
         if (highlight.dataIndex >= getAllData().size) return null
         val data: ChartData<*> = getDataByIndex(highlight.dataIndex)
-        if (highlight.dataSetIndex >= data.dataSetCount) return null
+        if (highlight.dataSetIndex >= data.getDataSetCount()) return null
 
         // The value of the highlighted entry could be NaN -
         //   if we are not interested in highlighting a specific value.
-        val entries = data.getDataSetByIndex(highlight.dataSetIndex)
-            .getEntriesForXValue(highlight.x)
-        for (entry in entries!!) if (entry.y == highlight.y ||
+        val entries =
+            data.getDataSetByIndex(highlight.dataSetIndex).getEntriesForXValue(highlight.x)
+        for (entry in entries) if (entry.getY() == highlight.y ||
             java.lang.Float.isNaN(highlight.y)
         ) return entry
         return null
@@ -163,14 +169,14 @@ class CombinedData :
     fun getDataSetByHighlight(highlight: Highlight): IBarLineScatterCandleBubbleDataSet<out Entry>? {
         if (highlight.dataIndex >= getAllData().size) return null
         val data = getDataByIndex(highlight.dataIndex)
-        return if (highlight.dataSetIndex >= data.dataSetCount) null else data.dataSets[highlight.dataSetIndex] as IBarLineScatterCandleBubbleDataSet<out Entry>
+        return if (highlight.dataSetIndex >= data.getDataSetCount()) null else data.getDataSets()!![highlight.dataSetIndex]
     }
 
     fun getDataIndex(data: ChartData<*>?): Int {
         return getAllData().indexOf(data)
     }
 
-    override fun removeDataSet(d: IBarLineScatterCandleBubbleDataSet<out Entry?>?): Boolean {
+    fun removeDataSet(d: IBarLineScatterCandleBubbleDataSet<out Entry>): Boolean {
         val datas = getAllData()
         var success = false
         for (data in datas) {

@@ -398,7 +398,7 @@ abstract class BarLineChartBase<T : BarLineScatterCandleBubbleData<out IBarLineS
 
     private val mOffsetsBuffer = RectF()
 
-    override fun calculateOffsets() {
+    public override fun calculateOffsets() {
         if (!mCustomViewPortEnabled) {
             var offsetLeft = 0f
             var offsetRight = 0f

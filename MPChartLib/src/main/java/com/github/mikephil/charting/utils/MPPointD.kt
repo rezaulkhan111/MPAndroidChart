@@ -7,7 +7,8 @@ import com.github.mikephil.charting.utils.ObjectPool.Poolable
  *
  * @author Philipp Jahoda
  */
-class MPPointD private constructor(var x: Double, var y: Double) : Poolable() {
+class MPPointD : Poolable {
+
     companion object {
         private var pool: ObjectPool<MPPointD>? = null
 
@@ -34,8 +35,16 @@ class MPPointD private constructor(var x: Double, var y: Double) : Poolable() {
         }
     }
 
+    var x = 0.0
+    var y = 0.0
+
     override fun instantiate(): Poolable {
         return MPPointD(0.0, 0.0)
+    }
+
+    constructor(x: Double, y: Double) {
+        this.x = x
+        this.y = y
     }
 
     /**

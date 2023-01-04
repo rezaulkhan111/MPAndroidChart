@@ -15,7 +15,7 @@ class ScatterDataSet : LineScatterCandleRadarDataSet<Entry>, IScatterDataSet {
     /**
      * Renderer responsible for rendering this DataSet, default: square
      */
-    private var mShapeRenderer: IShapeRenderer? = SquareShapeRenderer()
+    private var mShapeRenderer: IShapeRenderer = SquareShapeRenderer()
 
     /**
      * The radius of the hole in the shape (applies to Square, Circle and Triangle)
@@ -30,18 +30,17 @@ class ScatterDataSet : LineScatterCandleRadarDataSet<Entry>, IScatterDataSet {
      */
     private var mScatterShapeHoleColor = ColorTemplate.COLOR_NONE
 
-    constructor(yVals: MutableList<Entry>, label: String?) : super(yVals, label) {
-
+    constructor(yVals: MutableList<Entry>, label: String) : super(yVals, label) {
     }
 
-    override fun copy(): DataSet<Entry>? {
+    override fun copy(): DataSet<Entry> {
         val entries: MutableList<Entry> = ArrayList()
         for (i in mEntries!!.indices) {
-            entries.add(mEntries!![i].copy()!!)
+            entries.add(mEntries!![i].copy())
         }
         val copied = ScatterDataSet(entries, getLabel())
         copy(copied)
-        return copied.copy()
+        return copied
     }
 
     private fun copy(scatterDataSet: ScatterDataSet) {
@@ -62,7 +61,6 @@ class ScatterDataSet : LineScatterCandleRadarDataSet<Entry>, IScatterDataSet {
         mShapeSize = size
     }
 
-
     override fun getScatterShapeSize(): Float {
         return mShapeSize
     }
@@ -74,7 +72,7 @@ class ScatterDataSet : LineScatterCandleRadarDataSet<Entry>, IScatterDataSet {
      * @param shape
      */
     fun setScatterShape(shape: ScatterShape?) {
-        mShapeRenderer = getRendererForShape(shape)
+        mShapeRenderer = getRendererForShape(shape)!!
     }
 
     /**
@@ -83,11 +81,11 @@ class ScatterDataSet : LineScatterCandleRadarDataSet<Entry>, IScatterDataSet {
      *
      * @param shapeRenderer
      */
-    fun setShapeRenderer(shapeRenderer: IShapeRenderer?) {
+    fun setShapeRenderer(shapeRenderer: IShapeRenderer) {
         mShapeRenderer = shapeRenderer
     }
 
-    override fun getShapeRenderer(): IShapeRenderer? {
+    override fun getShapeRenderer(): IShapeRenderer {
         return mShapeRenderer
     }
 
@@ -127,7 +125,6 @@ class ScatterDataSet : LineScatterCandleRadarDataSet<Entry>, IScatterDataSet {
             ScatterShape.X -> return XShapeRenderer()
             ScatterShape.CHEVRON_UP -> return ChevronUpShapeRenderer()
             ScatterShape.CHEVRON_DOWN -> return ChevronDownShapeRenderer()
-            else -> {}
         }
         return null
     }

@@ -161,7 +161,7 @@ interface IDataSet<T : Entry> {
      *
      * @param e
      */
-    fun addEntry(e: T): Boolean
+    fun addEntry(e: T?): Boolean
 
 
     /**
@@ -172,7 +172,7 @@ interface IDataSet<T : Entry> {
      *
      * @param e
      */
-    fun addEntryOrdered(e: T)
+    fun addEntryOrdered(e: T?)
 
     /**
      * Removes the first Entry (at index 0) of this DataSet from the entries array.
@@ -198,7 +198,7 @@ interface IDataSet<T : Entry> {
      *
      * @param e
      */
-    fun removeEntry(e: T): Boolean
+    fun removeEntry(e: T?): Boolean
 
     /**
      * Removes the Entry object closest to the given x-value from the DataSet.

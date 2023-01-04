@@ -9,40 +9,34 @@ import android.text.TextPaint
 import com.github.mikephil.charting.animation.ChartAnimator
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.data.*
-import com.github.mikephil.charting.data.PieDataSet.ValuePosition
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.interfaces.datasets.IPieDataSet
 import com.github.mikephil.charting.utils.*
-import com.github.mikephil.charting.utils.MPPointF.Companion.recycleInstance
-import com.github.mikephil.charting.utils.Utils.calcTextHeight
-import com.github.mikephil.charting.utils.Utils.convertDpToPixel
-import com.github.mikephil.charting.utils.Utils.drawImage
 import java.lang.ref.WeakReference
 
-open class PieChartRenderer(
-    var mChart: PieChart, animator: ChartAnimator?,
-    viewPortHandler: ViewPortHandler?
-) : DataRenderer(animator!!, viewPortHandler) {
+open class PieChartRenderer : DataRenderer {
+
+    protected var mChart: PieChart? = null
+
     /**
      * paint for the hole in the center of the pie chart and the transparent
      * circle
      */
-    var paintHole: Paint
-        protected set
-    var paintTransparentCircle: Paint
-        protected set
-    var mValueLinePaint: Paint
+    protected var mHolePaint: Paint? = null
+    protected var mTransparentCirclePaint: Paint? = null
+    protected var mValueLinePaint: Paint? = null
 
     /**
      * paint object for the text that can be displayed in the center of the
      * chart
      */
-    val paintCenterText: TextPaint
+    private var mCenterTextPaint: TextPaint? = null
 
     /**
      * paint object used for drwing the slice-text
      */
-    val paintEntryLabels: Paint
+    private var mEntryLabelsPaint: Paint? = null
+
     private var mCenterTextLayout: StaticLayout? = null
     private var mCenterTextLastValue: CharSequence? = null
     private val mCenterTextLastBounds = RectF()
@@ -51,14 +45,59 @@ open class PieChartRenderer(
     /**
      * Bitmap for drawing the center hole
      */
-    var mDrawBitmap: WeakReference<Bitmap?>? = null
-    var mBitmapCanvas: Canvas? = null
-    override fun initBuffers() {
+    protected var mDrawBitmap: WeakReference<Bitmap?>? = null
+
+    protected var mBitmapCanvas: Canvas? = null
+
+    constructor(
+        chart: PieChart?, animator: ChartAnimator?,
+        viewPortHandler: ViewPortHandler?
+    ) : super(animator, viewPortHandler) {
+        mChart = chart
+        mHolePaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        mHolePaint!!.color = Color.WHITE
+        mHolePaint!!.style = Paint.Style.FILL
+        mTransparentCirclePaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        mTransparentCirclePaint!!.color = Color.WHITE
+        mTransparentCirclePaint!!.style = Paint.Style.FILL
+        mTransparentCirclePaint!!.alpha = 105
+        mCenterTextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
+        mCenterTextPaint!!.color = Color.BLACK
+        mCenterTextPaint!!.textSize = Utils.convertDpToPixel(12f)
+        mValuePaint!!.textSize = Utils.convertDpToPixel(13f)
+        mValuePaint!!.color = Color.WHITE
+        mValuePaint!!.textAlign = Align.CENTER
+        mEntryLabelsPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        mEntryLabelsPaint!!.color = Color.WHITE
+        mEntryLabelsPaint!!.textAlign = Align.CENTER
+        mEntryLabelsPaint!!.textSize = Utils.convertDpToPixel(13f)
+        mValueLinePaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        mValueLinePaint!!.style = Paint.Style.STROKE
     }
 
-    override fun drawData(c: Canvas) {
-        val width = mViewPortHandler.chartWidth.toInt()
-        val height = mViewPortHandler.chartHeight.toInt()
+    open fun getPaintHole(): Paint? {
+        return mHolePaint
+    }
+
+    open fun getPaintTransparentCircle(): Paint? {
+        return mTransparentCirclePaint
+    }
+
+    open fun getPaintCenterText(): TextPaint? {
+        return mCenterTextPaint
+    }
+
+    open fun getPaintEntryLabels(): Paint? {
+        return mEntryLabelsPaint
+    }
+
+    override fun initBuffers() {
+        // TODO Auto-generated method stub
+    }
+
+    override fun drawData(c: Canvas?) {
+        val width = mViewPortHandler!!.getChartWidth().toInt()
+        val height = mViewPortHandler!!.getChartHeight().toInt()
         var drawBitmap = if (mDrawBitmap == null) null else mDrawBitmap!!.get()
         if (drawBitmap == null || drawBitmap.width != width
             || drawBitmap.height != height
@@ -70,15 +109,16 @@ open class PieChartRenderer(
             } else return
         }
         drawBitmap!!.eraseColor(Color.TRANSPARENT)
-        val pieData = mChart.data
-        for (set in pieData?.dataSets!!) {
-            if (set.isVisible && set.entryCount > 0) drawDataSet(c, set)
+        val pieData = mChart!!.getData()
+        for (set in pieData!!.getDataSets()!!) {
+            if (set.isVisible() && set.getEntryCount() > 0) drawDataSet(c, set)
         }
     }
 
     private val mPathBuffer = Path()
     private val mInnerRectBuffer = RectF()
-    fun calculateMinimumRadiusForSpacedSlice(
+
+    protected open fun calculateMinimumRadiusForSpacedSlice(
         center: MPPointF,
         radius: Float,
         angle: Float,
@@ -132,55 +172,56 @@ open class PieChartRenderer(
      * @param dataSet
      * @return
      */
-    fun getSliceSpace(dataSet: IPieDataSet): Float {
-        if (!dataSet.isAutomaticallyDisableSliceSpacingEnabled) return dataSet.sliceSpace
+    protected open fun getSliceSpace(dataSet: IPieDataSet): Float {
+        if (!dataSet.isAutomaticallyDisableSliceSpacingEnabled()) return dataSet.getSliceSpace()
         val spaceSizeRatio =
-            dataSet.sliceSpace / mViewPortHandler.smallestContentExtension
-        val minValueRatio = dataSet.yMin / mChart.data!!.yValueSum * 2
-        return if (spaceSizeRatio > minValueRatio) 0f else dataSet.sliceSpace
+            dataSet.getSliceSpace() / mViewPortHandler!!.getSmallestContentExtension()
+        val minValueRatio =
+            dataSet.getYMin() / mChart!!.getData()!!.getYValueSum() * 2
+        return if (spaceSizeRatio > minValueRatio) 0f else dataSet.getSliceSpace()
     }
 
-    protected fun drawDataSet(c: Canvas?, dataSet: IPieDataSet) {
+    protected open fun drawDataSet(c: Canvas?, dataSet: IPieDataSet) {
         var angle = 0f
-        val rotationAngle = mChart.rotationAngle
-        val phaseX = mAnimator.phaseX
-        val phaseY = mAnimator.phaseY
-        val circleBox = mChart.circleBox
-        val entryCount = dataSet.entryCount
-        val drawAngles = mChart.drawAngles
-        val center = mChart.centerCircleBox
-        val radius = mChart.radius
-        val drawInnerArc = mChart.isDrawHoleEnabled && !mChart.isDrawSlicesUnderHoleEnabled
-        val userInnerRadius = if (drawInnerArc) radius * (mChart.holeRadius / 100f) else 0f
-        val roundedRadius = (radius - radius * mChart.holeRadius / 100f) / 2f
+        val rotationAngle = mChart!!.getRotationAngle()
+        val phaseX = mAnimator!!.getPhaseX()
+        val phaseY = mAnimator!!.getPhaseY()
+        val circleBox = mChart!!.getCircleBox()
+        val entryCount = dataSet.getEntryCount()
+        val drawAngles = mChart!!.getDrawAngles()
+        val center = mChart!!.getCenterCircleBox()
+        val radius = mChart!!.getRadius()
+        val drawInnerArc = mChart!!.isDrawHoleEnabled() && !mChart!!.isDrawSlicesUnderHoleEnabled()
+        val userInnerRadius = if (drawInnerArc) radius * (mChart!!.getHoleRadius() / 100f) else 0f
+        val roundedRadius = (radius - radius * mChart!!.getHoleRadius() / 100f) / 2f
         val roundedCircleBox = RectF()
-        val drawRoundedSlices = drawInnerArc && mChart.isDrawRoundedSlicesEnabled
+        val drawRoundedSlices = drawInnerArc && mChart!!.isDrawRoundedSlicesEnabled()
         var visibleAngleCount = 0
         for (j in 0 until entryCount) {
             // draw only if the value is greater than zero
-            if (Math.abs(dataSet.getEntryForIndex(j)!!.y) > Utils.FLOAT_EPSILON) {
+            if (Math.abs(dataSet.getEntryForIndex(j).getY()) > Utils.FLOAT_EPSILON) {
                 visibleAngleCount++
             }
         }
         val sliceSpace = if (visibleAngleCount <= 1) 0f else getSliceSpace(dataSet)
         for (j in 0 until entryCount) {
-            val sliceAngle = drawAngles[j]
+            val sliceAngle = drawAngles!![j]
             var innerRadius = userInnerRadius
-            val e: Entry = dataSet.getEntryForIndex(j)!!
+            val e: Entry = dataSet.getEntryForIndex(j)
 
             // draw only if the value is greater than zero
-            if (Math.abs(e.y) <= Utils.FLOAT_EPSILON) {
+            if (Math.abs(e.getY()) <= Utils.FLOAT_EPSILON) {
                 angle += sliceAngle * phaseX
                 continue
             }
 
             // Don't draw if it's highlighted, unless the chart uses rounded slices
-            if (dataSet.isHighlightEnabled && mChart.needsHighlight(j) && !drawRoundedSlices) {
+            if (dataSet.isHighlightEnabled() && mChart!!.needsHighlight(j) && !drawRoundedSlices) {
                 angle += sliceAngle * phaseX
                 continue
             }
             val accountForSliceSpacing = sliceSpace > 0f && sliceAngle <= 180f
-            mRenderPaint.color = dataSet.getColor(j)
+            mRenderPaint!!.color = dataSet.getColor(j)
             val sliceSpaceAngleOuter =
                 if (visibleAngleCount == 1) 0f else sliceSpace / (Utils.FDEG2RAD * radius)
             val startAngleOuter = rotationAngle + (angle + sliceSpaceAngleOuter / 2f) * phaseY
@@ -300,65 +341,65 @@ open class PieChartRenderer(
                 }
             }
             mPathBuffer.close()
-            mBitmapCanvas!!.drawPath(mPathBuffer, mRenderPaint)
+            mBitmapCanvas!!.drawPath(mPathBuffer, mRenderPaint!!)
             angle += sliceAngle * phaseX
         }
-        recycleInstance(center)
+        MPPointF.recycleInstance(center)
     }
 
-    override fun drawValues(c: Canvas) {
-        val center = mChart.centerCircleBox
+    override fun drawValues(c: Canvas?) {
+        val center = mChart!!.getCenterCircleBox()
 
         // get whole the radius
-        val radius = mChart.radius
-        var rotationAngle = mChart.rotationAngle
-        val drawAngles = mChart.drawAngles
-        val absoluteAngles = mChart.absoluteAngles
-        val phaseX = mAnimator.phaseX
-        val phaseY = mAnimator.phaseY
-        val roundedRadius = (radius - radius * mChart.holeRadius / 100f) / 2f
-        val holeRadiusPercent = mChart.holeRadius / 100f
+        val radius = mChart!!.getRadius()
+        var rotationAngle = mChart!!.getRotationAngle()
+        val drawAngles = mChart!!.getDrawAngles()
+        val absoluteAngles = mChart!!.getAbsoluteAngles()
+        val phaseX = mAnimator!!.getPhaseX()
+        val phaseY = mAnimator!!.getPhaseY()
+        val roundedRadius = (radius - radius * mChart!!.getHoleRadius() / 100f) / 2f
+        val holeRadiusPercent = mChart!!.getHoleRadius() / 100f
         var labelRadiusOffset = radius / 10f * 3.6f
-        if (mChart.isDrawHoleEnabled) {
+        if (mChart!!.isDrawHoleEnabled()) {
             labelRadiusOffset = (radius - radius * holeRadiusPercent) / 2f
-            if (!mChart.isDrawSlicesUnderHoleEnabled && mChart.isDrawRoundedSlicesEnabled) {
+            if (!mChart!!.isDrawSlicesUnderHoleEnabled() && mChart!!.isDrawRoundedSlicesEnabled()) {
                 // Add curved circle slice and spacing to rotation angle, so that it sits nicely inside
                 rotationAngle += (roundedRadius * 360 / (Math.PI * 2 * radius)).toFloat()
             }
         }
         val labelRadius = radius - labelRadiusOffset
-        val data = mChart.data
-        val dataSets = data?.dataSets
-        val yValueSum = data?.yValueSum
-        val drawEntryLabels = mChart.isDrawEntryLabelsEnabled
+        val data = mChart!!.getData()
+        val dataSets: List<IPieDataSet>? = data!!.getDataSets()
+        val yValueSum = data.getYValueSum()
+        val drawEntryLabels = mChart!!.isDrawEntryLabelsEnabled()
         var angle: Float
         var xIndex = 0
-        c.save()
-        val offset = convertDpToPixel(5f)
+        c!!.save()
+        val offset = Utils.convertDpToPixel(5f)
         for (i in dataSets!!.indices) {
             val dataSet = dataSets[i]
-            val drawValues = dataSet.isDrawValuesEnabled
+            val drawValues = dataSet.isDrawValuesEnabled()
             if (!drawValues && !drawEntryLabels) continue
-            val xValuePosition = dataSet.xValuePosition
-            val yValuePosition = dataSet.yValuePosition
+            val xValuePosition = dataSet.getXValuePosition()
+            val yValuePosition = dataSet.getYValuePosition()
 
             // apply the text-styling defined by the DataSet
             applyValueTextStyle(dataSet)
-            val lineHeight = (calcTextHeight(mValuePaint, "Q")
-                    + convertDpToPixel(4f))
-            val formatter = dataSet.valueFormatter
-            val entryCount = dataSet.entryCount
-            val isUseValueColorForLineEnabled = dataSet.isUseValueColorForLineEnabled
-            val valueLineColor = dataSet.valueLineColor
-            mValueLinePaint.strokeWidth = convertDpToPixel(dataSet.valueLineWidth)
+            val lineHeight = (Utils.calcTextHeight(mValuePaint!!, "Q")
+                    + Utils.convertDpToPixel(4f))
+            val formatter = dataSet.getValueFormatter()
+            val entryCount = dataSet.getEntryCount()
+            val isUseValueColorForLineEnabled = dataSet.isUseValueColorForLineEnabled()
+            val valueLineColor = dataSet.getValueLineColor()
+            mValueLinePaint!!.strokeWidth = Utils.convertDpToPixel(dataSet.getValueLineWidth())
             val sliceSpace = getSliceSpace(dataSet)
-            val iconsOffset = MPPointF.getInstance(dataSet.iconsOffset)
-            iconsOffset.x = convertDpToPixel(iconsOffset.x)
-            iconsOffset.y = convertDpToPixel(iconsOffset.y)
+            val iconsOffset = MPPointF.getInstance(dataSet.getIconsOffset())
+            iconsOffset.x = Utils.convertDpToPixel(iconsOffset.x)
+            iconsOffset.y = Utils.convertDpToPixel(iconsOffset.y)
             for (j in 0 until entryCount) {
                 val entry = dataSet.getEntryForIndex(j)
-                angle = if (xIndex == 0) 0f else absoluteAngles[xIndex - 1] * phaseX
-                val sliceAngle = drawAngles[xIndex]
+                angle = if (xIndex == 0) 0f else absoluteAngles!![xIndex - 1] * phaseX
+                val sliceAngle = drawAngles!![xIndex]
                 val sliceSpaceMiddleAngle = sliceSpace / (Utils.FDEG2RAD * labelRadius)
 
                 // offset needed to center the drawn text in the slice
@@ -366,50 +407,58 @@ open class PieChartRenderer(
                 angle = angle + angleOffset
                 val transformedAngle = rotationAngle + angle * phaseY
                 val value: Float =
-                    if (mChart.isUsePercentValuesEnabled) entry.y / yValueSum * 100f else entry.getY()
-                val entryLabel = entry.label
+                    if (mChart!!.isUsePercentValuesEnabled()) entry.getY() / yValueSum * 100f else entry.getY()
+                val entryLabel = entry.getLabel()
                 val sliceXBase = Math.cos((transformedAngle * Utils.FDEG2RAD).toDouble()).toFloat()
                 val sliceYBase = Math.sin((transformedAngle * Utils.FDEG2RAD).toDouble()).toFloat()
                 val drawXOutside = drawEntryLabels &&
-                        xValuePosition == ValuePosition.OUTSIDE_SLICE
+                        xValuePosition === PieDataSet.ValuePosition.OUTSIDE_SLICE
                 val drawYOutside = drawValues &&
-                        yValuePosition == ValuePosition.OUTSIDE_SLICE
+                        yValuePosition === PieDataSet.ValuePosition.OUTSIDE_SLICE
                 val drawXInside = drawEntryLabels &&
-                        xValuePosition == ValuePosition.INSIDE_SLICE
+                        xValuePosition === PieDataSet.ValuePosition.INSIDE_SLICE
                 val drawYInside = drawValues &&
-                        yValuePosition == ValuePosition.INSIDE_SLICE
+                        yValuePosition === PieDataSet.ValuePosition.INSIDE_SLICE
                 if (drawXOutside || drawYOutside) {
-                    val valueLineLength1 = dataSet.valueLinePart1Length
-                    val valueLineLength2 = dataSet.valueLinePart2Length
+                    val valueLineLength1 = dataSet.getValueLinePart1Length()
+                    val valueLineLength2 = dataSet.getValueLinePart2Length()
                     val valueLinePart1OffsetPercentage =
-                        dataSet.valueLinePart1OffsetPercentage / 100f
+                        dataSet.getValueLinePart1OffsetPercentage() / 100f
                     var pt2x: Float
                     var pt2y: Float
                     var labelPtx: Float
                     var labelPty: Float
                     var line1Radius: Float
                     line1Radius =
-                        if (mChart.isDrawHoleEnabled) (radius - radius * holeRadiusPercent) * valueLinePart1OffsetPercentage + radius * holeRadiusPercent else radius * valueLinePart1OffsetPercentage
+                        if (mChart!!.isDrawHoleEnabled()) {
+                            (radius - radius * holeRadiusPercent) * valueLinePart1OffsetPercentage
+                            +radius * holeRadiusPercent
+                        } else {
+                            radius * valueLinePart1OffsetPercentage
+                        }
                     val polyline2Width =
-                        if (dataSet.isValueLineVariableLength) labelRadius * valueLineLength2 * Math.abs(
-                            Math.sin((transformedAngle * Utils.FDEG2RAD).toDouble())
+                        if (dataSet.isValueLineVariableLength()) labelRadius * valueLineLength2 * Math.abs(
+                            Math.sin(
+                                (
+                                        transformedAngle * Utils.FDEG2RAD).toDouble()
+                            )
                         ).toFloat() else labelRadius * valueLineLength2
                     val pt0x = line1Radius * sliceXBase + center.x
                     val pt0y = line1Radius * sliceYBase + center.y
                     val pt1x = labelRadius * (1 + valueLineLength1) * sliceXBase + center.x
                     val pt1y = labelRadius * (1 + valueLineLength1) * sliceYBase + center.y
-                    if (!(transformedAngle % 360.0 < 90.0 || transformedAngle % 360.0 > 270.0)) {
+                    if (transformedAngle % 360.0 >= 90.0 && transformedAngle % 360.0 <= 270.0) {
                         pt2x = pt1x - polyline2Width
                         pt2y = pt1y
-                        mValuePaint.textAlign = Align.RIGHT
-                        if (drawXOutside) paintEntryLabels.textAlign = Align.RIGHT
+                        mValuePaint!!.textAlign = Align.RIGHT
+                        if (drawXOutside) mEntryLabelsPaint!!.textAlign = Align.RIGHT
                         labelPtx = pt2x - offset
                         labelPty = pt2y
                     } else {
                         pt2x = pt1x + polyline2Width
                         pt2y = pt1y
-                        mValuePaint.textAlign = Align.LEFT
-                        if (drawXOutside) paintEntryLabels.textAlign = Align.LEFT
+                        mValuePaint!!.textAlign = Align.LEFT
+                        if (drawXOutside) mEntryLabelsPaint!!.textAlign = Align.LEFT
                         labelPtx = pt2x + offset
                         labelPty = pt2y
                     }
@@ -418,9 +467,9 @@ open class PieChartRenderer(
                         dataSet.getColor(j) else if (valueLineColor != ColorTemplate.COLOR_NONE) lineColor =
                         valueLineColor
                     if (lineColor != ColorTemplate.COLOR_NONE) {
-                        mValueLinePaint.color = lineColor
-                        c.drawLine(pt0x, pt0y, pt1x, pt1y, mValueLinePaint)
-                        c.drawLine(pt1x, pt1y, pt2x, pt2y, mValueLinePaint)
+                        mValueLinePaint!!.color = lineColor
+                        c.drawLine(pt0x, pt0y, pt1x, pt1y, mValueLinePaint!!)
+                        c.drawLine(pt1x, pt1y, pt2x, pt2y, mValueLinePaint!!)
                     }
 
                     // draw everything, depending on settings
@@ -435,11 +484,11 @@ open class PieChartRenderer(
                             labelPty,
                             dataSet.getValueTextColor(j)
                         )
-                        if (j < data.entryCount && entryLabel != null) {
+                        if (j < data.getEntryCount() && entryLabel != null) {
                             drawEntryLabel(c, entryLabel, labelPtx, labelPty + lineHeight)
                         }
                     } else if (drawXOutside) {
-                        if (j < data.entryCount && entryLabel != null) {
+                        if (j < data.getEntryCount() && entryLabel != null) {
                             drawEntryLabel(c, entryLabel, labelPtx, labelPty + lineHeight / 2f)
                         }
                     } else if (drawYOutside) {
@@ -460,16 +509,16 @@ open class PieChartRenderer(
                     // calculate the text position
                     val x = labelRadius * sliceXBase + center.x
                     val y = labelRadius * sliceYBase + center.y
-                    mValuePaint.textAlign = Align.CENTER
+                    mValuePaint!!.textAlign = Align.CENTER
 
                     // draw everything, depending on settings
                     if (drawXInside && drawYInside) {
                         drawValue(c, formatter, value, entry, 0, x, y, dataSet.getValueTextColor(j))
-                        if (j < data.entryCount && entryLabel != null) {
+                        if (j < data.getEntryCount() && entryLabel != null) {
                             drawEntryLabel(c, entryLabel, x, y + lineHeight)
                         }
                     } else if (drawXInside) {
-                        if (j < data.entryCount && entryLabel != null) {
+                        if (j < data.getEntryCount() && entryLabel != null) {
                             drawEntryLabel(c, entryLabel, x, y + lineHeight / 2f)
                         }
                     } else if (drawYInside) {
@@ -485,23 +534,23 @@ open class PieChartRenderer(
                         )
                     }
                 }
-                if (entry.icon != null && dataSet.isDrawIconsEnabled) {
-                    val icon = entry.icon
+                if (entry.getIcon() != null && dataSet.isDrawIconsEnabled()) {
+                    val icon = entry.getIcon()
                     val x = (labelRadius + iconsOffset.y) * sliceXBase + center.x
                     var y = (labelRadius + iconsOffset.y) * sliceYBase + center.y
                     y += iconsOffset.x
-                    drawImage(
+                    Utils.drawImage(
                         c,
-                        icon, x.toInt(), y.toInt(),
+                        icon!!, x.toInt(), y.toInt(),
                         icon.intrinsicWidth,
                         icon.intrinsicHeight
                     )
                 }
                 xIndex++
             }
-            recycleInstance(iconsOffset)
+            MPPointF.recycleInstance(iconsOffset)
         }
-        recycleInstance(center)
+        MPPointF.recycleInstance(center)
         c.restore()
     }
 
@@ -513,13 +562,13 @@ open class PieChartRenderer(
      * @param x
      * @param y
      */
-    fun drawEntryLabel(c: Canvas, label: String?, x: Float, y: Float) {
-        c.drawText(label!!, x, y, paintEntryLabels)
+    protected open fun drawEntryLabel(c: Canvas, label: String?, x: Float, y: Float) {
+        c.drawText(label!!, x, y, mEntryLabelsPaint!!)
     }
 
-    override fun drawExtras(c: Canvas) {
+    override fun drawExtras(c: Canvas?) {
         drawHole(c)
-        c.drawBitmap(mDrawBitmap!!.get()!!, 0f, 0f, null)
+        c!!.drawBitmap(mDrawBitmap!!.get()!!, 0f, 0f, null)
         drawCenterText(c)
     }
 
@@ -529,56 +578,56 @@ open class PieChartRenderer(
      * draws the hole in the center of the chart and the transparent circle /
      * hole
      */
-    fun drawHole(c: Canvas?) {
-        if (mChart.isDrawHoleEnabled && mBitmapCanvas != null) {
-            val radius = mChart.radius
-            val holeRadius = radius * (mChart.holeRadius / 100)
-            val center = mChart.centerCircleBox
-            if (Color.alpha(paintHole.color) > 0) {
+    protected open fun drawHole(c: Canvas?) {
+        if (mChart!!.isDrawHoleEnabled() && mBitmapCanvas != null) {
+            val radius = mChart!!.getRadius()
+            val holeRadius = radius * (mChart!!.getHoleRadius() / 100)
+            val center = mChart!!.getCenterCircleBox()
+            if (Color.alpha(mHolePaint!!.color) > 0) {
                 // draw the hole-circle
                 mBitmapCanvas!!.drawCircle(
                     center.x, center.y,
-                    holeRadius, paintHole
+                    holeRadius, mHolePaint!!
                 )
             }
 
             // only draw the circle if it can be seen (not covered by the hole)
-            if (Color.alpha(paintTransparentCircle.color) > 0 &&
-                mChart.transparentCircleRadius > mChart.holeRadius
+            if (Color.alpha(mTransparentCirclePaint!!.color) > 0 &&
+                mChart!!.getTransparentCircleRadius() > mChart!!.getHoleRadius()
             ) {
-                val alpha = paintTransparentCircle.alpha
-                val secondHoleRadius = radius * (mChart.transparentCircleRadius / 100)
-                paintTransparentCircle.alpha =
-                    (alpha.toFloat() * mAnimator.phaseX * mAnimator.phaseY).toInt()
+                val alpha = mTransparentCirclePaint!!.alpha
+                val secondHoleRadius = radius * (mChart!!.getTransparentCircleRadius() / 100)
+                mTransparentCirclePaint!!.alpha =
+                    (alpha.toFloat() * mAnimator!!.getPhaseX() * mAnimator!!.getPhaseY()).toInt()
 
                 // draw the transparent-circle
                 mHoleCirclePath.reset()
                 mHoleCirclePath.addCircle(center.x, center.y, secondHoleRadius, Path.Direction.CW)
                 mHoleCirclePath.addCircle(center.x, center.y, holeRadius, Path.Direction.CCW)
-                mBitmapCanvas!!.drawPath(mHoleCirclePath, paintTransparentCircle)
+                mBitmapCanvas!!.drawPath(mHoleCirclePath, mTransparentCirclePaint!!)
 
                 // reset alpha
-                paintTransparentCircle.alpha = alpha
+                mTransparentCirclePaint!!.alpha = alpha
             }
-            recycleInstance(center)
+            MPPointF.recycleInstance(center)
         }
     }
 
-    var mDrawCenterTextPathBuffer = Path()
+    protected var mDrawCenterTextPathBuffer = Path()
 
     /**
      * draws the description text in the center of the pie chart makes most
      * sense when center-hole is enabled
      */
-    fun drawCenterText(c: Canvas) {
-        val centerText = mChart.centerText
-        if (mChart.isDrawCenterTextEnabled && centerText != null) {
-            val center = mChart.centerCircleBox
-            val offset = mChart.centerTextOffset
-            val x = center.x + offset.x
+    protected open fun drawCenterText(c: Canvas) {
+        val centerText = mChart!!.getCenterText()
+        if (mChart!!.isDrawCenterTextEnabled() && centerText != null) {
+            val center = mChart!!.getCenterCircleBox()
+            val offset = mChart!!.getCenterTextOffset()
+            val x = center.x + offset!!.x
             val y = center.y + offset.y
             val innerRadius =
-                if (mChart.isDrawHoleEnabled && !mChart.isDrawSlicesUnderHoleEnabled) mChart.radius * (mChart.holeRadius / 100f) else mChart.radius
+                if (mChart!!.isDrawHoleEnabled() && !mChart!!.isDrawSlicesUnderHoleEnabled()) mChart!!.getRadius() * (mChart!!.getHoleRadius() / 100f) else mChart!!.getRadius()
             val holeRect = mRectBuffer[0]
             holeRect.left = x - innerRadius
             holeRect.top = y - innerRadius
@@ -586,7 +635,7 @@ open class PieChartRenderer(
             holeRect.bottom = y + innerRadius
             val boundingRect = mRectBuffer[1]
             boundingRect.set(holeRect)
-            val radiusPercent = mChart.centerTextRadiusPercent / 100f
+            val radiusPercent = mChart!!.getCenterTextRadiusPercent() / 100f
             if (radiusPercent > 0.0) {
                 boundingRect.inset(
                     (boundingRect.width() - boundingRect.width() * radiusPercent) / 2f,
@@ -603,7 +652,7 @@ open class PieChartRenderer(
                 // If width is 0, it will crash. Always have a minimum of 1
                 mCenterTextLayout = StaticLayout(
                     centerText, 0, centerText.length,
-                    paintCenterText, Math.max(Math.ceil(width.toDouble()), 1.0).toInt(),
+                    mCenterTextPaint, Math.max(Math.ceil(width.toDouble()), 1.0).toInt(),
                     Layout.Alignment.ALIGN_CENTER, 1f, 0f, false
                 )
             }
@@ -611,7 +660,7 @@ open class PieChartRenderer(
             //float layoutWidth = Utils.getStaticLayoutMaxWidth(mCenterTextLayout);
             val layoutHeight = mCenterTextLayout!!.height.toFloat()
             c.save()
-            if (Build.VERSION.SDK_INT >= 28) {
+            if (Build.VERSION.SDK_INT >= 18) {
                 val path = mDrawCenterTextPathBuffer
                 path.reset()
                 path.addOval(holeRect, Path.Direction.CW)
@@ -623,52 +672,57 @@ open class PieChartRenderer(
             )
             mCenterTextLayout!!.draw(c)
             c.restore()
-            recycleInstance(center)
-            recycleInstance(offset)
+            MPPointF.recycleInstance(center)
+            MPPointF.recycleInstance(offset)
         }
     }
 
-    var mDrawHighlightedRectF = RectF()
-    override fun drawHighlighted(c: Canvas, indices: Array<Highlight>) {
-        val drawInnerArc = mChart.isDrawHoleEnabled && !mChart.isDrawSlicesUnderHoleEnabled
-        if (drawInnerArc && mChart.isDrawRoundedSlicesEnabled) return
-        val phaseX = mAnimator.phaseX
-        val phaseY = mAnimator.phaseY
+    protected var mDrawHighlightedRectF = RectF()
+    override fun drawHighlighted(c: Canvas?, indices: Array<Highlight>?) {
+        /* Skip entirely if using rounded circle slices, because it doesn't make sense to highlight
+         * in this way.
+         * TODO: add support for changing slice color with highlighting rather than only shifting the slice
+         */
+        val drawInnerArc = mChart!!.isDrawHoleEnabled() && !mChart!!.isDrawSlicesUnderHoleEnabled()
+        if (drawInnerArc && mChart!!.isDrawRoundedSlicesEnabled()) return
+        val phaseX = mAnimator!!.getPhaseX()
+        val phaseY = mAnimator!!.getPhaseY()
         var angle: Float
-        val rotationAngle = mChart.rotationAngle
-        val drawAngles = mChart.drawAngles
-        val absoluteAngles = mChart.absoluteAngles
-        val center = mChart.centerCircleBox
-        val radius = mChart.radius
-        val userInnerRadius = if (drawInnerArc) radius * (mChart.holeRadius / 100f) else 0f
+        val rotationAngle = mChart!!.getRotationAngle()
+        val drawAngles = mChart!!.getDrawAngles()
+        val absoluteAngles = mChart!!.getAbsoluteAngles()
+        val center = mChart!!.getCenterCircleBox()
+        val radius = mChart!!.getRadius()
+        val userInnerRadius = if (drawInnerArc) radius * (mChart!!.getHoleRadius() / 100f) else 0f
         val highlightedCircleBox = mDrawHighlightedRectF
         highlightedCircleBox[0f, 0f, 0f] = 0f
-        for (i in indices.indices) {
+        for (i in indices!!.indices) {
+
             // get the index to highlight
-            val index = indices[i].x.toInt()
-            if (index >= drawAngles.size) continue
-            val set = mChart.data!!.getDataSetByIndex(indices[i].dataSetIndex)
-            if (set == null || !set.isHighlightEnabled) continue
-            val entryCount = set.entryCount
+            val index = indices[i].getX().toInt()
+            if (index >= drawAngles!!.size) continue
+            val set = mChart!!.getData()!!.getDataSetByIndex(indices[i].getDataSetIndex())
+            if (set == null || !set.isHighlightEnabled()) continue
+            val entryCount = set.getEntryCount()
             var visibleAngleCount = 0
             for (j in 0 until entryCount) {
                 // draw only if the value is greater than zero
-                if (Math.abs(set.getEntryForIndex(j)!!.y) > Utils.FLOAT_EPSILON) {
+                if (Math.abs(set.getEntryForIndex(j).getY()) > Utils.FLOAT_EPSILON) {
                     visibleAngleCount++
                 }
             }
-            angle = if (index == 0) 0f else absoluteAngles[index - 1] * phaseX
-            val sliceSpace = if (visibleAngleCount <= 1) 0f else set.sliceSpace
+            angle = if (index == 0) 0f else absoluteAngles!![index - 1] * phaseX
+            val sliceSpace = if (visibleAngleCount <= 1) 0f else set.getSliceSpace()
             val sliceAngle = drawAngles[index]
             var innerRadius = userInnerRadius
-            val shift = set.selectionShift
+            val shift = set.getSelectionShift()
             val highlightedRadius = radius + shift
-            highlightedCircleBox.set(mChart.circleBox!!)
+            highlightedCircleBox.set(mChart!!.getCircleBox()!!)
             highlightedCircleBox.inset(-shift, -shift)
             val accountForSliceSpacing = sliceSpace > 0f && sliceAngle <= 180f
-            var highlightColor = set.highlightColor
+            var highlightColor = set.getHighlightColor()
             if (highlightColor == null) highlightColor = set.getColor(index)
-            mRenderPaint.color = highlightColor
+            mRenderPaint!!.color = highlightColor
             val sliceSpaceAngleOuter =
                 if (visibleAngleCount == 1) 0f else sliceSpace / (Utils.FDEG2RAD * radius)
             val sliceSpaceAngleShifted =
@@ -772,9 +826,9 @@ open class PieChartRenderer(
                 }
             }
             mPathBuffer.close()
-            mBitmapCanvas!!.drawPath(mPathBuffer, mRenderPaint)
+            mBitmapCanvas!!.drawPath(mPathBuffer, mRenderPaint!!)
         }
-        recycleInstance(center)
+        MPPointF.recycleInstance(center)
     }
 
     /**
@@ -782,25 +836,25 @@ open class PieChartRenderer(
      *
      * @param c
      */
-    fun drawRoundedSlices(c: Canvas?) {
-        if (!mChart.isDrawRoundedSlicesEnabled) return
-        val dataSet = mChart.data.dataSet
-        if (!dataSet.isVisible) return
-        val phaseX = mAnimator.phaseX
-        val phaseY = mAnimator.phaseY
-        val center = mChart.centerCircleBox
-        val r = mChart.radius
+    protected open fun drawRoundedSlices(c: Canvas?) {
+        if (!mChart!!.isDrawRoundedSlicesEnabled()) return
+        val dataSet = mChart!!.getData()!!.getDataSet()
+        if (!dataSet.isVisible()) return
+        val phaseX = mAnimator!!.getPhaseX()
+        val phaseY = mAnimator!!.getPhaseY()
+        val center = mChart!!.getCenterCircleBox()
+        val r = mChart!!.getRadius()
 
         // calculate the radius of the "slice-circle"
-        val circleRadius = (r - r * mChart.holeRadius / 100f) / 2f
-        val drawAngles = mChart.drawAngles
-        var angle = mChart.rotationAngle
-        for (j in 0 until dataSet!!.entryCount) {
-            val sliceAngle = drawAngles[j]
-            val e: Entry = dataSet.getEntryForIndex(j)!!
+        val circleRadius = (r - r * mChart!!.getHoleRadius() / 100f) / 2f
+        val drawAngles = mChart!!.getDrawAngles()
+        var angle = mChart!!.getRotationAngle()
+        for (j in 0 until dataSet.getEntryCount()) {
+            val sliceAngle = drawAngles!![j]
+            val e: Entry = dataSet.getEntryForIndex(j)
 
             // draw only if the value is greater than zero
-            if (Math.abs(e.y) > Utils.FLOAT_EPSILON) {
+            if (Math.abs(e.getY()) > Utils.FLOAT_EPSILON) {
                 val x = ((r - circleRadius)
                         * Math.cos(
                     Math.toRadians(
@@ -815,18 +869,18 @@ open class PieChartRenderer(
                                 * phaseY).toDouble()
                     )
                 ) + center.y).toFloat()
-                mRenderPaint.color = dataSet.getColor(j)
-                mBitmapCanvas!!.drawCircle(x, y, circleRadius, mRenderPaint)
+                mRenderPaint!!.color = dataSet.getColor(j)
+                mBitmapCanvas!!.drawCircle(x, y, circleRadius, mRenderPaint!!)
             }
             angle += sliceAngle * phaseX
         }
-        recycleInstance(center)
+        MPPointF.recycleInstance(center)
     }
 
     /**
      * Releases the drawing bitmap. This should be called when [LineChart.onDetachedFromWindow].
      */
-    fun releaseBitmap() {
+    open fun releaseBitmap() {
         if (mBitmapCanvas != null) {
             mBitmapCanvas!!.setBitmap(null)
             mBitmapCanvas = null
@@ -837,27 +891,5 @@ open class PieChartRenderer(
             mDrawBitmap!!.clear()
             mDrawBitmap = null
         }
-    }
-
-    init {
-        paintHole = Paint(Paint.ANTI_ALIAS_FLAG)
-        paintHole.color = Color.WHITE
-        paintHole.style = Paint.Style.FILL
-        paintTransparentCircle = Paint(Paint.ANTI_ALIAS_FLAG)
-        paintTransparentCircle.color = Color.WHITE
-        paintTransparentCircle.style = Paint.Style.FILL
-        paintTransparentCircle.alpha = 105
-        paintCenterText = TextPaint(Paint.ANTI_ALIAS_FLAG)
-        paintCenterText.color = Color.BLACK
-        paintCenterText.textSize = convertDpToPixel(12f)
-        mValuePaint.textSize = convertDpToPixel(13f)
-        mValuePaint.color = Color.WHITE
-        mValuePaint.textAlign = Align.CENTER
-        paintEntryLabels = Paint(Paint.ANTI_ALIAS_FLAG)
-        paintEntryLabels.color = Color.WHITE
-        paintEntryLabels.textAlign = Align.CENTER
-        paintEntryLabels.textSize = convertDpToPixel(13f)
-        mValueLinePaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        mValueLinePaint.style = Paint.Style.STROKE
     }
 }

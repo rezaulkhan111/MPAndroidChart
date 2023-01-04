@@ -10,8 +10,8 @@ import com.github.mikephil.charting.utils.Utils.convertDpToPixel
  *
  * @author Philipp Jahoda
  */
-class CandleDataSet(yVals: MutableList<CandleEntry?>?, label: String?) :
-    LineScatterCandleRadarDataSet<CandleEntry?>(yVals, label), ICandleDataSet {
+class CandleDataSet : LineScatterCandleRadarDataSet<CandleEntry>, ICandleDataSet {
+
     /**
      * the width of the shadow of the candle
      */
@@ -40,45 +40,50 @@ class CandleDataSet(yVals: MutableList<CandleEntry?>?, label: String?) :
      * paint style when open < close
      * increasing candlesticks are traditionally hollow
      */
-    protected var mIncreasingPaintStyle = Paint.Style.STROKE
+    private var mIncreasingPaintStyle = Paint.Style.STROKE
 
     /**
      * paint style when open > close
      * descreasing candlesticks are traditionally filled
      */
-    protected var mDecreasingPaintStyle = Paint.Style.FILL
+    private var mDecreasingPaintStyle = Paint.Style.FILL
 
     /**
      * color for open == close
      */
-    protected var mNeutralColor = ColorTemplate.COLOR_SKIP
+    private var mNeutralColor = ColorTemplate.COLOR_SKIP
 
     /**
      * color for open < close
      */
-    protected var mIncreasingColor = ColorTemplate.COLOR_SKIP
+    private var mIncreasingColor = ColorTemplate.COLOR_SKIP
 
     /**
      * color for open > close
      */
-    protected var mDecreasingColor = ColorTemplate.COLOR_SKIP
+    private var mDecreasingColor = ColorTemplate.COLOR_SKIP
 
     /**
      * shadow line color, set -1 for backward compatibility and uses default
      * color
      */
-    protected var mShadowColor = ColorTemplate.COLOR_SKIP
-    override fun copy(): DataSet<CandleEntry?>? {
-        val entries: MutableList<CandleEntry?> = ArrayList()
+    private var mShadowColor = ColorTemplate.COLOR_SKIP
+
+    constructor(yVals: MutableList<CandleEntry>?, label: String?) : super(yVals, label) {
+
+    }
+
+    override fun copy(): DataSet<CandleEntry> {
+        val entries: MutableList<CandleEntry> = ArrayList()
         for (i in mEntries!!.indices) {
-            entries.add(mEntries!![i]!!.copy())
+            entries.add(mEntries!![i].copy())
         }
         val copied = CandleDataSet(entries, getLabel())
         copy(copied)
         return copied
     }
 
-    protected fun copy(candleDataSet: CandleDataSet) {
+    private fun copy(candleDataSet: CandleDataSet) {
         super.copy(candleDataSet)
         candleDataSet.mShadowWidth = mShadowWidth
         candleDataSet.mShowCandleBar = mShowCandleBar
@@ -93,13 +98,13 @@ class CandleDataSet(yVals: MutableList<CandleEntry?>?, label: String?) :
         candleDataSet.mShadowColor = mShadowColor
     }
 
-    override fun calcMinMax(e: CandleEntry?) {
-        if (e.getLow() < mYMin) mYMin = e.getLow()
-        if (e.getHigh() > mYMax) mYMax = e.getHigh()
+    protected fun calcMinMax(e: CandleEntry) {
+        if (e.low < mYMin) mYMin = e.low
+        if (e.high > mYMax) mYMax = e.high
         calcMinMaxX(e)
     }
 
-    protected override fun calcMinMaxY(e: CandleEntry) {
+    override fun calcMinMaxY(e: CandleEntry) {
         if (e.high < mYMin) mYMin = e.high
         if (e.high > mYMax) mYMax = e.high
         if (e.low < mYMin) mYMin = e.low
@@ -148,6 +153,19 @@ class CandleDataSet(yVals: MutableList<CandleEntry?>?, label: String?) :
     override fun getShowCandleBar(): Boolean {
         return mShowCandleBar
     }
+
+    // TODO
+    /**
+     * It is necessary to implement ColorsList class that will encapsulate
+     * colors list functionality, because It's wrong to copy paste setColor,
+     * addColor, ... resetColors for each time when we want to add a coloring
+     * options for one of objects
+     *
+     * @author Mesrop
+     */
+
+    /** BELOW THIS COLOR HANDLING */
+
     // TODO
     /**
      * It is necessary to implement ColorsList class that will encapsulate

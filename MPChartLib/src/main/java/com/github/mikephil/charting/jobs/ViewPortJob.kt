@@ -14,22 +14,33 @@ import com.github.mikephil.charting.utils.ViewPortHandler
  *
  * @author Philipp Jahoda
  */
-abstract class ViewPortJob(
-     var mViewPortHandler: ViewPortHandler?, xValue: Float, yValue: Float,
-    trans: Transformer?, v: View?
-) : Poolable(), Runnable {
-     var pts = FloatArray(2)
-    var xValue = 0f
-         set
-    var yValue = 0f
-         set
-     var mTrans: Transformer?
-     var view: View?
+abstract class ViewPortJob : Poolable, Runnable {
 
-    init {
+    protected var pts = FloatArray(2)
+    protected var mViewPortHandler: ViewPortHandler? = null
+    protected var xValue = 0f
+    protected var yValue = 0f
+    protected var mTrans: Transformer? = null
+    protected var view: View? = null
+
+    constructor(
+        viewPortHandler: ViewPortHandler?, xValue: Float, yValue: Float,
+        trans: Transformer?, v: View?
+    ) {
+        mViewPortHandler = viewPortHandler
         this.xValue = xValue
         this.yValue = yValue
         mTrans = trans
         view = v
+    }
+
+    @JvmName("getXValue1")
+    fun getXValue(): Float {
+        return xValue
+    }
+
+    @JvmName("getYValue1")
+    fun getYValue(): Float {
+        return yValue
     }
 }

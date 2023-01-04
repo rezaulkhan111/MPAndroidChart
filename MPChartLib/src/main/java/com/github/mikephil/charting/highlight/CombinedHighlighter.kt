@@ -10,15 +10,22 @@ import com.github.mikephil.charting.interfaces.datasets.IDataSet
 /**
  * Created by Philipp Jahoda on 12/09/15.
  */
-class CombinedHighlighter(chart: CombinedDataProvider, barChart: BarDataProvider) :
-    ChartHighlighter<CombinedDataProvider?>(chart), IHighlighter {
+class CombinedHighlighter : ChartHighlighter<CombinedDataProvider>, IHighlighter {
+
     /**
      * bar highlighter for supporting stacked highlighting
      */
-     var barHighlighter: BarHighlighter?
+    private var barHighlighter: BarHighlighter? = null
+
+    constructor(chart: CombinedDataProvider, barChart: BarDataProvider) : super(chart) {
+        // if there is BarData, create a BarHighlighter
+        barHighlighter = if (barChart.getBarData() == null) null else BarHighlighter(barChart)
+    }
+
     override fun getHighlightsAtXValue(xVal: Float, x: Float, y: Float): List<Highlight> {
         mHighlightBuffer.clear()
-        val dataObjects = mChart!!.combinedData!!.allData
+        val dataObjects = mChart!!.getCombinedData()!!
+            .getAllData()
         for (i in dataObjects.indices) {
             val dataObject: ChartData<*> = dataObjects[i]
 
@@ -31,49 +38,23 @@ class CombinedHighlighter(chart: CombinedDataProvider, barChart: BarDataProvider
                 }
             } else {
                 var j = 0
-                val dataSetCount = dataObject.dataSetCount
+                val dataSetCount = dataObject.getDataSetCount()
                 while (j < dataSetCount) {
-                    val dataSet: IDataSet<*> = dataObjects[i].getDataSetByIndex(j)
-
+                    val dataSet: IDataSet<*>? = dataObjects[i].getDataSetByIndex(j)
                     // don't include datasets that cannot be highlighted
-                    if (!dataSet.isHighlightEnabled) {
+                    if (!dataSet!!.isHighlightEnabled()) {
                         j++
                         continue
                     }
                     val highs = buildHighlights(dataSet, j, xVal, Rounding.CLOSEST)
                     for (high in highs!!) {
                         high.dataIndex = i
-                        mHighlightBuffer.add(high!!)
+                        mHighlightBuffer.add(high)
                     }
                     j++
                 }
             }
         }
         return mHighlightBuffer
-    } //    protected Highlight getClosest(float x, float y, Highlight... highs) {
-
-    //
-    //        Highlight closest = null;
-    //        float minDistance = Float.MAX_VALUE;
-    //
-    //        for (Highlight high : highs) {
-    //
-    //            if (high == null)
-    //                continue;
-    //
-    //            float tempDistance = getDistance(x, y, high.getXPx(), high.getYPx());
-    //
-    //            if (tempDistance < minDistance) {
-    //                minDistance = tempDistance;
-    //                closest = high;
-    //            }
-    //        }
-    //
-    //        return closest;
-    //    }
-    init {
-
-        // if there is BarData, create a BarHighlighter
-        barHighlighter = if (barChart.barData == null) null else BarHighlighter(barChart)
     }
 }

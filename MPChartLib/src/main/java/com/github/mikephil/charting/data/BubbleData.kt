@@ -2,7 +2,7 @@ package com.github.mikephil.charting.data
 
 import com.github.mikephil.charting.interfaces.datasets.IBubbleDataSet
 
-class BubbleData : BarLineScatterCandleBubbleData<IBubbleDataSet?> {
+class BubbleData : BarLineScatterCandleBubbleData<IBubbleDataSet> {
 
     constructor() : super() {}
     constructor(vararg dataSets: IBubbleDataSet?) : super(dataSets) {}
@@ -16,7 +16,7 @@ class BubbleData : BarLineScatterCandleBubbleData<IBubbleDataSet?> {
      */
     fun setHighlightCircleWidth(width: Float) {
         for (set in mDataSets!!) {
-            set?.setHighlightCircleWidth(width)
+            set.setHighlightCircleWidth(width)
         }
     }
 }

@@ -3,102 +3,105 @@ package com.github.mikephil.charting.renderer
 import android.graphics.*
 import android.graphics.Paint.Align
 import com.github.mikephil.charting.animation.ChartAnimator
+import com.github.mikephil.charting.buffer.BarBuffer
 import com.github.mikephil.charting.buffer.HorizontalBarBuffer
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.interfaces.dataprovider.BarDataProvider
 import com.github.mikephil.charting.interfaces.dataprovider.ChartInterface
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
 import com.github.mikephil.charting.utils.*
+import com.github.mikephil.charting.utils.MPPointF.Companion.getInstance
 import com.github.mikephil.charting.utils.MPPointF.Companion.recycleInstance
 import com.github.mikephil.charting.utils.Utils.calcTextHeight
 import com.github.mikephil.charting.utils.Utils.calcTextWidth
+import com.github.mikephil.charting.utils.Utils.convertDpToPixel
 import com.github.mikephil.charting.utils.Utils.drawImage
-import com.github.mikephil.charting.utils.ViewPortHandler.contentLeft
-import com.github.mikephil.charting.utils.ViewPortHandler.contentRight
-import com.github.mikephil.charting.utils.ViewPortHandler.isInBoundsBottom
-import com.github.mikephil.charting.utils.ViewPortHandler.isInBoundsTop
-import com.github.mikephil.charting.utils.ViewPortHandler.isInBoundsX
-import com.github.mikephil.charting.utils.ViewPortHandler.scaleY
 
 /**
  * Renderer for the HorizontalBarChart.
  *
  * @author Philipp Jahoda
  */
-class HorizontalBarChartRenderer(
-    chart: BarDataProvider, animator: ChartAnimator?,
-    viewPortHandler: ViewPortHandler?
-) : BarChartRenderer(chart, animator, viewPortHandler) {
+class HorizontalBarChartRenderer : BarChartRenderer {
+
+    constructor(
+        chart: BarDataProvider?, animator: ChartAnimator,
+        viewPortHandler: ViewPortHandler?
+    ) : super(chart, animator, viewPortHandler) {
+        mValuePaint!!.textAlign = Align.LEFT
+    }
+
     override fun initBuffers() {
-        val barData = mChart.barData
-        mBarBuffers = arrayOfNulls<HorizontalBarBuffer>(barData.dataSetCount)
-        for (i in mBarBuffers.indices) {
+        val barData = mChart!!.getBarData()
+        mBarBuffers = arrayOfNulls(barData.getDataSetCount())
+        for (i in 0 until mBarBuffers.size) {
             val set = barData.getDataSetByIndex(i)
             mBarBuffers[i] = HorizontalBarBuffer(
-                set.entryCount * 4 * if (set.isStacked) set.stackSize else 1,
-                barData.dataSetCount, set.isStacked
+                set!!.getEntryCount() * 4 * if (set.isStacked()) set.getStackSize() else 1,
+                barData.getDataSetCount(), set.isStacked()
             )
         }
     }
 
     private val mBarShadowRectBuffer = RectF()
-    override fun drawDataSet(c: Canvas, dataSet: IBarDataSet, index: Int) {
-        val trans = mChart.getTransformer(dataSet.axisDependency)
-        mBarBorderPaint.color = dataSet.barBorderColor
-        mBarBorderPaint.strokeWidth = Utils.convertDpToPixel(dataSet.barBorderWidth)
-        val drawBorder = dataSet.barBorderWidth > 0f
-        val phaseX = mAnimator.phaseX
-        val phaseY = mAnimator.phaseY
+
+    override fun drawDataSet(c: Canvas, dataSet: IBarDataSet?, index: Int) {
+        val trans = mChart!!.getTransformer(dataSet!!.getAxisDependency())
+        mBarBorderPaint!!.color = dataSet.getBarBorderColor()
+        mBarBorderPaint!!.strokeWidth = convertDpToPixel(dataSet.getBarBorderWidth())
+        val drawBorder = dataSet.getBarBorderWidth() > 0f
+        val phaseX = mAnimator!!.getPhaseX()
+        val phaseY = mAnimator!!.getPhaseY()
 
         // draw the bar shadow before the values
-        if (mChart.isDrawBarShadowEnabled) {
-            mShadowPaint.color = dataSet.barShadowColor
-            val barData = mChart.barData
-            val barWidth = barData.barWidth
+        if (mChart!!.isDrawBarShadowEnabled()) {
+            mShadowPaint!!.color = dataSet.getBarShadowColor()
+            val barData = mChart!!.getBarData()
+            val barWidth = barData.getBarWidth()
             val barWidthHalf = barWidth / 2.0f
             var x: Float
             var i = 0
             val count = Math.min(
-                Math.ceil((dataSet.entryCount.toFloat() * phaseX).toDouble()).toInt(),
-                dataSet.entryCount
+                Math.ceil((dataSet.getEntryCount().toFloat() * phaseX).toDouble()).toInt(),
+                dataSet.getEntryCount()
             )
             while (i < count) {
                 val e = dataSet.getEntryForIndex(i)
-                x = e.x
+                x = e.getX()
                 mBarShadowRectBuffer.top = x - barWidthHalf
                 mBarShadowRectBuffer.bottom = x + barWidthHalf
                 trans.rectValueToPixel(mBarShadowRectBuffer)
-                if (!mViewPortHandler.isInBoundsTop(mBarShadowRectBuffer.bottom)) {
+                if (!mViewPortHandler!!.isInBoundsTop(mBarShadowRectBuffer.bottom)) {
                     i++
                     continue
                 }
-                if (!mViewPortHandler.isInBoundsBottom(mBarShadowRectBuffer.top)) break
-                mBarShadowRectBuffer.left = mViewPortHandler.contentLeft()
-                mBarShadowRectBuffer.right = mViewPortHandler.contentRight()
-                c.drawRect(mBarShadowRectBuffer, mShadowPaint)
+                if (!mViewPortHandler!!.isInBoundsBottom(mBarShadowRectBuffer.top)) break
+                mBarShadowRectBuffer.left = mViewPortHandler!!.contentLeft()
+                mBarShadowRectBuffer.right = mViewPortHandler!!.contentRight()
+                c.drawRect(mBarShadowRectBuffer, mShadowPaint!!)
                 i++
             }
         }
 
         // initialize the buffer
-        val buffer = mBarBuffers[index]!!
-        buffer.setPhases(phaseX, phaseY)
+        val buffer = mBarBuffers[index]
+        buffer!!.setPhases(phaseX, phaseY)
         buffer.setDataSet(index)
-        buffer.setInverted(mChart.isInverted(dataSet.axisDependency))
-        buffer.setBarWidth(mChart.barData.barWidth)
+        buffer.setInverted(mChart!!.isInverted(dataSet.getAxisDependency()))
+        buffer.setBarWidth(mChart!!.getBarData().getBarWidth())
         buffer.feed(dataSet)
         trans.pointValuesToPixel(buffer.buffer)
-        val isCustomFill = dataSet.fills != null && !dataSet.fills.isEmpty()
-        val isSingleColor = dataSet.colors.size == 1
-        val isInverted = mChart.isInverted(dataSet.axisDependency)
+        val isCustomFill = dataSet.getFills() != null && dataSet.getFills().isNotEmpty()
+        val isSingleColor = dataSet.getColors().size == 1
+        val isInverted = mChart!!.isInverted(dataSet.getAxisDependency())
         if (isSingleColor) {
-            mRenderPaint.color = dataSet.color
+            mRenderPaint!!.color = dataSet.getColor()
         }
         var j = 0
         var pos = 0
         while (j < buffer.size()) {
-            if (!mViewPortHandler.isInBoundsTop(buffer.buffer[j + 3])) break
-            if (!mViewPortHandler.isInBoundsBottom(buffer.buffer[j + 1])) {
+            if (!mViewPortHandler!!.isInBoundsTop(buffer.buffer[j + 3])) break
+            if (!mViewPortHandler!!.isInBoundsBottom(buffer.buffer[j + 1])) {
                 j += 4
                 pos++
                 continue
@@ -106,12 +109,12 @@ class HorizontalBarChartRenderer(
             if (!isSingleColor) {
                 // Set the color for the currently drawn value. If the index
                 // is out of bounds, reuse colors.
-                mRenderPaint.color = dataSet.getColor(j / 4)
+                mRenderPaint!!.color = dataSet.getColor(j / 4)
             }
             if (isCustomFill) {
                 dataSet.getFill(pos)
                     .fillRect(
-                        c, mRenderPaint,
+                        c, mRenderPaint!!,
                         buffer.buffer[j],
                         buffer.buffer[j + 1],
                         buffer.buffer[j + 2],
@@ -121,13 +124,13 @@ class HorizontalBarChartRenderer(
             } else {
                 c.drawRect(
                     buffer.buffer[j], buffer.buffer[j + 1], buffer.buffer[j + 2],
-                    buffer.buffer[j + 3], mRenderPaint
+                    buffer.buffer[j + 3], mRenderPaint!!
                 )
             }
             if (drawBorder) {
                 c.drawRect(
                     buffer.buffer[j], buffer.buffer[j + 1], buffer.buffer[j + 2],
-                    buffer.buffer[j + 3], mBarBorderPaint
+                    buffer.buffer[j + 3], mBarBorderPaint!!
                 )
             }
             j += 4
@@ -135,52 +138,56 @@ class HorizontalBarChartRenderer(
         }
     }
 
-    override fun drawValues(c: Canvas) {
+    override fun drawValues(c: Canvas?) {
         // if values are drawn
-        if (isDrawingValuesAllowed(mChart)) {
-            val dataSets = mChart.barData.dataSets
-            val valueOffsetPlus = Utils.convertDpToPixel(5f)
+        if (isDrawingValuesAllowed(mChart!!)) {
+            val dataSets: List<IBarDataSet>? = mChart!!.getBarData().getDataSets()
+            val valueOffsetPlus = convertDpToPixel(5f)
             var posOffset = 0f
             var negOffset = 0f
-            val drawValueAboveBar = mChart.isDrawValueAboveBarEnabled
-            for (i in 0 until mChart.barData.dataSetCount) {
-                val dataSet = dataSets[i]
+            val drawValueAboveBar = mChart!!.isDrawValueAboveBarEnabled()
+            for (i in 0 until mChart!!.getBarData().getDataSetCount()) {
+                val dataSet = dataSets!![i]
                 if (!shouldDrawValues(dataSet)) continue
-                val isInverted = mChart.isInverted(dataSet.axisDependency)
+                val isInverted = mChart!!.isInverted(dataSet.getAxisDependency())
 
                 // apply the text-styling defined by the DataSet
                 applyValueTextStyle(dataSet)
-                val halfTextHeight = calcTextHeight(mValuePaint, "10") / 2f
-                val formatter = dataSet.valueFormatter
+                val halfTextHeight = calcTextHeight(
+                    mValuePaint!!, "10"
+                ) / 2f
+                val formatter = dataSet.getValueFormatter()
 
                 // get the buffer
-                val buffer = mBarBuffers[i]!!
-                val phaseY = mAnimator.phaseY
-                val iconsOffset = MPPointF.getInstance(dataSet.iconsOffset)
-                iconsOffset.x = Utils.convertDpToPixel(iconsOffset.x)
-                iconsOffset.y = Utils.convertDpToPixel(iconsOffset.y)
+                val buffer = mBarBuffers[i]
+                val phaseY = mAnimator!!.getPhaseY()
+                val iconsOffset = getInstance(dataSet.getIconsOffset())
+                iconsOffset.x = convertDpToPixel(iconsOffset.x)
+                iconsOffset.y = convertDpToPixel(iconsOffset.y)
 
                 // if only single values are drawn (sum)
-                if (!dataSet.isStacked) {
+                if (!dataSet.isStacked()) {
                     var j = 0
-                    while (j < buffer.buffer.size * mAnimator.phaseX) {
+                    while (j < buffer!!.buffer.size * mAnimator!!.getPhaseX()) {
                         val y = (buffer.buffer[j + 1] + buffer.buffer[j + 3]) / 2f
-                        if (!mViewPortHandler.isInBoundsTop(buffer.buffer[j + 1])) break
-                        if (!mViewPortHandler.isInBoundsX(buffer.buffer[j])) {
+                        if (!mViewPortHandler!!.isInBoundsTop(buffer.buffer[j + 1])) break
+                        if (!mViewPortHandler!!.isInBoundsX(buffer.buffer[j])) {
                             j += 4
                             continue
                         }
-                        if (!mViewPortHandler.isInBoundsBottom(buffer.buffer[j + 1])) {
+                        if (!mViewPortHandler!!.isInBoundsBottom(buffer.buffer[j + 1])) {
                             j += 4
                             continue
                         }
                         val entry = dataSet.getEntryForIndex(j / 4)
-                        val `val` = entry.y
+                        val `val` = entry.getY()
                         val formattedValue =
                             formatter.getFormattedValue(`val`, entry, i, mViewPortHandler)
 
                         // calculate the correct offset depending on the draw position of the value
-                        val valueTextWidth = calcTextWidth(mValuePaint, formattedValue).toFloat()
+                        val valueTextWidth = calcTextWidth(
+                            mValuePaint!!, formattedValue
+                        ).toFloat()
                         posOffset =
                             if (drawValueAboveBar) valueOffsetPlus else -(valueTextWidth + valueOffsetPlus)
                         negOffset =
@@ -190,24 +197,24 @@ class HorizontalBarChartRenderer(
                             posOffset = -posOffset - valueTextWidth
                             negOffset = -negOffset - valueTextWidth
                         }
-                        if (dataSet.isDrawValuesEnabled) {
+                        if (dataSet.isDrawValuesEnabled()) {
                             drawValue(
-                                c,
+                                c!!,
                                 formattedValue,
                                 buffer.buffer[j + 2] + if (`val` >= 0) posOffset else negOffset,
                                 y + halfTextHeight,
                                 dataSet.getValueTextColor(j / 2)
                             )
                         }
-                        if (entry.icon != null && dataSet.isDrawIconsEnabled) {
-                            val icon = entry.icon
+                        if (entry.getIcon() != null && dataSet.isDrawIconsEnabled()) {
+                            val icon = entry.getIcon()
                             var px = buffer.buffer[j + 2] + if (`val` >= 0) posOffset else negOffset
                             var py = y
                             px += iconsOffset.x
                             py += iconsOffset.y
                             drawImage(
-                                c,
-                                icon, px.toInt(), py.toInt(),
+                                c!!,
+                                icon!!, px.toInt(), py.toInt(),
                                 icon.intrinsicWidth,
                                 icon.intrinsicHeight
                             )
@@ -217,30 +224,31 @@ class HorizontalBarChartRenderer(
 
                     // if each value of a potential stack should be drawn
                 } else {
-                    val trans = mChart.getTransformer(dataSet.axisDependency)
+                    val trans = mChart!!.getTransformer(dataSet.getAxisDependency())
                     var bufferIndex = 0
                     var index = 0
-                    while (index < dataSet.entryCount * mAnimator.phaseX) {
+                    while (index < dataSet.getEntryCount() * mAnimator!!.getPhaseX()) {
                         val entry = dataSet.getEntryForIndex(index)
                         val color = dataSet.getValueTextColor(index)
-                        val vals = entry.yVals
+                        val vals = entry.getYVals()
 
                         // we still draw stacked bars, but there is one
                         // non-stacked
                         // in between
                         if (vals == null) {
-                            if (!mViewPortHandler.isInBoundsTop(buffer.buffer[bufferIndex + 1])) break
-                            if (!mViewPortHandler.isInBoundsX(buffer.buffer[bufferIndex])) continue
-                            if (!mViewPortHandler.isInBoundsBottom(buffer.buffer[bufferIndex + 1])) continue
-                            val `val` = entry.y
+                            if (!mViewPortHandler!!.isInBoundsTop(buffer!!.buffer[bufferIndex + 1])) break
+                            if (!mViewPortHandler!!.isInBoundsX(buffer.buffer[bufferIndex])) continue
+                            if (!mViewPortHandler!!.isInBoundsBottom(buffer.buffer[bufferIndex + 1])) continue
+                            val `val` = entry.getY()
                             val formattedValue = formatter.getFormattedValue(
                                 `val`,
                                 entry, i, mViewPortHandler
                             )
 
                             // calculate the correct offset depending on the draw position of the value
-                            val valueTextWidth =
-                                calcTextWidth(mValuePaint, formattedValue).toFloat()
+                            val valueTextWidth = calcTextWidth(
+                                mValuePaint!!, formattedValue
+                            ).toFloat()
                             posOffset =
                                 if (drawValueAboveBar) valueOffsetPlus else -(valueTextWidth + valueOffsetPlus)
                             negOffset =
@@ -249,23 +257,23 @@ class HorizontalBarChartRenderer(
                                 posOffset = -posOffset - valueTextWidth
                                 negOffset = -negOffset - valueTextWidth
                             }
-                            if (dataSet.isDrawValuesEnabled) {
+                            if (dataSet.isDrawValuesEnabled()) {
                                 drawValue(
-                                    c, formattedValue, buffer.buffer[bufferIndex + 2]
-                                            + if (entry.y >= 0) posOffset else negOffset,
+                                    c!!, formattedValue, buffer.buffer[bufferIndex + 2]
+                                            + if (entry.getY() >= 0) posOffset else negOffset,
                                     buffer.buffer[bufferIndex + 1] + halfTextHeight, color
                                 )
                             }
-                            if (entry.icon != null && dataSet.isDrawIconsEnabled) {
-                                val icon = entry.icon
+                            if (entry.getIcon() != null && dataSet.isDrawIconsEnabled()) {
+                                val icon = entry.getIcon()
                                 var px = (buffer.buffer[bufferIndex + 2]
-                                        + if (entry.y >= 0) posOffset else negOffset)
+                                        + if (entry.getY() >= 0) posOffset else negOffset)
                                 var py = buffer.buffer[bufferIndex + 1]
                                 px += iconsOffset.x
                                 py += iconsOffset.y
                                 drawImage(
-                                    c,
-                                    icon, px.toInt(), py.toInt(),
+                                    c!!,
+                                    icon!!, px.toInt(), py.toInt(),
                                     icon.intrinsicWidth,
                                     icon.intrinsicHeight
                                 )
@@ -273,7 +281,7 @@ class HorizontalBarChartRenderer(
                         } else {
                             val transformed = FloatArray(vals.size * 2)
                             var posY = 0f
-                            var negY = -entry.negativeSum
+                            var negY = -entry.getNegativeSum()
                             run {
                                 var k = 0
                                 var idx = 0
@@ -298,15 +306,16 @@ class HorizontalBarChartRenderer(
                             trans.pointValuesToPixel(transformed)
                             var k = 0
                             while (k < transformed.size) {
-                                val `val` = vals[k / 2]
+                                val valueK = vals[k / 2]
                                 val formattedValue = formatter.getFormattedValue(
-                                    `val`,
+                                    valueK,
                                     entry, i, mViewPortHandler
                                 )
 
                                 // calculate the correct offset depending on the draw position of the value
-                                val valueTextWidth =
-                                    calcTextWidth(mValuePaint, formattedValue).toFloat()
+                                val valueTextWidth = calcTextWidth(
+                                    mValuePaint!!, formattedValue
+                                ).toFloat()
                                 posOffset =
                                     if (drawValueAboveBar) valueOffsetPlus else -(valueTextWidth + valueOffsetPlus)
                                 negOffset =
@@ -315,29 +324,29 @@ class HorizontalBarChartRenderer(
                                     posOffset = -posOffset - valueTextWidth
                                     negOffset = -negOffset - valueTextWidth
                                 }
-                                val drawBelow = `val` == 0.0f && negY == 0.0f && posY > 0.0f ||
-                                        `val` < 0.0f
+                                val drawBelow = valueK == 0.0f && negY == 0.0f && posY > 0.0f ||
+                                        valueK < 0.0f
                                 val x = (transformed[k]
                                         + if (drawBelow) negOffset else posOffset)
                                 val y =
-                                    (buffer.buffer[bufferIndex + 1] + buffer.buffer[bufferIndex + 3]) / 2f
-                                if (!mViewPortHandler.isInBoundsTop(y)) break
-                                if (!mViewPortHandler.isInBoundsX(x)) {
+                                    (buffer!!.buffer[bufferIndex + 1] + buffer.buffer[bufferIndex + 3]) / 2f
+                                if (!mViewPortHandler!!.isInBoundsTop(y)) break
+                                if (!mViewPortHandler!!.isInBoundsX(x)) {
                                     k += 2
                                     continue
                                 }
-                                if (!mViewPortHandler.isInBoundsBottom(y)) {
+                                if (!mViewPortHandler!!.isInBoundsBottom(y)) {
                                     k += 2
                                     continue
                                 }
-                                if (dataSet.isDrawValuesEnabled) {
-                                    drawValue(c, formattedValue, x, y + halfTextHeight, color)
+                                if (dataSet.isDrawValuesEnabled()) {
+                                    drawValue(c!!, formattedValue, x, y + halfTextHeight, color)
                                 }
-                                if (entry.icon != null && dataSet.isDrawIconsEnabled) {
-                                    val icon = entry.icon
+                                if (entry.getIcon() != null && dataSet.isDrawIconsEnabled()) {
+                                    val icon = entry.getIcon()
                                     drawImage(
-                                        c,
-                                        icon,
+                                        c!!,
+                                        icon!!,
                                         (x + iconsOffset.x).toInt(),
                                         (y + iconsOffset.y).toInt(),
                                         icon.intrinsicWidth,
@@ -357,9 +366,9 @@ class HorizontalBarChartRenderer(
         }
     }
 
-     fun drawValue(c: Canvas, valueText: String?, x: Float, y: Float, color: Int) {
-        mValuePaint.color = color
-        c.drawText(valueText!!, x, y, mValuePaint)
+    protected fun drawValue(c: Canvas, valueText: String?, x: Float, y: Float, color: Int) {
+        mValuePaint!!.color = color
+        c.drawText(valueText!!, x, y, mValuePaint!!)
     }
 
     override fun prepareBarHighlight(
@@ -372,7 +381,7 @@ class HorizontalBarChartRenderer(
         val top = x - barWidthHalf
         val bottom = x + barWidthHalf
         mBarRect[y1, top, y2] = bottom
-        trans.rectToPixelPhaseHorizontal(mBarRect, mAnimator.phaseY)
+        trans.rectToPixelPhaseHorizontal(mBarRect, mAnimator!!.getPhaseY())
     }
 
     override fun setHighlightDrawPos(high: Highlight, bar: RectF) {
@@ -380,11 +389,7 @@ class HorizontalBarChartRenderer(
     }
 
     override fun isDrawingValuesAllowed(chart: ChartInterface): Boolean {
-        return chart.data.entryCount < chart.maxVisibleCount
-        * mViewPortHandler.scaleY
-    }
-
-    init {
-        mValuePaint.textAlign = Align.LEFT
+        return chart.getData()
+            .getEntryCount() < chart.getMaxVisibleCount() * mViewPortHandler!!.getScaleY()
     }
 }

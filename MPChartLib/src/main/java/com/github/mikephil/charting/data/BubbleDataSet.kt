@@ -9,7 +9,7 @@ class BubbleDataSet : BarLineScatterCandleBubbleDataSet<BubbleEntry>, IBubbleDat
     private var mNormalizeSize = true
     private var mHighlightCircleWidth = 2.5f
 
-    constructor(yVals: MutableList<BubbleEntry>?, label: String?) : super(yVals, label) {
+    constructor(yVals: MutableList<BubbleEntry>, label: String) : super(yVals, label) {
     }
 
     override fun setHighlightCircleWidth(width: Float) {

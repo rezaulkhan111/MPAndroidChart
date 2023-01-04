@@ -9,16 +9,12 @@ import java.util.*
  *
  * @author Philipp Jahoda
  */
-class RadarData : ChartData<IRadarDataSet?> {
-    /**
-     * Sets the labels that should be drawn around the RadarChart at the end of each web line.
-     *
-     * @param labels
-     */
-    var labels: List<String>? = null
+class RadarData : ChartData<IRadarDataSet> {
+
+    private var mLabels: List<String>? = null
 
     constructor() : super() {}
-    constructor(dataSets: List<IRadarDataSet>?) : super(dataSets) {}
+    constructor(dataSets: MutableList<IRadarDataSet>?) : super(dataSets) {}
     constructor(vararg dataSets: IRadarDataSet?) : super(*dataSets) {}
 
     /**
@@ -26,11 +22,24 @@ class RadarData : ChartData<IRadarDataSet?> {
      *
      * @param labels
      */
-    fun setLabels(vararg labels: String?) {
-        this.labels = Arrays.asList(*labels)
+    fun setLabels(labels: List<String>) {
+        this.mLabels = labels
     }
 
-    override fun getEntryForHighlight(highlight: Highlight): Entry? {
+    /**
+     * Sets the labels that should be drawn around the RadarChart at the end of each web line.
+     *
+     * @param labels
+     */
+    fun setLabels(vararg labels: String) {
+        this.mLabels = Arrays.asList(*labels)
+    }
+
+    fun getLabels(): List<String?>? {
+        return mLabels
+    }
+
+    override fun getEntryForHighlight(highlight: Highlight): Entry {
         return getDataSetByIndex(highlight.dataSetIndex)!!.getEntryForIndex(highlight.x.toInt())
     }
 }

@@ -5,7 +5,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.animation.AnimationUtils
 import com.github.mikephil.charting.charts.PieRadarChartBase
-import com.github.mikephil.charting.utils.MPPointF
+import com.github.mikephil.charting.utils.MPPointF.Companion.getInstance
 import com.github.mikephil.charting.utils.Utils.convertDpToPixel
 import com.github.mikephil.charting.utils.Utils.postInvalidateOnAnimation
 
@@ -14,24 +14,28 @@ import com.github.mikephil.charting.utils.Utils.postInvalidateOnAnimation
  *
  * @author Philipp Jahoda
  */
-class PieRadarChartTouchListener(chart: PieRadarChartBase<*>) :
-    ChartTouchListener<PieRadarChartBase<*>?>(chart) {
-    private val mTouchStartPoint = MPPointF.getInstance(0F, 0F)
+class PieRadarChartTouchListener : ChartTouchListener<PieRadarChartBase<*>> {
+
+    private val mTouchStartPoint = getInstance(0f, 0f)
 
     /**
      * the angle where the dragging started
      */
     private var mStartAngle = 0f
+
     private val _velocitySamples = ArrayList<AngularVelocitySample>()
+
     private var mDecelerationLastTime: Long = 0
     private var mDecelerationAngularVelocity = 0f
-    @SuppressLint("ClickableViewAccessibility")
-    override fun onTouch(v: View, event: MotionEvent): Boolean {
-        if (mGestureDetector.onTouchEvent(event)) return true
 
+    constructor(chart: PieRadarChartBase<*>) : super(chart) {
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    override fun onTouch(v: View?, event: MotionEvent): Boolean {
+        if (mGestureDetector.onTouchEvent(event)) return true
         // if rotation by touch is enabled
-        // TODO: Also check if the pie itself is being touched, rather than the entire chart area
-        if (mChart!!.isRotationEnabled) {
+        if (mChart.isRotationEnabled()) {
             val x = event.x
             val y = event.y
             when (event.action) {
@@ -39,45 +43,38 @@ class PieRadarChartTouchListener(chart: PieRadarChartBase<*>) :
                     startAction(event)
                     stopDeceleration()
                     resetVelocity()
-                    if (mChart!!.isDragDecelerationEnabled) sampleVelocity(x, y)
+                    if (mChart.isDragDecelerationEnabled()) sampleVelocity(x, y)
                     setGestureStartAngle(x, y)
                     mTouchStartPoint.x = x
                     mTouchStartPoint.y = y
                 }
                 MotionEvent.ACTION_MOVE -> {
-                    if (mChart!!.isDragDecelerationEnabled) sampleVelocity(x, y)
+                    if (mChart.isDragDecelerationEnabled()) sampleVelocity(x, y)
                     if (mTouchMode == NONE
-                        && ChartTouchListener.Companion.distance(
-                            x,
-                            mTouchStartPoint.x,
-                            y,
-                            mTouchStartPoint.y
-                        )
+                        && distance(x, mTouchStartPoint.x, y, mTouchStartPoint.y)
                         > convertDpToPixel(8f)
                     ) {
                         mLastGesture = ChartGesture.ROTATE
-                        mTouchMode = ChartTouchListener.Companion.ROTATE
-                        mChart!!.disableScroll()
-                    } else if (mTouchMode == ChartTouchListener.Companion.ROTATE) {
+                        mTouchMode = ROTATE
+                        mChart.disableScroll()
+                    } else if (mTouchMode == ROTATE) {
                         updateGestureRotation(x, y)
-                        mChart!!.invalidate()
+                        mChart.invalidate()
                     }
                     endAction(event)
                 }
                 MotionEvent.ACTION_UP -> {
-                    if (mChart!!.isDragDecelerationEnabled) {
+                    if (mChart.isDragDecelerationEnabled()) {
                         stopDeceleration()
                         sampleVelocity(x, y)
                         mDecelerationAngularVelocity = calculateVelocity()
                         if (mDecelerationAngularVelocity != 0f) {
                             mDecelerationLastTime = AnimationUtils.currentAnimationTimeMillis()
-                            postInvalidateOnAnimation(
-                                mChart!!
-                            ) // This causes computeScroll to fire, recommended for this by Google
+                            postInvalidateOnAnimation(mChart) // This causes computeScroll to fire, recommended for this by Google
                         }
                     }
-                    mChart!!.enableScroll()
-                    mTouchMode = ChartTouchListener.Companion.NONE
+                    mChart.enableScroll()
+                    mTouchMode = NONE
                     endAction(event)
                 }
             }
@@ -85,24 +82,24 @@ class PieRadarChartTouchListener(chart: PieRadarChartBase<*>) :
         return true
     }
 
-    override fun onLongPress(me: MotionEvent) {
+    override fun onLongPress(me: MotionEvent?) {
         mLastGesture = ChartGesture.LONG_PRESS
-        val l = mChart!!.onChartGestureListener
-        l?.onChartLongPressed(me)
+        val l = mChart.getOnChartGestureListener()
+        l?.onChartLongPressed(me!!)
     }
 
-    override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+    override fun onSingleTapConfirmed(e: MotionEvent?): Boolean {
         return true
     }
 
     override fun onSingleTapUp(e: MotionEvent): Boolean {
         mLastGesture = ChartGesture.SINGLE_TAP
-        val l = mChart!!.onChartGestureListener
+        val l = mChart.getOnChartGestureListener()
         l?.onChartSingleTapped(e)
-        if (!mChart!!.isHighlightPerTapEnabled) {
+        if (!mChart.isHighlightPerTapEnabled()) {
             return false
         }
-        val high = mChart!!.getHighlightByTouchPoint(e.x, e.y)
+        val high = mChart.getHighlightByTouchPoint(e.x, e.y)
         performHighlight(high, e)
         return true
     }
@@ -116,7 +113,7 @@ class PieRadarChartTouchListener(chart: PieRadarChartBase<*>) :
         _velocitySamples.add(
             AngularVelocitySample(
                 currentTime,
-                mChart!!.getAngleForPoint(touchLocationX, touchLocationY)
+                mChart.getAngleForPoint(touchLocationX, touchLocationY)
             )
         )
 
@@ -187,7 +184,7 @@ class PieRadarChartTouchListener(chart: PieRadarChartBase<*>) :
      * @param y
      */
     fun setGestureStartAngle(x: Float, y: Float) {
-        mStartAngle = mChart!!.getAngleForPoint(x, y) - mChart!!.rawRotationAngle
+        mStartAngle = mChart.getAngleForPoint(x, y) - mChart.getRawRotationAngle()
     }
 
     /**
@@ -198,7 +195,7 @@ class PieRadarChartTouchListener(chart: PieRadarChartBase<*>) :
      * @param y
      */
     fun updateGestureRotation(x: Float, y: Float) {
-        mChart!!.rotationAngle = mChart!!.getAngleForPoint(x, y) - mStartAngle
+        mChart.setRotationAngle(mChart.getAngleForPoint(x, y) - mStartAngle)
     }
 
     /**
@@ -211,16 +208,13 @@ class PieRadarChartTouchListener(chart: PieRadarChartBase<*>) :
     fun computeScroll() {
         if (mDecelerationAngularVelocity == 0f) return  // There's no deceleration in progress
         val currentTime = AnimationUtils.currentAnimationTimeMillis()
-        mDecelerationAngularVelocity *= mChart!!.dragDecelerationFrictionCoef
+        mDecelerationAngularVelocity *= mChart.getDragDecelerationFrictionCoef()
         val timeInterval = (currentTime - mDecelerationLastTime).toFloat() / 1000f
-        mChart!!.rotationAngle =
-            mChart!!.rotationAngle + mDecelerationAngularVelocity * timeInterval
+        mChart.setRotationAngle(mChart.getRotationAngle() + mDecelerationAngularVelocity * timeInterval)
         mDecelerationLastTime = currentTime
-        if (Math.abs(mDecelerationAngularVelocity) >= 0.001) postInvalidateOnAnimation(
-            mChart!!
-        ) // This causes computeScroll to fire, recommended for this by Google
+        if (Math.abs(mDecelerationAngularVelocity) >= 0.001) postInvalidateOnAnimation(mChart) // This causes computeScroll to fire, recommended for this by Google
         else stopDeceleration()
     }
 
-    private inner class AngularVelocitySample(var time: Long, var angle: Float)
+    private class AngularVelocitySample(var time: Long, var angle: Float)
 }

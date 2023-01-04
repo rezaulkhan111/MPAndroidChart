@@ -10,41 +10,50 @@ class GradientColor : Fill() {
     /**
      * Deprecated. Use `Fill.getGradientColors()`
      */
+    @Deprecated("")
+    fun getStartColor(): Int {
+        return getGradientColors()!![0]
+    }
+
     /**
      * Deprecated. Use `Fill.setGradientColors(...)`
      */
-    @get:Deprecated("")
-    @set:Deprecated("")
-    var startColor: Int
-        get() = gradientColors!![0]
-        set(startColor) {
-            if (gradientColors == null || gradientColors!!.size != 2) {
-                gradientColors = intArrayOf(
+    @Deprecated("")
+    fun setStartColor(startColor: Int) {
+        if (getGradientColors() == null || getGradientColors()?.size != 2) {
+            setGradientColors(
+                intArrayOf(
                     startColor,
-                    if (gradientColors != null && gradientColors!!.size > 1) gradientColors!![1] else 0
+                    if (getGradientColors() != null && getGradientColors()?.size!! > 1) getGradientColors()!![1] else 0
                 )
-            } else {
-                gradientColors!![0] = startColor
-            }
+            )
+        } else {
+            getGradientColors()!![0] = startColor
         }
+    }
+
     /**
      * Deprecated. Use `Fill.getGradientColors()`
      */
+    @Deprecated("")
+    fun getEndColor(): Int {
+        return getGradientColors()!![1]
+    }
+
     /**
      * Deprecated. Use `Fill.setGradientColors(...)`
      */
-    @get:Deprecated("")
-    @set:Deprecated("")
-    var endColor: Int
-        get() = gradientColors!![1]
-        set(endColor) {
-            if (gradientColors == null || gradientColors!!.size != 2) {
-                gradientColors = intArrayOf(
-                    if (gradientColors != null && gradientColors!!.size > 0) gradientColors!![0] else 0,
+    @Deprecated("")
+    fun setEndColor(endColor: Int) {
+        if (getGradientColors() == null || getGradientColors()?.size != 2) {
+            setGradientColors(
+                intArrayOf(
+                    if (getGradientColors() != null && getGradientColors()?.size!! > 0) getGradientColors()!![0] else 0,
                     endColor
                 )
-            } else {
-                gradientColors!![1] = endColor
-            }
+            )
+        } else {
+            getGradientColors()!![1] = endColor
         }
+    }
 }

@@ -16,18 +16,22 @@ import com.github.mikephil.charting.utils.MPPointD.Companion.getInstance
  *
  * @author Philipp Jahoda
  */
-open class Transformer( var mViewPortHandler: ViewPortHandler) {
+open class Transformer {
     /**
      * matrix to map the values to the screen pixels
      */
-    var valueMatrix = Matrix()
-         set
+    protected var mMatrixValueToPx = Matrix()
 
     /**
      * matrix for handling the different offsets of the chart
      */
-    var offsetMatrix = Matrix()
-         set
+    protected var mMatrixOffset = Matrix()
+
+    protected var mViewPortHandler: ViewPortHandler? = null
+
+    constructor(viewPortHandler: ViewPortHandler?) {
+        mViewPortHandler = viewPortHandler
+    }
 
     /**
      * Prepares the matrix that transforms values to pixels. Calculates the
@@ -38,9 +42,14 @@ open class Transformer( var mViewPortHandler: ViewPortHandler) {
      * @param deltaY
      * @param yChartMin
      */
-    fun prepareMatrixValuePx(xChartMin: Float, deltaX: Float, deltaY: Float, yChartMin: Float) {
-        var scaleX = (mViewPortHandler.contentWidth() / deltaX)
-        var scaleY = (mViewPortHandler.contentHeight() / deltaY)
+    open fun prepareMatrixValuePx(
+        xChartMin: Float,
+        deltaX: Float,
+        deltaY: Float,
+        yChartMin: Float
+    ) {
+        var scaleX = (mViewPortHandler!!.contentWidth() / deltaX)
+        var scaleY = (mViewPortHandler!!.contentHeight() / deltaY)
         if (java.lang.Float.isInfinite(scaleX)) {
             scaleX = 0f
         }
@@ -49,9 +58,9 @@ open class Transformer( var mViewPortHandler: ViewPortHandler) {
         }
 
         // setup all matrices
-        valueMatrix.reset()
-        valueMatrix.postTranslate(-xChartMin, -yChartMin)
-        valueMatrix.postScale(scaleX, -scaleY)
+        mMatrixValueToPx.reset()
+        mMatrixValueToPx.postTranslate(-xChartMin, -yChartMin)
+        mMatrixValueToPx.postScale(scaleX, -scaleY)
     }
 
     /**
@@ -60,20 +69,20 @@ open class Transformer( var mViewPortHandler: ViewPortHandler) {
      * @param inverted
      */
     open fun prepareMatrixOffset(inverted: Boolean) {
-        offsetMatrix.reset()
+        mMatrixOffset.reset()
 
         // offset.postTranslate(mOffsetLeft, getHeight() - mOffsetBottom);
-        if (!inverted) offsetMatrix.postTranslate(
-            mViewPortHandler.offsetLeft(),
-            mViewPortHandler.chartHeight - mViewPortHandler.offsetBottom()
+        if (!inverted) mMatrixOffset.postTranslate(
+            mViewPortHandler!!.offsetLeft(),
+            mViewPortHandler!!.getChartHeight() - mViewPortHandler!!.offsetBottom()
         ) else {
-            offsetMatrix
-                .setTranslate(mViewPortHandler.offsetLeft(), -mViewPortHandler.offsetTop())
-            offsetMatrix.postScale(1.0f, -1.0f)
+            mMatrixOffset
+                .setTranslate(mViewPortHandler!!.offsetLeft(), -mViewPortHandler!!.offsetTop())
+            mMatrixOffset.postScale(1.0f, -1.0f)
         }
     }
 
-     var valuePointsForGenerateTransformedValuesScatter = FloatArray(1)
+    protected var valuePointsForGenerateTransformedValuesScatter = FloatArray(1)
 
     /**
      * Transforms an List of Entry into a float array containing the x and
@@ -82,10 +91,10 @@ open class Transformer( var mViewPortHandler: ViewPortHandler) {
      * @param data
      * @return
      */
-    fun generateTransformedValuesScatter(
+    open fun generateTransformedValuesScatter(
         data: IScatterDataSet, phaseX: Float,
         phaseY: Float, from: Int, to: Int
-    ): FloatArray {
+    ): FloatArray? {
         val count = ((to - from) * phaseX + 1).toInt() * 2
         if (valuePointsForGenerateTransformedValuesScatter.size != count) {
             valuePointsForGenerateTransformedValuesScatter = FloatArray(count)
@@ -95,19 +104,19 @@ open class Transformer( var mViewPortHandler: ViewPortHandler) {
         while (j < count) {
             val e = data.getEntryForIndex(j / 2 + from)
             if (e != null) {
-                valuePoints[j] = e.x
-                valuePoints[j + 1] = e.y * phaseY
+                valuePoints[j] = e.getX()
+                valuePoints[j + 1] = e.getY() * phaseY
             } else {
-                valuePoints[j] = 0F
-                valuePoints[j + 1] = 0F
+                valuePoints[j] = 0f
+                valuePoints[j + 1] = 0f
             }
             j += 2
         }
-        valueToPixelMatrix.mapPoints(valuePoints)
+        getValueToPixelMatrix().mapPoints(valuePoints)
         return valuePoints
     }
 
-     var valuePointsForGenerateTransformedValuesBubble = FloatArray(1)
+    protected var valuePointsForGenerateTransformedValuesBubble = FloatArray(1)
 
     /**
      * Transforms an List of Entry into a float array containing the x and
@@ -116,12 +125,12 @@ open class Transformer( var mViewPortHandler: ViewPortHandler) {
      * @param data
      * @return
      */
-    fun generateTransformedValuesBubble(
+    open fun generateTransformedValuesBubble(
         data: IBubbleDataSet,
         phaseY: Float,
         from: Int,
         to: Int
-    ): FloatArray {
+    ): FloatArray? {
         val count = (to - from + 1) * 2 // (int) Math.ceil((to - from) * phaseX) * 2;
         if (valuePointsForGenerateTransformedValuesBubble.size != count) {
             valuePointsForGenerateTransformedValuesBubble = FloatArray(count)
@@ -129,21 +138,21 @@ open class Transformer( var mViewPortHandler: ViewPortHandler) {
         val valuePoints = valuePointsForGenerateTransformedValuesBubble
         var j = 0
         while (j < count) {
-            val e: Entry? = data.getEntryForIndex(j / 2 + from)
+            val e: Entry = data.getEntryForIndex(j / 2 + from)
             if (e != null) {
-                valuePoints[j] = e.x
-                valuePoints[j + 1] = e.y * phaseY
+                valuePoints[j] = e.getX()
+                valuePoints[j + 1] = e.getY() * phaseY
             } else {
-                valuePoints[j] = 0F
-                valuePoints[j + 1] = 0F
+                valuePoints[j] = 0f
+                valuePoints[j + 1] = 0f
             }
             j += 2
         }
-        valueToPixelMatrix.mapPoints(valuePoints)
+        getValueToPixelMatrix().mapPoints(valuePoints)
         return valuePoints
     }
 
-     var valuePointsForGenerateTransformedValuesLine = FloatArray(1)
+    protected var valuePointsForGenerateTransformedValuesLine = FloatArray(1)
 
     /**
      * Transforms an List of Entry into a float array containing the x and
@@ -152,11 +161,11 @@ open class Transformer( var mViewPortHandler: ViewPortHandler) {
      * @param data
      * @return
      */
-    fun generateTransformedValuesLine(
+    open fun generateTransformedValuesLine(
         data: ILineDataSet,
         phaseX: Float, phaseY: Float,
         min: Int, max: Int
-    ): FloatArray {
+    ): FloatArray? {
         val count = (((max - min) * phaseX).toInt() + 1) * 2
         if (valuePointsForGenerateTransformedValuesLine.size != count) {
             valuePointsForGenerateTransformedValuesLine = FloatArray(count)
@@ -166,19 +175,19 @@ open class Transformer( var mViewPortHandler: ViewPortHandler) {
         while (j < count) {
             val e = data.getEntryForIndex(j / 2 + min)
             if (e != null) {
-                valuePoints[j] = e.x
-                valuePoints[j + 1] = e.y * phaseY
+                valuePoints[j] = e.getX()
+                valuePoints[j + 1] = e.getY() * phaseY
             } else {
-                valuePoints[j] = 0F
-                valuePoints[j + 1] = 0F
+                valuePoints[j] = 0f
+                valuePoints[j + 1] = 0f
             }
             j += 2
         }
-        valueToPixelMatrix.mapPoints(valuePoints)
+        getValueToPixelMatrix().mapPoints(valuePoints)
         return valuePoints
     }
 
-     var valuePointsForGenerateTransformedValuesCandle = FloatArray(1)
+    protected var valuePointsForGenerateTransformedValuesCandle = FloatArray(1)
 
     /**
      * Transforms an List of Entry into a float array containing the x and
@@ -187,10 +196,10 @@ open class Transformer( var mViewPortHandler: ViewPortHandler) {
      * @param data
      * @return
      */
-    fun generateTransformedValuesCandle(
+    open fun generateTransformedValuesCandle(
         data: ICandleDataSet,
         phaseX: Float, phaseY: Float, from: Int, to: Int
-    ): FloatArray {
+    ): FloatArray? {
         val count = ((to - from) * phaseX + 1).toInt() * 2
         if (valuePointsForGenerateTransformedValuesCandle.size != count) {
             valuePointsForGenerateTransformedValuesCandle = FloatArray(count)
@@ -200,15 +209,15 @@ open class Transformer( var mViewPortHandler: ViewPortHandler) {
         while (j < count) {
             val e = data.getEntryForIndex(j / 2 + from)
             if (e != null) {
-                valuePoints[j] = e.x
-                valuePoints[j + 1] = e.high * phaseY
+                valuePoints[j] = e.getX()
+                valuePoints[j + 1] = e.getHigh() * phaseY
             } else {
-                valuePoints[j] = 0F
-                valuePoints[j + 1] = 0F
+                valuePoints[j] = 0f
+                valuePoints[j + 1] = 0f
             }
             j += 2
         }
-        valueToPixelMatrix.mapPoints(valuePoints)
+        getValueToPixelMatrix().mapPoints(valuePoints)
         return valuePoints
     }
 
@@ -218,10 +227,10 @@ open class Transformer( var mViewPortHandler: ViewPortHandler) {
      *
      * @param path
      */
-    fun pathValueToPixel(path: Path) {
-        path.transform(valueMatrix)
-        path.transform(mViewPortHandler.matrixTouch)
-        path.transform(offsetMatrix)
+    open fun pathValueToPixel(path: Path) {
+        path.transform(mMatrixValueToPx)
+        path.transform(mViewPortHandler!!.getMatrixTouch()!!)
+        path.transform(mMatrixOffset)
     }
 
     /**
@@ -229,7 +238,7 @@ open class Transformer( var mViewPortHandler: ViewPortHandler) {
      *
      * @param paths
      */
-    fun pathValuesToPixel(paths: List<Path>) {
+    open fun pathValuesToPixel(paths: List<Path>) {
         for (i in paths.indices) {
             pathValueToPixel(paths[i])
         }
@@ -241,10 +250,10 @@ open class Transformer( var mViewPortHandler: ViewPortHandler) {
      *
      * @param pts
      */
-    fun pointValuesToPixel(pts: FloatArray?) {
-        valueMatrix.mapPoints(pts)
-        mViewPortHandler.matrixTouch.mapPoints(pts)
-        offsetMatrix.mapPoints(pts)
+    open fun pointValuesToPixel(pts: FloatArray?) {
+        mMatrixValueToPx.mapPoints(pts)
+        mViewPortHandler!!.getMatrixTouch()?.mapPoints(pts)
+        mMatrixOffset.mapPoints(pts)
     }
 
     /**
@@ -252,10 +261,10 @@ open class Transformer( var mViewPortHandler: ViewPortHandler) {
      *
      * @param r
      */
-    fun rectValueToPixel(r: RectF?) {
-        valueMatrix.mapRect(r)
-        mViewPortHandler.matrixTouch.mapRect(r)
-        offsetMatrix.mapRect(r)
+    open fun rectValueToPixel(r: RectF?) {
+        mMatrixValueToPx.mapRect(r)
+        mViewPortHandler!!.getMatrixTouch()?.mapRect(r)
+        mMatrixOffset.mapRect(r)
     }
 
     /**
@@ -264,24 +273,24 @@ open class Transformer( var mViewPortHandler: ViewPortHandler) {
      * @param r
      * @param phaseY
      */
-    fun rectToPixelPhase(r: RectF, phaseY: Float) {
+    open fun rectToPixelPhase(r: RectF, phaseY: Float) {
 
         // multiply the height of the rect with the phase
         r.top *= phaseY
         r.bottom *= phaseY
-        valueMatrix.mapRect(r)
-        mViewPortHandler.matrixTouch.mapRect(r)
-        offsetMatrix.mapRect(r)
+        mMatrixValueToPx.mapRect(r)
+        mViewPortHandler!!.getMatrixTouch()?.mapRect(r)
+        mMatrixOffset.mapRect(r)
     }
 
-    fun rectToPixelPhaseHorizontal(r: RectF, phaseY: Float) {
+    open fun rectToPixelPhaseHorizontal(r: RectF, phaseY: Float) {
 
         // multiply the height of the rect with the phase
         r.left *= phaseY
         r.right *= phaseY
-        valueMatrix.mapRect(r)
-        mViewPortHandler.matrixTouch.mapRect(r)
-        offsetMatrix.mapRect(r)
+        mMatrixValueToPx.mapRect(r)
+        mViewPortHandler!!.getMatrixTouch()?.mapRect(r)
+        mMatrixOffset.mapRect(r)
     }
 
     /**
@@ -289,10 +298,10 @@ open class Transformer( var mViewPortHandler: ViewPortHandler) {
      *
      * @param r
      */
-    fun rectValueToPixelHorizontal(r: RectF?) {
-        valueMatrix.mapRect(r)
-        mViewPortHandler.matrixTouch.mapRect(r)
-        offsetMatrix.mapRect(r)
+    open fun rectValueToPixelHorizontal(r: RectF?) {
+        mMatrixValueToPx.mapRect(r)
+        mViewPortHandler!!.getMatrixTouch()?.mapRect(r)
+        mMatrixOffset.mapRect(r)
     }
 
     /**
@@ -301,14 +310,13 @@ open class Transformer( var mViewPortHandler: ViewPortHandler) {
      * @param r
      * @param phaseY
      */
-    fun rectValueToPixelHorizontal(r: RectF, phaseY: Float) {
-
+    open fun rectValueToPixelHorizontal(r: RectF, phaseY: Float) {
         // multiply the height of the rect with the phase
         r.left *= phaseY
         r.right *= phaseY
-        valueMatrix.mapRect(r)
-        mViewPortHandler.matrixTouch.mapRect(r)
-        offsetMatrix.mapRect(r)
+        mMatrixValueToPx.mapRect(r)
+        mViewPortHandler!!.getMatrixTouch()?.mapRect(r)
+        mMatrixOffset.mapRect(r)
     }
 
     /**
@@ -316,12 +324,12 @@ open class Transformer( var mViewPortHandler: ViewPortHandler) {
      *
      * @param rects
      */
-    fun rectValuesToPixel(rects: List<RectF?>) {
-        val m = valueToPixelMatrix
+    open fun rectValuesToPixel(rects: List<RectF?>) {
+        val m = getValueToPixelMatrix()
         for (i in rects.indices) m.mapRect(rects[i])
     }
 
-     var mPixelToValueMatrixBuffer = Matrix()
+    protected var mPixelToValueMatrixBuffer = Matrix()
 
     /**
      * Transforms the given array of touch positions (pixels) (x, y, x, y, ...)
@@ -329,16 +337,16 @@ open class Transformer( var mViewPortHandler: ViewPortHandler) {
      *
      * @param pixels
      */
-    fun pixelsToValue(pixels: FloatArray?) {
+    open fun pixelsToValue(pixels: FloatArray?) {
         val tmp = mPixelToValueMatrixBuffer
         tmp.reset()
 
         // invert all matrixes to convert back to the original value
-        offsetMatrix.invert(tmp)
+        mMatrixOffset.invert(tmp)
         tmp.mapPoints(pixels)
-        mViewPortHandler.matrixTouch.invert(tmp)
+        mViewPortHandler!!.getMatrixTouch()?.invert(tmp)
         tmp.mapPoints(pixels)
-        valueMatrix.invert(tmp)
+        mMatrixValueToPx.invert(tmp)
         tmp.mapPoints(pixels)
     }
 
@@ -358,13 +366,13 @@ open class Transformer( var mViewPortHandler: ViewPortHandler) {
      * @param y
      * @return
      */
-    fun getValuesByTouchPoint(x: Float, y: Float): MPPointD {
+    open fun getValuesByTouchPoint(x: Float, y: Float): MPPointD? {
         val result = getInstance(0.0, 0.0)
         getValuesByTouchPoint(x, y, result)
         return result
     }
 
-    fun getValuesByTouchPoint(x: Float, y: Float, outputPoint: MPPointD) {
+    open fun getValuesByTouchPoint(x: Float, y: Float, outputPoint: MPPointD) {
         ptsBuffer[0] = x
         ptsBuffer[1] = y
         pixelsToValue(ptsBuffer)
@@ -380,7 +388,7 @@ open class Transformer( var mViewPortHandler: ViewPortHandler) {
      * @param y
      * @return
      */
-    fun getPixelForValues(x: Float, y: Float): MPPointD {
+    open fun getPixelForValues(x: Float, y: Float): MPPointD? {
         ptsBuffer[0] = x
         ptsBuffer[1] = y
         pointValuesToPixel(ptsBuffer)
@@ -389,18 +397,27 @@ open class Transformer( var mViewPortHandler: ViewPortHandler) {
         return getInstance(xPx, yPx)
     }
 
+    open fun getValueMatrix(): Matrix? {
+        return mMatrixValueToPx
+    }
+
+    open fun getOffsetMatrix(): Matrix? {
+        return mMatrixOffset
+    }
+
     private val mMBuffer1 = Matrix()
-    val valueToPixelMatrix: Matrix
-        get() {
-            mMBuffer1.set(valueMatrix)
-            mMBuffer1.postConcat(mViewPortHandler.matrixTouch)
-            mMBuffer1.postConcat(offsetMatrix)
-            return mMBuffer1
-        }
+
+    open fun getValueToPixelMatrix(): Matrix {
+        mMBuffer1.set(mMatrixValueToPx)
+        mMBuffer1.postConcat(mViewPortHandler?.getMatrixTouch())
+        mMBuffer1.postConcat(mMatrixOffset)
+        return mMBuffer1
+    }
+
     private val mMBuffer2 = Matrix()
-    val pixelToValueMatrix: Matrix
-        get() {
-            valueToPixelMatrix.invert(mMBuffer2)
-            return mMBuffer2
-        }
+
+    open fun getPixelToValueMatrix(): Matrix? {
+        getValueToPixelMatrix().invert(mMBuffer2)
+        return mMBuffer2
+    }
 }

@@ -14,53 +14,52 @@ import com.github.mikephil.charting.utils.ViewPortHandler
  *
  * @author Philipp Jahoda
  */
-abstract class AxisRenderer(
-    viewPortHandler: ViewPortHandler,
-    trans: Transformer,
-    axis: AxisBase
-) : Renderer(viewPortHandler) {
+abstract class AxisRenderer : Renderer {
+
     /** base axis this axis renderer works with  */
-    var mAxis: AxisBase
+    protected var mAxis: AxisBase? = null
 
     /** transformer to transform values to screen pixels and return  */
-    var mTrans: Transformer
+    protected var mTrans: Transformer? = null
 
     /**
      * paint object for the grid lines
      */
-    lateinit var mGridPaint: Paint
+    protected var mGridPaint: Paint? = null
 
     /**
      * paint for the x-label values
      */
-    lateinit var mAxisLabelPaint: Paint
+    protected var mAxisLabelPaint: Paint? = null
 
     /**
      * paint for the line surrounding the chart
      */
-    lateinit var mAxisLinePaint: Paint
+    protected var mAxisLinePaint: Paint? = null
 
     /**
      * paint used for the limit lines
      */
-    lateinit var mLimitLinePaint: Paint
+    protected var mLimitLinePaint: Paint? = null
 
-    init {
+    constructor(viewPortHandler: ViewPortHandler?, trans: Transformer?, axis: AxisBase?) : super(
+        viewPortHandler
+    ) {
         mTrans = trans
-        this.mAxis = axis
+        mAxis = axis
         if (mViewPortHandler != null) {
             mAxisLabelPaint = Paint(Paint.ANTI_ALIAS_FLAG)
             mGridPaint = Paint()
-            mGridPaint.color = Color.GRAY
-            mGridPaint.strokeWidth = 1f
-            mGridPaint.style = Paint.Style.STROKE
-            mGridPaint.alpha = 90
+            mGridPaint!!.color = Color.GRAY
+            mGridPaint!!.strokeWidth = 1f
+            mGridPaint!!.style = Paint.Style.STROKE
+            mGridPaint!!.alpha = 90
             mAxisLinePaint = Paint()
-            mAxisLinePaint.color = Color.BLACK
-            mAxisLinePaint.strokeWidth = 1f
-            mAxisLinePaint.style = Paint.Style.STROKE
+            mAxisLinePaint!!.color = Color.BLACK
+            mAxisLinePaint!!.strokeWidth = 1f
+            mAxisLinePaint!!.style = Paint.Style.STROKE
             mLimitLinePaint = Paint(Paint.ANTI_ALIAS_FLAG)
-            mLimitLinePaint.style = Paint.Style.STROKE
+            mLimitLinePaint!!.style = Paint.Style.STROKE
         }
     }
 
@@ -109,25 +108,26 @@ abstract class AxisRenderer(
      * @param max - the maximum value in the data object for this axis
      */
     open fun computeAxis(min: Float, max: Float, inverted: Boolean) {
+
         // calculate the starting and entry point of the y-labels (depending on
         // zoom / contentrect bounds)
         var min = min
         var max = max
-        if (mViewPortHandler != null && mViewPortHandler.contentWidth() > 10 && !mViewPortHandler.isFullyZoomedOutY) {
-            val p1 = mTrans.getValuesByTouchPoint(
-                mViewPortHandler.contentLeft(),
-                mViewPortHandler.contentTop()
+        if (mViewPortHandler != null && mViewPortHandler?.contentWidth()!! > 10 && !mViewPortHandler?.isFullyZoomedOutY()!!) {
+            val p1 = mTrans!!.getValuesByTouchPoint(
+                mViewPortHandler!!.contentLeft(),
+                mViewPortHandler!!.contentTop()
             )
-            val p2 = mTrans.getValuesByTouchPoint(
-                mViewPortHandler.contentLeft(),
-                mViewPortHandler.contentBottom()
+            val p2 = mTrans!!.getValuesByTouchPoint(
+                mViewPortHandler!!.contentLeft(),
+                mViewPortHandler!!.contentBottom()
             )
             if (!inverted) {
-                min = p2.y.toFloat()
-                max = p1.y.toFloat()
+                min = p2!!.y.toFloat()
+                max = p1!!.y.toFloat()
             } else {
-                min = p1.y.toFloat()
-                max = p2.y.toFloat()
+                min = p1!!.y.toFloat()
+                max = p2!!.y.toFloat()
             }
             MPPointD.recycleInstance(p1)
             MPPointD.recycleInstance(p2)
@@ -141,12 +141,12 @@ abstract class AxisRenderer(
      * @return
      */
     protected open fun computeAxisValues(min: Float, max: Float) {
-        val labelCount: Int = mAxis.getLabelCount()
+        val labelCount = mAxis!!.getLabelCount()
         val range = Math.abs(max - min).toDouble()
         if (labelCount == 0 || range <= 0 || java.lang.Double.isInfinite(range)) {
-            mAxis.mEntries = floatArrayOf()
-            mAxis.mCenteredEntries = floatArrayOf()
-            mAxis.mEntryCount = 0
+            mAxis!!.mEntries = floatArrayOf()
+            mAxis!!.mCenteredEntries = floatArrayOf()
+            mAxis!!.mEntryCount = 0
             return
         }
 
@@ -156,8 +156,9 @@ abstract class AxisRenderer(
 
         // If granularity is enabled, then do not allow the interval to go below specified granularity.
         // This is used to avoid repeated values when rounding values for display.
-        if (mAxis.isGranularityEnabled) interval =
-            if (interval < mAxis.granularity) mAxis.granularity else interval
+        if (mAxis!!.isGranularityEnabled()) interval =
+            if (interval < mAxis!!.getGranularity()) mAxis!!.getGranularity()
+                .toDouble() else interval
 
         // Normalize interval
         val intervalMagnitude =
@@ -170,19 +171,19 @@ abstract class AxisRenderer(
             interval =
                 if (Math.floor(10.0 * intervalMagnitude) == 0.0) interval else Math.floor(10.0 * intervalMagnitude)
         }
-        var n = if (mAxis.isCenterAxisLabelsEnabled) 1 else 0
+        var n = if (mAxis!!.isCenterAxisLabelsEnabled()) 1 else 0
 
         // force label count
-        if (mAxis.isForceLabelsEnabled) {
+        if (mAxis!!.isForceLabelsEnabled()) {
             interval = (range.toFloat() / (labelCount - 1).toFloat()).toDouble()
-            mAxis.mEntryCount = labelCount
-            if (mAxis.mEntries.length < labelCount) {
+            mAxis!!.mEntryCount = labelCount
+            if (mAxis!!.mEntries.size < labelCount) {
                 // Ensure stops contains at least numStops elements.
-                mAxis.mEntries = FloatArray(labelCount)
+                mAxis!!.mEntries = FloatArray(labelCount)
             }
             var v = min
             for (i in 0 until labelCount) {
-                mAxis.mEntries.get(i) = v
+                mAxis!!.mEntries[i] = v
                 v += interval.toFloat()
             }
             n = labelCount
@@ -190,7 +191,7 @@ abstract class AxisRenderer(
             // no forced count
         } else {
             var first = if (interval == 0.0) 0.0 else Math.ceil(min / interval) * interval
-            if (mAxis.isCenterAxisLabelsEnabled) {
+            if (mAxis!!.isCenterAxisLabelsEnabled()) {
                 first -= interval
             }
             val last = if (interval == 0.0) 0.0 else Utils.nextUp(
@@ -209,17 +210,17 @@ abstract class AxisRenderer(
             } else if (last == first && n == 0) {
                 n = 1
             }
-            mAxis.mEntryCount = n
-            if (mAxis.mEntries.length < n) {
+            mAxis!!.mEntryCount = n
+            if (mAxis!!.mEntries.size < n) {
                 // Ensure stops contains at least numStops elements.
-                mAxis.mEntries = FloatArray(n)
+                mAxis!!.mEntries = FloatArray(n)
             }
             f = first
             i = 0
             while (i < n) {
                 if (f == 0.0) // Fix for negative zero case (Where value == -0.0, and 0.0 == -0.0)
                     f = 0.0
-                mAxis.mEntries.get(i) = f.toFloat()
+                mAxis!!.mEntries[i] = f.toFloat()
                 f += interval
                 ++i
             }
@@ -227,17 +228,17 @@ abstract class AxisRenderer(
 
         // set decimals
         if (interval < 1) {
-            mAxis.mDecimals = Math.ceil(-Math.log10(interval)).toInt()
+            mAxis!!.mDecimals = Math.ceil(-Math.log10(interval)).toInt()
         } else {
-            mAxis.mDecimals = 0
+            mAxis!!.mDecimals = 0
         }
-        if (mAxis.isCenterAxisLabelsEnabled) {
-            if (mAxis.mCenteredEntries.length < n) {
-                mAxis.mCenteredEntries = FloatArray(n)
+        if (mAxis!!.isCenterAxisLabelsEnabled()) {
+            if (mAxis!!.mCenteredEntries.size < n) {
+                mAxis!!.mCenteredEntries = FloatArray(n)
             }
             val offset = interval.toFloat() / 2f
             for (i in 0 until n) {
-                mAxis.mCenteredEntries.get(i) = mAxis.mEntries.get(i) + offset
+                mAxis!!.mCenteredEntries[i] = mAxis!!.mEntries[i] + offset
             }
         }
     }

@@ -7,8 +7,10 @@ import com.github.mikephil.charting.data.Entry
  * Created by philipp on 17/06/15.
  */
 class EntryXComparator : Comparator<Entry> {
+
     override fun compare(entry1: Entry, entry2: Entry): Int {
         val diff = entry1.getX() - entry2.getX()
+
         return if (diff == 0f) 0 else {
             if (diff > 0f) 1 else -1
         }

@@ -9,8 +9,14 @@ import com.github.mikephil.charting.utils.ViewPortHandler
 /**
  * Created by Philipp Jahoda on 25/01/16.
  */
-abstract class LineRadarRenderer(animator: ChartAnimator?, viewPortHandler: ViewPortHandler?) :
-    LineScatterCandleRadarRenderer(animator, viewPortHandler) {
+abstract class LineRadarRenderer : LineScatterCandleRadarRenderer {
+
+    constructor(animator: ChartAnimator?, viewPortHandler: ViewPortHandler?) : super(
+        animator,
+        viewPortHandler
+    ) {
+    }
+
     /**
      * Draws the provided path in filled mode with the provided drawable.
      *
@@ -18,7 +24,7 @@ abstract class LineRadarRenderer(animator: ChartAnimator?, viewPortHandler: View
      * @param filledPath
      * @param drawable
      */
-    protected fun drawFilledPath(c: Canvas, filledPath: Path?, drawable: Drawable) {
+    protected open fun drawFilledPath(c: Canvas, filledPath: Path?, drawable: Drawable) {
         if (clipPathSupported()) {
             val save = c.save()
             c.clipPath(filledPath!!)
@@ -47,27 +53,32 @@ abstract class LineRadarRenderer(animator: ChartAnimator?, viewPortHandler: View
      * @param fillColor
      * @param fillAlpha
      */
-    protected fun drawFilledPath(c: Canvas, filledPath: Path?, fillColor: Int, fillAlpha: Int) {
-        val color = fillAlpha shl 24 or (fillColor and 0xffffff)
+    protected open fun drawFilledPath(
+        c: Canvas,
+        filledPath: Path?,
+        fillColor: Int,
+        fillAlpha: Int
+    ) {
+        val color = (fillAlpha shl 24) or (fillColor and 0xffffff)
         if (clipPathSupported()) {
             val save = c.save()
-            c.clipPath(filledPath!!)
+            c.clipPath((filledPath)!!)
             c.drawColor(color)
             c.restoreToCount(save)
         } else {
 
             // save
-            val previous = mRenderPaint.style
-            val previousColor = mRenderPaint.color
+            val previous = mRenderPaint!!.style
+            val previousColor = mRenderPaint!!.color
 
             // set
-            mRenderPaint.style = Paint.Style.FILL
-            mRenderPaint.color = color
-            c.drawPath(filledPath!!, mRenderPaint)
+            mRenderPaint!!.style = Paint.Style.FILL
+            mRenderPaint!!.color = color
+            c.drawPath((filledPath)!!, (mRenderPaint)!!)
 
             // restore
-            mRenderPaint.color = previousColor
-            mRenderPaint.style = previous
+            mRenderPaint!!.color = previousColor
+            mRenderPaint!!.style = previous
         }
     }
 
