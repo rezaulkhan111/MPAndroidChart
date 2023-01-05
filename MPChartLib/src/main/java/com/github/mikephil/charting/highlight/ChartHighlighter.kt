@@ -152,7 +152,7 @@ open class ChartHighlighter<T : BarLineScatterCandleBubbleDataProvider> : IHighl
      * @param rounding
      * @return
      */
-    protected fun buildHighlights(
+    protected open fun buildHighlights(
         set: IDataSet<*>?,
         dataSetIndex: Int,
         xVal: Float,

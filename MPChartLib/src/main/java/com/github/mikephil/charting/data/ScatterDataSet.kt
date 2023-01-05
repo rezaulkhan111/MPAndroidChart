@@ -125,6 +125,7 @@ class ScatterDataSet : LineScatterCandleRadarDataSet<Entry>, IScatterDataSet {
             ScatterShape.X -> return XShapeRenderer()
             ScatterShape.CHEVRON_UP -> return ChevronUpShapeRenderer()
             ScatterShape.CHEVRON_DOWN -> return ChevronDownShapeRenderer()
+            else -> {}
         }
         return null
     }
