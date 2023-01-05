@@ -45,7 +45,7 @@ open class BarChartRenderer : BarLineScatterCandleBubbleRenderer {
 
     override fun initBuffers() {
         val barData = mChart!!.getBarData()
-        mBarBuffers = arrayOfNulls(barData.getDataSetCount())
+        mBarBuffers = arrayOfNulls(barData!!.getDataSetCount())
         mBarBuffers
         for (i in mBarBuffers.indices) {
             val set = barData.getDataSetByIndex(i)
@@ -58,7 +58,7 @@ open class BarChartRenderer : BarLineScatterCandleBubbleRenderer {
 
     override fun drawData(c: Canvas?) {
         val barData = mChart!!.getBarData()
-        for (i in 0 until barData.getDataSetCount()) {
+        for (i in 0 until barData!!.getDataSetCount()) {
             val set = barData.getDataSetByIndex(i)
             if (set!!.isVisible()) {
                 drawDataSet(c!!, set, i)
@@ -82,7 +82,7 @@ open class BarChartRenderer : BarLineScatterCandleBubbleRenderer {
         if (mChart!!.isDrawBarShadowEnabled()) {
             mShadowPaint!!.color = dataSet.getBarShadowColor()
             val barData = mChart!!.getBarData()
-            val barWidth = barData.getBarWidth()
+            val barWidth = barData!!.getBarWidth()
             val barWidthHalf = barWidth / 2.0f
             var x: Float
             var i = 0
@@ -113,7 +113,7 @@ open class BarChartRenderer : BarLineScatterCandleBubbleRenderer {
         buffer?.setPhases(phaseX!!.toFloat(), phaseY!!.toFloat())
         buffer?.setDataSet(index)
         buffer?.setInverted(mChart!!.isInverted(dataSet.getAxisDependency()))
-        buffer?.setBarWidth(mChart!!.getBarData().getBarWidth())
+        buffer?.setBarWidth(mChart!!.getBarData()!!.getBarWidth())
         buffer?.feed(dataSet)
         trans.pointValuesToPixel(buffer?.buffer)
         val isCustomFill = dataSet.getFills() != null && !dataSet.getFills().isEmpty()
@@ -179,12 +179,12 @@ open class BarChartRenderer : BarLineScatterCandleBubbleRenderer {
     override fun drawValues(c: Canvas?) {
         // if values are drawn
         if (isDrawingValuesAllowed(mChart!!)) {
-            val dataSets: List<IBarDataSet>? = mChart!!.getBarData().getDataSets()
+            val dataSets: List<IBarDataSet>? = mChart!!.getBarData()!!.getDataSets()
             val valueOffsetPlus = convertDpToPixel(4.5f)
             var posOffset = 0f
             var negOffset = 0f
             val drawValueAboveBar = mChart!!.isDrawValueAboveBarEnabled()
-            for (i in 0 until mChart!!.getBarData().getDataSetCount()) {
+            for (i in 0 until mChart!!.getBarData()!!.getDataSetCount()) {
                 val dataSet = dataSets!![i]
                 if (!shouldDrawValues(dataSet)) continue
 
@@ -371,7 +371,7 @@ open class BarChartRenderer : BarLineScatterCandleBubbleRenderer {
     override fun drawHighlighted(c: Canvas?, indices: Array<Highlight>?) {
         val barData = mChart!!.getBarData()
         for (high in indices!!) {
-            val set = barData.getDataSetByIndex(high.getDataSetIndex())
+            val set = barData!!.getDataSetByIndex(high.getDataSetIndex())
             if (set == null || !set.isHighlightEnabled()) continue
             val e = set.getEntryForXValue(high.getX(), high.getY())
             if (!isInBoundsX(e, set)) continue
