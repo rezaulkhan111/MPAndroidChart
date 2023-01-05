@@ -121,7 +121,7 @@ class RealtimeLineChartActivity : DemoBase(), OnChartValueSelectedListener {
     }
 
     private fun createSet(): LineDataSet {
-        val set = LineDataSet(null, "Dynamic Data")
+        val set = LineDataSet(mutableListOf(), "Dynamic Data")
         set.setAxisDependency(AxisDependency.LEFT)
         set.setColor(getHoloBlue())
         set.setCircleColor(Color.WHITE)

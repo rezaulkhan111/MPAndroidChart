@@ -41,7 +41,7 @@ abstract class LineRadarDataSet<T : Entry> : LineScatterCandleRadarDataSet<T>,
     private var mDrawFilled = false
 
 
-    constructor(yVals: MutableList<T>?, label: String?) : super(yVals, label) {
+    constructor(yVals: MutableList<T>, label: String) : super(yVals, label) {
     }
 
     override fun getFillColor(): Int {
@@ -104,8 +104,8 @@ abstract class LineRadarDataSet<T : Entry> : LineScatterCandleRadarDataSet<T>,
         return mLineWidth
     }
 
-    override fun setDrawFilled(filled: Boolean) {
-        mDrawFilled = filled
+    override fun setDrawFilled(enabled: Boolean) {
+        mDrawFilled = enabled
     }
 
     override fun isDrawFilledEnabled(): Boolean {

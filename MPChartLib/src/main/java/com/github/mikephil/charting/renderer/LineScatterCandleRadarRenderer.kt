@@ -47,8 +47,8 @@ abstract class LineScatterCandleRadarRenderer : BarLineScatterCandleBubbleRender
 
             // create vertical path
             mHighlightLinePath.reset()
-            mHighlightLinePath.moveTo(x, mViewPortHandler.contentTop())
-            mHighlightLinePath.lineTo(x, mViewPortHandler.contentBottom())
+            mHighlightLinePath.moveTo(x, mViewPortHandler!!.contentTop())
+            mHighlightLinePath.lineTo(x, mViewPortHandler!!.contentBottom())
             c.drawPath(mHighlightLinePath, mHighlightPaint!!)
         }
 
@@ -57,8 +57,8 @@ abstract class LineScatterCandleRadarRenderer : BarLineScatterCandleBubbleRender
 
             // create horizontal path
             mHighlightLinePath.reset()
-            mHighlightLinePath.moveTo(mViewPortHandler.contentLeft(), y)
-            mHighlightLinePath.lineTo(mViewPortHandler.contentRight(), y)
+            mHighlightLinePath.moveTo(mViewPortHandler!!.contentLeft(), y)
+            mHighlightLinePath.lineTo(mViewPortHandler!!.contentRight(), y)
             c.drawPath(mHighlightLinePath, mHighlightPaint!!)
         }
     }

@@ -14,6 +14,7 @@ import com.github.mikephil.charting.renderer.ScatterChartRenderer
  * @author Philipp Jahoda
  */
 class ScatterChart : BarLineChartBase<ScatterData>, ScatterDataProvider {
+
     constructor(context: Context?) : super(context) {}
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {}
     constructor(context: Context?, attrs: AttributeSet?, defStyle: Int) : super(
@@ -30,7 +31,7 @@ class ScatterChart : BarLineChartBase<ScatterData>, ScatterDataProvider {
         getXAxis()!!.setSpaceMax(0.5f)
     }
 
-    override fun getScatterData(): ScatterData {
+    override fun getScatterData(): ScatterData? {
         return mData!!
     }
 
@@ -53,4 +54,6 @@ class ScatterChart : BarLineChartBase<ScatterData>, ScatterDataProvider {
                 get() = arrayOf(SQUARE, CIRCLE, TRIANGLE, CROSS, X, CHEVRON_UP, CHEVRON_DOWN)
         }
     }
+
+
 }

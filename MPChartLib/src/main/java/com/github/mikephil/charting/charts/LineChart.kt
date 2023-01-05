@@ -28,7 +28,7 @@ class LineChart : BarLineChartBase<LineData>, LineDataProvider {
         mRenderer = LineChartRenderer(this, mAnimator, mViewPortHandler)
     }
 
-    override fun getLineData(): LineData {
+    override fun getLineData(): LineData? {
         return mData!!
     }
 

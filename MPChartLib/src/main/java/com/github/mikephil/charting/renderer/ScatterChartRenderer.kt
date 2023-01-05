@@ -28,7 +28,7 @@ class ScatterChartRenderer : LineScatterCandleRadarRenderer {
 
     override fun drawData(c: Canvas?) {
         val scatterData = mChart!!.getScatterData()
-        for (set in scatterData.getDataSets()!!) {
+        for (set in scatterData!!.getDataSets()!!) {
             if (set.isVisible()) drawDataSet(c, set)
         }
     }
@@ -71,8 +71,8 @@ class ScatterChartRenderer : LineScatterCandleRadarRenderer {
     override fun drawValues(c: Canvas?) {
         // if values are drawn
         if (isDrawingValuesAllowed(mChart!!)) {
-            val dataSets: List<IScatterDataSet>? = mChart!!.getScatterData().getDataSets()
-            for (i in 0 until mChart!!.getScatterData().getDataSetCount()) {
+            val dataSets: List<IScatterDataSet>? = mChart!!.getScatterData()!!.getDataSets()
+            for (i in 0 until mChart!!.getScatterData()!!.getDataSetCount()) {
                 val dataSet = dataSets!![i]
                 if (!shouldDrawValues(dataSet) || dataSet.getEntryCount() < 1) continue
 
@@ -135,7 +135,7 @@ class ScatterChartRenderer : LineScatterCandleRadarRenderer {
     override fun drawHighlighted(c: Canvas?, indices: Array<Highlight>?) {
         val scatterData = mChart!!.getScatterData()
         for (high in indices!!) {
-            val set = scatterData.getDataSetByIndex(high.getDataSetIndex())
+            val set = scatterData!!.getDataSetByIndex(high.getDataSetIndex())
             if (set == null || !set.isHighlightEnabled()) continue
             val e = set.getEntryForXValue(high.getX(), high.getY())
             if (!isInBoundsX(e, set)) continue

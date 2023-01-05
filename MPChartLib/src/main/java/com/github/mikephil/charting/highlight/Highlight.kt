@@ -73,7 +73,7 @@ class Highlight {
     }
 
     constructor(x: Float, dataSetIndex: Int, stackIndex: Int) {
-        this(x, Float.NaN, dataSetIndex)
+        Highlight(x, Float.NaN, dataSetIndex)
         mStackIndex = stackIndex
     }
 
@@ -118,7 +118,7 @@ class Highlight {
         stackIndex: Int,
         axis: AxisDependency?
     ) {
-        this(x, y, xPx, yPx, dataSetIndex, axis)
+        Highlight(x, y, xPx, yPx, dataSetIndex, axis)
         mStackIndex = stackIndex
     }
 

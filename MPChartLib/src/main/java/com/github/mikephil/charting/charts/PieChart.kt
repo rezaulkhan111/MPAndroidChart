@@ -7,7 +7,8 @@ import android.graphics.Typeface
 import android.util.AttributeSet
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.PieData
-import com.github.mikephil.charting.highlight.*
+import com.github.mikephil.charting.highlight.Highlight
+import com.github.mikephil.charting.highlight.PieHighlighter
 import com.github.mikephil.charting.interfaces.datasets.IPieDataSet
 import com.github.mikephil.charting.renderer.PieChartRenderer
 import com.github.mikephil.charting.utils.MPPointF
@@ -21,12 +22,12 @@ import com.github.mikephil.charting.utils.Utils.getNormalizedAngle
  *
  * @author Philipp Jahoda
  */
-class PieChart : PieRadarChartBase<PieData?> {
+open class PieChart : PieRadarChartBase<PieData> {
     /**
      * rect object that represents the bounds of the piechart, needed for
      * drawing the circle
      */
-    private val mCircleBox: RectF? = RectF()
+    private val mCircleBox: RectF = RectF()
 
     /**
      * flag indicating if entry labels should be drawn or not
@@ -68,7 +69,7 @@ class PieChart : PieRadarChartBase<PieData?> {
      */
     private var mCenterText: CharSequence = ""
 
-    private val mCenterTextOffset = getInstance(0, 0)
+    private val mCenterTextOffset = getInstance(0f, 0f)
 
     /**
      * indicates the size of the hole in the center of the piechart, default:
@@ -118,8 +119,8 @@ class PieChart : PieRadarChartBase<PieData?> {
         mHighlighter = PieHighlighter(this)
     }
 
-    protected fun onDraw(canvas: Canvas?) {
-        super.onDraw(canvas!!)
+    override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
         if (mData == null) return
         mRenderer!!.drawData(canvas)
         if (valuesToHighlight()) mRenderer!!.drawHighlighted(canvas, mIndicesToHighlight)
@@ -135,14 +136,14 @@ class PieChart : PieRadarChartBase<PieData?> {
 
         // prevent nullpointer when no data set
         if (mData == null) return
-        val diameter = diameter
+        val diameter = getDiameter();
         val radius = diameter / 2f
         val c = getCenterOffsets()
-        val shift = mData!!.dataSet!!.getSelectionShift()
+        val shift = mData!!.getDataSet().getSelectionShift()
 
         // create the circle box that will contain the pie-chart (the bounds of
         // the pie-chart)
-        mCircleBox!![c!!.x - radius + shift, c.y - radius + shift, c.x + radius - shift] =
+        mCircleBox!![c.x - radius + shift, c.y - radius + shift, c.x + radius - shift] =
             c.y + radius - shift
         recycleInstance(c)
     }
@@ -151,7 +152,7 @@ class PieChart : PieRadarChartBase<PieData?> {
         calcAngles()
     }
 
-    protected fun getMarkerPosition(highlight: Highlight): FloatArray? {
+    override fun getMarkerPosition(highlight: Highlight?): FloatArray {
         val center = getCenterCircleBox()
         var r = getRadius()
         var off = r / 10f * 3.6f
@@ -159,8 +160,8 @@ class PieChart : PieRadarChartBase<PieData?> {
             off = (r - r / 100f * getHoleRadius()) / 2f
         }
         r -= off // offset to keep things inside the chart
-        val rotationAngle = rotationAngle
-        val entryIndex = highlight.x.toInt()
+        val rotationAngle = getRotationAngle();
+        val entryIndex = highlight!!.getX().toInt()
 
         // offset needed to center the drawn text in the slice
         val offset = mDrawAngles[entryIndex] / 2
@@ -193,27 +194,27 @@ class PieChart : PieRadarChartBase<PieData?> {
             mDrawAngles = FloatArray(entryCount)
         } else {
             for (i in 0 until entryCount) {
-                mDrawAngles[i] = 0
+                mDrawAngles[i] = 0f
             }
         }
         if (mAbsoluteAngles.size != entryCount) {
             mAbsoluteAngles = FloatArray(entryCount)
         } else {
             for (i in 0 until entryCount) {
-                mAbsoluteAngles[i] = 0
+                mAbsoluteAngles[i] = 0f
             }
         }
-        val yValueSum = mData!!.yValueSum
-        val dataSets: List<IPieDataSet>? = mData!!.dataSets
+        val yValueSum = mData!!.getYValueSum()
+        val dataSets: MutableList<IPieDataSet>? = mData!!.getDataSets();
         val hasMinAngle = mMinAngleForSlices != 0f && entryCount * mMinAngleForSlices <= mMaxAngle
         val minAngles = FloatArray(entryCount)
         var cnt = 0
         var offset = 0f
         var diff = 0f
-        for (i in 0 until mData!!.dataSetCount) {
+        for (i in 0 until mData!!.getDataSetCount()) {
             val set = dataSets!![i]
             for (j in 0 until set.getEntryCount()) {
-                val drawAngle = calcAngle(Math.abs(set.getEntryForIndex(j)!!.getY()), yValueSum)
+                val drawAngle = calcAngle(Math.abs(set.getEntryForIndex(j).getY()), yValueSum)
                 if (hasMinAngle) {
                     val temp = drawAngle - mMinAngleForSlices
                     if (temp <= 0) {
@@ -258,8 +259,8 @@ class PieChart : PieRadarChartBase<PieData?> {
 
         // no highlight
         if (!valuesToHighlight()) return false
-        for (i in 0 until mIndicesToHighlight.length)  // check if the xvalue for the given dataset needs highlight
-            if (mIndicesToHighlight!![i]!!.x.toInt() == index) return true
+        for (i in 0 until mIndicesToHighlight!!.size)  // check if the xvalue for the given dataset needs highlight
+            if (mIndicesToHighlight!![i].getX().toInt() == index) return true
         return false
     }
 
@@ -270,7 +271,7 @@ class PieChart : PieRadarChartBase<PieData?> {
      * @return
      */
     private fun calcAngle(value: Float): Float {
-        return calcAngle(value, mData!!.yValueSum)
+        return calcAngle(value, mData!!.getYValueSum())
     }
 
     /**
@@ -297,7 +298,7 @@ class PieChart : PieRadarChartBase<PieData?> {
     override fun getIndexForAngle(angle: Float): Int {
 
         // take the current angle of the chart into consideration
-        val a = getNormalizedAngle(angle - rotationAngle)
+        val a = getNormalizedAngle(angle - getRotationAngle())
         for (i in mAbsoluteAngles.indices) {
             if (mAbsoluteAngles[i] > a) return i
         }
@@ -311,7 +312,7 @@ class PieChart : PieRadarChartBase<PieData?> {
      * @return
      */
     fun getDataSetIndexForIndex(xIndex: Int): Int {
-        val dataSets: List<IPieDataSet>? = mData!!.dataSets
+        val dataSets: List<IPieDataSet>? = mData!!.getDataSets()
         for (i in dataSets!!.indices) {
             if (dataSets[i].getEntryForXValue(xIndex.toFloat(), Float.NaN) != null) return i
         }
@@ -346,7 +347,7 @@ class PieChart : PieRadarChartBase<PieData?> {
      * @param color
      */
     fun setHoleColor(color: Int) {
-        (mRenderer as PieChartRenderer).paintHole.color = color
+        (mRenderer as PieChartRenderer).getPaintHole()!!.color = color
     }
 
     /**
@@ -422,16 +423,16 @@ class PieChart : PieRadarChartBase<PieData?> {
         return mDrawCenterText
     }
 
-    protected fun getRequiredLegendOffset(): Float {
-        return mLegendRenderer!!.labelPaint.textSize * 2f
+    override fun getRequiredLegendOffset(): Float {
+        return mLegendRenderer!!.getLabelPaint()!!.textSize * 2f
     }
 
-    protected fun getRequiredBaseOffset(): Float {
-        return 0
+    override fun getRequiredBaseOffset(): Float {
+        return 0f
     }
 
-    fun getRadius(): Float {
-        return if (mCircleBox == null) 0 else Math.min(
+    override fun getRadius(): Float {
+        return if (mCircleBox == null) 0f else Math.min(
             mCircleBox.width() / 2f,
             mCircleBox.height() / 2f
         )
@@ -461,7 +462,7 @@ class PieChart : PieRadarChartBase<PieData?> {
      * @param t
      */
     fun setCenterTextTypeface(t: Typeface?) {
-        (mRenderer as PieChartRenderer).paintCenterText.typeface = t
+        (mRenderer as PieChartRenderer).getPaintCenterText()!!.typeface = t
     }
 
     /**
@@ -470,7 +471,7 @@ class PieChart : PieRadarChartBase<PieData?> {
      * @param sizeDp
      */
     fun setCenterTextSize(sizeDp: Float) {
-        (mRenderer as PieChartRenderer).paintCenterText.textSize = convertDpToPixel(sizeDp)
+        (mRenderer as PieChartRenderer).getPaintCenterText()!!.textSize = convertDpToPixel(sizeDp)
     }
 
     /**
@@ -479,7 +480,7 @@ class PieChart : PieRadarChartBase<PieData?> {
      * @param sizePixels
      */
     fun setCenterTextSizePixels(sizePixels: Float) {
-        (mRenderer as PieChartRenderer).paintCenterText.textSize = sizePixels
+        (mRenderer as PieChartRenderer).getPaintCenterText()!!.textSize = sizePixels
     }
 
     /**
@@ -498,7 +499,7 @@ class PieChart : PieRadarChartBase<PieData?> {
      *
      * @return
      */
-    fun getCenterTextOffset(): MPPointF? {
+    fun getCenterTextOffset(): MPPointF {
         return getInstance(mCenterTextOffset.x, mCenterTextOffset.y)
     }
 
@@ -508,7 +509,7 @@ class PieChart : PieRadarChartBase<PieData?> {
      * @param color
      */
     fun setCenterTextColor(color: Int) {
-        (mRenderer as PieChartRenderer).paintCenterText.color = color
+        (mRenderer as PieChartRenderer).getPaintCenterText()!!.color = color
     }
 
     /**
@@ -536,8 +537,8 @@ class PieChart : PieRadarChartBase<PieData?> {
      * @param color
      */
     fun setTransparentCircleColor(color: Int) {
-        val p = (mRenderer as PieChartRenderer).paintTransparentCircle
-        val alpha = p.alpha
+        val p = (mRenderer as PieChartRenderer).getPaintTransparentCircle()
+        val alpha = p!!.alpha
         p.color = color
         p.alpha = alpha
     }
@@ -566,7 +567,7 @@ class PieChart : PieRadarChartBase<PieData?> {
      * @param alpha 0-255
      */
     fun setTransparentCircleAlpha(alpha: Int) {
-        (mRenderer as PieChartRenderer).paintTransparentCircle.alpha = alpha
+        (mRenderer as PieChartRenderer).getPaintTransparentCircle()!!.alpha = alpha
     }
 
     /**
@@ -604,7 +605,7 @@ class PieChart : PieRadarChartBase<PieData?> {
      * @param color
      */
     fun setEntryLabelColor(color: Int) {
-        (mRenderer as PieChartRenderer).paintEntryLabels.color = color
+        (mRenderer as PieChartRenderer).getPaintEntryLabels()!!.color = color
     }
 
     /**
@@ -613,7 +614,7 @@ class PieChart : PieRadarChartBase<PieData?> {
      * @param tf
      */
     fun setEntryLabelTypeface(tf: Typeface?) {
-        (mRenderer as PieChartRenderer).paintEntryLabels.typeface = tf
+        (mRenderer as PieChartRenderer).getPaintEntryLabels()!!.typeface = tf
     }
 
     /**
@@ -622,7 +623,7 @@ class PieChart : PieRadarChartBase<PieData?> {
      * @param size
      */
     fun setEntryLabelTextSize(size: Float) {
-        (mRenderer as PieChartRenderer).paintEntryLabels.textSize = convertDpToPixel(size)
+        (mRenderer as PieChartRenderer).getPaintEntryLabels()!!.textSize = convertDpToPixel(size)
     }
 
     /**

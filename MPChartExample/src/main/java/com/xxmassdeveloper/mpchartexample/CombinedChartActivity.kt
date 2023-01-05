@@ -50,14 +50,14 @@ class CombinedChartActivity : DemoBase() {
 
         val l = chart.getLegend()
         l!!.setWordWrapEnabled(true)
-        l!!.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM)
-        l!!.setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER)
-        l!!.setOrientation(Legend.LegendOrientation.HORIZONTAL)
-        l!!.setDrawInside(false)
+        l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM)
+        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER)
+        l.setOrientation(Legend.LegendOrientation.HORIZONTAL)
+        l.setDrawInside(false)
 
         val rightAxis = chart.getAxisRight()
         rightAxis!!.setDrawGridLines(false)
-        rightAxis!!.setAxisMinimum(0f) // this replaces setStartAtZero(true)
+        rightAxis.setAxisMinimum(0f) // this replaces setStartAtZero(true)
 
 
         val leftAxis = chart.getAxisLeft()
@@ -83,8 +83,7 @@ class CombinedChartActivity : DemoBase() {
         data.setData(generateScatterData())
         data.setData(generateCandleData())
         data.setValueTypeface(tfLight)
-
-        xAxis!!.setAxisMaximum(data.getXMax() + 0.25f)
+        xAxis.setAxisMaximum(data.getXMax() + 0.25f)
 
         chart.setData(data)
         chart.invalidate()
@@ -128,7 +127,7 @@ class CombinedChartActivity : DemoBase() {
 
         val set2 = BarDataSet(entries2, "")
         set2.setStackLabels(arrayOf("Stack 1", "Stack 2"))
-        set2.setColors(Color.rgb(61, 165, 255), Color.rgb(23, 197, 255))
+//        set2.setColors(Color.rgb(61, 165, 255), Color.rgb(23, 197, 255))
         set2.setValueTextColor(Color.rgb(61, 165, 255))
         set2.setValueTextSize(10f)
         set2.setAxisDependency(AxisDependency.LEFT)
@@ -155,7 +154,7 @@ class CombinedChartActivity : DemoBase() {
         }
 
         val set = ScatterDataSet(entries, "Scatter DataSet")
-        set.setColors(*ColorTemplate.MATERIAL_COLORS)
+        set.setColors(ColorTemplate.MATERIAL_COLORS)
         set.setScatterShapeSize(7.5f)
         set.setDrawValues(false)
         set.setValueTextSize(10f)
@@ -191,7 +190,7 @@ class CombinedChartActivity : DemoBase() {
         }
 
         val set = BubbleDataSet(entries, "Bubble DataSet")
-        set.setColors(*ColorTemplate.VORDIPLOM_COLORS)
+        set.setColors(ColorTemplate.VORDIPLOM_COLORS)
         set.setValueTextSize(10f)
         set.setValueTextColor(Color.WHITE)
         set.setHighlightCircleWidth(1.5f)
@@ -214,21 +213,21 @@ class CombinedChartActivity : DemoBase() {
                 startActivity(i)
             }
             R.id.actionToggleLineValues -> {
-                for (set in chart.getData()!!.getDataSets()!!) {
+                for (set in chart.getData().getDataSets()!!) {
                     (set as? LineDataSet)?.setDrawValues(!set.isDrawValuesEnabled())
                 }
                 chart.invalidate()
             }
             R.id.actionToggleBarValues -> {
-                for (set in chart.getData()!!.getDataSets()!!) {
+                for (set in chart.getData().getDataSets()!!) {
                     (set as? BarDataSet)?.setDrawValues(!set.isDrawValuesEnabled())
                 }
                 chart.invalidate()
             }
             R.id.actionRemoveDataSet -> {
-                val rnd = getRandom(chart.getData()!!.getDataSetCount().toFloat(), 0f).toInt()
-                chart.getData()!!.removeDataSet(chart.getData()!!.getDataSetByIndex(rnd)!!)
-                chart.getData()!!.notifyDataChanged()
+                val rnd = getRandom(chart.getData().getDataSetCount().toFloat(), 0f).toInt()
+                chart.getData().removeDataSet(chart.getData().getDataSetByIndex(rnd)!!)
+                chart.getData().notifyDataChanged()
                 chart.notifyDataSetChanged()
                 chart.invalidate()
             }

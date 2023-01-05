@@ -115,4 +115,5 @@ abstract class LineScatterCandleRadarDataSet<T : Entry> :
         lineScatterCandleRadarDataSet.mHighlightLineWidth = mHighlightLineWidth
         lineScatterCandleRadarDataSet.mHighlightDashPathEffect = mHighlightDashPathEffect
     }
+
 }

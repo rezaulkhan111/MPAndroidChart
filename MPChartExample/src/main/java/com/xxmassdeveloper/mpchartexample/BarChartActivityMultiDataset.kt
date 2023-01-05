@@ -167,13 +167,13 @@ class BarChartActivityMultiDataset : DemoBase(), OnSeekBarChangeListener,
         }
 
         // specify the width each bar should have
-        chart.getBarData().setBarWidth(barWidth)
+        chart.getBarData()!!.setBarWidth(barWidth)
 
         // restrict the x-axis range
         chart.getXAxis()!!.setAxisMinimum(startYear.toFloat())
         // barData.getGroupWith(...) is a helper that calculates the width each group needs based on the provided parameters
         chart.getXAxis()!!.setAxisMaximum(
-            startYear + chart.getBarData().getGroupWidth(groupSpace, barSpace) * groupCount
+            startYear + chart.getBarData()!!.getGroupWidth(groupSpace, barSpace) * groupCount
         )
         chart.groupBars(startYear.toFloat(), groupSpace, barSpace)
         chart.invalidate()

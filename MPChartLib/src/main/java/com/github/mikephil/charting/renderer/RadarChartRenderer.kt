@@ -132,7 +132,7 @@ class RadarChartRenderer : LineRadarRenderer {
         val pIcon = getInstance(0f, 0f)
         val yoffset = convertDpToPixel(5f)
         for (i in 0 until mChart!!.getData().getDataSetCount()) {
-            val dataSet: IRadarDataSet = mChart!!.getData().getDataSetByIndex(i)
+            val dataSet: IRadarDataSet = mChart!!.getData().getDataSetByIndex(i)!!
             if (!shouldDrawValues(dataSet)) continue
 
             // apply the text-styling defined by the DataSet
@@ -204,12 +204,12 @@ class RadarChartRenderer : LineRadarRenderer {
         mWebPaint!!.color = mChart!!.getWebColor()
         mWebPaint!!.alpha = mChart!!.getWebAlpha()
         val xIncrements = 1 + mChart!!.getSkipWebLineCount()
-        val maxEntryCount: Int = mChart!!.getData().getMaxEntryCountSet().getEntryCount()
+        val maxEntryCount: Int = mChart!!.getData().getMaxEntryCountSet()!!.getEntryCount()
         val p = getInstance(0f, 0f)
         var i = 0
         while (i < maxEntryCount) {
             getPosition(
-                center!!,
+                center,
                 mChart!!.getYRange() * factor,
                 sliceangle * i + rotationangle,
                 p
@@ -229,7 +229,7 @@ class RadarChartRenderer : LineRadarRenderer {
         for (j in 0 until labelCount) {
             for (i in 0 until mChart!!.getData().getEntryCount()) {
                 val r = (mChart!!.getYAxis()!!.mEntries[j] - mChart!!.getYChartMin()) * factor
-                getPosition(center!!, r, sliceangle * i + rotationangle, p1out)
+                getPosition(center, r, sliceangle * i + rotationangle, p1out)
                 getPosition(center, r, sliceangle * (i + 1) + rotationangle, p2out)
                 c.drawLine(p1out.x, p1out.y, p2out.x, p2out.y, mWebPaint!!)
             }

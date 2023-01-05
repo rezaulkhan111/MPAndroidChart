@@ -20,7 +20,7 @@ class DefaultFillFormatter : IFillFormatter {
         } else {
             val max: Float
             val min: Float
-            max = if (data.getYMax() > 0) 0f else chartMaxY
+            max = if (data!!.getYMax() > 0) 0f else chartMaxY
             min = if (data.getYMin() < 0) 0f else chartMinY
             fillMin = if (dataSet.getYMin() >= 0) min else max
         }

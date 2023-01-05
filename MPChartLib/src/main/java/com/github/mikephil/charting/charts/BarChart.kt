@@ -36,7 +36,6 @@ open class BarChart : BarLineChartBase<BarData>, BarDataProvider {
     private var mFitBars = false
 
     constructor(context: Context?) : super(context) {
-
     }
 
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
@@ -47,7 +46,6 @@ open class BarChart : BarLineChartBase<BarData>, BarDataProvider {
         attrs,
         defStyle
     ) {
-
     }
 
     override fun init() {
@@ -137,7 +135,7 @@ open class BarChart : BarLineChartBase<BarData>, BarDataProvider {
         val top: Float = if (y >= 0) y else 0f
         val bottom: Float = if (y <= 0) y else 0f
         outputRect[left, top, right] = bottom
-        getTransformer(set.getAxisDependency())!!.rectValueToPixel(outputRect)
+        getTransformer(set.getAxisDependency()).rectValueToPixel(outputRect)
     }
 
     /**
@@ -208,7 +206,7 @@ open class BarChart : BarLineChartBase<BarData>, BarDataProvider {
         highlightValue(Highlight(x, dataSetIndex, stackIndex), false)
     }
 
-    override fun getBarData(): BarData {
+    override fun getBarData(): BarData? {
         return mData!!
     }
 

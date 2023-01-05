@@ -15,7 +15,7 @@ class RadarData : ChartData<IRadarDataSet> {
 
     constructor() : super() {}
     constructor(dataSets: MutableList<IRadarDataSet>?) : super(dataSets) {}
-    constructor(vararg dataSets: IRadarDataSet?) : super(*dataSets) {}
+    constructor(vararg dataSets: IRadarDataSet) : super(*dataSets) {}
 
     /**
      * Sets the labels that should be drawn around the RadarChart at the end of each web line.
@@ -40,6 +40,8 @@ class RadarData : ChartData<IRadarDataSet> {
     }
 
     override fun getEntryForHighlight(highlight: Highlight): Entry {
-        return getDataSetByIndex(highlight.dataSetIndex)!!.getEntryForIndex(highlight.x.toInt())
+        return getDataSetByIndex(highlight.getDataSetIndex())!!.getEntryForIndex(
+            highlight.getX().toInt()
+        )
     }
 }

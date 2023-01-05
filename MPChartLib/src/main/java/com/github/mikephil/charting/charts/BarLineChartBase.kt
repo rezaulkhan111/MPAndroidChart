@@ -494,8 +494,8 @@ abstract class BarLineChartBase<T : BarLineScatterCandleBubbleData<out IBarLineS
      *
      * @return
      */
-    override fun getTransformer(which: AxisDependency): Transformer {
-        return if (which === AxisDependency.LEFT) mLeftAxisTransformer!! else mRightAxisTransformer!!
+    override fun getTransformer(axis: AxisDependency): Transformer {
+        return if (axis === AxisDependency.LEFT) mLeftAxisTransformer!! else mRightAxisTransformer!!
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
@@ -1298,7 +1298,7 @@ abstract class BarLineChartBase<T : BarLineScatterCandleBubbleData<out IBarLineS
      * @return
      */
     open fun getPixelForValues(x: Float, y: Float, axis: AxisDependency): MPPointD? {
-        return getTransformer(axis)!!.getPixelForValues(x, y)
+        return getTransformer(axis).getPixelForValues(x, y)
     }
 
     /**

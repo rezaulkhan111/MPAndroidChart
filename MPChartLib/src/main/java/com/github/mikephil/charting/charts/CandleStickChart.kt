@@ -29,7 +29,7 @@ class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvider {
         getXAxis()!!.setSpaceMax(0.5f)
     }
 
-    override fun getCandleData(): CandleData {
+    override fun getCandleData(): CandleData? {
         return mData!!
     }
 }

@@ -67,8 +67,8 @@ class PieData : ChartData<IPieDataSet> {
         ) mDataSets!![0] else null else if (label == mDataSets!![0].getLabel()) mDataSets!![0] else null
     }
 
-    override fun getEntryForHighlight(highlight: Highlight): Entry? {
-        return getDataSet().getEntryForIndex(highlight.x.toInt())
+    override fun getEntryForHighlight(highlight: Highlight): Entry {
+        return getDataSet().getEntryForIndex(highlight.getX().toInt())
     }
 
     /**

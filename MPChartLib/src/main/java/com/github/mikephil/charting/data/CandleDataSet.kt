@@ -69,7 +69,7 @@ class CandleDataSet : LineScatterCandleRadarDataSet<CandleEntry>, ICandleDataSet
      */
     private var mShadowColor = ColorTemplate.COLOR_SKIP
 
-    constructor(yVals: MutableList<CandleEntry>?, label: String?) : super(yVals, label) {
+    constructor(yVals: MutableList<CandleEntry>, label: String) : super(yVals, label) {
 
     }
 
@@ -99,16 +99,20 @@ class CandleDataSet : LineScatterCandleRadarDataSet<CandleEntry>, ICandleDataSet
     }
 
     protected fun calcMinMax(e: CandleEntry) {
-        if (e.low < mYMin) mYMin = e.low
-        if (e.high > mYMax) mYMax = e.high
+        if (e.getLow() < mYMin) mYMin = e.getLow()
+
+        if (e.getHigh() > mYMax) mYMax = e.getHigh()
         calcMinMaxX(e)
     }
 
     override fun calcMinMaxY(e: CandleEntry) {
-        if (e.high < mYMin) mYMin = e.high
-        if (e.high > mYMax) mYMax = e.high
-        if (e.low < mYMin) mYMin = e.low
-        if (e.low > mYMax) mYMax = e.low
+        if (e.getHigh() < mYMin) mYMin = e.getHigh()
+
+        if (e.getHigh() > mYMax) mYMax = e.getHigh()
+
+        if (e.getLow() < mYMin) mYMin = e.getLow()
+
+        if (e.getLow() > mYMax) mYMax = e.getLow()
     }
 
     /**

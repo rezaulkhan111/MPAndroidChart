@@ -17,8 +17,8 @@ import com.github.mikephil.charting.utils.MPPointF
 import com.github.mikephil.charting.utils.MPPointF.Companion.getInstance
 import com.github.mikephil.charting.utils.MPPointF.Companion.recycleInstance
 import com.github.mikephil.charting.utils.Utils.convertDpToPixel
-import com.github.mikephil.charting.utils.Utils.maximumFlingVelocity
-import com.github.mikephil.charting.utils.Utils.minimumFlingVelocity
+import com.github.mikephil.charting.utils.Utils.getMaximumFlingVelocity
+import com.github.mikephil.charting.utils.Utils.getMinimumFlingVelocity
 import com.github.mikephil.charting.utils.Utils.postInvalidateOnAnimation
 import com.github.mikephil.charting.utils.Utils.velocityTrackerPointerUpCleanUpIfNecessary
 
@@ -186,14 +186,14 @@ class BarLineChartTouchListener :
                 val pointerId = event.getPointerId(0)
                 velocityTracker!!.computeCurrentVelocity(
                     1000,
-                    maximumFlingVelocity.toFloat()
+                    getMaximumFlingVelocity().toFloat()
                 )
                 val velocityY = velocityTracker.getYVelocity(pointerId)
                 val velocityX = velocityTracker.getXVelocity(pointerId)
-                if (Math.abs(velocityX) > minimumFlingVelocity ||
-                    Math.abs(velocityY) > minimumFlingVelocity
+                if (Math.abs(velocityX) > getMinimumFlingVelocity() ||
+                    Math.abs(velocityY) > getMinimumFlingVelocity()
                 ) {
-                    if (mTouchMode === DRAG && mChart.isDragDecelerationEnabled()) {
+                    if (mTouchMode == DRAG && mChart.isDragDecelerationEnabled()) {
                         stopDeceleration()
                         mDecelerationLastTime = AnimationUtils.currentAnimationTimeMillis()
                         mDecelerationCurrentPoint.x = event.x
@@ -204,7 +204,7 @@ class BarLineChartTouchListener :
                         // Google
                     }
                 }
-                if (mTouchMode === X_ZOOM || mTouchMode === Y_ZOOM || mTouchMode === PINCH_ZOOM || mTouchMode === POST_ZOOM) {
+                if (mTouchMode == X_ZOOM || mTouchMode == Y_ZOOM || mTouchMode == PINCH_ZOOM || mTouchMode == POST_ZOOM) {
 
                     // Range might have changed, which means that Y-axis labels
                     // could have changed in size, affecting Y-axis size.
@@ -234,7 +234,7 @@ class BarLineChartTouchListener :
         }
 
         // perform the transformation, update the chart
-        mMatrix = mChart.getViewPortHandler()!!.refresh(mMatrix, mChart, true)
+        mMatrix = mChart.getViewPortHandler()!!.refresh(mMatrix, mChart, true)!!
         return true // indicate event was handled
     }
 
@@ -530,8 +530,8 @@ class BarLineChartTouchListener :
     }
 
     fun stopDeceleration() {
-        mDecelerationVelocity.x = 0
-        mDecelerationVelocity.y = 0
+        mDecelerationVelocity.x = 0f
+        mDecelerationVelocity.y = 0f
     }
 
     fun computeScroll() {
@@ -554,7 +554,7 @@ class BarLineChartTouchListener :
             if (mChart.isDragYEnabled()) mDecelerationCurrentPoint.y - mTouchStartPoint.y else 0f
         performDrag(event, dragDistanceX, dragDistanceY)
         event.recycle()
-        mMatrix = mChart.getViewPortHandler()!!.refresh(mMatrix, mChart, false)
+        mMatrix = mChart.getViewPortHandler()!!.refresh(mMatrix, mChart, false)!!
         mDecelerationLastTime = currentTime
         if (Math.abs(mDecelerationVelocity.x) >= 0.01 || Math.abs(mDecelerationVelocity.y) >= 0.01) postInvalidateOnAnimation(
             mChart

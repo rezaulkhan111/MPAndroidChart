@@ -17,7 +17,7 @@ import com.github.mikephil.charting.renderer.CombinedChartRenderer
  *
  * @author Philipp Jahoda
  */
-class CombinedChart : BarLineChartBase<CombinedData?>, CombinedDataProvider {
+class CombinedChart : BarLineChartBase<CombinedData>, CombinedDataProvider {
 
     /**
      * if set to true, all values are drawn above their bars, instead of below
@@ -74,18 +74,18 @@ class CombinedChart : BarLineChartBase<CombinedData?>, CombinedDataProvider {
 
         // Old default behaviour
         setHighlightFullBarEnabled(true)
-        mRenderer = CombinedChartRenderer(this, mAnimator, mViewPortHandler)
+        mRenderer = CombinedChartRenderer(this, mAnimator!!, mViewPortHandler)
     }
 
     override fun getCombinedData(): CombinedData? {
         return mData
     }
 
-    override fun setData(data: CombinedData?) {
+    override fun setData(data: CombinedData) {
         super.setData(data)
         setHighlighter(CombinedHighlighter(this, this))
         (mRenderer as CombinedChartRenderer).createRenderers()
-        mRenderer.initBuffers()
+        mRenderer!!.initBuffers()
     }
 
     /**
@@ -104,12 +104,10 @@ class CombinedChart : BarLineChartBase<CombinedData?>, CombinedDataProvider {
         } else {
             val h = getHighlighter()!!.getHighlight(x, y)
             if (h == null || !isHighlightFullBarEnabled()) h else Highlight(
-                h.x, h.y,
-                h.xPx, h.yPx,
-                h.dataSetIndex, -1, h.axis
+                h.getX(), h.getY(),
+                h.getXPx(), h.getYPx(),
+                h.getDataSetIndex(), -1, h.getAxis()
             )
-
-            // For isHighlightFullBarEnabled, remove stackIndex
         }
     }
 
@@ -208,11 +206,11 @@ class CombinedChart : BarLineChartBase<CombinedData?>, CombinedDataProvider {
 
         // if there is no marker view or drawing marker is disabled
         if (mMarker == null || !isDrawMarkersEnabled() || !valuesToHighlight()) return
-        for (i in 0 until mIndicesToHighlight.length) {
-            val highlight = mIndicesToHighlight!![i]!!
+        for (i in 0 until mIndicesToHighlight!!.size) {
+            val highlight = mIndicesToHighlight!![i]
             val set: IDataSet<*>? = mData!!.getDataSetByHighlight(highlight)
             val e = mData!!.getEntryForHighlight(highlight) ?: continue
-            val entryIndex = set!!.getEntryIndex(e)
+            val entryIndex = set!!.getEntryIndex(e as Nothing)
 
             // make sure entry not null
             if (entryIndex > set.getEntryCount() * mAnimator!!.getPhaseX()) continue
@@ -225,7 +223,7 @@ class CombinedChart : BarLineChartBase<CombinedData?>, CombinedDataProvider {
             mMarker!!.refreshContent(e, highlight)
 
             // draw the marker
-            mMarker!!.draw(canvas, pos[0], pos[1])
+            mMarker!!.draw(canvas!!, pos[0], pos[1])
         }
     }
 }

@@ -18,7 +18,7 @@ class RadarDataSet : LineRadarDataSet<RadarEntry>, IRadarDataSet {
     private var mHighlightCircleOuterRadius = 4.0f
     private var mHighlightCircleStrokeWidth = 2.0f
 
-    constructor(yVals: MutableList<RadarEntry>, label: String?) : super(yVals, label) {}
+    constructor(yVals: MutableList<RadarEntry>, label: String) : super(yVals, label) {}
 
     /// Returns true if highlight circle should be drawn, false if not
     override fun isDrawHighlightCircleEnabled(): Boolean {

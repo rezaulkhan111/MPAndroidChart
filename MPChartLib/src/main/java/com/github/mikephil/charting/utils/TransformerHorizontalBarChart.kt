@@ -19,12 +19,12 @@ class TransformerHorizontalBarChart : Transformer {
         mMatrixOffset.reset()
         if (!inverted) mMatrixOffset.postTranslate(
             mViewPortHandler!!.offsetLeft(),
-            mViewPortHandler!!.chartHeight - mViewPortHandler!!.offsetBottom()
+            mViewPortHandler!!.getChartHeight() - mViewPortHandler!!.offsetBottom()
         ) else {
             mMatrixOffset
                 .setTranslate(
-                    -(mViewPortHandler!!.chartWidth - mViewPortHandler!!.offsetRight()),
-                    mViewPortHandler!!.chartHeight - mViewPortHandler!!.offsetBottom()
+                    -(mViewPortHandler!!.getChartWidth() - mViewPortHandler!!.offsetRight()),
+                    mViewPortHandler!!.getChartHeight() - mViewPortHandler!!.offsetBottom()
                 )
             mMatrixOffset.postScale(-1.0f, 1.0f)
         }

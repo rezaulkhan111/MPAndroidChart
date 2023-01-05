@@ -81,8 +81,9 @@ class BarEntry : Entry {
      * @param x
      * @param vals - the stack values, use at least 2
      */
-    constructor(x: Float, vals: FloatArray?) : super(x, calcSum(vals)) {
-        mYVals = vals
+//    constructor(x: Float, vals: FloatArray?) : super(x, calcSum(vals)) {
+    constructor(x: Float, vals: FloatArray?) : super(x, 0f) {
+        mYVals = vals!!
         calcPosNegSum()
         calcRanges()
     }
@@ -94,8 +95,9 @@ class BarEntry : Entry {
      * @param vals - the stack values, use at least 2
      * @param data - Spot for additional data this Entry represents.
      */
-    constructor(x: Float, vals: FloatArray?, data: Any?) : super(x, calcSum(vals), data) {
-        mYVals = vals
+//    constructor(x: Float, vals: FloatArray?, data: Any?) : super(x, calcSum(vals), data) {
+    constructor(x: Float, vals: FloatArray?, data: Any?) : super(x, 0f, data) {
+        mYVals = vals!!
         calcPosNegSum()
         calcRanges()
     }
@@ -107,8 +109,9 @@ class BarEntry : Entry {
      * @param vals - the stack values, use at least 2
      * @param icon - icon image
      */
-    constructor(x: Float, vals: FloatArray?, icon: Drawable?) : super(x, calcSum(vals), icon) {
-        mYVals = vals
+//    constructor(x: Float, vals: FloatArray?, icon: Drawable?) : super(x, calcSum(vals), icon) {
+    constructor(x: Float, vals: FloatArray?, icon: Drawable?) : super(x, 0f, icon) {
+        mYVals = vals!!
         calcPosNegSum()
         calcRanges()
     }
@@ -121,13 +124,14 @@ class BarEntry : Entry {
      * @param icon - icon image
      * @param data - Spot for additional data this Entry represents.
      */
+//    constructor(x: Float, vals: FloatArray?, icon: Drawable?, data: Any?) : super(        x,        calcSum(vals),        icon,        data    ) {
     constructor(x: Float, vals: FloatArray?, icon: Drawable?, data: Any?) : super(
         x,
-        calcSum(vals),
+        0f,
         icon,
         data
     ) {
-        mYVals = vals
+        mYVals = vals!!
         calcPosNegSum()
         calcRanges()
     }
@@ -135,7 +139,7 @@ class BarEntry : Entry {
     /**
      * Returns an exact copy of the BarEntry.
      */
-    override fun copy(): BarEntry? {
+    override fun copy(): BarEntry {
         val copied = BarEntry(getX(), getY(), getData())
         copied.setVals(mYVals)
         return copied
@@ -147,7 +151,7 @@ class BarEntry : Entry {
      *
      * @return
      */
-    fun getYVals(): FloatArray? {
+    fun getYVals(): FloatArray {
         return mYVals
     }
 
@@ -201,9 +205,9 @@ class BarEntry : Entry {
     fun getSumBelow(stackIndex: Int): Float {
         if (mYVals == null) return 0f
         var remainder = 0f
-        var index = mYVals!!.size - 1
+        var index = mYVals.size - 1
         while (index > stackIndex && index >= 0) {
-            remainder += mYVals!![index]
+            remainder += mYVals[index]
             index--
         }
         return remainder
@@ -258,7 +262,9 @@ class BarEntry : Entry {
     protected fun calcRanges() {
         val values = getYVals()
         if (values == null || values.size == 0) return
-        mRanges = arrayOfNulls(values.size)
+//        mRanges = arrayOfNulls(values.size)
+        mRanges = arrayOf()
+
         var negRemain = -getNegativeSum()
         var posRemain = 0f
         for (i in mRanges.indices) {

@@ -34,14 +34,14 @@ abstract class SimpleFragment : Fragment() {
     }
 
     fun generateBarData(dataSets: Int, range: Float, count: Int): BarData {
-        val sets = ArrayList<IBarDataSet>()
+        val sets = mutableListOf<IBarDataSet>()
         for (i in 0 until dataSets) {
-            val entries = ArrayList<BarEntry?>()
+            val entries = mutableListOf<BarEntry>()
             for (j in 0 until count) {
                 entries.add(BarEntry(j.toFloat(), (Math.random() * range).toFloat() + range / 4))
             }
             val ds = BarDataSet(entries, getLabel(i))
-            ds.setColors(*ColorTemplate.VORDIPLOM_COLORS)
+            ds.setColors(ColorTemplate.VORDIPLOM_COLORS)
             sets.add(ds)
         }
         val d = BarData(sets)
@@ -50,17 +50,17 @@ abstract class SimpleFragment : Fragment() {
     }
 
     fun generateScatterData(dataSets: Int, range: Float, count: Int): ScatterData {
-        val sets = ArrayList<IScatterDataSet>()
+        val sets = mutableListOf<IScatterDataSet>()
         val shapes = allDefaultShapes
         for (i in 0 until dataSets) {
-            val entries = ArrayList<Entry>()
+            val entries = mutableListOf<Entry>()
             for (j in 0 until count) {
                 entries.add(Entry(j.toFloat(), (Math.random() * range).toFloat() + range / 4))
             }
             val ds = ScatterDataSet(entries, getLabel(i))
             ds.setScatterShapeSize(12f)
             ds.setScatterShape(shapes[i % shapes.size])
-            ds.setColors(*ColorTemplate.COLORFUL_COLORS)
+            ds.setColors(ColorTemplate.COLORFUL_COLORS)
             ds.setScatterShapeSize(9f)
             sets.add(ds)
         }
@@ -80,7 +80,7 @@ abstract class SimpleFragment : Fragment() {
             entries1.add(PieEntry((Math.random() * 60 + 40).toFloat(), "Quarter " + (i + 1)))
         }
         val ds1 = PieDataSet(entries1, "Quarterly Revenues 2015")
-        ds1.setColors(*ColorTemplate.VORDIPLOM_COLORS)
+        ds1.setColors(ColorTemplate.VORDIPLOM_COLORS)
         ds1.setSliceSpace(2f)
         ds1.setValueTextColor(Color.WHITE)
         ds1.setValueTextSize(12f)
@@ -126,7 +126,7 @@ abstract class SimpleFragment : Fragment() {
             val sets = ArrayList<ILineDataSet>()
             val ds1 = LineDataSet(
                 loadEntriesFromAssets(
-                   requireContext().assets, "n.txt"
+                    requireContext().assets, "n.txt"
                 ).toMutableList(), "O(n)"
             )
             val ds2 = LineDataSet(

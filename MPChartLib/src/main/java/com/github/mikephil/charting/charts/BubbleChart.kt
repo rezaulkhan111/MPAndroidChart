@@ -35,7 +35,7 @@ class BubbleChart : BarLineChartBase<BubbleData>, BubbleDataProvider {
         mRenderer = BubbleChartRenderer(this, mAnimator!!, mViewPortHandler)
     }
 
-    override fun getBubbleData(): BubbleData {
+    override fun getBubbleData(): BubbleData? {
         return mData!!
     }
 }

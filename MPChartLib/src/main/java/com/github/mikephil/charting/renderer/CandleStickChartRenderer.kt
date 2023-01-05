@@ -32,7 +32,7 @@ class CandleStickChartRenderer : LineScatterCandleRadarRenderer {
 
     override fun drawData(c: Canvas?) {
         val candleData = mChart!!.getCandleData()
-        for (set in candleData.getDataSets()!!) {
+        for (set in candleData!!.getDataSets()!!) {
             if (set.isVisible()) drawDataSet(c!!, set)
         }
     }
@@ -192,7 +192,7 @@ class CandleStickChartRenderer : LineScatterCandleRadarRenderer {
     override fun drawValues(c: Canvas?) {
         // if values are drawn
         if (isDrawingValuesAllowed(mChart!!)) {
-            val dataSets: List<ICandleDataSet>? = mChart!!.getCandleData().getDataSets()
+            val dataSets: List<ICandleDataSet>? = mChart!!.getCandleData()!!.getDataSets()
             for (i in dataSets!!.indices) {
                 val dataSet = dataSets[i]
                 if (!shouldDrawValues(dataSet) || dataSet.getEntryCount() < 1) continue
@@ -226,7 +226,7 @@ class CandleStickChartRenderer : LineScatterCandleRadarRenderer {
                         drawValue(
                             c!!,
                             dataSet.getValueFormatter(),
-                            entry!!.getHigh(),
+                            entry.getHigh(),
                             entry,
                             i,
                             x,
@@ -235,7 +235,7 @@ class CandleStickChartRenderer : LineScatterCandleRadarRenderer {
                                 .getValueTextColor(j / 2)
                         )
                     }
-                    if (entry!!.getIcon() != null && dataSet.isDrawIconsEnabled()) {
+                    if (entry.getIcon() != null && dataSet.isDrawIconsEnabled()) {
                         val icon = entry.getIcon()
                         drawImage(
                             c!!,
@@ -256,7 +256,7 @@ class CandleStickChartRenderer : LineScatterCandleRadarRenderer {
     override fun drawHighlighted(c: Canvas?, indices: Array<Highlight>?) {
         val candleData = mChart!!.getCandleData()
         for (high in indices!!) {
-            val set = candleData.getDataSetByIndex(high.getDataSetIndex())
+            val set = candleData!!.getDataSetByIndex(high.getDataSetIndex())
             if (set == null || !set.isHighlightEnabled()) continue
             val e = set.getEntryForXValue(high.getX(), high.getY())
             if (!isInBoundsX(e, set)) continue

@@ -16,12 +16,14 @@ open class BarHighlighter : ChartHighlighter<BarDataProvider> {
     override fun getHighlight(x: Float, y: Float): Highlight? {
         val high = super.getHighlight(x, y) ?: return null
         val pos = getValsForTouch(x, y)
-        val barData = mChart.getBarData()
-        val set = barData.getDataSetByIndex(high.dataSetIndex)
+        val barData = mChart!!.getBarData()
+        val set = barData!!.getDataSetByIndex(high.getDataSetIndex())
         if (set!!.isStacked()) {
             return getStackedHighlight(
                 high,
-                set, pos.x.toFloat(), pos.y.toFloat()
+                set,
+                pos.x.toFloat(),
+                pos.y.toFloat()
             )
         }
         recycleInstance(pos)
@@ -47,20 +49,24 @@ open class BarHighlighter : ChartHighlighter<BarDataProvider> {
         val entry = set!!.getEntryForXValue(xVal, yVal) ?: return null
 
         // not stacked
+
+        // not stacked
         if (entry.getYVals() == null) {
             return high
         } else {
             val ranges = entry.getRanges()
             if (ranges.size > 0) {
                 val stackIndex = getClosestStackIndex(ranges, yVal)
-                val pixels = mChart.getTransformer(set.getAxisDependency())
-                    .getPixelForValues(high.x, ranges[stackIndex].to)
+                val pixels = mChart!!.getTransformer(set.getAxisDependency())
+                    .getPixelForValues(high.getX(), ranges[stackIndex].to)
                 val stackedHigh = Highlight(
                     entry.getX(),
-                    entry.getY(), pixels.x.toFloat(), pixels.y.toFloat(),
-                    high.dataSetIndex,
+                    entry.getY(),
+                    pixels!!.x.toFloat(),
+                    pixels.y.toFloat(),
+                    high.getDataSetIndex(),
                     stackIndex,
-                    high.axis
+                    high.getAxis()
                 )
                 recycleInstance(pixels)
                 return stackedHigh
@@ -92,7 +98,7 @@ open class BarHighlighter : ChartHighlighter<BarDataProvider> {
         return Math.abs(x1 - x2)
     }
 
-    protected open fun getData(): BarLineScatterCandleBubbleData<*>? {
-        return mChart.getBarData()
+    override fun getData(): BarLineScatterCandleBubbleData<*>? {
+        return mChart!!.getBarData()
     }
 }

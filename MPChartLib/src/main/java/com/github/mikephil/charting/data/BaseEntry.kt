@@ -22,19 +22,22 @@ abstract class BaseEntry {
     }
 
     constructor(y: Float, data: Any?) {
-        this(y)
-        mData = data
+//        this(y)
+        this.y = y
+        mData = data!!
     }
 
     constructor(y: Float, icon: Drawable?) {
-        this(y)
-        mIcon = icon
+//        this(y)
+        this.y = y
+        mIcon = icon!!
     }
 
     constructor(y: Float, icon: Drawable?, data: Any?) {
-        this(y)
-        mIcon = icon
-        mData = data
+//        this(y)
+        this.y = y
+        mIcon = icon!!
+        mData = data!!
     }
 
     /**
@@ -52,7 +55,7 @@ abstract class BaseEntry {
      * @param icon
      */
     open fun setIcon(icon: Drawable?) {
-        mIcon = icon
+        mIcon = icon!!
     }
 
     /**

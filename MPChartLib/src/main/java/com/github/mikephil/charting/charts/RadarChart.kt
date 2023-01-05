@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.util.AttributeSet
 import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.components.YAxis.AxisDependency
+import com.github.mikephil.charting.data.RadarData
 import com.github.mikephil.charting.highlight.RadarHighlighter
 import com.github.mikephil.charting.renderer.RadarChartRenderer
 import com.github.mikephil.charting.renderer.XAxisRendererRadarChart
@@ -19,7 +20,7 @@ import com.github.mikephil.charting.utils.Utils.getNormalizedAngle
  *
  * @author Philipp Jahoda
  */
-class RadarChart : PieRadarChartBase<RadarData?> {
+class RadarChart : PieRadarChartBase<RadarData> {
     /**
      * width of the main web lines
      */
@@ -86,8 +87,11 @@ class RadarChart : PieRadarChartBase<RadarData?> {
 
     override fun calcMinMax() {
         super.calcMinMax()
-        mYAxis!!.calculate(mData.getYMin(AxisDependency.LEFT), mData.getYMax(AxisDependency.LEFT))
-        mXAxis!!.calculate(0f, mData.getMaxEntryCountSet().getEntryCount().toFloat())
+        mYAxis!!.calculate(
+            mData!!.getYMin(AxisDependency.LEFT),
+            mData!!.getYMax(AxisDependency.LEFT)
+        )
+        mXAxis!!.calculate(0f, mData!!.getMaxEntryCountSet()!!.getEntryCount().toFloat())
     }
 
     override fun notifyDataSetChanged() {
@@ -99,11 +103,11 @@ class RadarChart : PieRadarChartBase<RadarData?> {
             mYAxis!!.isInverted()
         )
         mXAxisRenderer!!.computeAxis(mXAxis!!.mAxisMinimum, mXAxis!!.mAxisMaximum, false)
-        if (mLegend != null && !mLegend!!.isLegendCustom()) mLegendRenderer!!.computeLegend(mData)
+        if (mLegend != null && !mLegend!!.isLegendCustom()) mLegendRenderer!!.computeLegend(mData!!)
         calculateOffsets()
     }
 
-    protected fun onDraw(canvas: Canvas?) {
+    override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas!!)
         if (mData == null) return
 
@@ -137,8 +141,8 @@ class RadarChart : PieRadarChartBase<RadarData?> {
      * @return
      */
     fun getFactor(): Float {
-        val content = mViewPortHandler.contentRect
-        return Math.min(content.width() / 2f, content.height() / 2f) / mYAxis!!.mAxisRange
+        val content = mViewPortHandler.getContentRect()
+        return Math.min(content!!.width() / 2f, content.height() / 2f) / mYAxis!!.mAxisRange
     }
 
     /**
@@ -147,7 +151,7 @@ class RadarChart : PieRadarChartBase<RadarData?> {
      * @return
      */
     fun getSliceAngle(): Float {
-        return 360f / mData.getMaxEntryCountSet().getEntryCount().toFloat()
+        return 360f / mData!!.getMaxEntryCountSet()!!.getEntryCount().toFloat()
     }
 
     override fun getIndexForAngle(angle: Float): Int {
@@ -155,7 +159,7 @@ class RadarChart : PieRadarChartBase<RadarData?> {
         // take the current angle of the chart into consideration
         val a = getNormalizedAngle(angle - getRotationAngle())
         val sliceangle = getSliceAngle()
-        val max: Int = mData.getMaxEntryCountSet().getEntryCount()
+        val max: Int = mData!!.getMaxEntryCountSet()!!.getEntryCount()
         var index = 0
         for (i in 0 until max) {
             val referenceAngle = sliceangle * (i + 1) - sliceangle / 2f
@@ -282,7 +286,7 @@ class RadarChart : PieRadarChartBase<RadarData?> {
     }
 
     override fun getRequiredLegendOffset(): Float {
-        return mLegendRenderer!!.labelPaint.textSize * 4f
+        return mLegendRenderer!!.getLabelPaint()!!.textSize * 4f
     }
 
     override fun getRequiredBaseOffset(): Float {
@@ -292,8 +296,8 @@ class RadarChart : PieRadarChartBase<RadarData?> {
     }
 
     override fun getRadius(): Float {
-        val content = mViewPortHandler.contentRect
-        return Math.min(content.width() / 2f, content.height() / 2f)
+        val content = mViewPortHandler.getContentRect()
+        return Math.min(content!!.width() / 2f, content.height() / 2f)
     }
 
     /**

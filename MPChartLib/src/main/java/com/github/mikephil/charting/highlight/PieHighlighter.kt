@@ -12,7 +12,7 @@ class PieHighlighter : PieRadarHighlighter<PieChart> {
     }
 
     override fun getClosestHighlight(index: Int, x: Float, y: Float): Highlight {
-        val set = mChart.getData()!!.getDataSet()
+        val set = mChart!!.getData().getDataSet()
         val entry: Entry = set.getEntryForIndex(index)
         return Highlight(index.toFloat(), entry.getY(), x, y, 0, set.getAxisDependency())
     }

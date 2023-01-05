@@ -33,7 +33,7 @@ class CombinedHighlighter : ChartHighlighter<CombinedDataProvider>, IHighlighter
             if (barHighlighter != null && dataObject is BarData) {
                 val high = barHighlighter!!.getHighlight(x, y)
                 if (high != null) {
-                    high.dataIndex = i
+                    high.setDataIndex(i)
                     mHighlightBuffer.add(high)
                 }
             } else {
@@ -47,8 +47,8 @@ class CombinedHighlighter : ChartHighlighter<CombinedDataProvider>, IHighlighter
                         continue
                     }
                     val highs = buildHighlights(dataSet, j, xVal, Rounding.CLOSEST)
-                    for (high in highs!!) {
-                        high.dataIndex = i
+                    for (high in highs) {
+                        high.setDataIndex(i)
                         mHighlightBuffer.add(high)
                     }
                     j++

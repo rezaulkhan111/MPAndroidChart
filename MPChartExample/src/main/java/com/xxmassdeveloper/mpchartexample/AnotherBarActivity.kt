@@ -77,7 +77,7 @@ class AnotherBarActivity : DemoBase(), OnSeekBarChangeListener {
     override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
         tvX!!.text = seekBarX.progress.toString()
         tvY!!.text = seekBarY.progress.toString()
-        val values = ArrayList<BarEntry>()
+        val values = mutableListOf<BarEntry>()
         for (i in 0 until seekBarX.progress) {
             val multi = (seekBarY.progress + 1).toFloat()
             val `val` = (Math.random() * multi).toFloat() + multi / 3
@@ -94,9 +94,9 @@ class AnotherBarActivity : DemoBase(), OnSeekBarChangeListener {
             chart.notifyDataSetChanged()
         } else {
             set1 = BarDataSet(values, "Data Set")
-            set1.setColors(IntArray(0).apply { ColorTemplate.VORDIPLOM_COLORS })
+            set1.setColors(ColorTemplate.VORDIPLOM_COLORS)
             set1.setDrawValues(false)
-            val dataSets = java.util.ArrayList<IBarDataSet>()
+            val dataSets = mutableListOf<IBarDataSet>()
             dataSets.add(set1)
             val data = BarData(dataSets)
             chart.setData(data)

@@ -7,6 +7,7 @@ import com.github.mikephil.charting.utils.Fill
  * Created by philipp on 21/10/15.
  */
 interface IBarDataSet : IBarLineScatterCandleBubbleDataSet<BarEntry> {
+
     fun getFills(): MutableList<Fill>
 
     fun getFill(index: Int): Fill

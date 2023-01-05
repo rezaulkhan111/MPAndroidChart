@@ -30,7 +30,7 @@ class BubbleChartRenderer : BarLineScatterCandleBubbleRenderer {
 
     override fun drawData(c: Canvas?) {
         val bubbleData = mChart!!.getBubbleData()
-        for (set in bubbleData.getDataSets()!!) {
+        for (set in bubbleData!!.getDataSets()!!) {
             if (set.isVisible()) drawDataSet(c!!, set)
         }
     }
@@ -153,7 +153,7 @@ class BubbleChartRenderer : BarLineScatterCandleBubbleRenderer {
         val bubbleData = mChart!!.getBubbleData()
         val phaseY = mAnimator!!.getPhaseY()
         for (high in indices!!) {
-            val set = bubbleData.getDataSetByIndex(high.getDataSetIndex())
+            val set = bubbleData!!.getDataSetByIndex(high.getDataSetIndex())
             if (set == null || !set.isHighlightEnabled()) continue
             val entry = set.getEntryForXValue(high.getX(), high.getY())
             if (entry!!.getY() != high.getY()) continue

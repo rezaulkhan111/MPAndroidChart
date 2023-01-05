@@ -45,11 +45,11 @@ class RadarHighlighter : PieRadarHighlighter<RadarChart> {
         val factor = mChart!!.getFactor()
         val pOut = getInstance(0f, 0f)
         for (i in 0 until mChart!!.getData().getDataSetCount()) {
-            val dataSet: IDataSet<*> = mChart!!.getData().getDataSetByIndex(i)
+            val dataSet: IDataSet<*> = mChart!!.getData().getDataSetByIndex(i)!!
             val entry = dataSet.getEntryForIndex(index)
             val y = entry.getY() - mChart!!.getYChartMin()
             getPosition(
-                mChart!!.getCenterOffsets()!!, y * factor * phaseY,
+                mChart!!.getCenterOffsets(), y * factor * phaseY,
                 sliceangle * index * phaseX + mChart!!.getRotationAngle(), pOut
             )
             mHighlightBuffer.add(

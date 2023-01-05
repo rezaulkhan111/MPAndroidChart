@@ -353,9 +353,9 @@ abstract class BaseDataSet<T : Entry> : IDataSet<T> {
         return mDrawIcons
     }
 
-    override fun setIconsOffset(offsetDp: MPPointF) {
-        mIconsOffset.x = offsetDp.x
-        mIconsOffset.y = offsetDp.y
+    override fun setIconsOffset(offset: MPPointF) {
+        mIconsOffset.x = offset.x
+        mIconsOffset.y = offset.y
     }
 
     override fun getIconsOffset(): MPPointF {
@@ -413,9 +413,9 @@ abstract class BaseDataSet<T : Entry> : IDataSet<T> {
         return removeEntry(e)
     }
 
-    override fun contains(e: T): Boolean {
+    override fun contains(entry: T): Boolean {
         for (i in 0 until getEntryCount()) {
-            if (getEntryForIndex(i) == e) return true
+            if (getEntryForIndex(i) == entry) return true
         }
         return false
     }

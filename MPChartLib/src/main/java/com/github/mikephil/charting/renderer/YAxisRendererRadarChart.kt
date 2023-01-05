@@ -169,14 +169,14 @@ class YAxisRendererRadarChart : YAxisRenderer {
             val r = (l.getLimit() - mChart!!.getYChartMin()) * factor
             val limitPath = mRenderLimitLinesPathBuffer
             limitPath.reset()
-            for (j in 0 until mChart!!.getData().getMaxEntryCountSet().getEntryCount()) {
-                Utils.getPosition(center!!, r, sliceangle * j + mChart!!.getRotationAngle(), pOut)
+            for (j in 0 until mChart!!.getData().getMaxEntryCountSet()!!.getEntryCount()) {
+                Utils.getPosition(center, r, sliceangle * j + mChart!!.getRotationAngle(), pOut)
                 if (j == 0) limitPath.moveTo(pOut.x, pOut.y) else limitPath.lineTo(pOut.x, pOut.y)
             }
             limitPath.close()
             c!!.drawPath(limitPath, mLimitLinePaint!!)
         }
-        MPPointF.recycleInstance(center!!)
+        MPPointF.recycleInstance(center)
         MPPointF.recycleInstance(pOut)
     }
 }

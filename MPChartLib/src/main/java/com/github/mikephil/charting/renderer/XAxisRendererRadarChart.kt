@@ -34,11 +34,11 @@ class XAxisRendererRadarChart : XAxisRenderer {
         val factor = mChart!!.getFactor()
         val center = mChart!!.getCenterOffsets()
         val pOut = getInstance(0f, 0f)
-        for (i in 0 until mChart!!.getData().getMaxEntryCountSet().getEntryCount()) {
+        for (i in 0 until mChart!!.getData().getMaxEntryCountSet()!!.getEntryCount()) {
             val label = mXAxis!!.getValueFormatter().getFormattedValue(i.toFloat(), mXAxis)
             val angle = (sliceangle * i + mChart!!.getRotationAngle()) % 360f
             getPosition(
-                center!!, mChart!!.getYRange() * factor
+                center, mChart!!.getYRange() * factor
                         + mXAxis!!.mLabelRotatedWidth / 2f, angle, pOut
             )
             drawLabel(

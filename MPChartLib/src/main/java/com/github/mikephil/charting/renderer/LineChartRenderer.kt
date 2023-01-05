@@ -70,7 +70,7 @@ class LineChartRenderer : LineRadarRenderer {
         }
         drawBitmap!!.eraseColor(Color.TRANSPARENT)
         val lineData = mChart!!.getLineData()
-        for (set in lineData.getDataSets()!!) {
+        for (set in lineData!!.getDataSets()!!) {
             if (set.isVisible()) drawDataSet(c, set)
         }
         c?.drawBitmap(drawBitmap, 0f, 0f, mRenderPaint)
@@ -429,7 +429,7 @@ class LineChartRenderer : LineRadarRenderer {
 
     override fun drawValues(c: Canvas?) {
         if (isDrawingValuesAllowed(mChart!!)) {
-            val dataSets: List<ILineDataSet>? = mChart!!.getLineData().getDataSets()
+            val dataSets: List<ILineDataSet>? = mChart!!.getLineData()!!.getDataSets()
             for (i in dataSets!!.indices) {
                 val dataSet = dataSets[i]
                 if (!shouldDrawValues(dataSet) || dataSet.getEntryCount() < 1) continue
@@ -500,7 +500,7 @@ class LineChartRenderer : LineRadarRenderer {
         val phaseY = mAnimator!!.getPhaseY()
         mCirclesBuffer[0] = 0f
         mCirclesBuffer[1] = 0f
-        val dataSets: List<ILineDataSet>? = mChart!!.getLineData().getDataSets()
+        val dataSets: List<ILineDataSet>? = mChart!!.getLineData()!!.getDataSets()
         for (i in dataSets!!.indices) {
             val dataSet = dataSets[i]
             if (!dataSet.isVisible() || !dataSet.isDrawCirclesEnabled() || dataSet.getEntryCount() == 0) continue
@@ -552,7 +552,7 @@ class LineChartRenderer : LineRadarRenderer {
     override fun drawHighlighted(c: Canvas?, indices: Array<Highlight>?) {
         val lineData = mChart!!.getLineData()
         for (high in indices!!) {
-            val set = lineData.getDataSetByIndex(high.getDataSetIndex())
+            val set = lineData!!.getDataSetByIndex(high.getDataSetIndex())
             if (set == null || !set.isHighlightEnabled()) continue
             val e = set.getEntryForXValue(high.getX(), high.getY())
             if (!isInBoundsX(e, set)) continue

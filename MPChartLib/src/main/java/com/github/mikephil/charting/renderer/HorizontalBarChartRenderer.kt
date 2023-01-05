@@ -33,7 +33,7 @@ class HorizontalBarChartRenderer : BarChartRenderer {
 
     override fun initBuffers() {
         val barData = mChart!!.getBarData()
-        mBarBuffers = arrayOfNulls(barData.getDataSetCount())
+        mBarBuffers = arrayOfNulls(barData!!.getDataSetCount())
         for (i in 0 until mBarBuffers.size) {
             val set = barData.getDataSetByIndex(i)
             mBarBuffers[i] = HorizontalBarBuffer(
@@ -57,7 +57,7 @@ class HorizontalBarChartRenderer : BarChartRenderer {
         if (mChart!!.isDrawBarShadowEnabled()) {
             mShadowPaint!!.color = dataSet.getBarShadowColor()
             val barData = mChart!!.getBarData()
-            val barWidth = barData.getBarWidth()
+            val barWidth = barData!!.getBarWidth()
             val barWidthHalf = barWidth / 2.0f
             var x: Float
             var i = 0
@@ -88,7 +88,7 @@ class HorizontalBarChartRenderer : BarChartRenderer {
         buffer!!.setPhases(phaseX, phaseY)
         buffer.setDataSet(index)
         buffer.setInverted(mChart!!.isInverted(dataSet.getAxisDependency()))
-        buffer.setBarWidth(mChart!!.getBarData().getBarWidth())
+        buffer.setBarWidth(mChart!!.getBarData()!!.getBarWidth())
         buffer.feed(dataSet)
         trans.pointValuesToPixel(buffer.buffer)
         val isCustomFill = dataSet.getFills() != null && dataSet.getFills().isNotEmpty()
@@ -141,12 +141,12 @@ class HorizontalBarChartRenderer : BarChartRenderer {
     override fun drawValues(c: Canvas?) {
         // if values are drawn
         if (isDrawingValuesAllowed(mChart!!)) {
-            val dataSets: List<IBarDataSet>? = mChart!!.getBarData().getDataSets()
+            val dataSets: List<IBarDataSet>? = mChart!!.getBarData()!!.getDataSets()
             val valueOffsetPlus = convertDpToPixel(5f)
             var posOffset = 0f
             var negOffset = 0f
             val drawValueAboveBar = mChart!!.isDrawValueAboveBarEnabled()
-            for (i in 0 until mChart!!.getBarData().getDataSetCount()) {
+            for (i in 0 until mChart!!.getBarData()!!.getDataSetCount()) {
                 val dataSet = dataSets!![i]
                 if (!shouldDrawValues(dataSet)) continue
                 val isInverted = mChart!!.isInverted(dataSet.getAxisDependency())

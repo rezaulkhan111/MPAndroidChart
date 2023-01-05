@@ -3,7 +3,7 @@ package com.github.mikephil.charting.renderer
 import android.graphics.*
 import android.graphics.drawable.Drawable
 import com.github.mikephil.charting.animation.ChartAnimator
-import com.github.mikephil.charting.utils.Utils.sDKInt
+import com.github.mikephil.charting.utils.Utils
 import com.github.mikephil.charting.utils.ViewPortHandler
 
 /**
@@ -12,7 +12,7 @@ import com.github.mikephil.charting.utils.ViewPortHandler
 abstract class LineRadarRenderer : LineScatterCandleRadarRenderer {
 
     constructor(animator: ChartAnimator?, viewPortHandler: ViewPortHandler?) : super(
-        animator,
+        animator!!,
         viewPortHandler
     ) {
     }
@@ -29,17 +29,17 @@ abstract class LineRadarRenderer : LineScatterCandleRadarRenderer {
             val save = c.save()
             c.clipPath(filledPath!!)
             drawable.setBounds(
-                mViewPortHandler.contentLeft().toInt(),
-                mViewPortHandler.contentTop().toInt(),
-                mViewPortHandler.contentRight().toInt(),
-                mViewPortHandler.contentBottom().toInt()
+                mViewPortHandler!!.contentLeft().toInt(),
+                mViewPortHandler!!.contentTop().toInt(),
+                mViewPortHandler!!.contentRight().toInt(),
+                mViewPortHandler!!.contentBottom().toInt()
             )
             drawable.draw(c)
             c.restoreToCount(save)
         } else {
             throw RuntimeException(
                 "Fill-drawables not (yet) supported below API level 18, " +
-                        "this code was run on API level " + sDKInt + "."
+                        "this code was run on API level " + Utils.getSDKInt() + "."
             )
         }
     }
@@ -88,6 +88,6 @@ abstract class LineRadarRenderer : LineScatterCandleRadarRenderer {
      * @return
      */
     private fun clipPathSupported(): Boolean {
-        return sDKInt >= 18
+        return Utils.getSDKInt() >= 18
     }
 }
