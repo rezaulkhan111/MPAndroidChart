@@ -7,5 +7,5 @@ import com.github.mikephil.charting.data.LineData
 interface LineDataProvider : BarLineScatterCandleBubbleDataProvider {
     fun getLineData(): LineData
 
-    fun getAxis(dependency: AxisDependency): YAxis
+//    fun getAxis(dependency: AxisDependency): YAxis
 }

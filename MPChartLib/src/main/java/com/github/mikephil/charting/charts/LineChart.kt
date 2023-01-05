@@ -2,6 +2,7 @@ package com.github.mikephil.charting.charts
 
 import android.content.Context
 import android.util.AttributeSet
+import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider
 import com.github.mikephil.charting.renderer.LineChartRenderer
@@ -11,7 +12,7 @@ import com.github.mikephil.charting.renderer.LineChartRenderer
  *
  * @author Philipp Jahoda
  */
-class LineChart : BarLineChartBase<LineData?>, LineDataProvider {
+class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 
     constructor(context: Context?) : super(context) {}
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {}
@@ -27,8 +28,8 @@ class LineChart : BarLineChartBase<LineData?>, LineDataProvider {
         mRenderer = LineChartRenderer(this, mAnimator, mViewPortHandler)
     }
 
-    override fun getLineData(): LineData? {
-        return mData
+    override fun getLineData(): LineData {
+        return mData!!
     }
 
     override fun onDetachedFromWindow() {

@@ -11,7 +11,7 @@ import com.github.mikephil.charting.interfaces.datasets.IDataSet
 import com.github.mikephil.charting.utils.ColorTemplate.createColors
 import com.github.mikephil.charting.utils.MPPointF
 import com.github.mikephil.charting.utils.Utils.convertDpToPixel
-import com.github.mikephil.charting.utils.Utils.defaultValueFormatter
+import com.github.mikephil.charting.utils.Utils.getDefaultValueFormatter
 
 /**
  * Created by Philipp Jahoda on 21/10/15.
@@ -104,7 +104,6 @@ abstract class BaseDataSet<T : Entry> : IDataSet<T> {
      * @param label
      */
     constructor(label: String) {
-        this()
         mLabel = label
     }
 
@@ -164,7 +163,7 @@ abstract class BaseDataSet<T : Entry> : IDataSet<T> {
      *
      * @param colors
      */
-    open fun setColors(vararg colors: Int) {
+    open fun setColors(colors: IntArray) {
         mColors = createColors(colors)
     }
 
@@ -266,7 +265,7 @@ abstract class BaseDataSet<T : Entry> : IDataSet<T> {
     }
 
     override fun getValueFormatter(): IValueFormatter {
-        return if (needsFormatter()) defaultValueFormatter else mValueFormatter
+        return if (needsFormatter()) getDefaultValueFormatter()!! else mValueFormatter
     }
 
     override fun needsFormatter(): Boolean {
@@ -278,11 +277,11 @@ abstract class BaseDataSet<T : Entry> : IDataSet<T> {
         mValueColors!!.add(color)
     }
 
-    open fun setValueTextColors(colors: MutableList<Int>) {
+    override fun setValueTextColors(colors: MutableList<Int>) {
         mValueColors = colors
     }
 
-    open fun setValueTypeface(tf: Typeface) {
+    override fun setValueTypeface(tf: Typeface) {
         mValueTypeface = tf
     }
 
@@ -291,15 +290,15 @@ abstract class BaseDataSet<T : Entry> : IDataSet<T> {
     }
 
     override fun getValueTextColor(): Int {
-        return mValueColors!![0]
+        return mValueColors[0]
     }
 
     override fun getValueTextColor(index: Int): Int {
-        return mValueColors!![index % mValueColors!!.size]
+        return mValueColors[index % mValueColors.size]
     }
 
-    override fun getValueTypeface(): Typeface? {
-        return mValueTypeface
+    override fun getValueTypeface(): Typeface {
+        return mValueTypeface!!
     }
 
     override fun getValueTextSize(): Float {
@@ -310,7 +309,7 @@ abstract class BaseDataSet<T : Entry> : IDataSet<T> {
         mForm = form
     }
 
-    override fun getForm(): LegendForm? {
+    override fun getForm(): LegendForm {
         return mForm
     }
 
@@ -335,7 +334,7 @@ abstract class BaseDataSet<T : Entry> : IDataSet<T> {
     }
 
     override fun getFormLineDashEffect(): DashPathEffect {
-        return mFormLineDashEffect
+        return mFormLineDashEffect!!
     }
 
     override fun setDrawValues(enabled: Boolean) {
@@ -355,7 +354,7 @@ abstract class BaseDataSet<T : Entry> : IDataSet<T> {
     }
 
     override fun setIconsOffset(offsetDp: MPPointF) {
-        mIconsOffset.x = MPPointF.x
+        mIconsOffset.x = offsetDp.x
         mIconsOffset.y = offsetDp.y
     }
 

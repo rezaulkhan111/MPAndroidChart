@@ -5,13 +5,17 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
-import android.view.*
+import android.view.Menu
+import android.view.MenuItem
+import android.view.WindowManager
 import com.github.mikephil.charting.charts.LineChart
-import com.github.mikephil.charting.components.Legend
-import com.github.mikephil.charting.data.*
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
 import com.xxmassdeveloper.mpchartexample.notimportant.DemoBase
 
 class LineChartActivityColored : DemoBase() {
+
     private val charts = arrayOfNulls<LineChart>(4)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,61 +50,64 @@ class LineChartActivityColored : DemoBase() {
         (data.getDataSetByIndex(0) as LineDataSet?)!!.setCircleHoleColor(color)
 
         // no description text
-        chart!!.description!!.isEnabled = false
+        chart!!.getDescription()!!.setEnabled(false)
 
         // chart.setDrawHorizontalGrid(false);
         //
         // enable / disable grid background
         chart.setDrawGridBackground(false)
-        //        chart.getRenderer().getGridPaint().setGridColor(Color.WHITE & 0x70FFFFFF);
 
+//        chart.getRenderer().getGridPaint().setGridColor(Color.WHITE & 0x70FFFFFF);
         // enable touch gestures
         chart.setTouchEnabled(true)
 
         // enable scaling and dragging
-        chart.isDragEnabled = true
+        chart.setDragEnabled(true)
         chart.setScaleEnabled(true)
 
         // if disabled, scaling can be done on x- and y-axis separately
         chart.setPinchZoom(false)
+
         chart.setBackgroundColor(color)
 
         // set custom chart offsets (automatic offset calculation is hereby disabled)
         chart.setViewPortOffsets(10f, 0f, 10f, 0f)
 
         // add data
-        chart.data = data
+        chart.setData(data)
 
         // get the legend (only possible after setting data)
-        val l: Legend? = chart.legend
-        l!!.isEnabled = false
-        chart.axisLeft!!.isEnabled = false
-        chart.axisLeft!!.spaceTop = 40
-        chart.axisLeft!!.spaceBottom = 40
-        chart.axisRight!!.isEnabled = false
-        chart.xAxis.setEnabled(false)
+        val l = chart.getLegend()
+        l!!.setEnabled(false)
+
+        chart.getAxisLeft()!!.setEnabled(false)
+        chart.getAxisLeft()!!.setSpaceTop(40f)
+        chart.getAxisLeft()!!.setSpaceBottom(40f)
+        chart.getAxisRight()!!.setEnabled(false)
+
+        chart.getXAxis()!!.setEnabled(false)
 
         // animate calls invalidate()...
         chart.animateX(2500)
     }
 
     private fun getData(count: Int, range: Float): LineData {
-        val values = ArrayList<Entry?>()
+        val values = mutableListOf<Entry>()
         for (i in 0 until count) {
-            val `val` = (Math.random() * range).toFloat() + 3
-            values.add(Entry(i.toFloat(), `val`))
+            val valF0 = (Math.random() * range).toFloat() + 3
+            values.add(Entry(i.toFloat(), valF0))
         }
 
         // create a dataset and give it a type
         val set1 = LineDataSet(values, "DataSet 1")
         // set1.setFillAlpha(110);
         // set1.setFillColor(Color.RED);
-        set1.lineWidth = 1.75f
-        set1.circleRadius = 5f
-        set1.circleHoleRadius = 2.5f
-        set1.color = Color.WHITE
+        set1.setLineWidth(1.75f)
+        set1.setCircleRadius(5f)
+        set1.setCircleHoleRadius(2.5f)
+        set1.setColor(Color.WHITE)
         set1.setCircleColor(Color.WHITE)
-        set1.highLightColor = Color.WHITE
+        set1.setHighLightColor(Color.WHITE)
         set1.setDrawValues(false)
 
         // create a data object with the data sets

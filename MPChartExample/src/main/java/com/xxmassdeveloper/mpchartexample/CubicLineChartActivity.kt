@@ -6,26 +6,31 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.view.*
+import android.view.Menu
+import android.view.MenuItem
+import android.view.WindowManager
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.github.mikephil.charting.charts.LineChart
-import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.YAxis.YAxisLabelPosition
-import com.github.mikephil.charting.data.*
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.IFillFormatter
 import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.xxmassdeveloper.mpchartexample.notimportant.DemoBase
 
 class CubicLineChartActivity : DemoBase(), OnSeekBarChangeListener {
-    private var chart: LineChart? = null
-    private var seekBarX: SeekBar? = null
-    private var seekBarY: SeekBar? = null
-    private var tvX: TextView? = null
-    private var tvY: TextView? = null
+
+    private lateinit var chart: LineChart
+    private lateinit var seekBarX: SeekBar
+    private lateinit var seekBarY: SeekBar
+    private lateinit var tvX: TextView
+    private lateinit var tvY: TextView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.setFlags(
@@ -43,39 +48,54 @@ class CubicLineChartActivity : DemoBase(), OnSeekBarChangeListener {
         chart.setBackgroundColor(Color.rgb(104, 241, 175))
 
         // no description text
-        chart.description!!.isEnabled = false
+
+        // no description text
+        chart.getDescription()!!.setEnabled(false)
+
+        // enable touch gestures
 
         // enable touch gestures
         chart.setTouchEnabled(true)
 
         // enable scaling and dragging
-        chart.isDragEnabled = true
+
+        // enable scaling and dragging
+        chart.setDragEnabled(true)
         chart.setScaleEnabled(true)
 
         // if disabled, scaling can be done on x- and y-axis separately
+
+        // if disabled, scaling can be done on x- and y-axis separately
         chart.setPinchZoom(false)
+
         chart.setDrawGridBackground(false)
-        chart.maxHighlightDistance = 300f
-        val x: XAxis? = chart.xAxis
-        x!!.isEnabled = false
-        val y = chart.axisLeft
-        y!!.typeface = tfLight
-        y.setLabelCount(6, false)
-        y.textColor = Color.WHITE
-        y.setPosition(YAxisLabelPosition.INSIDE_CHART)
-        y.setDrawGridLines(false)
-        y.axisLineColor = Color.WHITE
-        chart.axisRight!!.isEnabled = false
+        chart.setMaxHighlightDistance(300f)
+
+        val x = chart.getXAxis()
+        x!!.setEnabled(false)
+
+        val y = chart.getAxisLeft()
+        y!!.setTypeface(tfLight!!)
+        y!!.setLabelCount(6, false)
+        y!!.setTextColor(Color.WHITE)
+        y!!.setPosition(YAxisLabelPosition.INSIDE_CHART)
+        y!!.setDrawGridLines(false)
+        y!!.setAxisLineColor(Color.WHITE)
+
+        chart.getAxisRight()!!.setEnabled(false)
 
         // add data
         seekBarY.setOnSeekBarChangeListener(this)
         seekBarX.setOnSeekBarChangeListener(this)
 
         // lower max, as cubic runs significantly slower than linear
-        seekBarX.setMax(700)
-        seekBarX.setProgress(45)
-        seekBarY.setProgress(100)
-        chart.legend.setEnabled(false)
+        seekBarX.max = 700
+
+        seekBarX.progress = 45
+        seekBarY.progress = 100
+
+        chart.getLegend()!!.setEnabled(false)
+
         chart.animateXY(2000, 2000)
 
         // don't forget to refresh the drawing
@@ -83,51 +103,50 @@ class CubicLineChartActivity : DemoBase(), OnSeekBarChangeListener {
     }
 
     private fun setData(count: Int, range: Float) {
-        val values = ArrayList<Entry?>()
+        val values = mutableListOf<Entry>()
         for (i in 0 until count) {
             val `val` = (Math.random() * (range + 1)).toFloat() + 20
             values.add(Entry(i.toFloat(), `val`))
         }
         val set1: LineDataSet?
-        if (chart!!.data != null &&
-            chart!!.data!!.dataSetCount > 0
+
+        if (chart.getData() != null &&
+            chart.getData().getDataSetCount() > 0
         ) {
-            set1 = chart!!.data!!.getDataSetByIndex(0) as LineDataSet?
+            set1 = chart.getData().getDataSetByIndex(0) as LineDataSet?
             set1!!.setValues(values)
-            chart!!.data!!.notifyDataChanged()
-            chart!!.notifyDataSetChanged()
+            chart.getData().notifyDataChanged()
+            chart.notifyDataSetChanged()
         } else {
             // create a dataset and give it a type
             set1 = LineDataSet(values, "DataSet 1")
-            set1.mode = LineDataSet.Mode.CUBIC_BEZIER
-            set1.cubicIntensity = 0.2f
+            set1.setMode(LineDataSet.Mode.CUBIC_BEZIER)
+            set1.setCubicIntensity(0.2f)
             set1.setDrawFilled(true)
             set1.setDrawCircles(false)
-            set1.lineWidth = 1.8f
-            set1.circleRadius = 4f
+            set1.setLineWidth(1.8f)
+            set1.setCircleRadius(4f)
             set1.setCircleColor(Color.WHITE)
-            set1.highLightColor = Color.rgb(244, 117, 117)
-            set1.color = Color.WHITE
-            set1.fillColor = Color.WHITE
-            set1.fillAlpha = 100
+            set1.setHighLightColor(Color.rgb(244, 117, 117))
+            set1.setColor(Color.WHITE)
+            set1.setFillColor(Color.WHITE)
+            set1.setFillAlpha(100)
             set1.setDrawHorizontalHighlightIndicator(false)
             set1.setFillFormatter(object : IFillFormatter {
                 override fun getFillLinePosition(
                     dataSet: ILineDataSet,
                     dataProvider: LineDataProvider
                 ): Float {
-                    return chart!!.axisLeft!!.axisMinimum
+                    return chart.getAxisLeft()!!.getAxisMinimum()
                 }
             })
-
             // create a data object with the data sets
             val data = LineData(set1)
             data.setValueTypeface(tfLight)
             data.setValueTextSize(9f)
             data.setDrawValues(false)
-
             // set data
-            chart!!.data = data
+            chart.setData(data)
         }
     }
 
@@ -145,85 +164,83 @@ class CubicLineChartActivity : DemoBase(), OnSeekBarChangeListener {
                 startActivity(i)
             }
             R.id.actionToggleValues -> {
-                for (set in chart!!.data!!.dataSets!!) set!!.setDrawValues(!set.isDrawValuesEnabled)
+                for (set in chart.getData()
+                    .getDataSets()!!) set.setDrawValues(!set.isDrawValuesEnabled())
                 chart.invalidate()
             }
             R.id.actionToggleHighlight -> {
-                if (chart!!.data != null) {
-                    chart!!.data!!.isHighlightEnabled = !chart!!.data!!.isHighlightEnabled
+                if (chart.getData() != null) {
+                    chart.getData().setHighlightEnabled(!chart.getData().isHighlightEnabled())
                     chart.invalidate()
                 }
             }
             R.id.actionToggleFilled -> {
-                val sets = chart!!.data
-                    .dataSets
+                val sets: List<ILineDataSet>? = chart.getData()
+                    .getDataSets()
                 for (iSet in sets!!) {
-                    val set = iSet as LineDataSet?
-                    if (set!!.isDrawFilledEnabled) set.setDrawFilled(false) else set.setDrawFilled(
+                    val set = iSet as LineDataSet
+                    if (set.isDrawFilledEnabled()) set.setDrawFilled(false) else set.setDrawFilled(
                         true
                     )
                 }
                 chart.invalidate()
             }
             R.id.actionToggleCircles -> {
-                val sets = chart!!.data
-                    .dataSets
+                val sets: List<ILineDataSet>? = chart.getData()
+                    .getDataSets()
                 for (iSet in sets!!) {
-                    val set = iSet as LineDataSet?
-                    if (set!!.isDrawCirclesEnabled) set.setDrawCircles(false) else set.setDrawCircles(
+                    val set = iSet as LineDataSet
+                    if (set.isDrawCirclesEnabled()) set.setDrawCircles(false) else set.setDrawCircles(
                         true
                     )
                 }
                 chart.invalidate()
             }
             R.id.actionToggleCubic -> {
-                val sets = chart!!.data
-                    .dataSets
+                val sets: List<ILineDataSet>? = chart.getData()
+                    .getDataSets()
                 for (iSet in sets!!) {
-                    val set = iSet as LineDataSet?
-                    set!!.mode =
-                        if (set.mode === LineDataSet.Mode.CUBIC_BEZIER) LineDataSet.Mode.LINEAR else LineDataSet.Mode.CUBIC_BEZIER
+                    val set = iSet as LineDataSet
+                    set.setMode(if (set.getMode() === LineDataSet.Mode.CUBIC_BEZIER) LineDataSet.Mode.LINEAR else LineDataSet.Mode.CUBIC_BEZIER)
                 }
                 chart.invalidate()
             }
             R.id.actionToggleStepped -> {
-                val sets = chart!!.data
-                    .dataSets
+                val sets: List<ILineDataSet>? = chart.getData()
+                    .getDataSets()
                 for (iSet in sets!!) {
-                    val set = iSet as LineDataSet?
-                    set!!.mode =
-                        if (set.mode === LineDataSet.Mode.STEPPED) LineDataSet.Mode.LINEAR else LineDataSet.Mode.STEPPED
+                    val set = iSet as LineDataSet
+                    set.setMode(if (set.getMode() === LineDataSet.Mode.STEPPED) LineDataSet.Mode.LINEAR else LineDataSet.Mode.STEPPED)
                 }
                 chart.invalidate()
             }
             R.id.actionToggleHorizontalCubic -> {
-                val sets = chart!!.data
-                    .dataSets
+                val sets: List<ILineDataSet>? = chart.getData()
+                    .getDataSets()
                 for (iSet in sets!!) {
-                    val set = iSet as LineDataSet?
-                    set!!.mode =
-                        if (set.mode === LineDataSet.Mode.HORIZONTAL_BEZIER) LineDataSet.Mode.LINEAR else LineDataSet.Mode.HORIZONTAL_BEZIER
+                    val set = iSet as LineDataSet
+                    set.setMode(if (set.getMode() === LineDataSet.Mode.HORIZONTAL_BEZIER) LineDataSet.Mode.LINEAR else LineDataSet.Mode.HORIZONTAL_BEZIER)
                 }
                 chart.invalidate()
             }
             R.id.actionTogglePinch -> {
-                if (chart!!.isPinchZoomEnabled) chart!!.setPinchZoom(false) else chart!!.setPinchZoom(
+                if (chart.isPinchZoomEnabled()) chart.setPinchZoom(false) else chart.setPinchZoom(
                     true
                 )
                 chart.invalidate()
             }
             R.id.actionToggleAutoScaleMinMax -> {
-                chart!!.isAutoScaleMinMaxEnabled = !chart!!.isAutoScaleMinMaxEnabled
-                chart!!.notifyDataSetChanged()
+                chart.setAutoScaleMinMaxEnabled(!chart.isAutoScaleMinMaxEnabled())
+                chart.notifyDataSetChanged()
             }
             R.id.animateX -> {
-                chart!!.animateX(2000)
+                chart.animateX(2000)
             }
             R.id.animateY -> {
-                chart!!.animateY(2000)
+                chart.animateY(2000)
             }
             R.id.animateXY -> {
-                chart!!.animateXY(2000, 2000)
+                chart.animateXY(2000, 2000)
             }
             R.id.actionSave -> {
                 if (ContextCompat.checkSelfPermission(

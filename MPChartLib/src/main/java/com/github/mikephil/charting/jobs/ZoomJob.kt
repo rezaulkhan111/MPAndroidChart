@@ -5,7 +5,6 @@ import android.view.View
 import com.github.mikephil.charting.charts.BarLineChartBase
 import com.github.mikephil.charting.components.YAxis.AxisDependency
 import com.github.mikephil.charting.utils.ObjectPool
-import com.github.mikephil.charting.utils.ObjectPool.Companion.create
 import com.github.mikephil.charting.utils.ObjectPool.Poolable
 import com.github.mikephil.charting.utils.Transformer
 import com.github.mikephil.charting.utils.ViewPortHandler
@@ -71,9 +70,9 @@ class ZoomJob : ViewPortJob {
         mViewPortHandler!!.zoom(scaleX, scaleY, save)
         mViewPortHandler!!.refresh(save, view!!, false)
         val yValsInView =
-            (view as BarLineChartBase<*>).getAxis(axisDependency!!)!!.mAxisRange / mViewPortHandler!!.scaleY
+            (view as BarLineChartBase<*>).getAxis(axisDependency!!)!!.mAxisRange / mViewPortHandler!!.getScaleY()
         val xValsInView =
-            (view as BarLineChartBase<*>).getXAxis()!!.mAxisRange / mViewPortHandler!!.scaleX
+            (view as BarLineChartBase<*>).getXAxis()!!.mAxisRange / mViewPortHandler!!.getScaleX()
         pts[0] = xValue - xValsInView / 2f
         pts[1] = yValue + yValsInView / 2f
         mTrans!!.pointValuesToPixel(pts)

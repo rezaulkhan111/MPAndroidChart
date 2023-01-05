@@ -7,22 +7,26 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.view.*
+import android.view.Menu
+import android.view.MenuItem
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.github.mikephil.charting.charts.LineChart
-import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.components.Legend.LegendForm
-import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.YAxis.AxisDependency
-import com.github.mikephil.charting.data.*
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
-import com.github.mikephil.charting.utils.ColorTemplate.holoBlue
+import com.github.mikephil.charting.utils.ColorTemplate.getHoloBlue
 import com.xxmassdeveloper.mpchartexample.notimportant.DemoBase
 
 class RealtimeLineChartActivity : DemoBase(), OnChartValueSelectedListener {
-    private var chart: LineChart? = null
+
+    private lateinit var chart: LineChart
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.setFlags(
@@ -35,13 +39,13 @@ class RealtimeLineChartActivity : DemoBase(), OnChartValueSelectedListener {
         chart.setOnChartValueSelectedListener(this)
 
         // enable description text
-        chart.description!!.isEnabled = true
+        chart.getDescription()!!.setEnabled(true)
 
         // enable touch gestures
         chart.setTouchEnabled(true)
 
         // enable scaling and dragging
-        chart.isDragEnabled = true
+        chart.setDragEnabled(true)
         chart.setScaleEnabled(true)
         chart.setDrawGridBackground(false)
 
@@ -50,37 +54,41 @@ class RealtimeLineChartActivity : DemoBase(), OnChartValueSelectedListener {
 
         // set an alternative background color
         chart.setBackgroundColor(Color.LTGRAY)
+
         val data = LineData()
         data.setValueTextColor(Color.WHITE)
 
         // add empty data
-        chart.data = data
+        chart.setData(data)
 
         // get the legend (only possible after setting data)
-        val l: Legend? = chart.legend
+        val l = chart.getLegend()
 
         // modify the legend ...
-        l!!.form = LegendForm.LINE
-        l.typeface = tfLight
-        l.textColor = Color.WHITE
-        val xl: XAxis? = chart.xAxis
-        xl!!.typeface = tfLight
-        xl.textColor = Color.WHITE
+        l!!.setForm(LegendForm.LINE)
+        l.setTypeface(tfLight!!)
+        l.setTextColor(Color.WHITE)
+
+        val xl = chart.getXAxis()
+        xl!!.setTypeface(tfLight!!)
+        xl.setTextColor(Color.WHITE)
         xl.setDrawGridLines(false)
         xl.setAvoidFirstLastClipping(true)
-        xl.isEnabled = true
-        val leftAxis = chart.axisLeft
-        leftAxis!!.typeface = tfLight
-        leftAxis.textColor = Color.WHITE
-        leftAxis.axisMaximum = 100f
-        leftAxis.axisMinimum = 0f
+        xl.setEnabled(true)
+
+        val leftAxis = chart.getAxisLeft()
+        leftAxis!!.setTypeface(tfLight!!)
+        leftAxis.setTextColor(Color.WHITE)
+        leftAxis.setAxisMaximum(100f)
+        leftAxis.setAxisMinimum(0f)
         leftAxis.setDrawGridLines(true)
-        val rightAxis = chart.axisRight
-        rightAxis!!.isEnabled = false
+
+        val rightAxis = chart.getAxisRight()
+        rightAxis!!.setEnabled(false)
     }
 
     private fun addEntry() {
-        val data = chart!!.data
+        val data = chart.getData()
         if (data != null) {
             var set = data.getDataSetByIndex(0)
             // set.addEntry(...); // can be called as well
@@ -88,18 +96,23 @@ class RealtimeLineChartActivity : DemoBase(), OnChartValueSelectedListener {
                 set = createSet()
                 data.addDataSet(set)
             }
-            data.addEntry(Entry(set.entryCount.toFloat(), (Math.random() * 40).toFloat() + 30f), 0)
+            data.addEntry(
+                Entry(
+                    set.getEntryCount().toFloat(),
+                    (Math.random() * 40).toFloat() + 30f
+                ), 0
+            )
             data.notifyDataChanged()
 
             // let the chart know it's data has changed
-            chart!!.notifyDataSetChanged()
+            chart.notifyDataSetChanged()
 
             // limit the number of visible entries
-            chart!!.setVisibleXRangeMaximum(120f)
+            chart.setVisibleXRangeMaximum(120f)
             // chart.setVisibleYRange(30, AxisDependency.LEFT);
 
             // move to the latest entry
-            chart!!.moveViewToX(data.getEntryCount())
+            chart.moveViewToX(data.getEntryCount().toFloat())
 
             // this automatically refreshes the chart (calls invalidate())
             // chart.moveViewTo(data.getXValCount()-7, 55f,
@@ -109,16 +122,16 @@ class RealtimeLineChartActivity : DemoBase(), OnChartValueSelectedListener {
 
     private fun createSet(): LineDataSet {
         val set = LineDataSet(null, "Dynamic Data")
-        set.axisDependency = AxisDependency.LEFT
-        set.color = holoBlue
+        set.setAxisDependency(AxisDependency.LEFT)
+        set.setColor(getHoloBlue())
         set.setCircleColor(Color.WHITE)
-        set.lineWidth = 2f
-        set.circleRadius = 4f
-        set.fillAlpha = 65
-        set.fillColor = holoBlue
-        set.highLightColor = Color.rgb(244, 117, 117)
-        set.valueTextColor = Color.WHITE
-        set.valueTextSize = 9f
+        set.setLineWidth(2f)
+        set.setCircleRadius(4f)
+        set.setFillAlpha(65)
+        set.setFillColor(getHoloBlue())
+        set.setHighLightColor(Color.rgb(244, 117, 117))
+        set.setValueTextColor(Color.WHITE)
+        set.setValueTextSize(9f)
         set.setDrawValues(false)
         return set
     }
@@ -181,10 +194,10 @@ class RealtimeLineChartActivity : DemoBase(), OnChartValueSelectedListener {
     }
 
     override fun saveToGallery() {
-        saveToGallery(chart!!, "RealtimeLineChartActivity")
+        saveToGallery(chart, "RealtimeLineChartActivity")
     }
 
-    override fun onValueSelected(e: Entry?, h: Highlight?) {
+    override fun onValueSelected(e: Entry, h: Highlight) {
         Log.i("Entry selected", e.toString())
     }
 

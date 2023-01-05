@@ -16,7 +16,6 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.components.Legend
-import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.XAxis.XAxisPosition
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
@@ -31,11 +30,13 @@ import com.xxmassdeveloper.mpchartexample.custom.MyValueFormatter
 import com.xxmassdeveloper.mpchartexample.notimportant.DemoBase
 
 class StackedBarActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSelectedListener {
+
     private lateinit var chart: BarChart
     private lateinit var seekBarX: SeekBar
     private lateinit var seekBarY: SeekBar
     private lateinit var tvX: TextView
     private lateinit var tvY: TextView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.setFlags(
@@ -52,41 +53,43 @@ class StackedBarActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSele
         seekBarY.setOnSeekBarChangeListener(this)
         chart = findViewById(R.id.chart1)
         chart.setOnChartValueSelectedListener(this)
-        chart.description!!.isEnabled = false
 
+        chart.getDescription()!!.setEnabled(false)
         // if more than 60 entries are displayed in the chart, no values will be
         // drawn
         chart.setMaxVisibleValueCount(40)
 
         // scaling can now only be done on x- and y-axis separately
         chart.setPinchZoom(false)
+
         chart.setDrawGridBackground(false)
         chart.setDrawBarShadow(false)
+
         chart.setDrawValueAboveBar(false)
-        chart.isHighlightFullBarEnabled = false
+        chart.setHighlightFullBarEnabled(false)
 
         // change the position of the y-labels
-        val leftAxis = chart.axisLeft
-        leftAxis!!.valueFormatter = MyAxisValueFormatter()
-        leftAxis.axisMinimum = 0f // this replaces setStartAtZero(true)
-        chart.axisRight!!.isEnabled = false
-        val xLabels: XAxis? = chart.xAxis
-        xLabels!!.position = XAxisPosition.TOP
+        val leftAxis = chart.getAxisLeft()
+        leftAxis!!.setValueFormatter(MyAxisValueFormatter())
+        leftAxis.setAxisMinimum(0f) // this replaces setStartAtZero(true)
+        chart.getAxisRight()!!.setEnabled(false)
+        val xLabels = chart.getXAxis()
+        xLabels!!.setPosition(XAxisPosition.TOP)
 
         // chart.setDrawXLabels(false);
         // chart.setDrawYLabels(false);
-
         // setting data
         seekBarX.progress = 12
         seekBarY.progress = 100
-        val l: Legend? = chart.legend
-        l!!.verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
-        l.horizontalAlignment = Legend.LegendHorizontalAlignment.RIGHT
-        l.orientation = Legend.LegendOrientation.HORIZONTAL
+
+        val l = chart.getLegend()
+        l!!.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM)
+        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT)
+        l.setOrientation(Legend.LegendOrientation.HORIZONTAL)
         l.setDrawInside(false)
-        l.formSize = 8f
-        l.formToTextSpace = 4f
-        l.xEntrySpace = 6f
+        l.setFormSize(8f)
+        l.setFormToTextSpace(4f)
+        l.setXEntrySpace(6f)
 
         // chart.setDrawLegend(false);
     }
@@ -94,7 +97,7 @@ class StackedBarActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSele
     override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
         tvX.text = seekBarX.progress.toString()
         tvY.text = seekBarY.progress.toString()
-        val values = ArrayList<BarEntry?>()
+        val values = mutableListOf<BarEntry>()
         for (i in 0 until seekBarX.progress) {
             val mul = (seekBarY.progress + 1).toFloat()
             val val1 = (Math.random() * mul).toFloat() + mul / 3
@@ -107,27 +110,28 @@ class StackedBarActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSele
                 )
             )
         }
+
         val set1: BarDataSet?
-        if (chart!!.data != null &&
-            chart!!.data!!.dataSetCount > 0
+        if (chart.getData() != null &&
+            chart.getData().getDataSetCount() > 0
         ) {
-            set1 = chart!!.data!!.getDataSetByIndex(0) as BarDataSet?
+            set1 = chart.getData().getDataSetByIndex(0) as BarDataSet?
             set1!!.setValues(values)
-            chart!!.data!!.notifyDataChanged()
-            chart!!.notifyDataSetChanged()
+            chart.getData().notifyDataChanged()
+            chart.notifyDataSetChanged()
         } else {
             set1 = BarDataSet(values, "Statistics Vienna 2014")
             set1.setDrawIcons(false)
-            set1.setColors(*colors)
-            set1.stackLabels = arrayOf("Births", "Divorces", "Marriages")
+            set1.setColors(getColors())
+            set1.setStackLabels(arrayOf("Births", "Divorces", "Marriages"))
             val dataSets = ArrayList<IBarDataSet>()
             dataSets.add(set1)
             val data = BarData(dataSets)
             data.setValueFormatter(MyValueFormatter())
             data.setValueTextColor(Color.WHITE)
-            chart!!.data = data
+            chart.setData(data)
         }
-        chart!!.setFitBars(true)
+        chart.setFitBars(true)
         chart.invalidate()
     }
 
@@ -145,52 +149,53 @@ class StackedBarActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSele
                 startActivity(i)
             }
             R.id.actionToggleValues -> {
-                val sets = chart!!.data
-                    .dataSets
+                val sets: List<IBarDataSet>? = chart.getData()
+                    .getDataSets()
                 for (iSet in sets!!) {
-                    val set = iSet as BarDataSet?
-                    set!!.setDrawValues(!set.isDrawValuesEnabled)
+                    val set = iSet as BarDataSet
+                    set.setDrawValues(!set.isDrawValuesEnabled())
                 }
                 chart.invalidate()
             }
             R.id.actionToggleIcons -> {
-                val sets = chart!!.data
-                    .dataSets
+                val sets: List<IBarDataSet>? = chart.getData()
+                    .getDataSets()
                 for (iSet in sets!!) {
-                    val set = iSet as BarDataSet?
-                    set!!.setDrawIcons(!set.isDrawIconsEnabled)
+                    val set = iSet as BarDataSet
+                    set.setDrawIcons(!set.isDrawIconsEnabled())
                 }
                 chart.invalidate()
             }
             R.id.actionToggleHighlight -> {
-                if (chart!!.data != null) {
-                    chart!!.data!!.isHighlightEnabled = !chart!!.data!!.isHighlightEnabled
+                if (chart.getData() != null) {
+                    chart.getData().setHighlightEnabled(!chart.getData().isHighlightEnabled())
                     chart.invalidate()
                 }
             }
             R.id.actionTogglePinch -> {
-                if (chart!!.isPinchZoomEnabled) chart!!.setPinchZoom(false) else chart!!.setPinchZoom(
+                if (chart.isPinchZoomEnabled()) chart.setPinchZoom(false) else chart.setPinchZoom(
                     true
                 )
                 chart.invalidate()
             }
             R.id.actionToggleAutoScaleMinMax -> {
-                chart!!.isAutoScaleMinMaxEnabled = !chart!!.isAutoScaleMinMaxEnabled
-                chart!!.notifyDataSetChanged()
+                chart.setAutoScaleMinMaxEnabled(!chart.isAutoScaleMinMaxEnabled())
+                chart.notifyDataSetChanged()
             }
             R.id.actionToggleBarBorders -> {
-                for (set in chart!!.data!!.dataSets!!) (set as BarDataSet?)!!.barBorderWidth =
-                    if (set!!.barBorderWidth == 1f) 0f else 1f
+                for (set in chart.getData().getDataSets()!!) (set as BarDataSet).setBarBorderWidth(
+                    if (set.getBarBorderWidth() == 1f) 0f else 1f
+                )
                 chart.invalidate()
             }
             R.id.animateX -> {
-                chart!!.animateX(2000)
+                chart.animateX(2000)
             }
             R.id.animateY -> {
-                chart!!.animateY(2000)
+                chart.animateY(2000)
             }
             R.id.animateXY -> {
-                chart!!.animateXY(2000, 2000)
+                chart.animateXY(2000, 2000)
             }
             R.id.actionSave -> {
                 if (ContextCompat.checkSelfPermission(
@@ -208,28 +213,26 @@ class StackedBarActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSele
     }
 
     override fun saveToGallery() {
-        saveToGallery(chart!!, "StackedBarActivity")
+        saveToGallery(chart, "StackedBarActivity")
     }
 
     override fun onStartTrackingTouch(seekBar: SeekBar) {}
     override fun onStopTrackingTouch(seekBar: SeekBar) {}
-    override fun onValueSelected(e: Entry?, h: Highlight?) {
+    override fun onValueSelected(e: Entry, h: Highlight) {
         val entry = e as BarEntry?
-        if (entry!!.yVals != null) Log.i(
+        if (entry!!.getYVals() != null) Log.i(
             "VAL SELECTED",
-            "Value: " + entry.yVals!![h!!.stackIndex]
-        ) else Log.i("VAL SELECTED", "Value: " + entry.y)
+            "Value: " + entry.getYVals()!![h.getStackIndex()]
+        ) else Log.i("VAL SELECTED", "Value: " + entry.getY())
     }
 
     override fun onNothingSelected() {}
 
     // have as many colors as stack-values per entry
-    private val colors: IntArray
-        private get() {
-
-            // have as many colors as stack-values per entry
-            val colors = IntArray(3)
-            System.arraycopy(ColorTemplate.MATERIAL_COLORS, 0, colors, 0, 3)
-            return colors
-        }
+    private fun getColors(): IntArray {
+        // have as many colors as stack-values per entry
+        val colors = IntArray(3)
+        System.arraycopy(ColorTemplate.MATERIAL_COLORS, 0, colors, 0, 3)
+        return colors
+    }
 }

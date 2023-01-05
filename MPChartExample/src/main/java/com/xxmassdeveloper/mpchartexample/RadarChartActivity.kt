@@ -11,23 +11,18 @@ import androidx.core.content.ContextCompat
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.charts.RadarChart
 import com.github.mikephil.charting.components.*
-import com.github.mikephil.charting.components.ComponentBase.isEnabled
-import com.github.mikephil.charting.data.BaseDataSet.isDrawValuesEnabled
-import com.github.mikephil.charting.data.BaseDataSet.setDrawValues
-import com.github.mikephil.charting.data.ChartData.isHighlightEnabled
-import com.github.mikephil.charting.data.ChartData.setDrawValues
 import com.github.mikephil.charting.data.RadarData
 import com.github.mikephil.charting.data.RadarDataSet
 import com.github.mikephil.charting.data.RadarEntry
 import com.github.mikephil.charting.formatter.IAxisValueFormatter
-import com.github.mikephil.charting.interfaces.datasets.IDataSet.isDrawValuesEnabled
-import com.github.mikephil.charting.interfaces.datasets.IDataSet.setDrawValues
 import com.github.mikephil.charting.interfaces.datasets.IRadarDataSet
 import com.xxmassdeveloper.mpchartexample.custom.RadarMarkerView
 import com.xxmassdeveloper.mpchartexample.notimportant.DemoBase
 
 class RadarChartActivity : DemoBase() {
-    private var chart: RadarChart? = null
+
+    private lateinit var chart: RadarChart
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.setFlags(
@@ -38,56 +33,59 @@ class RadarChartActivity : DemoBase() {
         title = "RadarChartActivity"
         chart = findViewById(R.id.chart1)
         chart.setBackgroundColor(Color.rgb(60, 65, 82))
-        chart.description!!.isEnabled = false
-        chart.webLineWidth = 1f
-        chart.webColor = Color.LTGRAY
-        chart.webLineWidthInner = 1f
-        chart.webColorInner = Color.LTGRAY
-        chart.webAlpha = 100
+
+        chart.getDescription()!!.setEnabled(false)
+        chart.setWebLineWidth(1f)
+        chart.setWebColor(Color.LTGRAY)
+        chart.setWebLineWidthInner(1f)
+        chart.setWebColorInner(Color.LTGRAY)
+        chart.setWebAlpha(100)
 
         // create a custom MarkerView (extend MarkerView) and specify the layout
         // to use for it
         val mv: MarkerView = RadarMarkerView(this, R.layout.radar_markerview)
         mv.setChartView(chart) // For bounds control
-        chart.marker = mv // Set the marker to the chart
+        chart.setMarker(mv) // Set the marker to the chart
         setData()
         chart.animateXY(1400, 1400, Easing.EaseInOutQuad)
-        val xAxis: XAxis? = chart.xAxis
-        xAxis!!.typeface = tfLight
-        xAxis.textSize = 9f
-        xAxis.yOffset = 0f
-        xAxis.xOffset = 0f
-        xAxis.valueFormatter = object : IAxisValueFormatter {
+        val xAxis = chart.getXAxis()
+        xAxis!!.setTypeface(tfLight!!)
+        xAxis.setTextSize(9f)
+        xAxis.setYOffset(0f)
+        xAxis.setXOffset(0f)
+        xAxis.setValueFormatter(object : IAxisValueFormatter {
             private val mActivities = arrayOf("Burger", "Steak", "Salad", "Pasta", "Pizza")
             override fun getFormattedValue(value: Float, axis: AxisBase?): String {
                 return mActivities[value.toInt() % mActivities.size]
             }
-        }
-        xAxis.textColor = Color.WHITE
-        val yAxis: YAxis? = chart.yAxis
-        yAxis!!.typeface = tfLight
+        })
+        xAxis.setTextColor(Color.WHITE)
+
+        val yAxis = chart.getYAxis()
+        yAxis!!.setTypeface(tfLight!!)
         yAxis.setLabelCount(5, false)
-        yAxis.textSize = 9f
-        yAxis.axisMinimum = 0f
-        yAxis.axisMaximum = 80f
+        yAxis.setTextSize(9f)
+        yAxis.setAxisMinimum(0f)
+        yAxis.setAxisMaximum(80f)
         yAxis.setDrawLabels(false)
-        val l: Legend? = chart.legend
-        l!!.verticalAlignment = Legend.LegendVerticalAlignment.TOP
-        l.horizontalAlignment = Legend.LegendHorizontalAlignment.CENTER
-        l.orientation = Legend.LegendOrientation.HORIZONTAL
+
+        val l = chart.getLegend()
+        l!!.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP)
+        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER)
+        l.setOrientation(Legend.LegendOrientation.HORIZONTAL)
         l.setDrawInside(false)
-        l.typeface = tfLight
-        l.xEntrySpace = 7f
-        l.yEntrySpace = 5f
-        l.textColor = Color.WHITE
+        l.setTypeface(tfLight!!)
+        l.setXEntrySpace(7f)
+        l.setYEntrySpace(5f)
+        l.setTextColor(Color.WHITE)
     }
 
     private fun setData() {
         val mul = 80f
         val min = 20f
         val cnt = 5
-        val entries1 = ArrayList<RadarEntry?>()
-        val entries2 = ArrayList<RadarEntry?>()
+        val entries1 = mutableListOf<RadarEntry>()
+        val entries2 = mutableListOf<RadarEntry>()
 
         // NOTE: The order of the entries when being added to the entries array determines their position around the center of
         // the chart.
@@ -98,30 +96,34 @@ class RadarChartActivity : DemoBase() {
             entries2.add(RadarEntry(val2))
         }
         val set1 = RadarDataSet(entries1, "Last Week")
-        set1.color = Color.rgb(103, 110, 129)
-        set1.fillColor = Color.rgb(103, 110, 129)
+        set1.setColor(Color.rgb(103, 110, 129))
+        set1.setFillColor(Color.rgb(103, 110, 129))
         set1.setDrawFilled(true)
-        set1.fillAlpha = 180
-        set1.lineWidth = 2f
+        set1.setFillAlpha(180)
+        set1.setLineWidth(2f)
         set1.setDrawHighlightCircleEnabled(true)
         set1.setDrawHighlightIndicators(false)
+
         val set2 = RadarDataSet(entries2, "This Week")
-        set2.color = Color.rgb(121, 162, 175)
-        set2.fillColor = Color.rgb(121, 162, 175)
+        set2.setColor(Color.rgb(121, 162, 175))
+        set2.setFillColor(Color.rgb(121, 162, 175))
         set2.setDrawFilled(true)
-        set2.fillAlpha = 180
-        set2.lineWidth = 2f
+        set2.setFillAlpha(180)
+        set2.setLineWidth(2f)
         set2.setDrawHighlightCircleEnabled(true)
         set2.setDrawHighlightIndicators(false)
-        val sets = ArrayList<IRadarDataSet>()
+
+        val sets = mutableListOf<IRadarDataSet>()
         sets.add(set1)
         sets.add(set2)
+
         val data = RadarData(sets)
         data.setValueTypeface(tfLight)
         data.setValueTextSize(8f)
         data.setDrawValues(false)
         data.setValueTextColor(Color.WHITE)
-        chart!!.data = data
+
+        chart.setData(data)
         chart.invalidate()
     }
 
@@ -139,61 +141,62 @@ class RadarChartActivity : DemoBase() {
                 startActivity(i)
             }
             R.id.actionToggleValues -> {
-                for (set in chart!!.data.getDataSets()) set.setDrawValues(!set.isDrawValuesEnabled)
+                for (set in chart.getData()
+                    .getDataSets()) set.setDrawValues(!set.isDrawValuesEnabled())
                 chart.invalidate()
             }
             R.id.actionToggleHighlight -> {
-                if (chart!!.data != null) {
-                    chart!!.data.setHighlightEnabled(!chart!!.data.isHighlightEnabled())
+                if (chart.getData() != null) {
+                    chart.getData().setHighlightEnabled(!chart.getData().isHighlightEnabled())
                     chart.invalidate()
                 }
             }
             R.id.actionToggleRotate -> {
-                if (chart!!.isRotationEnabled) chart!!.isRotationEnabled =
-                    false else chart!!.isRotationEnabled = true
+                if (chart.isRotationEnabled()) chart.setRotationEnabled(false) else chart.setRotationEnabled(
+                    true
+                )
                 chart.invalidate()
             }
             R.id.actionToggleFilled -> {
-                val sets = chart!!.data
-                    .getDataSets() as ArrayList<IRadarDataSet>
-                for (set in sets) {
-                    if (set.isDrawFilledEnabled) set.setDrawFilled(false) else set.setDrawFilled(
+                for (set in chart.getData()
+                    .getDataSets()) {
+                    if (set.isDrawFilledEnabled()) set.setDrawFilled(false) else set.setDrawFilled(
                         true
                     )
                 }
                 chart.invalidate()
             }
             R.id.actionToggleHighlightCircle -> {
-                val sets = chart!!.data
+                val sets = chart.getData()
                     .getDataSets() as ArrayList<IRadarDataSet>
                 for (set in sets) {
-                    set.isDrawHighlightCircleEnabled = !set.isDrawHighlightCircleEnabled
+                    set.setDrawHighlightCircleEnabled(!set.isDrawHighlightCircleEnabled())
                 }
                 chart.invalidate()
             }
             R.id.actionToggleXLabels -> {
-                chart!!.xAxis.setEnabled(!chart!!.xAxis.isEnabled())
-                chart!!.notifyDataSetChanged()
+                chart.getXAxis()!!.setEnabled(!chart.getXAxis()!!.isEnabled())
+                chart.notifyDataSetChanged()
                 chart.invalidate()
             }
             R.id.actionToggleYLabels -> {
-                chart!!.yAxis.setEnabled(!chart!!.yAxis.isEnabled())
+                chart.getYAxis()!!.setEnabled(!chart.getYAxis()!!.isEnabled())
                 chart.invalidate()
             }
             R.id.animateX -> {
-                chart!!.animateX(1400)
+                chart.animateX(1400)
             }
             R.id.animateY -> {
-                chart!!.animateY(1400)
+                chart.animateY(1400)
             }
             R.id.animateXY -> {
-                chart!!.animateXY(1400, 1400)
+                chart.animateXY(1400, 1400)
             }
             R.id.actionToggleSpin -> {
-                chart!!.spin(
+                chart.spin(
                     2000,
-                    chart!!.rotationAngle,
-                    chart!!.rotationAngle + 360,
+                    chart.getRotationAngle(),
+                    chart.getRotationAngle() + 360,
                     Easing.EaseInOutCubic
                 )
             }

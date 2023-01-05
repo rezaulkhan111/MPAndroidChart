@@ -15,7 +15,6 @@ import androidx.core.content.ContextCompat
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.components.Legend
-import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.IAxisValueFormatter
 import com.github.mikephil.charting.formatter.LargeValueFormatter
@@ -27,11 +26,12 @@ import java.util.*
 
 class BarChartActivityMultiDataset : DemoBase(), OnSeekBarChangeListener,
     OnChartValueSelectedListener {
-    private var chart: BarChart? = null
-    private var seekBarX: SeekBar? = null
-    private var seekBarY: SeekBar? = null
-    private var tvX: TextView? = null
-    private var tvY: TextView? = null
+
+    private lateinit var chart: BarChart
+    private lateinit var seekBarX: SeekBar
+    private lateinit var seekBarY: SeekBar
+    private lateinit var tvX: TextView
+    private lateinit var tvY: TextView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.setFlags(
@@ -43,55 +43,75 @@ class BarChartActivityMultiDataset : DemoBase(), OnSeekBarChangeListener,
         tvX = findViewById(R.id.tvXMax)
         tvX.setTextSize(10f)
         tvY = findViewById(R.id.tvYMax)
+
         seekBarX = findViewById(R.id.seekBar1)
         seekBarX.setMax(50)
         seekBarX.setOnSeekBarChangeListener(this)
+
         seekBarY = findViewById(R.id.seekBar2)
         seekBarY.setOnSeekBarChangeListener(this)
+
         chart = findViewById(R.id.chart1)
         chart.setOnChartValueSelectedListener(this)
-        chart.description!!.isEnabled = false
+        chart.getDescription()!!.setEnabled(false)
+
+//        chart.setDrawBorders(true);
+
+        // scaling can now only be done on x- and y-axis separately
 
 //        chart.setDrawBorders(true);
 
         // scaling can now only be done on x- and y-axis separately
         chart.setPinchZoom(false)
+
         chart.setDrawBarShadow(false)
+
         chart.setDrawGridBackground(false)
+
+        // create a custom MarkerView (extend MarkerView) and specify the layout
+        // to use for it
 
         // create a custom MarkerView (extend MarkerView) and specify the layout
         // to use for it
         val mv = MyMarkerView(this, R.layout.custom_marker_view)
         mv.setChartView(chart) // For bounds control
-        chart.marker = mv // Set the marker to the chart
+
+        chart.setMarker(mv) // Set the marker to the chart
+
+
         seekBarX.setProgress(10)
         seekBarY.setProgress(100)
-        val l: Legend? = chart.legend
-        l!!.verticalAlignment = Legend.LegendVerticalAlignment.TOP
-        l.horizontalAlignment = Legend.LegendHorizontalAlignment.RIGHT
-        l.orientation = Legend.LegendOrientation.VERTICAL
-        l.setDrawInside(true)
-        l.typeface = tfLight
-        l.yOffset = 0f
-        l.xOffset = 10f
-        l.yEntrySpace = 0f
-        l.textSize = 8f
-        val xAxis: XAxis? = chart.xAxis
-        xAxis!!.typeface = tfLight
-        xAxis.granularity = 1f
-        xAxis.setCenterAxisLabels(true)
-        xAxis.valueFormatter = object : IAxisValueFormatter {
+
+        val l = chart.getLegend()
+        l!!.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP)
+        l!!.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT)
+        l!!.setOrientation(Legend.LegendOrientation.VERTICAL)
+        l!!.setDrawInside(true)
+        l!!.setTypeface(tfLight!!)
+        l!!.setYOffset(0f)
+        l!!.setXOffset(10f)
+        l!!.setYEntrySpace(0f)
+        l!!.setTextSize(8f)
+
+        val xAxis = chart.getXAxis()
+        xAxis!!.setTypeface(tfLight!!)
+        xAxis!!.setGranularity(1f)
+        xAxis!!.setCenterAxisLabels(true)
+        xAxis!!.setValueFormatter(object : IAxisValueFormatter {
             override fun getFormattedValue(value: Float, axis: AxisBase?): String {
                 return value.toInt().toString()
             }
-        }
-        val leftAxis = chart.axisLeft
-        leftAxis!!.typeface = tfLight
-        leftAxis.valueFormatter = LargeValueFormatter()
-        leftAxis.setDrawGridLines(false)
-        leftAxis.spaceTop = 35f
-        leftAxis.axisMinimum = 0f // this replaces setStartAtZero(true)
-        chart.axisRight!!.isEnabled = false
+        })
+
+        val leftAxis = chart.getAxisLeft()
+        leftAxis!!.setTypeface(tfLight!!)
+        leftAxis!!.setValueFormatter(LargeValueFormatter())
+        leftAxis!!.setDrawGridLines(false)
+        leftAxis!!.setSpaceTop(35f)
+        leftAxis!!.setAxisMinimum(0f) // this replaces setStartAtZero(true)
+
+
+        chart.getAxisRight()!!.setEnabled(false)
     }
 
     override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
@@ -104,62 +124,58 @@ class BarChartActivityMultiDataset : DemoBase(), OnSeekBarChangeListener,
         val endYear = startYear + groupCount
         tvX!!.text = String.format(Locale.ENGLISH, "%d-%d", startYear, endYear)
         tvY!!.text = seekBarY!!.progress.toString()
-        val values1 = ArrayList<BarEntry?>()
-        val values2 = ArrayList<BarEntry?>()
-        val values3 = ArrayList<BarEntry?>()
-        val values4 = ArrayList<BarEntry?>()
+        val values1 = mutableListOf<BarEntry>()
+        val values2 = mutableListOf<BarEntry>()
+        val values3 = mutableListOf<BarEntry>()
+        val values4 = mutableListOf<BarEntry>()
         val randomMultiplier = seekBarY!!.progress * 100000f
         for (i in startYear until endYear) {
-            values1.add(BarEntry(i, (Math.random() * randomMultiplier).toFloat()))
-            values2.add(BarEntry(i, (Math.random() * randomMultiplier).toFloat()))
-            values3.add(BarEntry(i, (Math.random() * randomMultiplier).toFloat()))
-            values4.add(BarEntry(i, (Math.random() * randomMultiplier).toFloat()))
+            values1.add(BarEntry(i.toFloat(), (Math.random() * randomMultiplier).toFloat()))
+            values2.add(BarEntry(i.toFloat(), (Math.random() * randomMultiplier).toFloat()))
+            values3.add(BarEntry(i.toFloat(), (Math.random() * randomMultiplier).toFloat()))
+            values4.add(BarEntry(i.toFloat(), (Math.random() * randomMultiplier).toFloat()))
         }
         val set1: BarDataSet?
         val set2: BarDataSet?
         val set3: BarDataSet?
         val set4: BarDataSet?
-        if (chart!!.data != null && chart!!.data!!.dataSetCount > 0) {
-            set1 = chart!!.data!!.getDataSetByIndex(0) as BarDataSet?
-            set2 = chart!!.data!!.getDataSetByIndex(1) as BarDataSet?
-            set3 = chart!!.data!!.getDataSetByIndex(2) as BarDataSet?
-            set4 = chart!!.data!!.getDataSetByIndex(3) as BarDataSet?
+        if (chart.getData() != null && chart.getData().getDataSetCount() > 0) {
+            set1 = chart.getData().getDataSetByIndex(0) as BarDataSet?
+            set2 = chart.getData().getDataSetByIndex(1) as BarDataSet?
+            set3 = chart.getData().getDataSetByIndex(2) as BarDataSet?
+            set4 = chart.getData().getDataSetByIndex(3) as BarDataSet?
             set1!!.setValues(values1)
             set2!!.setValues(values2)
             set3!!.setValues(values3)
             set4!!.setValues(values4)
-            chart!!.data!!.notifyDataChanged()
-            chart!!.notifyDataSetChanged()
+            chart.getData().notifyDataChanged()
+            chart.notifyDataSetChanged()
         } else {
             // create 4 DataSets
             set1 = BarDataSet(values1, "Company A")
-            set1.color = Color.rgb(104, 241, 175)
+            set1.setColor(Color.rgb(104, 241, 175))
             set2 = BarDataSet(values2, "Company B")
-            set2.color = Color.rgb(164, 228, 251)
+            set2.setColor(Color.rgb(164, 228, 251))
             set3 = BarDataSet(values3, "Company C")
-            set3.color = Color.rgb(242, 247, 158)
+            set3.setColor(Color.rgb(242, 247, 158))
             set4 = BarDataSet(values4, "Company D")
-            set4.color = Color.rgb(255, 102, 0)
+            set4.setColor(Color.rgb(255, 102, 0))
             val data = BarData(set1, set2, set3, set4)
             data.setValueFormatter(LargeValueFormatter())
             data.setValueTypeface(tfLight)
-            chart!!.data = data
+            chart.setData(data)
         }
 
         // specify the width each bar should have
-        chart!!.barData!!.barWidth = barWidth
+        chart.getBarData().setBarWidth(barWidth)
 
         // restrict the x-axis range
-        chart!!.xAxis.setAxisMinimum(startYear)
-
+        chart.getXAxis()!!.setAxisMinimum(startYear.toFloat())
         // barData.getGroupWith(...) is a helper that calculates the width each group needs based on the provided parameters
-        chart!!.xAxis.setAxisMaximum(
-            startYear + chart!!.barData!!.getGroupWidth(
-                groupSpace,
-                barSpace
-            ) * groupCount
+        chart.getXAxis()!!.setAxisMaximum(
+            startYear + chart.getBarData().getGroupWidth(groupSpace, barSpace) * groupCount
         )
-        chart!!.groupBars(startYear.toFloat(), groupSpace, barSpace)
+        chart.groupBars(startYear.toFloat(), groupSpace, barSpace)
         chart.invalidate()
     }
 
@@ -177,27 +193,29 @@ class BarChartActivityMultiDataset : DemoBase(), OnSeekBarChangeListener,
                 startActivity(i)
             }
             R.id.actionToggleValues -> {
-                for (set in chart!!.data!!.dataSets!!) set!!.setDrawValues(!set.isDrawValuesEnabled)
+                for (set in chart.getData()
+                    .getDataSets()!!) set.setDrawValues(!set.isDrawValuesEnabled())
                 chart.invalidate()
             }
             R.id.actionTogglePinch -> {
-                if (chart!!.isPinchZoomEnabled) chart!!.setPinchZoom(false) else chart!!.setPinchZoom(
+                if (chart.isPinchZoomEnabled()) chart.setPinchZoom(false) else chart.setPinchZoom(
                     true
                 )
                 chart.invalidate()
             }
             R.id.actionToggleAutoScaleMinMax -> {
-                chart!!.isAutoScaleMinMaxEnabled = !chart!!.isAutoScaleMinMaxEnabled
-                chart!!.notifyDataSetChanged()
+                chart.setAutoScaleMinMaxEnabled(!chart.isAutoScaleMinMaxEnabled())
+                chart.notifyDataSetChanged()
             }
             R.id.actionToggleBarBorders -> {
-                for (set in chart!!.data!!.dataSets!!) (set as BarDataSet?)!!.barBorderWidth =
-                    if (set!!.barBorderWidth == 1f) 0f else 1f
+                for (set in chart.getData().getDataSets()!!) (set as BarDataSet).setBarBorderWidth(
+                    if (set.getBarBorderWidth() == 1f) 0f else 1f
+                )
                 chart.invalidate()
             }
             R.id.actionToggleHighlight -> {
-                if (chart!!.data != null) {
-                    chart!!.data!!.isHighlightEnabled = !chart!!.data!!.isHighlightEnabled
+                if (chart.getData() != null) {
+                    chart.getData().setHighlightEnabled(!chart.getData().isHighlightEnabled())
                     chart.invalidate()
                 }
             }
@@ -213,13 +231,13 @@ class BarChartActivityMultiDataset : DemoBase(), OnSeekBarChangeListener,
                 }
             }
             R.id.animateX -> {
-                chart!!.animateX(2000)
+                chart.animateX(2000)
             }
             R.id.animateY -> {
-                chart!!.animateY(2000)
+                chart.animateY(2000)
             }
             R.id.animateXY -> {
-                chart!!.animateXY(2000, 2000)
+                chart.animateXY(2000, 2000)
             }
         }
         return true
@@ -231,8 +249,8 @@ class BarChartActivityMultiDataset : DemoBase(), OnSeekBarChangeListener,
 
     override fun onStartTrackingTouch(seekBar: SeekBar) {}
     override fun onStopTrackingTouch(seekBar: SeekBar) {}
-    override fun onValueSelected(e: Entry?, h: Highlight?) {
-        Log.i("Activity", "Selected: " + e.toString() + ", dataSet: " + h!!.dataSetIndex)
+
+    override fun onValueSelected(e: Entry, h: Highlight) {
     }
 
     override fun onNothingSelected() {

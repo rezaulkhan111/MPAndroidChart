@@ -11,7 +11,7 @@ import com.github.mikephil.charting.renderer.CandleStickChartRenderer
  *
  * @author Philipp Jahoda
  */
-class CandleStickChart : BarLineChartBase<CandleData?>, CandleDataProvider {
+class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvider {
 
     constructor(context: Context?) : super(context) {}
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {}
@@ -24,12 +24,12 @@ class CandleStickChart : BarLineChartBase<CandleData?>, CandleDataProvider {
 
     override fun init() {
         super.init()
-        mRenderer = CandleStickChartRenderer(this, mAnimator, mViewPortHandler)
-        xAxis!!.setSpaceMin(0.5f)
-        xAxis!!.setSpaceMax(0.5f)
+        mRenderer = CandleStickChartRenderer(this, mAnimator!!, mViewPortHandler)
+        getXAxis()!!.setSpaceMin(0.5f)
+        getXAxis()!!.setSpaceMax(0.5f)
     }
 
-    override fun getCandleData(): CandleData? {
-        return mData
+    override fun getCandleData(): CandleData {
+        return mData!!
     }
 }

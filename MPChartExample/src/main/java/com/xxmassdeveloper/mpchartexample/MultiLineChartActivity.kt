@@ -12,8 +12,6 @@ import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.github.mikephil.charting.charts.LineChart
-import com.github.mikephil.charting.components.AxisBase.setDrawAxisLine
-import com.github.mikephil.charting.components.AxisBase.setDrawGridLines
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.highlight.Highlight
@@ -26,11 +24,13 @@ import com.xxmassdeveloper.mpchartexample.notimportant.DemoBase
 
 class MultiLineChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartGestureListener,
     OnChartValueSelectedListener {
-    private var chart: LineChart? = null
-    private var seekBarX: SeekBar? = null
-    private var seekBarY: SeekBar? = null
-    private var tvX: TextView? = null
-    private var tvY: TextView? = null
+
+    private lateinit var chart: LineChart
+    private lateinit var seekBarX: SeekBar
+    private lateinit var seekBarY: SeekBar
+    private lateinit var tvX: TextView
+    private lateinit var tvY: TextView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.setFlags(
@@ -48,29 +48,32 @@ class MultiLineChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartGestu
         chart = findViewById(R.id.chart1)
         chart.setOnChartValueSelectedListener(this)
         chart.setDrawGridBackground(false)
-        chart.description!!.isEnabled = false
+        chart.getDescription()!!.setEnabled(false)
         chart.setDrawBorders(false)
-        chart.axisLeft!!.isEnabled = false
-        chart.axisRight!!.setDrawAxisLine(false)
-        chart.axisRight!!.setDrawGridLines(false)
-        chart.xAxis.setDrawAxisLine(false)
-        chart.xAxis.setDrawGridLines(false)
+
+        chart.getAxisLeft()!!.setEnabled(false)
+        chart.getAxisRight()!!.setDrawAxisLine(false)
+        chart.getAxisRight()!!.setDrawGridLines(false)
+        chart.getXAxis()!!.setDrawAxisLine(false)
+        chart.getXAxis()!!.setDrawGridLines(false)
 
         // enable touch gestures
         chart.setTouchEnabled(true)
 
         // enable scaling and dragging
-        chart.isDragEnabled = true
+        chart.setDragEnabled(true)
         chart.setScaleEnabled(true)
 
         // if disabled, scaling can be done on x- and y-axis separately
         chart.setPinchZoom(false)
-        seekBarX.setProgress(20)
-        seekBarY.setProgress(100)
-        val l: Legend? = chart.legend
-        l!!.verticalAlignment = Legend.LegendVerticalAlignment.TOP
-        l.horizontalAlignment = Legend.LegendHorizontalAlignment.RIGHT
-        l.orientation = Legend.LegendOrientation.VERTICAL
+
+        seekBarX.progress = 20
+        seekBarY.progress = 100
+
+        val l = chart.getLegend()
+        l!!.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP)
+        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT)
+        l.setOrientation(Legend.LegendOrientation.VERTICAL)
         l.setDrawInside(false)
     }
 
@@ -82,22 +85,23 @@ class MultiLineChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartGestu
 
     override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
         var progress = progress
-        chart!!.resetTracking()
-        progress = seekBarX!!.progress
-        tvX!!.text = seekBarX!!.progress.toString()
-        tvY!!.text = seekBarY!!.progress.toString()
-        val dataSets = ArrayList<ILineDataSet>()
+        chart.resetTracking()
+        progress = seekBarX.progress
+        tvX.text = seekBarX.progress.toString()
+        tvY.text = seekBarY.progress.toString()
+        val dataSets = mutableListOf<ILineDataSet>()
         for (z in 0..2) {
-            val values = ArrayList<Entry?>()
+            val values = mutableListOf<Entry>()
             for (i in 0 until progress) {
-                val `val` = Math.random() * seekBarY!!.progress + 3
+                val `val` = Math.random() * seekBarY.progress + 3
                 values.add(Entry(i.toFloat(), `val`.toFloat()))
             }
             val d = LineDataSet(values, "DataSet " + (z + 1))
-            d.lineWidth = 2.5f
-            d.circleRadius = 4f
+            d.setLineWidth(2.5f)
+            d.setCircleRadius(4f)
+
             val color = colors[z % colors.size]
-            d.color = color
+            d.setColor(color)
             d.setCircleColor(color)
             dataSets.add(d)
         }
@@ -107,7 +111,7 @@ class MultiLineChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartGestu
         (dataSets[0] as LineDataSet).setColors(*ColorTemplate.VORDIPLOM_COLORS)
         (dataSets[0] as LineDataSet).setCircleColors(*ColorTemplate.VORDIPLOM_COLORS)
         val data = LineData(dataSets)
-        chart!!.data = data
+        chart.setData(data)
         chart.invalidate()
     }
 
@@ -126,79 +130,76 @@ class MultiLineChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartGestu
                 startActivity(i)
             }
             R.id.actionToggleValues -> {
-                val sets = chart!!.data
-                    .dataSets
+                val sets: List<ILineDataSet>? = chart.getData()
+                    .getDataSets()
                 for (iSet in sets!!) {
-                    val set = iSet as LineDataSet?
-                    set!!.setDrawValues(!set.isDrawValuesEnabled)
+                    val set = iSet as LineDataSet
+                    set.setDrawValues(!set.isDrawValuesEnabled())
                 }
                 chart.invalidate()
             }
             R.id.actionTogglePinch -> {
-                if (chart!!.isPinchZoomEnabled) chart!!.setPinchZoom(false) else chart!!.setPinchZoom(
+                if (chart.isPinchZoomEnabled()) chart.setPinchZoom(false) else chart.setPinchZoom(
                     true
                 )
                 chart.invalidate()
             }
             R.id.actionToggleAutoScaleMinMax -> {
-                chart!!.isAutoScaleMinMaxEnabled = !chart!!.isAutoScaleMinMaxEnabled
-                chart!!.notifyDataSetChanged()
+                chart.setAutoScaleMinMaxEnabled(!chart.isAutoScaleMinMaxEnabled())
+                chart.notifyDataSetChanged()
             }
             R.id.actionToggleHighlight -> {
-                if (chart!!.data != null) {
-                    chart!!.data!!.isHighlightEnabled = !chart!!.data!!.isHighlightEnabled
+                if (chart.getData() != null) {
+                    chart.getData().setHighlightEnabled(!chart.getData().isHighlightEnabled())
                     chart.invalidate()
                 }
             }
             R.id.actionToggleFilled -> {
-                val sets = chart!!.data
-                    .dataSets
+                val sets: List<ILineDataSet>? = chart.getData()
+                    .getDataSets()
                 for (iSet in sets!!) {
-                    val set = iSet as LineDataSet?
-                    if (set!!.isDrawFilledEnabled) set.setDrawFilled(false) else set.setDrawFilled(
+                    val set = iSet as LineDataSet
+                    if (set.isDrawFilledEnabled()) set.setDrawFilled(false) else set.setDrawFilled(
                         true
                     )
                 }
                 chart.invalidate()
             }
             R.id.actionToggleCircles -> {
-                val sets = chart!!.data
-                    .dataSets
+                val sets: List<ILineDataSet>? = chart.getData()
+                    .getDataSets()
                 for (iSet in sets!!) {
-                    val set = iSet as LineDataSet?
-                    if (set!!.isDrawCirclesEnabled) set.setDrawCircles(false) else set.setDrawCircles(
+                    val set = iSet as LineDataSet
+                    if (set.isDrawCirclesEnabled()) set.setDrawCircles(false) else set.setDrawCircles(
                         true
                     )
                 }
                 chart.invalidate()
             }
             R.id.actionToggleCubic -> {
-                val sets = chart!!.data
-                    .dataSets
+                val sets: List<ILineDataSet>? = chart.getData()
+                    .getDataSets()
                 for (iSet in sets!!) {
-                    val set = iSet as LineDataSet?
-                    set!!.mode =
-                        if (set.mode === LineDataSet.Mode.CUBIC_BEZIER) LineDataSet.Mode.LINEAR else LineDataSet.Mode.CUBIC_BEZIER
+                    val set = iSet as LineDataSet
+                    set.setMode(if (set.getMode() === LineDataSet.Mode.CUBIC_BEZIER) LineDataSet.Mode.LINEAR else LineDataSet.Mode.CUBIC_BEZIER)
                 }
                 chart.invalidate()
             }
             R.id.actionToggleStepped -> {
-                val sets = chart!!.data
-                    .dataSets
+                val sets: List<ILineDataSet>? = chart.getData()
+                    .getDataSets()
                 for (iSet in sets!!) {
-                    val set = iSet as LineDataSet?
-                    set!!.mode =
-                        if (set.mode === LineDataSet.Mode.STEPPED) LineDataSet.Mode.LINEAR else LineDataSet.Mode.STEPPED
+                    val set = iSet as LineDataSet
+                    set.setMode(if (set.getMode() === LineDataSet.Mode.STEPPED) LineDataSet.Mode.LINEAR else LineDataSet.Mode.STEPPED)
                 }
                 chart.invalidate()
             }
             R.id.actionToggleHorizontalCubic -> {
-                val sets = chart!!.data
-                    .dataSets
+                val sets: List<ILineDataSet>? = chart.getData()
+                    .getDataSets()
                 for (iSet in sets!!) {
-                    val set = iSet as LineDataSet?
-                    set!!.mode =
-                        if (set.mode === LineDataSet.Mode.HORIZONTAL_BEZIER) LineDataSet.Mode.LINEAR else LineDataSet.Mode.HORIZONTAL_BEZIER
+                    val set = iSet as LineDataSet
+                    set.setMode(if (set.getMode() === LineDataSet.Mode.HORIZONTAL_BEZIER) LineDataSet.Mode.LINEAR else LineDataSet.Mode.HORIZONTAL_BEZIER)
                 }
                 chart.invalidate()
             }
@@ -214,13 +215,13 @@ class MultiLineChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartGestu
                 }
             }
             R.id.animateX -> {
-                chart!!.animateX(2000)
+                chart.animateX(2000)
             }
             R.id.animateY -> {
-                chart!!.animateY(2000)
+                chart.animateY(2000)
             }
             R.id.animateXY -> {
-                chart!!.animateXY(2000, 2000)
+                chart.animateXY(2000, 2000)
             }
         }
         return true
@@ -230,52 +231,48 @@ class MultiLineChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartGestu
         saveToGallery(chart!!, "MultiLineChartActivity")
     }
 
-    override fun onChartGestureStart(me: MotionEvent?, lastPerformedGesture: ChartGesture?) {
+    override fun onChartGestureStart(me: MotionEvent, lastPerformedGesture: ChartGesture) {
         Log.i("Gesture", "START, x: " + me!!.x + ", y: " + me.y)
     }
 
-    override fun onChartGestureEnd(me: MotionEvent?, lastPerformedGesture: ChartGesture?) {
+    override fun onChartGestureEnd(me: MotionEvent, lastPerformedGesture: ChartGesture) {
         Log.i("Gesture", "END, lastGesture: $lastPerformedGesture")
 
         // un-highlight values after the gesture is finished and no single-tap
         if (lastPerformedGesture !== ChartGesture.SINGLE_TAP) chart!!.highlightValues(null) // or highlightTouch(null) for callback to onNothingSelected(...)
     }
 
-    override fun onChartLongPressed(me: MotionEvent?) {
+    override fun onChartLongPressed(me: MotionEvent) {
         Log.i("LongPress", "Chart long pressed.")
     }
 
-    override fun onChartDoubleTapped(me: MotionEvent?) {
+    override fun onChartDoubleTapped(me: MotionEvent) {
         Log.i("DoubleTap", "Chart double-tapped.")
     }
 
-    override fun onChartSingleTapped(me: MotionEvent?) {
+    override fun onChartSingleTapped(me: MotionEvent) {
         Log.i("SingleTap", "Chart single-tapped.")
     }
 
     override fun onChartFling(
-        me1: MotionEvent?,
-        me2: MotionEvent?,
+        me1: MotionEvent,
+        me2: MotionEvent,
         velocityX: Float,
         velocityY: Float
     ) {
         Log.i("Fling", "Chart fling. VelocityX: $velocityX, VelocityY: $velocityY")
     }
 
-    override fun onChartScale(me: MotionEvent?, scaleX: Float, scaleY: Float) {
+    override fun onChartScale(me: MotionEvent, scaleX: Float, scaleY: Float) {
         Log.i("Scale / Zoom", "ScaleX: $scaleX, ScaleY: $scaleY")
     }
 
-    override fun onChartTranslate(me: MotionEvent?, dX: Float, dY: Float) {
+    override fun onChartTranslate(me: MotionEvent, dX: Float, dY: Float) {
         Log.i("Translate / Move", "dX: $dX, dY: $dY")
     }
 
-    override fun onValueSelected(e: Entry?, h: Highlight?) {
-        Log.i(
-            "VAL SELECTED",
-            "Value: " + e!!.y + ", xIndex: " + e.x
-                    + ", DataSet index: " + h!!.dataSetIndex
-        )
+    override fun onValueSelected(e: Entry, h: Highlight) {
+       
     }
 
     override fun onNothingSelected() {}

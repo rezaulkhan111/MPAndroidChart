@@ -3,9 +3,10 @@ package com.xxmassdeveloper.mpchartexample
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.view.*
+import android.view.Menu
+import android.view.MenuItem
+import android.view.WindowManager
 import com.github.mikephil.charting.charts.BarChart
-import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.XAxis.XAxisPosition
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
@@ -14,7 +15,9 @@ import com.github.mikephil.charting.utils.ColorTemplate
 import com.xxmassdeveloper.mpchartexample.notimportant.DemoBase
 
 class ScrollViewActivity : DemoBase() {
-    private var chart: BarChart? = null
+
+    private lateinit var chart: BarChart
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.setFlags(
@@ -24,34 +27,40 @@ class ScrollViewActivity : DemoBase() {
         setContentView(R.layout.activity_scrollview)
         title = "ScrollViewActivity"
         chart = findViewById(R.id.chart1)
-        chart.description!!.isEnabled = false
+
+        chart.getDescription()!!.setEnabled(false)
 
         // scaling can now only be done on x- and y-axis separately
         chart.setPinchZoom(false)
+
         chart.setDrawBarShadow(false)
         chart.setDrawGridBackground(false)
-        val xAxis: XAxis? = chart.xAxis
-        xAxis!!.position = XAxisPosition.BOTTOM
+
+        val xAxis = chart.getXAxis()
+        xAxis!!.setPosition(XAxisPosition.BOTTOM)
         xAxis.setDrawGridLines(false)
-        chart.axisLeft!!.setDrawGridLines(false)
-        chart.legend.setEnabled(false)
+
+        chart.getAxisLeft()!!.setDrawGridLines(false)
+
+        chart.getLegend()!!.setEnabled(false)
+
         setData(10)
         chart.setFitBars(true)
     }
 
     private fun setData(count: Int) {
-        val values = ArrayList<BarEntry?>()
+        val values = mutableListOf<BarEntry>()
         for (i in 0 until count) {
-            val `val` = (Math.random() * count).toFloat() + 15
-            values.add(BarEntry(i, `val`.toInt()))
+            val valFloat1 = (Math.random() * count).toFloat() + 15
+            values.add(BarEntry(i.toFloat(), valFloat1.toInt().toFloat()))
         }
         val set = BarDataSet(values, "Data Set")
-        set.setColors(*ColorTemplate.VORDIPLOM_COLORS)
+        set.setColors(ColorTemplate.VORDIPLOM_COLORS)
         set.setDrawValues(false)
         val data = BarData(set)
-        chart!!.data = data
+        chart.setData(data)
         chart.invalidate()
-        chart!!.animateY(800)
+        chart.animateY(800)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

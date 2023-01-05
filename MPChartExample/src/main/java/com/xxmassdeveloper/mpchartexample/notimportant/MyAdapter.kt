@@ -32,12 +32,12 @@ internal class MyAdapter(context: Context, objects: List<ContentItem>?) :
         holder.tvName = convertView.findViewById(R.id.tvName)
         holder.tvDesc = convertView.findViewById(R.id.tvDesc)
         convertView.tag = holder
-        if (c != null && c.isSection) holder.tvName.setTypeface(mTypeFaceRegular) else holder.tvName.setTypeface(
+        if (c != null && c.isSection) holder.tvName!!.typeface =
+            mTypeFaceRegular else holder.tvName!!.typeface =
             mTypeFaceLight
-        )
-        holder.tvDesc.setTypeface(mTypeFaceLight)
-        holder.tvName.setText(c?.name)
-        holder.tvDesc.setText(c?.desc)
+        holder.tvDesc!!.typeface = mTypeFaceLight
+        holder.tvName!!.text = c?.name
+        holder.tvDesc!!.text = c?.desc
         return convertView
     }
 

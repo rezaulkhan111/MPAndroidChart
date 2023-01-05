@@ -20,7 +20,7 @@ class AnimatedZoomJob : AnimatedViewPortJob, Animator.AnimatorListener {
 
 
     companion object {
-        private var pool: ObjectPool<AnimatedZoomJob?>? = null
+        private var pool: ObjectPool<AnimatedZoomJob>? = null
 
         @JvmStatic
         fun getInstance(
@@ -95,8 +95,8 @@ class AnimatedZoomJob : AnimatedViewPortJob, Animator.AnimatorListener {
         val save = mOnAnimationUpdateMatrixBuffer
         mViewPortHandler!!.setZoom(scaleX, scaleY, save)
         mViewPortHandler!!.refresh(save, view!!, false)
-        val valsInView = yAxis!!.mAxisRange / mViewPortHandler!!.scaleY
-        val xsInView = xAxisRange / mViewPortHandler!!.scaleX
+        val valsInView = yAxis!!.mAxisRange / mViewPortHandler!!.getScaleY()
+        val xsInView = xAxisRange / mViewPortHandler!!.getScaleX()
         pts[0] = zoomOriginX + (zoomCenterX - xsInView / 2f - zoomOriginX) * phase
         pts[1] = zoomOriginY + (zoomCenterY + valsInView / 2f - zoomOriginY) * phase
         mTrans!!.pointValuesToPixel(pts)

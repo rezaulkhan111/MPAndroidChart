@@ -10,7 +10,9 @@ import android.text.style.ForegroundColorSpan
 import android.text.style.RelativeSizeSpan
 import android.text.style.StyleSpan
 import android.util.DisplayMetrics
-import android.view.*
+import android.view.Menu
+import android.view.MenuItem
+import android.view.WindowManager
 import android.widget.RelativeLayout
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.charts.PieChart
@@ -20,11 +22,13 @@ import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.PercentFormatter
 import com.github.mikephil.charting.utils.ColorTemplate
-import com.github.mikephil.charting.utils.ColorTemplate.holoBlue
+import com.github.mikephil.charting.utils.ColorTemplate.getHoloBlue
 import com.xxmassdeveloper.mpchartexample.notimportant.DemoBase
 
 class HalfPieChartActivity : DemoBase() {
-    private var chart: PieChart? = null
+
+    private lateinit var chart: PieChart
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.setFlags(
@@ -35,34 +39,46 @@ class HalfPieChartActivity : DemoBase() {
         title = "HalfPieChartActivity"
         chart = findViewById(R.id.chart1)
         chart.setBackgroundColor(Color.WHITE)
+
         moveOffScreen()
+
         chart.setUsePercentValues(true)
-        chart.description!!.isEnabled = false
+        chart.getDescription()!!.setEnabled(false)
+
         chart.setCenterTextTypeface(tfLight)
-        chart.centerText = generateCenterSpannableText()
-        chart.isDrawHoleEnabled = true
+        chart.setCenterText(generateCenterSpannableText())
+
+        chart.setDrawHoleEnabled(true)
         chart.setHoleColor(Color.WHITE)
+
         chart.setTransparentCircleColor(Color.WHITE)
         chart.setTransparentCircleAlpha(110)
-        chart.holeRadius = 58f
-        chart.transparentCircleRadius = 61f
-        chart.setDrawCenterText(true)
-        chart.isRotationEnabled = false
-        chart.isHighlightPerTapEnabled = true
-        chart.maxAngle = 180f // HALF CHART
-        chart.rotationAngle = 180f
-        chart.setCenterTextOffset(0f, -20f)
-        setData(4, 100f)
-        chart.animateY(1400, Easing.EaseInOutQuad)
-        val l: Legend? = chart.legend
-        l!!.verticalAlignment = Legend.LegendVerticalAlignment.TOP
-        l.horizontalAlignment = Legend.LegendHorizontalAlignment.CENTER
-        l.orientation = Legend.LegendOrientation.HORIZONTAL
-        l.setDrawInside(false)
-        l.xEntrySpace = 7f
-        l.yEntrySpace = 0f
-        l.yOffset = 0f
 
+        chart.setHoleRadius(58f)
+        chart.setTransparentCircleRadius(61f)
+
+        chart.setDrawCenterText(true)
+
+        chart.setRotationEnabled(false)
+        chart.setHighlightPerTapEnabled(true)
+
+        chart.setMaxAngle(180f) // HALF CHART
+
+        chart.setRotationAngle(180f)
+        chart.setCenterTextOffset(0f, -20f)
+
+        setData(4, 100f)
+
+        chart.animateY(1400, Easing.EaseInOutQuad)
+
+        val l = chart.getLegend()
+        l!!.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP)
+        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER)
+        l.setOrientation(Legend.LegendOrientation.HORIZONTAL)
+        l.setDrawInside(false)
+        l.setXEntrySpace(7f)
+        l.setYEntrySpace(0f)
+        l.setYOffset(0f)
         // entry label styling
         chart.setEntryLabelColor(Color.WHITE)
         chart.setEntryLabelTypeface(tfRegular)
@@ -70,18 +86,19 @@ class HalfPieChartActivity : DemoBase() {
     }
 
     private fun setData(count: Int, range: Float) {
-        val values = ArrayList<PieEntry?>()
+        val values = mutableListOf<PieEntry>()
         for (i in 0 until count) {
             values.add(
                 PieEntry(
                     (Math.random() * range + range / 5).toFloat(),
-                    parties[i % parties.length]
+                    parties[i % parties.size]
                 )
             )
         }
         val dataSet = PieDataSet(values, "Election Results")
-        dataSet.sliceSpace = 3f
-        dataSet.selectionShift = 5f
+        dataSet.setSliceSpace(3f)
+        dataSet.setSelectionShift(5f)
+
         dataSet.setColors(*ColorTemplate.MATERIAL_COLORS)
         //dataSet.setSelectionShift(0f);
         val data = PieData(dataSet)
@@ -89,7 +106,8 @@ class HalfPieChartActivity : DemoBase() {
         data.setValueTextSize(11f)
         data.setValueTextColor(Color.WHITE)
         data.setValueTypeface(tfLight)
-        chart!!.data = data
+        chart.setData(data)
+
         chart.invalidate()
     }
 
@@ -100,7 +118,7 @@ class HalfPieChartActivity : DemoBase() {
         s.setSpan(ForegroundColorSpan(Color.GRAY), 14, s.length - 15, 0)
         s.setSpan(RelativeSizeSpan(.8f), 14, s.length - 15, 0)
         s.setSpan(StyleSpan(Typeface.ITALIC), s.length - 14, s.length, 0)
-        s.setSpan(ForegroundColorSpan(holoBlue), s.length - 14, s.length, 0)
+        s.setSpan(ForegroundColorSpan(getHoloBlue()), s.length - 14, s.length, 0)
         return s
     }
 
@@ -109,9 +127,9 @@ class HalfPieChartActivity : DemoBase() {
         windowManager.defaultDisplay.getMetrics(displayMetrics)
         val height = displayMetrics.heightPixels
         val offset = (height * 0.65).toInt() /* percent to move */
-        val rlParams = chart.getLayoutParams() as RelativeLayout.LayoutParams
+        val rlParams = chart.layoutParams as RelativeLayout.LayoutParams
         rlParams.setMargins(0, 0, 0, -offset)
-        chart.setLayoutParams(rlParams)
+        chart.layoutParams = rlParams
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

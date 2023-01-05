@@ -22,11 +22,13 @@ import com.github.mikephil.charting.utils.ColorTemplate
 import com.xxmassdeveloper.mpchartexample.notimportant.DemoBase
 
 class AnotherBarActivity : DemoBase(), OnSeekBarChangeListener {
+
     private lateinit var chart: BarChart
     private lateinit var seekBarX: SeekBar
     private lateinit var seekBarY: SeekBar
-    private var tvX: TextView? = null
-    private var tvY: TextView? = null
+    private lateinit var tvX: TextView
+    private lateinit var tvY: TextView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.setFlags(
@@ -42,7 +44,7 @@ class AnotherBarActivity : DemoBase(), OnSeekBarChangeListener {
         seekBarY = findViewById(R.id.seekBar2)
         seekBarY.setOnSeekBarChangeListener(this)
         chart = findViewById(R.id.chart1)
-        chart.description.isEnabled = false
+        chart.getDescription()!!.setEnabled(false)
 
         // if more than 60 entries are displayed in the chart, no values will be
         // drawn
@@ -50,12 +52,17 @@ class AnotherBarActivity : DemoBase(), OnSeekBarChangeListener {
 
         // scaling can now only be done on x- and y-axis separately
         chart.setPinchZoom(false)
+
         chart.setDrawBarShadow(false)
         chart.setDrawGridBackground(false)
-        val xAxis = chart.xAxis
-        xAxis.position = XAxisPosition.BOTTOM
-        xAxis.setDrawGridLines(false)
-        chart.axisLeft.setDrawGridLines(false)
+
+        val xAxis = chart.getXAxis()
+        xAxis!!.setPosition(XAxisPosition.BOTTOM)
+        xAxis!!.setDrawGridLines(false)
+
+        chart.getAxisLeft()!!.setDrawGridLines(false)
+
+        // setting data
 
         // setting data
         seekBarX.progress = 10
@@ -63,7 +70,8 @@ class AnotherBarActivity : DemoBase(), OnSeekBarChangeListener {
 
         // add a nice and smooth animation
         chart.animateY(1500)
-        chart.legend.isEnabled = false
+
+        chart.getLegend()!!.setEnabled(false)
     }
 
     override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
@@ -75,22 +83,23 @@ class AnotherBarActivity : DemoBase(), OnSeekBarChangeListener {
             val `val` = (Math.random() * multi).toFloat() + multi / 3
             values.add(BarEntry(i.toFloat(), `val`))
         }
-        val set1: BarDataSet
-        if (chart.data != null &&
-            chart.data.dataSetCount > 0
+        val set1: BarDataSet?
+
+        if (chart.getData() != null &&
+            chart.getData().getDataSetCount() > 0
         ) {
-            set1 = chart.data.getDataSetByIndex(0) as BarDataSet
-            set1.values = values
-            chart.data.notifyDataChanged()
+            set1 = chart.getData().getDataSetByIndex(0) as BarDataSet?
+            set1!!.setValues(values)
+            chart.getData().notifyDataChanged()
             chart.notifyDataSetChanged()
         } else {
             set1 = BarDataSet(values, "Data Set")
-            set1.setColors(*ColorTemplate.VORDIPLOM_COLORS)
+            set1.setColors(IntArray(0).apply { ColorTemplate.VORDIPLOM_COLORS })
             set1.setDrawValues(false)
-            val dataSets = ArrayList<IBarDataSet>()
+            val dataSets = java.util.ArrayList<IBarDataSet>()
             dataSets.add(set1)
             val data = BarData(dataSets)
-            chart.data = data
+            chart.setData(data)
             chart.setFitBars(true)
         }
         chart.invalidate()
@@ -111,28 +120,30 @@ class AnotherBarActivity : DemoBase(), OnSeekBarChangeListener {
                 startActivity(i)
             }
             R.id.actionToggleValues -> {
-                for (set in chart.data.dataSets) set.setDrawValues(!set.isDrawValuesEnabled)
+                for (set in chart.getData()
+                    .getDataSets()!!) set.setDrawValues(!set.isDrawValuesEnabled())
                 chart.invalidate()
             }
             R.id.actionToggleHighlight -> {
-                if (chart.data != null) {
-                    chart.data.isHighlightEnabled = !chart.data.isHighlightEnabled
+                if (chart.getData() != null) {
+                    chart.getData().setHighlightEnabled(!chart.getData().isHighlightEnabled())
                     chart.invalidate()
                 }
             }
             R.id.actionTogglePinch -> {
-                if (chart.isPinchZoomEnabled) chart.setPinchZoom(false) else chart.setPinchZoom(
+                if (chart.isPinchZoomEnabled()) chart.setPinchZoom(false) else chart.setPinchZoom(
                     true
                 )
                 chart.invalidate()
             }
             R.id.actionToggleAutoScaleMinMax -> {
-                chart.isAutoScaleMinMaxEnabled = !chart.isAutoScaleMinMaxEnabled
+                chart.setAutoScaleMinMaxEnabled(!chart.isAutoScaleMinMaxEnabled())
                 chart.notifyDataSetChanged()
             }
             R.id.actionToggleBarBorders -> {
-                for (set in chart.data.dataSets) (set as BarDataSet).barBorderWidth =
-                    if (set.barBorderWidth == 1f) 0f else 1f
+                for (set in chart.getData().getDataSets()!!) (set as BarDataSet).setBarBorderWidth(
+                    if (set.getBarBorderWidth() == 1f) 0f else 1f
+                )
                 chart.invalidate()
             }
             R.id.animateX -> {

@@ -99,7 +99,7 @@ abstract class AxisBase : ComponentBase {
     /**
      * array of limit lines that can be set for the axis
      */
-    protected var mLimitLines: List<LimitLine>? = null
+    protected var mLimitLines: MutableList<LimitLine>? = null
 
     /**
      * flag indicating the limit lines layer depth
@@ -422,7 +422,7 @@ abstract class AxisBase : ComponentBase {
      * @param l
      */
     open fun addLimitLine(l: LimitLine?) {
-        mLimitLines.add(l)
+        mLimitLines?.add(l!!)
         if (mLimitLines!!.size > 6) {
             Log.e(
                 "MPAndroiChart",
@@ -438,14 +438,14 @@ abstract class AxisBase : ComponentBase {
      * @param l
      */
     open fun removeLimitLine(l: LimitLine?) {
-        mLimitLines.remove(l)
+        mLimitLines?.remove(l)
     }
 
     /**
      * Removes all LimitLines from the axis.
      */
     open fun removeAllLimitLines() {
-        mLimitLines.clear()
+        mLimitLines?.clear()
     }
 
     /**
@@ -529,9 +529,9 @@ abstract class AxisBase : ComponentBase {
     open fun getValueFormatter(): IAxisValueFormatter {
         if (mAxisValueFormatter == null ||
             mAxisValueFormatter is DefaultAxisValueFormatter &&
-            (mAxisValueFormatter as DefaultAxisValueFormatter).decimalDigits != mDecimals
+            (mAxisValueFormatter as DefaultAxisValueFormatter).getDecimalDigits() != mDecimals
         ) mAxisValueFormatter = DefaultAxisValueFormatter(mDecimals)
-        return mAxisValueFormatter
+        return mAxisValueFormatter!!
     }
 
     /**

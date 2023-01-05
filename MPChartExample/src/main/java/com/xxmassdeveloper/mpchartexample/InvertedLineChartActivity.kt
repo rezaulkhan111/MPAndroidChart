@@ -12,11 +12,10 @@ import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.github.mikephil.charting.charts.LineChart
-import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.components.Legend.LegendForm
-import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.highlight.Highlight
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.github.mikephil.charting.utils.EntryXComparator
 import com.xxmassdeveloper.mpchartexample.custom.MyMarkerView
@@ -25,11 +24,13 @@ import java.util.*
 
 class InvertedLineChartActivity : DemoBase(), OnSeekBarChangeListener,
     OnChartValueSelectedListener {
+
     private lateinit var chart: LineChart
     private lateinit var seekBarX: SeekBar
     private lateinit var seekBarY: SeekBar
-    private var tvX: TextView? = null
-    private var tvY: TextView? = null
+    private lateinit var tvX: TextView
+    private lateinit var tvY: TextView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.setFlags(
@@ -49,13 +50,13 @@ class InvertedLineChartActivity : DemoBase(), OnSeekBarChangeListener,
         chart.setDrawGridBackground(false)
 
         // no description text
-        chart.description!!.isEnabled = false
+        chart.getDescription()!!.setEnabled(false)
 
         // enable touch gestures
         chart.setTouchEnabled(true)
 
         // enable scaling and dragging
-        chart.isDragEnabled = true
+        chart.setDragEnabled(true)
         chart.setScaleEnabled(true)
 
         // if disabled, scaling can be done on x- and y-axis separately
@@ -68,19 +69,19 @@ class InvertedLineChartActivity : DemoBase(), OnSeekBarChangeListener,
         // to use for it
         val mv = MyMarkerView(this, R.layout.custom_marker_view)
         mv.setChartView(chart) // For bounds control
-        chart.marker = mv // Set the marker to the chart
-        val xl: XAxis? = chart.xAxis
+        chart.setMarker(mv) // Set the marker to the chart
+        val xl = chart.getXAxis()
         xl!!.setAvoidFirstLastClipping(true)
-        xl.axisMinimum = 0f
-        val leftAxis = chart.axisLeft
-        leftAxis!!.isInverted = true
-        leftAxis.axisMinimum = 0f // this replaces setStartAtZero(true)
-        val rightAxis = chart.axisRight
-        rightAxis!!.isEnabled = false
+        xl!!.setAxisMinimum(0f)
+        val leftAxis = chart.getAxisLeft()
+        leftAxis!!.setInverted(true)
+        leftAxis!!.setAxisMinimum(0f) // this replaces setStartAtZero(true)
+        val rightAxis = chart.getAxisRight()
+        rightAxis!!.setEnabled(false)
 
         // add data
-        seekBarX.setProgress(25)
-        seekBarY.setProgress(50)
+        seekBarX.progress = 25
+        seekBarY.progress = 50
 
         // // restrain the maximum scale-out factor
         // chart.setScaleMinima(3f, 3f);
@@ -89,17 +90,25 @@ class InvertedLineChartActivity : DemoBase(), OnSeekBarChangeListener,
         // chart.centerViewPort(10, 50);
 
         // get the legend (only possible after setting data)
-        val l: Legend? = chart.legend
+
+        // // restrain the maximum scale-out factor
+        // chart.setScaleMinima(3f, 3f);
+        //
+        // // center the view to a specific position inside the chart
+        // chart.centerViewPort(10, 50);
+
+        // get the legend (only possible after setting data)
+        val l = chart.getLegend()
 
         // modify the legend ...
-        l!!.form = LegendForm.LINE
+        l!!.setForm(LegendForm.LINE)
 
         // don't forget to refresh the drawing
         chart.invalidate()
     }
 
     private fun setData(count: Int, range: Float) {
-        val entries = ArrayList<Entry?>()
+        val entries = mutableListOf<Entry>()
         for (i in 0 until count) {
             val xVal = (Math.random() * range).toFloat()
             val yVal = (Math.random() * range).toFloat()
@@ -108,17 +117,14 @@ class InvertedLineChartActivity : DemoBase(), OnSeekBarChangeListener,
 
         // sort by x-value
         Collections.sort(entries, EntryXComparator())
-
         // create a dataset and give it a type
         val set1 = LineDataSet(entries, "DataSet 1")
-        set1.lineWidth = 1.5f
-        set1.circleRadius = 4f
-
+        set1.setLineWidth(1.5f)
+        set1.setCircleRadius(4f)
         // create a data object with the data sets
         val data = LineData(set1)
-
         // set data
-        chart!!.data = data
+        chart.setData(data)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -135,60 +141,60 @@ class InvertedLineChartActivity : DemoBase(), OnSeekBarChangeListener,
                 startActivity(i)
             }
             R.id.actionToggleValues -> {
-                val sets = chart!!.data
-                    .dataSets
+                val sets: List<ILineDataSet>? = chart.getData()
+                    .getDataSets()
                 for (iSet in sets!!) {
-                    val set = iSet as LineDataSet?
-                    set!!.setDrawValues(!set.isDrawValuesEnabled)
+                    val set = iSet as LineDataSet
+                    set.setDrawValues(!set.isDrawValuesEnabled())
                 }
                 chart.invalidate()
             }
             R.id.actionToggleHighlight -> {
-                if (chart!!.data != null) {
-                    chart!!.data!!.isHighlightEnabled = !chart!!.data!!.isHighlightEnabled
+                if (chart.getData() != null) {
+                    chart.getData().setHighlightEnabled(!chart.getData().isHighlightEnabled())
                     chart.invalidate()
                 }
             }
             R.id.actionToggleFilled -> {
-                val sets = chart!!.data
-                    .dataSets
+                val sets: List<ILineDataSet>? = chart.getData()
+                    .getDataSets()
                 for (iSet in sets!!) {
-                    val set = iSet as LineDataSet?
-                    if (set!!.isDrawFilledEnabled) set.setDrawFilled(false) else set.setDrawFilled(
+                    val set = iSet as LineDataSet
+                    if (set.isDrawFilledEnabled()) set.setDrawFilled(false) else set.setDrawFilled(
                         true
                     )
                 }
                 chart.invalidate()
             }
             R.id.actionToggleCircles -> {
-                val sets = chart!!.data
-                    .dataSets
+                val sets: List<ILineDataSet>? = chart.getData()
+                    .getDataSets()
                 for (iSet in sets!!) {
-                    val set = iSet as LineDataSet?
-                    if (set!!.isDrawCirclesEnabled) set.setDrawCircles(false) else set.setDrawCircles(
+                    val set = iSet as LineDataSet
+                    if (set.isDrawCirclesEnabled()) set.setDrawCircles(false) else set.setDrawCircles(
                         true
                     )
                 }
                 chart.invalidate()
             }
             R.id.animateX -> {
-                chart!!.animateX(2000)
+                chart.animateX(2000)
             }
             R.id.animateY -> {
-                chart!!.animateY(2000)
+                chart.animateY(2000)
             }
             R.id.animateXY -> {
-                chart!!.animateXY(2000, 2000)
+                chart.animateXY(2000, 2000)
             }
             R.id.actionTogglePinch -> {
-                if (chart!!.isPinchZoomEnabled) chart!!.setPinchZoom(false) else chart!!.setPinchZoom(
+                if (chart.isPinchZoomEnabled()) chart.setPinchZoom(false) else chart.setPinchZoom(
                     true
                 )
                 chart.invalidate()
             }
             R.id.actionToggleAutoScaleMinMax -> {
-                chart!!.isAutoScaleMinMaxEnabled = !chart!!.isAutoScaleMinMaxEnabled
-                chart!!.notifyDataSetChanged()
+                chart.setAutoScaleMinMaxEnabled(!chart.isAutoScaleMinMaxEnabled())
+                chart.notifyDataSetChanged()
             }
             R.id.actionSave -> {
                 if (ContextCompat.checkSelfPermission(
@@ -206,9 +212,9 @@ class InvertedLineChartActivity : DemoBase(), OnSeekBarChangeListener,
     }
 
     override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-        tvX!!.text = seekBarX!!.progress.toString()
-        tvY!!.text = seekBarY!!.progress.toString()
-        setData(seekBarX!!.progress, seekBarY!!.progress.toFloat())
+        tvX.text = seekBarX.progress.toString()
+        tvY.text = seekBarY.progress.toString()
+        setData(seekBarX.progress, seekBarY.progress.toFloat())
 
         // redraw
         chart.invalidate()
@@ -218,12 +224,7 @@ class InvertedLineChartActivity : DemoBase(), OnSeekBarChangeListener,
         saveToGallery(chart!!, "InvertedLineChartActivity")
     }
 
-    override fun onValueSelected(e: Entry?, h: Highlight?) {
-        Log.i(
-            "VAL SELECTED",
-            "Value: " + e!!.y + ", xIndex: " + e.x
-                    + ", DataSet index: " + h!!.dataSetIndex
-        )
+    override fun onValueSelected(e: Entry, h: Highlight) {
     }
 
     override fun onNothingSelected() {}

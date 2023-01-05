@@ -6,7 +6,8 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.view.*
-import android.widget.*
+import android.widget.ArrayAdapter
+import android.widget.ListView
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.github.mikephil.charting.utils.ColorTemplate
@@ -23,6 +24,7 @@ import com.xxmassdeveloper.mpchartexample.notimportant.DemoBase
  * @author Philipp Jahoda
  */
 class ListViewMultiChartActivity : DemoBase() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.setFlags(
@@ -78,27 +80,32 @@ class ListViewMultiChartActivity : DemoBase() {
      * @return Line data
      */
     private fun generateDataLine(cnt: Int): LineData {
-        val values1 = ArrayList<Entry?>()
+        val values1 = mutableListOf<Entry>()
         for (i in 0..11) {
             values1.add(Entry(i.toFloat(), ((Math.random() * 65).toInt() + 40).toFloat()))
         }
+
         val d1 = LineDataSet(values1, "New DataSet $cnt, (1)")
-        d1.lineWidth = 2.5f
-        d1.circleRadius = 4.5f
-        d1.highLightColor = Color.rgb(244, 117, 117)
+        d1.setLineWidth(2.5f)
+        d1.setCircleRadius(4.5f)
+        d1.setHighLightColor(Color.rgb(244, 117, 117))
         d1.setDrawValues(false)
-        val values2 = ArrayList<Entry?>()
+
+        val values2 = java.util.ArrayList<Entry>()
+
         for (i in 0..11) {
-            values2.add(Entry(i.toFloat(), values1[i]!!.y - 30))
+            values2.add(Entry(i.toFloat(), values1[i].getY() - 30))
         }
+
         val d2 = LineDataSet(values2, "New DataSet $cnt, (2)")
-        d2.lineWidth = 2.5f
-        d2.circleRadius = 4.5f
-        d2.highLightColor = Color.rgb(244, 117, 117)
-        d2.color = ColorTemplate.VORDIPLOM_COLORS[0]
+        d2.setLineWidth(2.5f)
+        d2.setCircleRadius(4.5f)
+        d2.setHighLightColor(Color.rgb(244, 117, 117))
+        d2.setColor(ColorTemplate.VORDIPLOM_COLORS[0])
         d2.setCircleColor(ColorTemplate.VORDIPLOM_COLORS[0])
         d2.setDrawValues(false)
-        val sets = ArrayList<ILineDataSet>()
+
+        val sets = java.util.ArrayList<ILineDataSet>()
         sets.add(d1)
         sets.add(d2)
         return LineData(sets)
@@ -110,15 +117,16 @@ class ListViewMultiChartActivity : DemoBase() {
      * @return Bar data
      */
     private fun generateDataBar(cnt: Int): BarData {
-        val entries = ArrayList<BarEntry?>()
+        val entries = mutableListOf<BarEntry>()
         for (i in 0..11) {
-            entries.add(BarEntry(i, (Math.random() * 70).toInt() + 30))
+            entries.add(BarEntry(i.toFloat(), (Math.random() * 70).toInt().toFloat() + 30))
         }
         val d = BarDataSet(entries, "New DataSet $cnt")
         d.setColors(*ColorTemplate.VORDIPLOM_COLORS)
-        d.highLightAlpha = 255
+        d.setHighLightAlpha(255)
+
         val cd = BarData(d)
-        cd.barWidth = 0.9f
+        cd.setBarWidth(0.9f)
         return cd
     }
 
@@ -128,14 +136,14 @@ class ListViewMultiChartActivity : DemoBase() {
      * @return Pie data
      */
     private fun generateDataPie(): PieData {
-        val entries = ArrayList<PieEntry?>()
+        val entries = mutableListOf<PieEntry>()
         for (i in 0..3) {
             entries.add(PieEntry((Math.random() * 70 + 30).toFloat(), "Quarter " + (i + 1)))
         }
-        val d = PieDataSet(entries, "")
 
+        val d = PieDataSet(entries, "")
         // space between slices
-        d.sliceSpace = 2f
+        d.setSliceSpace(2f)
         d.setColors(*ColorTemplate.VORDIPLOM_COLORS)
         return PieData(d)
     }

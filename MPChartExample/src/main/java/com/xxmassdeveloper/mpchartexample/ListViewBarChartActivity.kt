@@ -7,9 +7,9 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.view.*
-import android.widget.*
+import android.widget.ArrayAdapter
+import android.widget.ListView
 import com.github.mikephil.charting.charts.BarChart
-import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.XAxis.XAxisPosition
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
@@ -25,6 +25,7 @@ import com.xxmassdeveloper.mpchartexample.notimportant.DemoBase
  * @author Philipp Jahoda
  */
 class ListViewBarChartActivity : DemoBase() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.setFlags(
@@ -73,28 +74,32 @@ class ListViewBarChartActivity : DemoBase() {
                 data.setValueTypeface(tfLight)
                 data.setValueTextColor(Color.BLACK)
             }
-            holder.chart!!.description!!.isEnabled = false
+            holder.chart!!.getDescription()!!.setEnabled(false)
             holder.chart!!.setDrawGridBackground(false)
-            val xAxis: XAxis? = holder.chart!!.xAxis
-            xAxis!!.position = XAxisPosition.BOTTOM
-            xAxis.typeface = tfLight
+
+            val xAxis = holder.chart!!.getXAxis()
+            xAxis!!.setPosition(XAxisPosition.BOTTOM)
+            xAxis.setTypeface(tfLight!!)
             xAxis.setDrawGridLines(false)
-            val leftAxis = holder.chart!!.axisLeft
-            leftAxis!!.typeface = tfLight
+
+            val leftAxis = holder.chart!!.getAxisLeft()
+            leftAxis!!.setTypeface(tfLight!!)
             leftAxis.setLabelCount(5, false)
-            leftAxis.spaceTop = 15f
-            val rightAxis = holder.chart!!.axisRight
-            rightAxis!!.typeface = tfLight
+            leftAxis.setSpaceTop(15f)
+
+            val rightAxis = holder.chart!!.getAxisRight()
+            rightAxis!!.setTypeface(tfLight!!)
             rightAxis.setLabelCount(5, false)
-            rightAxis.spaceTop = 15f
+            rightAxis.setSpaceTop(15f)
 
             // set data
-            holder.chart!!.data = data
+            holder.chart!!.setData(data!!)
             holder.chart!!.setFitBars(true)
 
             // do not forget to refresh the chart
 //            holder.chart.invalidate();
             holder.chart!!.animateY(700)
+
             return convertView!!
         }
 
@@ -109,17 +114,17 @@ class ListViewBarChartActivity : DemoBase() {
      * @return Bar data
      */
     private fun generateData(cnt: Int): BarData {
-        val entries = ArrayList<BarEntry?>()
+        val entries = mutableListOf<BarEntry>()
         for (i in 0..11) {
-            entries.add(BarEntry(i, (Math.random() * 70).toFloat() + 30))
+            entries.add(BarEntry(i.toFloat(), (Math.random() * 70).toFloat() + 30))
         }
         val d = BarDataSet(entries, "New DataSet $cnt")
         d.setColors(*ColorTemplate.VORDIPLOM_COLORS)
-        d.barShadowColor = Color.rgb(203, 203, 203)
-        val sets = ArrayList<IBarDataSet>()
+        d.setBarShadowColor(Color.rgb(203, 203, 203))
+        val sets = mutableListOf<IBarDataSet>()
         sets.add(d)
         val cd = BarData(sets)
-        cd.barWidth = 0.9f
+        cd.setBarWidth(0.9f)
         return cd
     }
 

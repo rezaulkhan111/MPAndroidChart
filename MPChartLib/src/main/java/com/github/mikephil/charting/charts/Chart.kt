@@ -49,7 +49,7 @@ import java.io.OutputStream
  *
  * @author Philipp Jahoda
  */
-abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, ChartInterface {
+abstract class Chart<T : ChartData<out IDataSet<out Entry>>> : ViewGroup, ChartInterface {
     val LOG_TAG = "MPAndroidChart"
 
     /**
@@ -157,17 +157,17 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
     /**
      * Extra offsets to be appended to the viewport
      */
-    private var mExtraTopOffset = 0f;
+    private var mExtraTopOffset = 0f
 
     /**
      * Extra offsets to be appended to the viewport
      */
-    private var mExtraRightOffset = 0f;
+    private var mExtraRightOffset = 0f
 
     /**
      * Extra offsets to be appended to the viewport
      */
-    private var mExtraBottomOffset = 0f;
+    private var mExtraBottomOffset = 0f
 
     /**
      * Extra offsets to be appended to the viewport
@@ -214,7 +214,7 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
         mMaxHighlightDistance = convertDpToPixel(500f)
         mDescription = Description()
         mLegend = Legend()
-        mLegendRenderer = LegendRenderer(mViewPortHandler, mLegend!!)
+        mLegendRenderer = LegendRenderer(mViewPortHandler, mLegend)
         mXAxis = XAxis()
         mDescPaint = Paint(Paint.ANTI_ALIAS_FLAG)
         mInfoPaint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -224,80 +224,13 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
         if (mLogEnabled) Log.i("", "Chart.init()")
     }
 
-    // public void initWithDummyData() {
-    // ColorTemplate template = new ColorTemplate();
-    // template.addColorsForDataSets(ColorTemplate.COLORFUL_COLORS,
-    // getContext());
-    //
-    // setColorTemplate(template);
-    // setDrawYValues(false);
-    //
-    // ArrayList<String> xVals = new ArrayList<String>();
-    // Calendar calendar = Calendar.getInstance();
-    // for (int i = 0; i < 12; i++) {
-    // xVals.add(calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT,
-    // Locale.getDefault()));
-    // }
-    //
-    // ArrayList<DataSet> dataSets = new ArrayList<DataSet>();
-    // for (int i = 0; i < 3; i++) {
-    //
-    // ArrayList<Entry> yVals = new ArrayList<Entry>();
-    //
-    // for (int j = 0; j < 12; j++) {
-    // float val = (float) (Math.random() * 100);
-    // yVals.add(new Entry(val, j));
-    // }
-    //
-    // DataSet set = new DataSet(yVals, "DataSet " + i);
-    // dataSets.add(set); // add the datasets
-    // }
-    // // create a data object with the datasets
-    // ChartData data = new ChartData(xVals, dataSets);
-    // setData(data);
-    // invalidate();
-    // }
-
-    // public void initWithDummyData() {
-    // ColorTemplate template = new ColorTemplate();
-    // template.addColorsForDataSets(ColorTemplate.COLORFUL_COLORS,
-    // getContext());
-    //
-    // setColorTemplate(template);
-    // setDrawYValues(false);
-    //
-    // ArrayList<String> xVals = new ArrayList<String>();
-    // Calendar calendar = Calendar.getInstance();
-    // for (int i = 0; i < 12; i++) {
-    // xVals.add(calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT,
-    // Locale.getDefault()));
-    // }
-    //
-    // ArrayList<DataSet> dataSets = new ArrayList<DataSet>();
-    // for (int i = 0; i < 3; i++) {
-    //
-    // ArrayList<Entry> yVals = new ArrayList<Entry>();
-    //
-    // for (int j = 0; j < 12; j++) {
-    // float val = (float) (Math.random() * 100);
-    // yVals.add(new Entry(val, j));
-    // }
-    //
-    // DataSet set = new DataSet(yVals, "DataSet " + i);
-    // dataSets.add(set); // add the datasets
-    // }
-    // // create a data object with the datasets
-    // ChartData data = new ChartData(xVals, dataSets);
-    // setData(data);
-    // invalidate();
-    // }
     /**
      * Sets a new data object for the chart. The data object contains all values
      * and information needed for displaying.
      *
      * @param data
      */
-    open fun setData(data: T?) {
+    open fun setData(data: T) {
         mData = data
         mOffsetsCalculated = false
         if (data == null) {
@@ -305,8 +238,8 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
         }
 
         // calculate how many digits are needed
-        setupDefaultFormatter(data.yMin, data.yMax)
-        for (set: IDataSet<*> in mData!!.dataSets!!) {
+        setupDefaultFormatter(data.getYMin(), data.getYMax())
+        for (set: IDataSet<*> in mData!!.getDataSets()!!) {
             if (set.needsFormatter() || set.getValueFormatter() === mDefaultValueFormatter) set.setValueFormatter(
                 mDefaultValueFormatter
             )
@@ -404,7 +337,7 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
                         canvas.drawText(mNoDataText, pt.x, pt.y, mInfoPaint!!)
                     }
                     Align.RIGHT -> {
-                        (pt.x *= 2.0).toFloat()
+                        pt.x *= 2.0f
                         canvas.drawText(mNoDataText, pt.x, pt.y, mInfoPaint!!)
                     }
                     else -> canvas.drawText(mNoDataText, pt.x, pt.y, mInfoPaint!!)
@@ -425,7 +358,7 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
 
         // check if description should be drawn
         if (mDescription != null && mDescription!!.isEnabled()) {
-            val position: MPPointF = mDescription!!.getPosition()
+            val position = mDescription!!.getPosition()
             mDescPaint!!.typeface = mDescription!!.getTypeface()
             mDescPaint!!.textSize = mDescription!!.getTextSize()
             mDescPaint!!.color = mDescription!!.getTextColor()
@@ -441,7 +374,7 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
                 x = position.x
                 y = position.y
             }
-            c.drawText(mDescription!!.getText(), x, y, mDescPaint!!)
+            c.drawText(mDescription!!.getText()!!, x, y, mDescPaint!!)
         }
     }
 
@@ -458,7 +391,7 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
      * array of Highlight objects that reference the highlighted slices in the
      * chart
      */
-    protected var mIndicesToHighlight: Array<Highlight?>?
+    protected var mIndicesToHighlight: Array<Highlight>? = null
 
     /**
      * The maximum distance in dp away from an entry causing it to highlight.
@@ -485,7 +418,7 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
      *
      * @return
      */
-    open fun getHighlighted(): Array<Highlight?>? {
+    open fun getHighlighted(): Array<Highlight>? {
         return mIndicesToHighlight
     }
 
@@ -524,7 +457,7 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
      *
      * @param highs
      */
-    protected open fun setLastHighlighted(highs: Array<Highlight?>?) {
+    protected open fun setLastHighlighted(highs: Array<Highlight>?) {
         if (highs == null || highs.size <= 0 || highs[0] == null) {
             mChartTouchListener!!.setLastHighlighted(null)
         } else {
@@ -540,7 +473,7 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
      *
      * @param highs
      */
-    open fun highlightValues(highs: Array<Highlight?>?) {
+    open fun highlightValues(highs: Array<Highlight>?) {
 
         // set the indices to highlight
         mIndicesToHighlight = highs
@@ -637,7 +570,7 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
         dataIndex: Int,
         callListener: Boolean
     ) {
-        if (dataSetIndex < 0 || dataSetIndex >= mData!!.dataSetCount) {
+        if (dataSetIndex < 0 || dataSetIndex >= mData!!.getDataSetCount()) {
             highlightValue(null, callListener)
         } else {
             highlightValue(Highlight(x, y, dataSetIndex, dataIndex), callListener)
@@ -695,7 +628,7 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
         if (callListener && mSelectionListener != null) {
             if (!valuesToHighlight()) mSelectionListener!!.onNothingSelected() else {
                 // notify the listener
-                mSelectionListener!!.onValueSelected(e, high)
+                mSelectionListener!!.onValueSelected(e!!, high!!)
             }
         }
 
@@ -761,15 +694,16 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
      * draws all MarkerViews on the highlighted positions
      */
     protected open fun drawMarkers(canvas: Canvas?) {
+
         // if there is no marker view or drawing marker is disabled
         if (mMarker == null || !isDrawMarkersEnabled() || !valuesToHighlight()) return
         for (i in mIndicesToHighlight!!.indices) {
             val highlight = mIndicesToHighlight!![i]
-            val set = mData!!.getDataSetByIndex(highlight!!.dataSetIndex)!!
+            val set = mData!!.getDataSetByIndex(highlight!!.getDataSetIndex())!!
             val e = mData!!.getEntryForHighlight(
                 mIndicesToHighlight!![i]!!
             )
-            val entryIndex = set.getEntryIndex(e)
+            val entryIndex = set.getEntryIndex(e as Nothing)
 
             // make sure entry not null
             if (e == null || entryIndex > set.getEntryCount() * mAnimator!!.getPhaseX()) continue
@@ -782,7 +716,7 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
             mMarker!!.refreshContent(e, highlight)
 
             // draw the marker
-            mMarker!!.draw(canvas, pos[0], pos[1])
+            mMarker!!.draw(canvas!!, pos[0], pos[1])
         }
     }
 
@@ -794,7 +728,7 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
      * @return
      */
     protected open fun getMarkerPosition(high: Highlight?): FloatArray {
-        return floatArrayOf(high!!.drawX, high.drawY)
+        return floatArrayOf(high!!.getDrawX(), high.getDrawY())
     }
 
     /**
@@ -1019,7 +953,7 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
      *
      * @return
      */
-    override fun getDefaultValueFormatter(): IValueFormatter? {
+    override fun getDefaultValueFormatter(): IValueFormatter {
         return mDefaultValueFormatter
     }
 
@@ -1057,7 +991,7 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
      * @return
      */
     open fun getYMax(): Float {
-        return mData!!.yMax
+        return mData!!.getYMax()
     }
 
     /**
@@ -1066,7 +1000,7 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
      * @return
      */
     open fun getYMin(): Float {
-        return mData!!.yMin
+        return mData!!.getYMin()
     }
 
     override fun getXChartMax(): Float {
@@ -1098,8 +1032,8 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
      *
      * @return
      */
-    override fun getCenterOffsets(): MPPointF? {
-        return mViewPortHandler.getContentCenter()
+    override fun getCenterOffsets(): MPPointF {
+        return mViewPortHandler.getContentCenter()!!
     }
 
     /**
@@ -1314,8 +1248,8 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
      *
      * @return
      */
-    override fun getContentRect(): RectF? {
-        return mViewPortHandler.contentRect
+    override fun getContentRect(): RectF {
+        return mViewPortHandler.getContentRect()!!
     }
 
     /**
@@ -1430,8 +1364,8 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
      *
      * @return
      */
-    override fun getData(): T? {
-        return mData
+    override fun getData(): T {
+        return mData!!
     }
 
     /**
@@ -1481,7 +1415,7 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
      *
      * @return
      */
-    override fun getCenterOfView(): MPPointF? {
+    override fun getCenterOfView(): MPPointF {
         return getCenter()
     }
 
@@ -1786,4 +1720,5 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
     open fun setUnbindEnabled(enabled: Boolean) {
         mUnbind = enabled
     }
+
 }

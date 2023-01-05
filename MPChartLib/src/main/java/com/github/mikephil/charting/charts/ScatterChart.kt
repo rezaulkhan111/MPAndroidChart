@@ -13,7 +13,7 @@ import com.github.mikephil.charting.renderer.ScatterChartRenderer
  *
  * @author Philipp Jahoda
  */
-class ScatterChart : BarLineChartBase<ScatterData?>, ScatterDataProvider {
+class ScatterChart : BarLineChartBase<ScatterData>, ScatterDataProvider {
     constructor(context: Context?) : super(context) {}
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {}
     constructor(context: Context?, attrs: AttributeSet?, defStyle: Int) : super(
@@ -25,13 +25,13 @@ class ScatterChart : BarLineChartBase<ScatterData?>, ScatterDataProvider {
 
     override fun init() {
         super.init()
-        mRenderer = ScatterChartRenderer(this, mAnimator, mViewPortHandler)
+        mRenderer = ScatterChartRenderer(this, mAnimator!!, mViewPortHandler)
         getXAxis()!!.setSpaceMin(0.5f)
         getXAxis()!!.setSpaceMax(0.5f)
     }
 
-    fun getScatterData(): ScatterData? {
-        return mData
+    override fun getScatterData(): ScatterData {
+        return mData!!
     }
 
     /**

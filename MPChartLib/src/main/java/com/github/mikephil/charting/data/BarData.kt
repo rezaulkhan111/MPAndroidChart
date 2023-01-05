@@ -14,8 +14,8 @@ class BarData : BarLineScatterCandleBubbleData<IBarDataSet> {
     private var mBarWidth = 0.85f
 
     constructor() : super() {}
-    constructor(dataSets: IBarDataSet) : super(*dataSets) {}
-    constructor(dataSets: List<IBarDataSet>) : super(dataSets) {}
+    constructor(vararg dataSets: IBarDataSet) : super(*dataSets) {}
+    constructor(dataSets: MutableList<IBarDataSet>) : super(dataSets) {}
 
     /**
      * Sets the width each bar should have on the x-axis (in values, not pixels).

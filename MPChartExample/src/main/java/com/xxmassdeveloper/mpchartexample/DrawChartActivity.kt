@@ -4,14 +4,17 @@ package com.xxmassdeveloper.mpchartexample
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
-import android.view.*
+import android.view.Menu
+import android.view.MenuItem
+import android.view.WindowManager
 import androidx.core.content.ContextCompat
-import com.github.mikephil.charting.charts.Chart
 import com.github.mikephil.charting.charts.LineChart
-import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.data.*
+import com.github.mikephil.charting.data.DataSet
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.highlight.Highlight
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.github.mikephil.charting.listener.OnDrawListener
 import com.xxmassdeveloper.mpchartexample.notimportant.DemoBase
@@ -23,7 +26,9 @@ import com.xxmassdeveloper.mpchartexample.notimportant.DemoBase
  * @author Philipp Jahoda
  */
 class DrawChartActivity : DemoBase(), OnChartValueSelectedListener, OnDrawListener {
-    private var chart: LineChart? = null
+
+    private lateinit var chart: LineChart
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.setFlags(
@@ -45,12 +50,14 @@ class DrawChartActivity : DemoBase(), OnChartValueSelectedListener, OnDrawListen
 
         // add dummy-data to the chart
         initWithDummyData()
-        val xl: XAxis? = chart.xAxis
-        xl!!.typeface = tfRegular
+        val xl = chart.getXAxis()
+        xl!!.setTypeface(tfRegular!!)
         xl.setAvoidFirstLastClipping(true)
-        val yl = chart.axisLeft
-        yl!!.typeface = tfRegular
-        chart.legend.setEnabled(false)
+
+        val yl = chart.getAxisLeft()
+        yl!!.setTypeface(tfRegular!!)
+
+        chart.getLegend()!!.setEnabled(false)
 
         // chart.setYRange(-40f, 40f, true);
         // call this to reset the changed y-range
@@ -58,16 +65,17 @@ class DrawChartActivity : DemoBase(), OnChartValueSelectedListener, OnDrawListen
     }
 
     private fun initWithDummyData() {
-        val values = ArrayList<Entry?>()
+        val values = mutableListOf<Entry>()
 
         // create a dataset and give it a type (0)
         val set1 = LineDataSet(values, "DataSet")
-        set1.lineWidth = 3f
-        set1.circleRadius = 5f
+        set1.setLineWidth(3f)
+        set1.setCircleRadius(5f)
 
         // create a data object with the data sets
         val data = LineData(set1)
-        chart!!.data = data
+
+        chart.setData(data)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -78,29 +86,29 @@ class DrawChartActivity : DemoBase(), OnChartValueSelectedListener, OnDrawListen
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.actionToggleValues -> {
-                val sets = chart!!.data
-                    .dataSets
+                val sets: List<ILineDataSet>? = chart.getData()
+                    .getDataSets()
                 for (iSet in sets!!) {
-                    val set = iSet as LineDataSet?
-                    set!!.setDrawValues(!set.isDrawValuesEnabled)
+                    val set = iSet as LineDataSet
+                    set.setDrawValues(!set.isDrawValuesEnabled())
                 }
                 chart.invalidate()
             }
             R.id.actionToggleHighlight -> {
-                if (chart!!.data != null) {
-                    chart!!.data!!.isHighlightEnabled = !chart!!.data!!.isHighlightEnabled
+                if (chart.getData() != null) {
+                    chart.getData().setHighlightEnabled(!chart.getData().isHighlightEnabled())
                     chart.invalidate()
                 }
             }
             R.id.actionTogglePinch -> {
-                if (chart!!.isPinchZoomEnabled) chart!!.setPinchZoom(false) else chart!!.setPinchZoom(
+                if (chart.isPinchZoomEnabled()) chart.setPinchZoom(false) else chart.setPinchZoom(
                     true
                 )
                 chart.invalidate()
             }
             R.id.actionToggleAutoScaleMinMax -> {
-                chart!!.isAutoScaleMinMaxEnabled = !chart!!.isAutoScaleMinMaxEnabled
-                chart!!.notifyDataSetChanged()
+                chart.setAutoScaleMinMaxEnabled(!chart.isAutoScaleMinMaxEnabled())
+                chart.notifyDataSetChanged()
             }
             R.id.actionSave -> {
                 if (ContextCompat.checkSelfPermission(
@@ -121,30 +129,22 @@ class DrawChartActivity : DemoBase(), OnChartValueSelectedListener, OnDrawListen
         saveToGallery(chart!!, "DrawChartActivity")
     }
 
-    override fun onValueSelected(e: Entry?, h: Highlight?) {
-        Log.i(
-            "VAL SELECTED",
-            "Value: " + e!!.y + ", xIndex: " + e.x
-                    + ", DataSet index: " + h!!.dataSetIndex
-        )
+    override fun onValueSelected(e: Entry, h: Highlight) {
+
     }
 
     override fun onNothingSelected() {}
 
     /** callback for each new entry drawn with the finger  */
-    override fun onEntryAdded(entry: Entry?) {
-        Log.i(Chart.LOG_TAG, entry.toString())
+    override fun onEntryAdded(entry: Entry) {
     }
 
     /** callback when a DataSet has been drawn (when lifting the finger)  */
     override fun onDrawFinished(dataSet: DataSet<*>) {
-        Log.i(Chart.LOG_TAG, "DataSet drawn. " + dataSet.toSimpleString())
-
         // prepare the legend again
-        chart!!.legendRenderer.computeLegend(chart!!.data)
+        chart.getLegendRenderer()!!.computeLegend(chart.getData())
     }
 
-    override fun onEntryMoved(entry: Entry?) {
-        Log.i(Chart.LOG_TAG, "Point moved " + entry.toString())
+    override fun onEntryMoved(entry: Entry) {
     }
 }

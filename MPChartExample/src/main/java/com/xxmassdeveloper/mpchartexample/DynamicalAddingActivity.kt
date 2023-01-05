@@ -6,19 +6,25 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.view.*
+import android.view.Menu
+import android.view.MenuItem
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.YAxis.AxisDependency
-import com.github.mikephil.charting.data.*
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.xxmassdeveloper.mpchartexample.notimportant.DemoBase
 
 class DynamicalAddingActivity : DemoBase(), OnChartValueSelectedListener {
-    private var chart: LineChart? = null
+
+    private lateinit var chart: LineChart
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.setFlags(
@@ -28,22 +34,24 @@ class DynamicalAddingActivity : DemoBase(), OnChartValueSelectedListener {
         setContentView(R.layout.activity_linechart_noseekbar)
         title = "DynamicalAddingActivity"
         chart = findViewById(R.id.chart1)
-        chart?.setOnChartValueSelectedListener(this)
-        chart?.setDrawGridBackground(false)
-        chart?.description!!.setEnabled(false)
-        chart?.setNoDataText("No chart data available. Use the menu to add entries and data sets!")
+
+        chart.setOnChartValueSelectedListener(this)
+        chart.setDrawGridBackground(false)
+        chart.getDescription()!!.setEnabled(false)
+        chart.setNoDataText("No chart data available. Use the menu to add entries and data sets!")
 
 //        chart.getXAxis().setDrawLabels(false);
 //        chart.getXAxis().setDrawGridLines(false);
-        chart?.invalidate()
+        chart.invalidate()
     }
 
     private val colors = ColorTemplate.VORDIPLOM_COLORS
     private fun addEntry() {
-        var data = chart!!.data
+        var data = chart.getData()
+
         if (data == null) {
             data = LineData()
-            chart!!.data = data
+            chart.setData(data)
         }
         var set = data.getDataSetByIndex(0)
         // set.addEntry(...); // can be called as well
@@ -53,7 +61,9 @@ class DynamicalAddingActivity : DemoBase(), OnChartValueSelectedListener {
         }
 
         // choose a random dataSet
-        val randomDataSetIndex = (Math.random() * data.dataSetCount).toInt()
+
+        // choose a random dataSet
+        val randomDataSetIndex = (Math.random() * data.getDataSetCount()).toInt()
         val randomSet = data.getDataSetByIndex(randomDataSetIndex)
         val value = (Math.random() * 50).toFloat() + 50f * (randomDataSetIndex + 1)
         data.addEntry(Entry(randomSet!!.getEntryCount().toFloat(), value), randomDataSetIndex)
@@ -69,7 +79,7 @@ class DynamicalAddingActivity : DemoBase(), OnChartValueSelectedListener {
     }
 
     private fun removeLastEntry() {
-        val data = chart!!.data
+        val data = chart.getData()
         if (data != null) {
             val set = data.getDataSetByIndex(0)
             if (set != null) {
@@ -78,26 +88,27 @@ class DynamicalAddingActivity : DemoBase(), OnChartValueSelectedListener {
                 // or remove by index
                 // mData.removeEntryByXValue(xIndex, dataSetIndex);
                 data.notifyDataChanged()
-                chart?.notifyDataSetChanged()
-                chart?.invalidate()
+                chart.notifyDataSetChanged()
+                chart.invalidate()
             }
         }
     }
 
     private fun addDataSet() {
-        val data = chart!!.data
+        val data = chart.getData()
+
         if (data == null) {
-            chart!!.data = LineData()
+            chart.setData(LineData())
         } else {
-            val count = data.dataSetCount + 1
+            val count = data.getDataSetCount() + 1
             val amount = data.getDataSetByIndex(0)!!.getEntryCount()
-            val values = ArrayList<Entry?>()
+            val values = mutableListOf<Entry>()
             for (i in 0 until amount) {
                 values.add(Entry(i.toFloat(), (Math.random() * 50f).toFloat() + 50f * count))
             }
             val set = LineDataSet(values, "DataSet $count")
-            set.lineWidth = 2.5f
-            set.circleRadius = 4.5f
+            set.setLineWidth(2.5f)
+            set.setCircleRadius(4.5f)
             val color = colors[count % colors.size]
             set.setColor(color)
             set.setCircleColor(color)
@@ -106,33 +117,34 @@ class DynamicalAddingActivity : DemoBase(), OnChartValueSelectedListener {
             set.setValueTextColor(color)
             data.addDataSet(set)
             data.notifyDataChanged()
-            chart!!.notifyDataSetChanged()
-            chart?.invalidate()
+            chart.notifyDataSetChanged()
+            chart.invalidate()
         }
     }
 
     private fun removeDataSet() {
-        val data = chart!!.data
+        val data = chart.getData()
         if (data != null) {
-            data.removeDataSet(data.getDataSetByIndex(data.dataSetCount - 1))
-            chart!!.notifyDataSetChanged()
-            chart?.invalidate()
+            data.removeDataSet(data.getDataSetByIndex(data.getDataSetCount() - 1))
+            chart.notifyDataSetChanged()
+            chart.invalidate()
         }
     }
 
     private fun createSet(): LineDataSet {
-        val set = LineDataSet(null, "DataSet 1")
-        set.lineWidth = 2.5f
-        set.circleRadius = 4.5f
+        val set = LineDataSet(mutableListOf(), "DataSet 1")
+        set.setLineWidth(2.5f)
+        set.setCircleRadius(4.5f)
         set.setColor(Color.rgb(240, 99, 99))
         set.setCircleColor(Color.rgb(240, 99, 99))
         set.setHighLightColor(Color.rgb(190, 190, 190))
         set.setAxisDependency(AxisDependency.LEFT)
         set.setValueTextSize(10f)
+
         return set
     }
 
-    override fun onValueSelected(e: Entry?, h: Highlight?) {
+    override fun onValueSelected(e: Entry, h: Highlight) {
         Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show()
     }
 

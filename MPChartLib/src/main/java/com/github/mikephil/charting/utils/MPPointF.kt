@@ -2,12 +2,12 @@ package com.github.mikephil.charting.utils
 
 import android.os.Parcel
 import android.os.Parcelable.Creator
-import com.github.mikephil.charting.utils.ObjectPool.Poolable
+import java.net.URI.create
 
 /**
  * Created by Tony Patino on 6/24/16.
  */
-class MPPointF : Poolable {
+class MPPointF : ObjectPool.Poolable {
 
     @JvmField
     var x = 0f
@@ -95,7 +95,7 @@ class MPPointF : Poolable {
         return y
     }
 
-    override fun instantiate(): Poolable {
+    override fun instantiate(): ObjectPool.Poolable {
         return MPPointF(0F, 0F)
     }
 }

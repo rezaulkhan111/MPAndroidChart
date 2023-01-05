@@ -37,16 +37,16 @@ class BarDataSet : BarLineScatterCandleBubbleDataSet<BarEntry>, IBarDataSet {
 
     protected lateinit var mFills: MutableList<Fill>
 
-    constructor(yVals: MutableList<BarEntry?>, label: String?) : super(yVals, label) {
+    constructor(yVals: MutableList<BarEntry>, label: String) : super(yVals, label) {
         mHighLightColor = Color.rgb(0, 0, 0)
         calcStackSize(yVals)
         calcEntryCountIncludingStacks(yVals)
     }
 
     override fun copy(): DataSet<BarEntry> {
-        val entries: MutableList<BarEntry?> = ArrayList()
+        val entries: MutableList<BarEntry> = ArrayList()
         for (i in mEntries!!.indices) {
-            entries.add(mEntries!![i].copy())
+            entries.add(mEntries!![i].copy()!!)
         }
         val copied = BarDataSet(entries, getLabel())
         copy(copied)

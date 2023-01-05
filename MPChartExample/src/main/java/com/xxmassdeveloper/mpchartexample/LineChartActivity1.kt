@@ -8,26 +8,29 @@ import android.graphics.DashPathEffect
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.view.*
+import android.view.Menu
+import android.view.MenuItem
+import android.view.WindowManager
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.charts.LineChart
-import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.components.Legend.LegendForm
 import com.github.mikephil.charting.components.LimitLine
 import com.github.mikephil.charting.components.LimitLine.LimitLabelPosition
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.YAxis
-import com.github.mikephil.charting.data.*
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.IFillFormatter
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
-import com.github.mikephil.charting.utils.Utils.sDKInt
+import com.github.mikephil.charting.utils.Utils.getSDKInt
 import com.xxmassdeveloper.mpchartexample.custom.MyMarkerView
 import com.xxmassdeveloper.mpchartexample.notimportant.DemoBase
 
@@ -38,11 +41,12 @@ import com.xxmassdeveloper.mpchartexample.notimportant.DemoBase
  * @version 3.1.0
  */
 class LineChartActivity1 : DemoBase(), OnSeekBarChangeListener, OnChartValueSelectedListener {
-    private var chart: LineChart? = null
-    private var seekBarX: SeekBar? = null
-    private var seekBarY: SeekBar? = null
-    private var tvX: TextView? = null
-    private var tvY: TextView? = null
+    private lateinit var chart: LineChart
+    private lateinit var seekBarX: SeekBar
+    private lateinit var seekBarY: SeekBar
+    private lateinit var tvX: TextView
+    private lateinit var tvY: TextView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.setFlags(
@@ -66,7 +70,9 @@ class LineChartActivity1 : DemoBase(), OnSeekBarChangeListener, OnChartValueSele
             chart.setBackgroundColor(Color.WHITE)
 
             // disable description text
-            chart.description!!.isEnabled = false
+
+            // disable description text
+            chart.getDescription()!!.setEnabled(false)
 
             // enable touch gestures
             chart.setTouchEnabled(true)
@@ -80,10 +86,10 @@ class LineChartActivity1 : DemoBase(), OnSeekBarChangeListener, OnChartValueSele
 
             // Set the marker to the chart
             mv.setChartView(chart)
-            chart.marker = mv
+            chart.setMarker(mv)
 
             // enable scaling and dragging
-            chart.isDragEnabled = true
+            chart.setDragEnabled(true)
             chart.setScaleEnabled(true)
             // chart.setScaleXEnabled(true);
             // chart.setScaleYEnabled(true);
@@ -94,7 +100,7 @@ class LineChartActivity1 : DemoBase(), OnSeekBarChangeListener, OnChartValueSele
         var xAxis: XAxis?
         run {
             // // X-Axis Style // //
-            xAxis = chart!!.xAxis
+            xAxis = chart.getXAxis()
 
             // vertical grid lines
             xAxis!!.enableGridDashedLine(10f, 10f, 0f)
@@ -102,38 +108,40 @@ class LineChartActivity1 : DemoBase(), OnSeekBarChangeListener, OnChartValueSele
         var yAxis: YAxis?
         run {
             // // Y-Axis Style // //
-            yAxis = chart!!.axisLeft
+            yAxis = chart.getAxisLeft()
 
             // disable dual axis (only use LEFT axis)
-            chart!!.axisRight!!.isEnabled = false
+            chart.getAxisRight()!!.setEnabled(false)
 
             // horizontal grid lines
             yAxis!!.enableGridDashedLine(10f, 10f, 0f)
 
             // axis range
-            yAxis!!.axisMaximum = 200f
-            yAxis!!.axisMinimum = -50f
+            yAxis!!.setAxisMaximum(200f)
+            yAxis!!.setAxisMinimum(-50f)
         }
         run {
             // // Create Limit Lines // //
             val llXAxis = LimitLine(9f, "Index 10")
-            llXAxis.lineWidth = 4f
+            llXAxis.setLineWidth(4f)
             llXAxis.enableDashedLine(10f, 10f, 0f)
-            llXAxis.labelPosition = LimitLabelPosition.RIGHT_BOTTOM
-            llXAxis.textSize = 10f
-            llXAxis.typeface = tfRegular
+            llXAxis.setLabelPosition(LimitLabelPosition.RIGHT_BOTTOM)
+            llXAxis.setTextSize(10f)
+            llXAxis.setTypeface(tfRegular!!)
+
             val ll1 = LimitLine(150f, "Upper Limit")
-            ll1.lineWidth = 4f
+            ll1.setLineWidth(4f)
             ll1.enableDashedLine(10f, 10f, 0f)
-            ll1.labelPosition = LimitLabelPosition.RIGHT_TOP
-            ll1.textSize = 10f
-            ll1.typeface = tfRegular
+            ll1.setLabelPosition(LimitLabelPosition.RIGHT_TOP)
+            ll1.setTextSize(10f)
+            ll1.setTypeface(tfRegular!!)
+
             val ll2 = LimitLine(-30f, "Lower Limit")
-            ll2.lineWidth = 4f
+            ll2.setLineWidth(4f)
             ll2.enableDashedLine(10f, 10f, 0f)
-            ll2.labelPosition = LimitLabelPosition.RIGHT_BOTTOM
-            ll2.textSize = 10f
-            ll2.typeface = tfRegular
+            ll2.setLabelPosition(LimitLabelPosition.RIGHT_BOTTOM)
+            ll2.setTextSize(10f)
+            ll2.setTypeface(tfRegular!!)
 
             // draw limit lines behind data instead of on top
             yAxis!!.setDrawLimitLinesBehindData(true)
@@ -145,35 +153,36 @@ class LineChartActivity1 : DemoBase(), OnSeekBarChangeListener, OnChartValueSele
         }
 
         // add data
-        seekBarX.setProgress(45)
-        seekBarY.setProgress(180)
+        seekBarX.progress = 45
+        seekBarY.progress = 180
         setData(45, 180f)
 
         // draw points over time
         chart!!.animateX(1500)
 
         // get the legend (only possible after setting data)
-        val l: Legend? = chart!!.legend
+        val l = chart.getLegend()
 
         // draw legend entries as lines
-        l!!.form = LegendForm.LINE
+        l!!.setForm(LegendForm.LINE)
     }
 
     private fun setData(count: Int, range: Float) {
-        val values = ArrayList<Entry?>()
+        val values = mutableListOf<Entry>()
         for (i in 0 until count) {
             val `val` = (Math.random() * range).toFloat() - 30
             values.add(Entry(i.toFloat(), `val`, resources.getDrawable(R.drawable.star)))
         }
         val set1: LineDataSet?
-        if (chart!!.data != null &&
-            chart!!.data!!.dataSetCount > 0
+
+        if (chart.getData() != null &&
+            chart.getData().getDataSetCount() > 0
         ) {
-            set1 = chart!!.data!!.getDataSetByIndex(0) as LineDataSet?
+            set1 = chart.getData().getDataSetByIndex(0) as LineDataSet?
             set1!!.setValues(values)
-            set1.notifyDataSetChanged()
-            chart!!.data!!.notifyDataChanged()
-            chart!!.notifyDataSetChanged()
+            set1!!.notifyDataSetChanged()
+            chart.getData().notifyDataChanged()
+            chart.notifyDataSetChanged()
         } else {
             // create a dataset and give it a type
             set1 = LineDataSet(values, "DataSet 1")
@@ -183,23 +192,23 @@ class LineChartActivity1 : DemoBase(), OnSeekBarChangeListener, OnChartValueSele
             set1.enableDashedLine(10f, 5f, 0f)
 
             // black lines and points
-            set1.color = Color.BLACK
+            set1.setColor(Color.BLACK)
             set1.setCircleColor(Color.BLACK)
 
             // line thickness and point size
-            set1.lineWidth = 1f
-            set1.circleRadius = 3f
+            set1.setLineWidth(1f)
+            set1.setCircleRadius(3f)
 
             // draw points as solid circles
             set1.setDrawCircleHole(false)
 
             // customize legend entry
-            set1.formLineWidth = 1f
-            set1.formLineDashEffect = DashPathEffect(floatArrayOf(10f, 5f), 0f)
-            set1.formSize = 15f
+            set1.setFormLineWidth(1f)
+            set1.setFormLineDashEffect(DashPathEffect(floatArrayOf(10f, 5f), 0f))
+            set1.setFormSize(15f)
 
             // text size of values
-            set1.valueTextSize = 9f
+            set1.setValueTextSize(9f)
 
             // draw selection line as dashed
             set1.enableDashedHighlightLine(10f, 5f, 0f)
@@ -211,26 +220,26 @@ class LineChartActivity1 : DemoBase(), OnSeekBarChangeListener, OnChartValueSele
                     dataSet: ILineDataSet,
                     dataProvider: LineDataProvider
                 ): Float {
-                    return chart!!.axisLeft!!.axisMinimum
+                    return chart.getAxisLeft()!!.getAxisMinimum()
                 }
             })
 
             // set color of filled area
-            if (sDKInt >= 18) {
+            if (getSDKInt() >= 18) {
                 // drawables only supported on api level 18 and above
                 val drawable = ContextCompat.getDrawable(this, R.drawable.fade_red)
-                set1.fillDrawable = drawable
+                set1.setFillDrawable(drawable)
             } else {
-                set1.fillColor = Color.BLACK
+                set1.setFillColor(Color.BLACK)
             }
-            val dataSets = ArrayList<ILineDataSet>()
+            val dataSets = java.util.ArrayList<ILineDataSet>()
             dataSets.add(set1) // add the data sets
 
             // create a data object with the data sets
             val data = LineData(dataSets)
 
             // set data
-            chart!!.data = data
+            chart.setData(data)
         }
     }
 
@@ -248,99 +257,96 @@ class LineChartActivity1 : DemoBase(), OnSeekBarChangeListener, OnChartValueSele
                 startActivity(i)
             }
             R.id.actionToggleValues -> {
-                val sets = chart!!.data
-                    .dataSets
+                val sets: List<ILineDataSet>? = chart.getData()
+                    .getDataSets()
                 for (iSet in sets!!) {
-                    val set = iSet as LineDataSet?
-                    set!!.setDrawValues(!set.isDrawValuesEnabled)
+                    val set = iSet as LineDataSet
+                    set.setDrawValues(!set.isDrawValuesEnabled())
                 }
                 chart.invalidate()
             }
             R.id.actionToggleIcons -> {
-                val sets = chart!!.data
-                    .dataSets
+                val sets: List<ILineDataSet>? = chart.getData()
+                    .getDataSets()
                 for (iSet in sets!!) {
-                    val set = iSet as LineDataSet?
-                    set!!.setDrawIcons(!set.isDrawIconsEnabled)
+                    val set = iSet as LineDataSet
+                    set.setDrawIcons(!set.isDrawIconsEnabled())
                 }
                 chart.invalidate()
             }
             R.id.actionToggleHighlight -> {
-                if (chart!!.data != null) {
-                    chart!!.data!!.isHighlightEnabled = !chart!!.data!!.isHighlightEnabled
+                if (chart.getData() != null) {
+                    chart.getData().setHighlightEnabled(!chart.getData().isHighlightEnabled())
                     chart.invalidate()
                 }
             }
             R.id.actionToggleFilled -> {
-                val sets = chart!!.data
-                    .dataSets
+                val sets: List<ILineDataSet>? = chart.getData()
+                    .getDataSets()
                 for (iSet in sets!!) {
-                    val set = iSet as LineDataSet?
-                    if (set!!.isDrawFilledEnabled) set.setDrawFilled(false) else set.setDrawFilled(
+                    val set = iSet as LineDataSet
+                    if (set.isDrawFilledEnabled()) set.setDrawFilled(false) else set.setDrawFilled(
                         true
                     )
                 }
                 chart.invalidate()
             }
             R.id.actionToggleCircles -> {
-                val sets = chart!!.data
-                    .dataSets
+                val sets: List<ILineDataSet>? = chart.getData()
+                    .getDataSets()
                 for (iSet in sets!!) {
-                    val set = iSet as LineDataSet?
-                    if (set!!.isDrawCirclesEnabled) set.setDrawCircles(false) else set.setDrawCircles(
+                    val set = iSet as LineDataSet
+                    if (set.isDrawCirclesEnabled()) set.setDrawCircles(false) else set.setDrawCircles(
                         true
                     )
                 }
                 chart.invalidate()
             }
             R.id.actionToggleCubic -> {
-                val sets = chart!!.data
-                    .dataSets
+                val sets: List<ILineDataSet>? = chart.getData()
+                    .getDataSets()
                 for (iSet in sets!!) {
-                    val set = iSet as LineDataSet?
-                    set!!.mode =
-                        if (set.mode === LineDataSet.Mode.CUBIC_BEZIER) LineDataSet.Mode.LINEAR else LineDataSet.Mode.CUBIC_BEZIER
+                    val set = iSet as LineDataSet
+                    set.setMode(if (set.getMode() === LineDataSet.Mode.CUBIC_BEZIER) LineDataSet.Mode.LINEAR else LineDataSet.Mode.CUBIC_BEZIER)
                 }
                 chart.invalidate()
             }
             R.id.actionToggleStepped -> {
-                val sets = chart!!.data
-                    .dataSets
+                val sets: List<ILineDataSet>? = chart.getData()
+                    .getDataSets()
                 for (iSet in sets!!) {
-                    val set = iSet as LineDataSet?
-                    set!!.mode =
-                        if (set.mode === LineDataSet.Mode.STEPPED) LineDataSet.Mode.LINEAR else LineDataSet.Mode.STEPPED
+                    val set = iSet as LineDataSet
+                    set.setMode(if (set.getMode() === LineDataSet.Mode.STEPPED) LineDataSet.Mode.LINEAR else LineDataSet.Mode.STEPPED)
                 }
                 chart.invalidate()
             }
             R.id.actionToggleHorizontalCubic -> {
-                val sets = chart!!.data
-                    .dataSets
+                val sets: List<ILineDataSet>? = chart.getData()
+                    .getDataSets()
                 for (iSet in sets!!) {
-                    val set = iSet as LineDataSet?
-                    set!!.mode =
-                        if (set.mode === LineDataSet.Mode.HORIZONTAL_BEZIER) LineDataSet.Mode.LINEAR else LineDataSet.Mode.HORIZONTAL_BEZIER
+                    val set = iSet as LineDataSet
+                    set.setMode(if (set.getMode() === LineDataSet.Mode.HORIZONTAL_BEZIER) LineDataSet.Mode.LINEAR else LineDataSet.Mode.HORIZONTAL_BEZIER)
                 }
                 chart.invalidate()
             }
             R.id.actionTogglePinch -> {
-                if (chart!!.isPinchZoomEnabled) chart!!.setPinchZoom(false) else chart!!.setPinchZoom(
+                if (chart.isPinchZoomEnabled()) chart.setPinchZoom(false) else chart.setPinchZoom(
                     true
                 )
                 chart.invalidate()
             }
             R.id.actionToggleAutoScaleMinMax -> {
-                chart!!.isAutoScaleMinMaxEnabled = !chart!!.isAutoScaleMinMaxEnabled
-                chart!!.notifyDataSetChanged()
+                chart.setAutoScaleMinMaxEnabled(!chart.isAutoScaleMinMaxEnabled())
+                chart.notifyDataSetChanged()
             }
             R.id.animateX -> {
-                chart!!.animateX(2000)
+                chart.animateX(2000)
             }
             R.id.animateY -> {
-                chart!!.animateY(2000, Easing.EaseInCubic)
+                chart.animateY(2000, Easing.EaseInCubic)
             }
             R.id.animateXY -> {
-                chart!!.animateXY(2000, 2000)
+                chart.animateXY(2000, 2000)
             }
             R.id.actionSave -> {
                 if (ContextCompat.checkSelfPermission(
@@ -358,26 +364,29 @@ class LineChartActivity1 : DemoBase(), OnSeekBarChangeListener, OnChartValueSele
     }
 
     override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-        tvX!!.text = seekBarX!!.progress.toString()
-        tvY!!.text = seekBarY!!.progress.toString()
-        setData(seekBarX!!.progress, seekBarY!!.progress.toFloat())
+        tvX.text = seekBarX.progress.toString()
+        tvY.text = seekBarY.progress.toString()
+        setData(seekBarX.progress, seekBarY.progress.toFloat())
 
         // redraw
         chart.invalidate()
     }
 
     override fun saveToGallery() {
-        saveToGallery(chart!!, "LineChartActivity1")
+        saveToGallery(chart, "LineChartActivity1")
     }
 
     override fun onStartTrackingTouch(seekBar: SeekBar) {}
     override fun onStopTrackingTouch(seekBar: SeekBar) {}
-    override fun onValueSelected(e: Entry?, h: Highlight?) {
+    override fun onValueSelected(e: Entry, h: Highlight) {
         Log.i("Entry selected", e.toString())
-        Log.i("LOW HIGH", "low: " + chart!!.lowestVisibleX + ", high: " + chart!!.highestVisibleX)
+        Log.i(
+            "LOW HIGH",
+            "low: " + chart.getLowestVisibleX() + ", high: " + chart.getHighestVisibleX()
+        )
         Log.i(
             "MIN MAX",
-            "xMin: " + chart!!.xChartMin + ", xMax: " + chart!!.xChartMax + ", yMin: " + chart!!.yChartMin + ", yMax: " + chart!!.yChartMax
+            "xMin: " + chart.getXChartMin() + ", xMax: " + chart.getXChartMax() + ", yMin: " + chart.getYChartMin() + ", yMax: " + chart.getYChartMax()
         )
     }
 

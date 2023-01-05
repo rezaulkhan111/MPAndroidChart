@@ -14,32 +14,23 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.github.mikephil.charting.charts.BubbleChart
 import com.github.mikephil.charting.components.Legend
-import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.XAxis.XAxisPosition
 import com.github.mikephil.charting.data.*
-import com.github.mikephil.charting.data.BaseDataSet.isDrawIconsEnabled
-import com.github.mikephil.charting.data.BaseDataSet.isDrawValuesEnabled
-import com.github.mikephil.charting.data.BaseDataSet.setDrawIcons
-import com.github.mikephil.charting.data.BaseDataSet.setDrawValues
-import com.github.mikephil.charting.data.ChartData.isHighlightEnabled
-import com.github.mikephil.charting.data.ChartData.setDrawValues
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.interfaces.datasets.IBubbleDataSet
-import com.github.mikephil.charting.interfaces.datasets.IDataSet.isDrawIconsEnabled
-import com.github.mikephil.charting.interfaces.datasets.IDataSet.isDrawValuesEnabled
-import com.github.mikephil.charting.interfaces.datasets.IDataSet.setDrawIcons
-import com.github.mikephil.charting.interfaces.datasets.IDataSet.setDrawValues
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.github.mikephil.charting.utils.MPPointF
 import com.xxmassdeveloper.mpchartexample.notimportant.DemoBase
 
 class BubbleChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSelectedListener {
-    private var chart: BubbleChart? = null
-    private var seekBarX: SeekBar? = null
-    private var seekBarY: SeekBar? = null
-    private var tvX: TextView? = null
-    private var tvY: TextView? = null
+
+    private lateinit var chart: BubbleChart
+    private lateinit var seekBarX: SeekBar
+    private lateinit var seekBarY: SeekBar
+    private lateinit var tvX: TextView
+    private lateinit var tvY: TextView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.setFlags(
@@ -55,33 +46,45 @@ class BubbleChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSel
         seekBarY = findViewById(R.id.seekBar2)
         seekBarY.setOnSeekBarChangeListener(this)
         chart = findViewById(R.id.chart1)
-        chart.description!!.isEnabled = false
+
+        chart.getDescription()!!.setEnabled(false)
+
         chart.setOnChartValueSelectedListener(this)
+
         chart.setDrawGridBackground(false)
+
         chart.setTouchEnabled(true)
 
         // enable scaling and dragging
-        chart.isDragEnabled = true
+
+        // enable scaling and dragging
+        chart.setDragEnabled(true)
         chart.setScaleEnabled(true)
+
         chart.setMaxVisibleValueCount(200)
         chart.setPinchZoom(true)
-        seekBarX.setProgress(10)
-        seekBarY.setProgress(50)
-        val l: Legend? = chart.legend
-        l!!.verticalAlignment = Legend.LegendVerticalAlignment.TOP
-        l.horizontalAlignment = Legend.LegendHorizontalAlignment.RIGHT
-        l.orientation = Legend.LegendOrientation.VERTICAL
-        l.setDrawInside(false)
-        l.typeface = tfLight
-        val yl = chart.axisLeft
-        yl!!.typeface = tfLight
-        yl.spaceTop = 30f
-        yl.spaceBottom = 30f
-        yl.setDrawZeroLine(false)
-        chart.axisRight!!.isEnabled = false
-        val xl: XAxis? = chart.xAxis
-        xl!!.position = XAxisPosition.BOTTOM
-        xl.typeface = tfLight
+
+        seekBarX.progress = 10
+        seekBarY.progress = 50
+
+        val l = chart.getLegend()
+        l!!.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP)
+        l!!.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT)
+        l!!.setOrientation(Legend.LegendOrientation.VERTICAL)
+        l!!.setDrawInside(false)
+        l!!.setTypeface(tfLight!!)
+
+        val yl = chart.getAxisLeft()
+        yl!!.setTypeface(tfLight!!)
+        yl!!.setSpaceTop(30f)
+        yl!!.setSpaceBottom(30f)
+        yl!!.setDrawZeroLine(false)
+
+        chart.getAxisRight()!!.setEnabled(false)
+
+        val xl = chart.getXAxis()
+        xl!!.setPosition(XAxisPosition.BOTTOM)
+        xl!!.setTypeface(tfLight!!)
     }
 
     override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
@@ -89,9 +92,9 @@ class BubbleChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSel
         val range = seekBarY!!.progress
         tvX!!.text = count.toString()
         tvY!!.text = range.toString()
-        val values1 = ArrayList<BubbleEntry?>()
-        val values2 = ArrayList<BubbleEntry?>()
-        val values3 = ArrayList<BubbleEntry?>()
+        val values1 = mutableListOf<BubbleEntry>()
+        val values2 = mutableListOf<BubbleEntry>()
+        val values3 = mutableListOf<BubbleEntry>()
         for (i in 0 until count) {
             values1.add(
                 BubbleEntry(
@@ -119,22 +122,30 @@ class BubbleChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSel
         }
 
         // create a dataset and give it a type
+
+        // create a dataset and give it a type
         val set1 = BubbleDataSet(values1, "DS 1")
         set1.setDrawIcons(false)
         set1.setColor(ColorTemplate.COLORFUL_COLORS[0], 130)
         set1.setDrawValues(true)
+
         val set2 = BubbleDataSet(values2, "DS 2")
         set2.setDrawIcons(false)
-        set2.iconsOffset = MPPointF(0, 15)
+        set2.setIconsOffset(MPPointF(0f, 15f))
         set2.setColor(ColorTemplate.COLORFUL_COLORS[1], 130)
         set2.setDrawValues(true)
+
         val set3 = BubbleDataSet(values3, "DS 3")
         set3.setColor(ColorTemplate.COLORFUL_COLORS[2], 130)
         set3.setDrawValues(true)
+
         val dataSets = ArrayList<IBubbleDataSet>()
         dataSets.add(set1) // add the data sets
+
         dataSets.add(set2)
         dataSets.add(set3)
+
+        // create a data object with the data sets
 
         // create a data object with the data sets
         val data = BubbleData(dataSets)
@@ -143,7 +154,8 @@ class BubbleChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSel
         data.setValueTextSize(8f)
         data.setValueTextColor(Color.WHITE)
         data.setHighlightCircleWidth(1.5f)
-        chart!!.data = data
+
+        chart.setData(data)
         chart.invalidate()
     }
 
@@ -161,28 +173,30 @@ class BubbleChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSel
                 startActivity(i)
             }
             R.id.actionToggleValues -> {
-                for (set in chart!!.data.getDataSets()) set.setDrawValues(!set.isDrawValuesEnabled)
+                for (set in chart.getData()
+                    .getDataSets()!!) set.setDrawValues(!set.isDrawValuesEnabled())
                 chart.invalidate()
             }
             R.id.actionToggleIcons -> {
-                for (set in chart!!.data.getDataSets()) set.setDrawIcons(!set.isDrawIconsEnabled)
+                for (set in chart.getData()
+                    .getDataSets()!!) set.setDrawIcons(!set.isDrawIconsEnabled())
                 chart.invalidate()
             }
             R.id.actionToggleHighlight -> {
-                if (chart!!.data != null) {
-                    chart!!.data.setHighlightEnabled(!chart!!.data.isHighlightEnabled())
+                if (chart.getData() != null) {
+                    chart.getData().setHighlightEnabled(!chart.getData().isHighlightEnabled())
                     chart.invalidate()
                 }
             }
             R.id.actionTogglePinch -> {
-                if (chart!!.isPinchZoomEnabled) chart!!.setPinchZoom(false) else chart!!.setPinchZoom(
+                if (chart.isPinchZoomEnabled()) chart.setPinchZoom(false) else chart.setPinchZoom(
                     true
                 )
                 chart.invalidate()
             }
             R.id.actionToggleAutoScaleMinMax -> {
-                chart!!.isAutoScaleMinMaxEnabled = !chart!!.isAutoScaleMinMaxEnabled
-                chart!!.notifyDataSetChanged()
+                chart.setAutoScaleMinMaxEnabled(!chart.isAutoScaleMinMaxEnabled())
+                chart.notifyDataSetChanged()
             }
             R.id.actionSave -> {
                 if (ContextCompat.checkSelfPermission(
@@ -196,13 +210,13 @@ class BubbleChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSel
                 }
             }
             R.id.animateX -> {
-                chart!!.animateX(2000)
+                chart.animateX(2000)
             }
             R.id.animateY -> {
-                chart!!.animateY(2000)
+                chart.animateY(2000)
             }
             R.id.animateXY -> {
-                chart!!.animateXY(2000, 2000)
+                chart.animateXY(2000, 2000)
             }
         }
         return true
@@ -212,12 +226,7 @@ class BubbleChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSel
         saveToGallery(chart!!, "BubbleChartActivity")
     }
 
-    override fun onValueSelected(e: Entry?, h: Highlight?) {
-        Log.i(
-            "VAL SELECTED",
-            "Value: " + e!!.y + ", xIndex: " + e.x
-                    + ", DataSet index: " + h!!.dataSetIndex
-        )
+    override fun onValueSelected(e: Entry, h: Highlight) {
     }
 
     override fun onNothingSelected() {}

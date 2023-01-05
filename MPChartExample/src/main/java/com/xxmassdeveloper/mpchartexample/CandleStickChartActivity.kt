@@ -3,40 +3,32 @@ package com.xxmassdeveloper.mpchartexample
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.*
+import android.graphics.Color
+import android.graphics.Paint
 import android.net.Uri
 import android.os.Bundle
-import android.view.*
+import android.view.Menu
+import android.view.MenuItem
+import android.view.WindowManager
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.github.mikephil.charting.charts.CandleStickChart
-import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.XAxis.XAxisPosition
 import com.github.mikephil.charting.components.YAxis.AxisDependency
-import com.github.mikephil.charting.data.BaseDataSet.isDrawIconsEnabled
-import com.github.mikephil.charting.data.BaseDataSet.isDrawValuesEnabled
-import com.github.mikephil.charting.data.BaseDataSet.setDrawIcons
-import com.github.mikephil.charting.data.BaseDataSet.setDrawValues
 import com.github.mikephil.charting.data.CandleData
 import com.github.mikephil.charting.data.CandleDataSet
 import com.github.mikephil.charting.data.CandleEntry
-import com.github.mikephil.charting.data.ChartData.isHighlightEnabled
-import com.github.mikephil.charting.data.ChartData.setDrawValues
-import com.github.mikephil.charting.interfaces.datasets.ICandleDataSet.shadowColorSameAsCandle
-import com.github.mikephil.charting.interfaces.datasets.IDataSet.isDrawIconsEnabled
-import com.github.mikephil.charting.interfaces.datasets.IDataSet.isDrawValuesEnabled
-import com.github.mikephil.charting.interfaces.datasets.IDataSet.setDrawIcons
-import com.github.mikephil.charting.interfaces.datasets.IDataSet.setDrawValues
 import com.xxmassdeveloper.mpchartexample.notimportant.DemoBase
 
 class CandleStickChartActivity : DemoBase(), OnSeekBarChangeListener {
-    private var chart: CandleStickChart? = null
-    private var seekBarX: SeekBar? = null
-    private var seekBarY: SeekBar? = null
-    private var tvX: TextView? = null
-    private var tvY: TextView? = null
+
+    private lateinit var chart: CandleStickChart
+    private lateinit var seekBarX: SeekBar
+    private lateinit var seekBarY: SeekBar
+    private lateinit var tvX: TextView
+    private lateinit var tvY: TextView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.setFlags(
@@ -53,31 +45,32 @@ class CandleStickChartActivity : DemoBase(), OnSeekBarChangeListener {
         seekBarY.setOnSeekBarChangeListener(this)
         chart = findViewById(R.id.chart1)
         chart.setBackgroundColor(Color.WHITE)
-        chart.description!!.isEnabled = false
+        chart.getDescription()!!.setEnabled(false)
 
         // if more than 60 entries are displayed in the chart, no values will be
         // drawn
         chart.setMaxVisibleValueCount(60)
-
         // scaling can now only be done on x- and y-axis separately
         chart.setPinchZoom(false)
         chart.setDrawGridBackground(false)
-        val xAxis: XAxis? = chart.xAxis
-        xAxis!!.position = XAxisPosition.BOTTOM
-        xAxis.setDrawGridLines(false)
-        val leftAxis = chart.axisLeft
+        val xAxis = chart.getXAxis()
+        xAxis!!.setPosition(XAxisPosition.BOTTOM)
+        xAxis!!.setDrawGridLines(false)
+
+        val leftAxis = chart.getAxisLeft()
+//        leftAxis.setEnabled(false);
         //        leftAxis.setEnabled(false);
         leftAxis!!.setLabelCount(7, false)
-        leftAxis.setDrawGridLines(false)
-        leftAxis.setDrawAxisLine(false)
-        val rightAxis = chart.axisRight
-        rightAxis!!.isEnabled = false
-        //        rightAxis.setStartAtZero(false);
-
+        leftAxis!!.setDrawGridLines(false)
+        leftAxis!!.setDrawAxisLine(false)
+        val rightAxis = chart.getAxisRight()
+        rightAxis!!.setEnabled(false)
+//        rightAxis.setStartAtZero(false);
         // setting data
-        seekBarX.setProgress(40)
-        seekBarY.setProgress(100)
-        chart.legend.setEnabled(false)
+        seekBarX.progress = 40
+        seekBarY.progress = 100
+
+        chart.getLegend()!!.setEnabled(false)
     }
 
     override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
@@ -86,7 +79,7 @@ class CandleStickChartActivity : DemoBase(), OnSeekBarChangeListener {
         tvX!!.text = progress.toString()
         tvY!!.text = seekBarY!!.progress.toString()
         chart!!.resetTracking()
-        val values = ArrayList<CandleEntry?>()
+        val values = mutableListOf<CandleEntry>()
         for (i in 0 until progress) {
             val multi = (seekBarY!!.progress + 1).toFloat()
             val `val` = (Math.random() * 40).toFloat() + multi
@@ -107,8 +100,8 @@ class CandleStickChartActivity : DemoBase(), OnSeekBarChangeListener {
         }
         val set1 = CandleDataSet(values, "Data Set")
         set1.setDrawIcons(false)
-        set1.axisDependency = AxisDependency.LEFT
-        //        set1.setColor(Color.rgb(80, 80, 80));
+        set1.setAxisDependency(AxisDependency.LEFT)
+//        set1.setColor(Color.rgb(80, 80, 80));
         set1.setShadowColor(Color.DKGRAY)
         set1.setShadowWidth(0.7f)
         set1.setDecreasingColor(Color.RED)
@@ -118,7 +111,8 @@ class CandleStickChartActivity : DemoBase(), OnSeekBarChangeListener {
         set1.setNeutralColor(Color.BLUE)
         //set1.setHighlightLineWidth(1f);
         val data = CandleData(set1)
-        chart!!.data = data
+
+        chart.setData(data)
         chart.invalidate()
     }
 
@@ -136,43 +130,45 @@ class CandleStickChartActivity : DemoBase(), OnSeekBarChangeListener {
                 startActivity(i)
             }
             R.id.actionToggleValues -> {
-                for (set in chart!!.data.getDataSets()) set.setDrawValues(!set.isDrawValuesEnabled)
+                for (set in chart.getData()
+                    .getDataSets()!!) set.setDrawValues(!set.isDrawValuesEnabled())
                 chart.invalidate()
             }
             R.id.actionToggleIcons -> {
-                for (set in chart!!.data.getDataSets()) set.setDrawIcons(!set.isDrawIconsEnabled)
+                for (set in chart.getData()
+                    .getDataSets()!!) set.setDrawIcons(!set.isDrawIconsEnabled())
                 chart.invalidate()
             }
             R.id.actionToggleHighlight -> {
-                if (chart!!.data != null) {
-                    chart!!.data.setHighlightEnabled(!chart!!.data.isHighlightEnabled())
+                if (chart.getData() != null) {
+                    chart.getData().setHighlightEnabled(!chart.getData().isHighlightEnabled())
                     chart.invalidate()
                 }
             }
             R.id.actionTogglePinch -> {
-                if (chart!!.isPinchZoomEnabled) chart!!.setPinchZoom(false) else chart!!.setPinchZoom(
+                if (chart.isPinchZoomEnabled()) chart.setPinchZoom(false) else chart.setPinchZoom(
                     true
                 )
                 chart.invalidate()
             }
             R.id.actionToggleAutoScaleMinMax -> {
-                chart!!.isAutoScaleMinMaxEnabled = !chart!!.isAutoScaleMinMaxEnabled
-                chart!!.notifyDataSetChanged()
+                chart.setAutoScaleMinMaxEnabled(!chart.isAutoScaleMinMaxEnabled())
+                chart.notifyDataSetChanged()
             }
             R.id.actionToggleMakeShadowSameColorAsCandle -> {
-                for (set in chart!!.data.getDataSets()) {
-                    (set as CandleDataSet).setShadowColorSameAsCandle(!set.shadowColorSameAsCandle)
+                for (set in chart.getData().getDataSets()!!) {
+                    (set as CandleDataSet).setShadowColorSameAsCandle(!set.getShadowColorSameAsCandle())
                 }
                 chart.invalidate()
             }
             R.id.animateX -> {
-                chart!!.animateX(2000)
+                chart.animateX(2000)
             }
             R.id.animateY -> {
-                chart!!.animateY(2000)
+                chart.animateY(2000)
             }
             R.id.animateXY -> {
-                chart!!.animateXY(2000, 2000)
+                chart.animateXY(2000, 2000)
             }
             R.id.actionSave -> {
                 if (ContextCompat.checkSelfPermission(

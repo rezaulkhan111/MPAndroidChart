@@ -4,21 +4,24 @@ import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.view.*
+import android.view.Menu
+import android.view.MenuItem
+import android.view.WindowManager
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
 import com.github.mikephil.charting.charts.LineChart
-import com.github.mikephil.charting.components.AxisBase.setDrawAxisLine
-import com.github.mikephil.charting.components.AxisBase.setDrawGridLines
-import com.github.mikephil.charting.components.Legend
-import com.github.mikephil.charting.data.*
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
 import com.xxmassdeveloper.mpchartexample.notimportant.DemoBase
 
 class PerformanceLineChart : DemoBase(), OnSeekBarChangeListener {
-    private var chart: LineChart? = null
-    private var seekBarValues: SeekBar? = null
-    private var tvCount: TextView? = null
+
+    private lateinit var chart: LineChart
+    private lateinit var seekBarValues: SeekBar
+    private lateinit var tvCount: TextView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.setFlags(
@@ -34,29 +37,31 @@ class PerformanceLineChart : DemoBase(), OnSeekBarChangeListener {
         chart.setDrawGridBackground(false)
 
         // no description text
-        chart.description!!.isEnabled = false
+        chart.getDescription()!!.setEnabled(false)
 
         // enable touch gestures
         chart.setTouchEnabled(true)
 
         // enable scaling and dragging
-        chart.isDragEnabled = true
+        chart.setDragEnabled(true)
         chart.setScaleEnabled(true)
 
         // if disabled, scaling can be done on x- and y-axis separately
         chart.setPinchZoom(false)
-        chart.axisLeft!!.setDrawGridLines(false)
-        chart.axisRight!!.isEnabled = false
-        chart.xAxis.setDrawGridLines(true)
-        chart.xAxis.setDrawAxisLine(false)
-        seekBarValues.setProgress(9000)
+
+        chart.getAxisLeft()!!.setDrawGridLines(false)
+        chart.getAxisRight()!!.setEnabled(false)
+        chart.getXAxis()!!.setDrawGridLines(true)
+        chart.getXAxis()!!.setDrawAxisLine(false)
+
+        seekBarValues.progress = 9000
 
         // don't forget to refresh the drawing
         chart.invalidate()
     }
 
     private fun setData(count: Int, range: Float) {
-        val values = ArrayList<Entry?>()
+        val values = mutableListOf<Entry>()
         for (i in 0 until count) {
             val `val` = (Math.random() * (range + 1)).toFloat() + 3
             values.add(Entry(i * 0.001f, `val`))
@@ -64,22 +69,22 @@ class PerformanceLineChart : DemoBase(), OnSeekBarChangeListener {
 
         // create a dataset and give it a type
         val set1 = LineDataSet(values, "DataSet 1")
-        set1.color = Color.BLACK
-        set1.lineWidth = 0.5f
+        set1.setColor(Color.BLACK)
+        set1.setLineWidth(0.5f)
         set1.setDrawValues(false)
         set1.setDrawCircles(false)
-        set1.mode = LineDataSet.Mode.LINEAR
+        set1.setMode(LineDataSet.Mode.LINEAR)
         set1.setDrawFilled(false)
 
         // create a data object with the data sets
         val data = LineData(set1)
 
         // set data
-        chart!!.data = data
+        chart.setData(data)
 
         // get the legend (only possible after setting data)
-        val l: Legend? = chart!!.legend
-        l!!.isEnabled = false
+        val l = chart.getLegend()
+        l!!.setEnabled(false)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -100,9 +105,9 @@ class PerformanceLineChart : DemoBase(), OnSeekBarChangeListener {
     }
 
     override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-        val count = seekBarValues!!.progress + 1000
-        tvCount!!.text = count.toString()
-        chart!!.resetTracking()
+        val count = seekBarValues.progress + 1000
+        tvCount.text = count.toString()
+        chart.resetTracking()
         setData(count, 500f)
 
         // redraw

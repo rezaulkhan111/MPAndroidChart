@@ -15,7 +15,7 @@ import com.github.mikephil.charting.utils.ViewPortHandler
 class AnimatedMoveViewJob : AnimatedViewPortJob {
 
     companion object {
-        private var pool: ObjectPool<AnimatedMoveViewJob?>? = null
+        private var pool: ObjectPool<AnimatedMoveViewJob>? = null
 
         @JvmStatic
         fun getInstance(
@@ -37,12 +37,12 @@ class AnimatedMoveViewJob : AnimatedViewPortJob {
             result.xOrigin = xOrigin
             result.yOrigin = yOrigin
             //result.resetAnimator();
-            result.animator.duration = duration
+            result.animator!!.duration = duration
             return result
         }
 
         fun recycleInstance(instance: AnimatedMoveViewJob?) {
-            pool!!.recycle(instance)
+            pool!!.recycle(instance!!)
         }
     }
 
@@ -59,7 +59,7 @@ class AnimatedMoveViewJob : AnimatedViewPortJob {
 
     }
 
-    override fun onAnimationUpdate(animation: ValueAnimator) {
+    override fun onAnimationUpdate(animation: ValueAnimator?) {
         pts[0] = xOrigin + (xValue - xOrigin) * phase
         pts[1] = yOrigin + (yValue - yOrigin) * phase
         mTrans!!.pointValuesToPixel(pts)

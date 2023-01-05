@@ -4,9 +4,7 @@ import android.content.Context
 import android.graphics.RectF
 import android.util.AttributeSet
 import android.util.Log
-import com.github.mikephil.charting.components.AxisBase.calculate
 import com.github.mikephil.charting.components.YAxis
-import com.github.mikephil.charting.components.YAxis.calculate
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.highlight.*
@@ -18,7 +16,7 @@ import com.github.mikephil.charting.renderer.BarChartRenderer
  *
  * @author Philipp Jahoda
  */
-open class BarChart : BarLineChartBase<BarData?>, BarDataProvider {
+open class BarChart : BarLineChartBase<BarData>, BarDataProvider {
 
     /**
      * flag that indicates whether the highlight should be full-bar oriented, or single-value?
@@ -52,30 +50,30 @@ open class BarChart : BarLineChartBase<BarData?>, BarDataProvider {
 
     }
 
-    protected override fun init() {
+    override fun init() {
         super.init()
-        mRenderer = BarChartRenderer(this, mAnimator, mViewPortHandler)
-        highlighter = BarHighlighter(this)
-        xAxis!!.setSpaceMin(0.5f)
-        xAxis!!.setSpaceMax(0.5f)
+        mRenderer = BarChartRenderer(this, mAnimator!!, mViewPortHandler)
+        setHighlighter(BarHighlighter(this))
+        getXAxis()!!.setSpaceMin(0.5f)
+        getXAxis()!!.setSpaceMax(0.5f)
     }
 
     protected override fun calcMinMax() {
         if (mFitBars) {
-            mXAxis.calculate(
-                mData!!.xMin - mData!!.getBarWidth() / 2f,
-                mData!!.xMax + mData!!.getBarWidth() / 2f
+            mXAxis!!.calculate(
+                mData!!.getXMin() - mData!!.getBarWidth() / 2f,
+                mData!!.getXMax() + mData!!.getBarWidth() / 2f
             )
         } else {
-            mXAxis.calculate(mData!!.xMin, mData!!.xMax)
+            mXAxis!!.calculate(mData!!.getXMin(), mData!!.getXMax())
         }
 
         // calculate axis range (min / max) according to provided data
-        mAxisLeft.calculate(
+        mAxisLeft!!.calculate(
             mData!!.getYMin(YAxis.AxisDependency.LEFT),
             mData!!.getYMax(YAxis.AxisDependency.LEFT)
         )
-        mAxisRight.calculate(
+        mAxisRight!!.calculate(
             mData!!.getYMin(YAxis.AxisDependency.RIGHT),
             mData!!.getYMax(YAxis.AxisDependency.RIGHT)
         )
@@ -95,14 +93,12 @@ open class BarChart : BarLineChartBase<BarData?>, BarDataProvider {
             Log.e(LOG_TAG, "Can't select by touch. No data set.")
             null
         } else {
-            val h = highlighter.getHighlight(x, y)
+            val h = getHighlighter()!!.getHighlight(x, y)
             if (h == null || !isHighlightFullBarEnabled()) h else Highlight(
-                h.x, h.y,
-                h.xPx, h.yPx,
-                h.dataSetIndex, -1, h.axis
+                h.getX(), h.getY(),
+                h.getXPx(), h.getYPx(),
+                h.getDataSetIndex(), -1, h.getAxis()
             )
-
-            // For isHighlightFullBarEnabled, remove stackIndex
         }
     }
 
@@ -212,8 +208,8 @@ open class BarChart : BarLineChartBase<BarData?>, BarDataProvider {
         highlightValue(Highlight(x, dataSetIndex, stackIndex), false)
     }
 
-    override fun getBarData(): BarData? {
-        return mData
+    override fun getBarData(): BarData {
+        return mData!!
     }
 
     /**

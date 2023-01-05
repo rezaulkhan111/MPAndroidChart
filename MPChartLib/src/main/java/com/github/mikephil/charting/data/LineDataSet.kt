@@ -59,7 +59,7 @@ class LineDataSet : LineRadarDataSet<Entry>, ILineDataSet {
     private var mDrawCircleHole = true
 
 
-    constructor(yVals: MutableList<Entry>, label: String?) : super(yVals, label) {
+    constructor(yVals: MutableList<Entry>?, label: String?) : super(yVals, label) {
         // mCircleRadius = Utils.convertDpToPixel(4f);
         // mLineWidth = Utils.convertDpToPixel(1f);
         if (mCircleColors == null) {
@@ -220,7 +220,7 @@ class LineDataSet : LineRadarDataSet<Entry>, ILineDataSet {
     }
 
     override fun getDashPathEffect(): DashPathEffect {
-        return mDashPathEffect
+        return mDashPathEffect!!
     }
 
     /**

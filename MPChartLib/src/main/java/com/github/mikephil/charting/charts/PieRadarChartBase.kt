@@ -22,7 +22,7 @@ import com.github.mikephil.charting.utils.Utils.getNormalizedAngle
  *
  * @author Philipp Jahoda
  */
-abstract class PieRadarChartBase<T : ChartData<out IDataSet<out Entry?>?>?> : Chart<T> {
+abstract class PieRadarChartBase<T : ChartData<out IDataSet<out Entry>>> : Chart<T> {
     /**
      * holds the normalized version of the current rotation angle of the chart
      */
@@ -92,7 +92,7 @@ abstract class PieRadarChartBase<T : ChartData<out IDataSet<out Entry?>?>?> : Ch
         if (mLegend != null && mLegend!!.isEnabled() && !mLegend!!.isDrawInsideEnabled()) {
             val fullLegendWidth = Math.min(
                 mLegend!!.mNeededWidth,
-                mViewPortHandler.chartWidth * mLegend!!.getMaxSizePercent()
+                mViewPortHandler.getChartWidth() * mLegend!!.getMaxSizePercent()
             )
             when (mLegend!!.getOrientation()) {
                 LegendOrientation.VERTICAL -> {
@@ -137,14 +137,15 @@ abstract class PieRadarChartBase<T : ChartData<out IDataSet<out Entry?>?>?> : Ch
                         LegendHorizontalAlignment.CENTER -> when (mLegend!!.getVerticalAlignment()) {
                             LegendVerticalAlignment.TOP -> legendTop = Math.min(
                                 mLegend!!.mNeededHeight,
-                                mViewPortHandler.chartHeight * mLegend!!.getMaxSizePercent()
+                                mViewPortHandler.getChartHeight() * mLegend!!.getMaxSizePercent()
                             )
                             LegendVerticalAlignment.BOTTOM -> legendBottom = Math.min(
                                 mLegend!!.mNeededHeight,
-                                mViewPortHandler.chartHeight * mLegend!!.getMaxSizePercent()
+                                mViewPortHandler.getChartHeight() * mLegend!!.getMaxSizePercent()
                             )
                             else -> {}
                         }
+                        else -> {}
                     }
                 }
                 LegendOrientation.HORIZONTAL -> {
@@ -159,7 +160,7 @@ abstract class PieRadarChartBase<T : ChartData<out IDataSet<out Entry?>?>?> : Ch
                         val yOffset = getRequiredLegendOffset()
                         yLegendOffset = Math.min(
                             mLegend!!.mNeededHeight + yOffset,
-                            mViewPortHandler.chartHeight * mLegend!!.getMaxSizePercent()
+                            mViewPortHandler.getChartHeight() * mLegend!!.getMaxSizePercent()
                         )
                         when (mLegend!!.getVerticalAlignment()) {
                             LegendVerticalAlignment.TOP -> legendTop = yLegendOffset
@@ -168,6 +169,7 @@ abstract class PieRadarChartBase<T : ChartData<out IDataSet<out Entry?>?>?> : Ch
                         }
                     }
                 }
+                else -> {}
             }
             legendLeft += getRequiredBaseOffset()
             legendRight += getRequiredBaseOffset()
@@ -178,7 +180,7 @@ abstract class PieRadarChartBase<T : ChartData<out IDataSet<out Entry?>?>?> : Ch
         if (this is RadarChart) {
             val x = getXAxis()
             if (x!!.isEnabled() && x.isDrawLabelsEnabled()) {
-                minOffset = Math.max(minOffset, x.mLabelRotatedWidth)
+                minOffset = Math.max(minOffset, x.mLabelRotatedWidth.toFloat())
             }
         }
         legendTop += getExtraTopOffset()
@@ -356,7 +358,7 @@ abstract class PieRadarChartBase<T : ChartData<out IDataSet<out Entry?>?>?> : Ch
      * @return
      */
     open fun getDiameter(): Float {
-        val content = mViewPortHandler.contentRect
+        val content = mViewPortHandler.getContentRect()!!
         content.left += getExtraLeftOffset()
         content.top += getExtraTopOffset()
         content.right -= getExtraRightOffset()

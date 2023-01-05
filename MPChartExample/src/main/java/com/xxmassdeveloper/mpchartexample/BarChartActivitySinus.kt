@@ -6,7 +6,9 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.view.*
+import android.view.Menu
+import android.view.MenuItem
+import android.view.WindowManager
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
@@ -14,7 +16,6 @@ import androidx.core.content.ContextCompat
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.components.Legend.LegendForm
-import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
@@ -22,10 +23,12 @@ import com.github.mikephil.charting.utils.FileUtils.loadBarEntriesFromAssets
 import com.xxmassdeveloper.mpchartexample.notimportant.DemoBase
 
 class BarChartActivitySinus : DemoBase(), OnSeekBarChangeListener {
-    private var chart: BarChart? = null
-    private var seekBarX: SeekBar? = null
-    private var tvX: TextView? = null
-    private var data: List<BarEntry>? = null
+
+    private lateinit var chart: BarChart
+    private lateinit var seekBarX: SeekBar
+    private lateinit var tvX: TextView
+    private var data: MutableList<BarEntry>? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.setFlags(
@@ -40,7 +43,7 @@ class BarChartActivitySinus : DemoBase(), OnSeekBarChangeListener {
         chart = findViewById(R.id.chart1)
         chart.setDrawBarShadow(false)
         chart.setDrawValueAboveBar(true)
-        chart.description!!.isEnabled = false
+        chart.getDescription()!!.setEnabled(false)
 
         // if more than 60 entries are displayed in the chart, no values will be
         // drawn
@@ -49,65 +52,69 @@ class BarChartActivitySinus : DemoBase(), OnSeekBarChangeListener {
         // scaling can now only be done on x- and y-axis separately
         chart.setPinchZoom(false)
 
-        // draw shadows for each bar that show the maximum value
-        // chart.setDrawBarShadow(true);
-
-        // chart.setDrawXLabels(false);
         chart.setDrawGridBackground(false)
-        // chart.setDrawYLabels(false);
-        val xAxis: XAxis? = chart.xAxis
-        xAxis!!.isEnabled = false
-        val leftAxis = chart.axisLeft
-        leftAxis!!.typeface = tfLight
+        val xAxis = chart.getXAxis()
+        xAxis!!.setEnabled(false)
+
+        val leftAxis = chart.getAxisLeft()
+        leftAxis!!.setTypeface(tfLight!!)
         leftAxis.setLabelCount(6, false)
-        leftAxis.axisMinimum = -2.5f
-        leftAxis.axisMaximum = 2.5f
-        leftAxis.isGranularityEnabled = true
-        leftAxis.granularity = 0.1f
-        val rightAxis = chart.axisRight
+        leftAxis.setAxisMinimum(-2.5f)
+        leftAxis.setAxisMaximum(2.5f)
+        leftAxis.setGranularityEnabled(true)
+        leftAxis.setGranularity(0.1f)
+
+        val rightAxis = chart.getAxisRight()
         rightAxis!!.setDrawGridLines(false)
-        rightAxis.typeface = tfLight
+        rightAxis.setTypeface(tfLight!!)
         rightAxis.setLabelCount(6, false)
-        rightAxis.axisMinimum = -2.5f
-        rightAxis.axisMaximum = 2.5f
-        rightAxis.granularity = 0.1f
+        rightAxis.setAxisMinimum(-2.5f)
+        rightAxis.setAxisMaximum(2.5f)
+        rightAxis.setGranularity(0.1f)
+
         seekBarX.setOnSeekBarChangeListener(this)
-        seekBarX.setProgress(150) // set data
-        val l: Legend? = chart.legend
-        l!!.verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
-        l.horizontalAlignment = Legend.LegendHorizontalAlignment.LEFT
-        l.orientation = Legend.LegendOrientation.HORIZONTAL
+        seekBarX.progress = 150 // set data
+
+        val l = chart.getLegend()
+        l!!.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM)
+        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT)
+        l.setOrientation(Legend.LegendOrientation.HORIZONTAL)
         l.setDrawInside(false)
-        l.form = LegendForm.SQUARE
-        l.formSize = 9f
-        l.textSize = 11f
-        l.xEntrySpace = 4f
+        l.setForm(LegendForm.SQUARE)
+        l.setFormSize(9f)
+        l.setTextSize(11f)
+        l.setXEntrySpace(4f)
+
         chart.animateXY(1500, 1500)
     }
 
     private fun setData(count: Int) {
-        val entries = ArrayList<BarEntry?>()
+        val entries = mutableListOf<BarEntry>()
         for (i in 0 until count) {
             entries.add(data!![i])
         }
+
         val set: BarDataSet?
-        if (chart!!.data != null &&
-            chart!!.data!!.dataSetCount > 0
+
+        if (chart.getData() != null &&
+            chart.getData().getDataSetCount() > 0
         ) {
-            set = chart!!.data!!.getDataSetByIndex(0) as BarDataSet?
+            set = chart.getData().getDataSetByIndex(0) as BarDataSet?
             set!!.setValues(entries)
-            chart!!.data!!.notifyDataChanged()
-            chart!!.notifyDataSetChanged()
+            chart.getData().notifyDataChanged()
+            chart.notifyDataSetChanged()
         } else {
             set = BarDataSet(entries, "Sinus Function")
-            set.color = Color.rgb(240, 120, 124)
+            set.setColor(Color.rgb(240, 120, 124))
         }
+
         val data = BarData(set)
         data.setValueTextSize(10f)
         data.setValueTypeface(tfLight)
         data.setDrawValues(false)
-        data.barWidth = 0.8f
-        chart!!.data = data
+        data.setBarWidth(0.8f)
+
+        chart.setData(data)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -124,38 +131,40 @@ class BarChartActivitySinus : DemoBase(), OnSeekBarChangeListener {
                 startActivity(i)
             }
             R.id.actionToggleValues -> {
-                for (set in chart!!.data!!.dataSets!!) set!!.setDrawValues(!set.isDrawValuesEnabled)
+                for (set in chart.getData()
+                    .getDataSets()!!) set.setDrawValues(!set.isDrawValuesEnabled())
                 chart.invalidate()
             }
             R.id.actionToggleHighlight -> {
-                if (chart!!.data != null) {
-                    chart!!.data!!.isHighlightEnabled = !chart!!.data!!.isHighlightEnabled
+                if (chart.getData() != null) {
+                    chart.getData().setHighlightEnabled(!chart.getData().isHighlightEnabled())
                     chart.invalidate()
                 }
             }
             R.id.actionTogglePinch -> {
-                if (chart!!.isPinchZoomEnabled) chart!!.setPinchZoom(false) else chart!!.setPinchZoom(
+                if (chart.isPinchZoomEnabled()) chart.setPinchZoom(false) else chart.setPinchZoom(
                     true
                 )
                 chart.invalidate()
             }
             R.id.actionToggleAutoScaleMinMax -> {
-                chart!!.isAutoScaleMinMaxEnabled = !chart!!.isAutoScaleMinMaxEnabled
-                chart!!.notifyDataSetChanged()
+                chart.setAutoScaleMinMaxEnabled(!chart.isAutoScaleMinMaxEnabled())
+                chart.notifyDataSetChanged()
             }
             R.id.actionToggleBarBorders -> {
-                for (set in chart!!.data!!.dataSets!!) (set as BarDataSet?)!!.barBorderWidth =
-                    if (set!!.barBorderWidth == 1f) 0f else 1f
+                for (set in chart.getData().getDataSets()!!) (set as BarDataSet).setBarBorderWidth(
+                    if (set.getBarBorderWidth() == 1f) 0f else 1f
+                )
                 chart.invalidate()
             }
             R.id.animateX -> {
-                chart!!.animateX(2000)
+                chart.animateX(2000)
             }
             R.id.animateY -> {
-                chart!!.animateY(2000)
+                chart.animateY(2000)
             }
             R.id.animateXY -> {
-                chart!!.animateXY(2000, 2000)
+                chart.animateXY(2000, 2000)
             }
             R.id.actionSave -> {
                 if (ContextCompat.checkSelfPermission(

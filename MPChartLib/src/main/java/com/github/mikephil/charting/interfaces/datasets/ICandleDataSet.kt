@@ -6,7 +6,7 @@ import com.github.mikephil.charting.data.CandleEntry
 /**
  * Created by philipp on 21/10/15.
  */
-interface ICandleDataSet : ILineScatterCandleRadarDataSet<CandleEntry?> {
+interface ICandleDataSet : ILineScatterCandleRadarDataSet<CandleEntry> {
     /**
      * Returns the space that is left out on the left and right side of each
      * candle.

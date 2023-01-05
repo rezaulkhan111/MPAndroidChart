@@ -1,7 +1,5 @@
 package com.github.mikephil.charting.utils
 
-import com.github.mikephil.charting.utils.ObjectPool.Poolable
-
 /**
  * An object pool for recycling of object instances extending Poolable.
  *
@@ -15,8 +13,7 @@ import com.github.mikephil.charting.utils.ObjectPool.Poolable
  *
  * Created by Tony Patino on 6/20/16.
  */
-class ObjectPool<T : Poolable> {
-    private var ids = 0
+class ObjectPool<T : ObjectPool.Poolable> {
 
     private var poolId = 0
     private var desiredCapacity = 0
@@ -42,13 +39,16 @@ class ObjectPool<T : Poolable> {
      * @param `object` An instance of the object that the pool should recycle.
      * @return
      */
-    @Synchronized
-    fun create(withCapacity: Int, poolableObj: T): ObjectPool<*> {
-        val result: ObjectPool<*> =
-            ObjectPool<T>(withCapacity, poolableObj)
-        result.poolId = ids
-        ids++
-        return result
+    companion object {
+        private var ids = 0
+
+        @Synchronized
+        fun create(withCapacity: Int, poolableObj: Poolable): ObjectPool<*> {
+            val result: ObjectPool<*> = ObjectPool(withCapacity, poolableObj)
+            result.poolId = ids
+            ids++
+            return result
+        }
     }
 
     constructor(withCapacity: Int, objectT: T) {

@@ -127,7 +127,7 @@ object FileUtils {
         }
     }
 
-    fun loadBarEntriesFromAssets(am: AssetManager, path: String?): List<BarEntry>? {
+    fun loadBarEntriesFromAssets(am: AssetManager, path: String?): MutableList<BarEntry> {
         val entries: MutableList<BarEntry> = ArrayList()
         var reader: BufferedReader? = null
         try {

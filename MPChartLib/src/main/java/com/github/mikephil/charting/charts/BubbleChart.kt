@@ -14,7 +14,7 @@ import com.github.mikephil.charting.renderer.BubbleChartRenderer
  *
  * @author Philipp Jahoda
  */
-class BubbleChart : BarLineChartBase<BubbleData?>, BubbleDataProvider {
+class BubbleChart : BarLineChartBase<BubbleData>, BubbleDataProvider {
 
     constructor(context: Context?) : super(context) {
     }
@@ -32,10 +32,10 @@ class BubbleChart : BarLineChartBase<BubbleData?>, BubbleDataProvider {
 
     override fun init() {
         super.init()
-        mRenderer = BubbleChartRenderer(this, mAnimator, mViewPortHandler)
+        mRenderer = BubbleChartRenderer(this, mAnimator!!, mViewPortHandler)
     }
 
-    override fun getBubbleData(): BubbleData? {
-        return mData
+    override fun getBubbleData(): BubbleData {
+        return mData!!
     }
 }
