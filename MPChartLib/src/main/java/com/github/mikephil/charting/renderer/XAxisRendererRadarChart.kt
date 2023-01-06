@@ -13,9 +13,9 @@ class XAxisRendererRadarChart : XAxisRenderer {
     private var mChart: RadarChart? = null
 
     constructor(
-        viewPortHandler: ViewPortHandler?,
-        xAxis: XAxis?,
-        chart: RadarChart?
+        viewPortHandler: ViewPortHandler,
+        xAxis: XAxis,
+        chart: RadarChart
     ) : super(viewPortHandler, xAxis, null) {
         mChart = chart
     }
@@ -34,7 +34,7 @@ class XAxisRendererRadarChart : XAxisRenderer {
         val factor = mChart!!.getFactor()
         val center = mChart!!.getCenterOffsets()
         val pOut = getInstance(0f, 0f)
-        for (i in 0 until mChart!!.getData().getMaxEntryCountSet()!!.getEntryCount()) {
+        for (i in 0 until mChart!!.getData()!!.getMaxEntryCountSet()!!.getEntryCount()) {
             val label = mXAxis!!.getValueFormatter().getFormattedValue(i.toFloat(), mXAxis)
             val angle = (sliceangle * i + mChart!!.getRotationAngle()) % 360f
             getPosition(

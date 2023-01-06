@@ -27,17 +27,17 @@ class AnimatedMoveViewJob : AnimatedViewPortJob {
             xOrigin: Float,
             yOrigin: Float,
             duration: Long
-        ): AnimatedMoveViewJob {
-            val result = pool!!.get()
-            result!!.mViewPortHandler = viewPortHandler
-            result.xValue = xValue
-            result.yValue = yValue
-            result.mTrans = trans
-            result.view = v
-            result.xOrigin = xOrigin
-            result.yOrigin = yOrigin
+        ): AnimatedMoveViewJob? {
+            val result = pool?.get()
+            result?.mViewPortHandler = viewPortHandler
+            result?.xValue = xValue
+            result?.yValue = yValue
+            result?.mTrans = trans
+            result?.view = v
+            result?.xOrigin = xOrigin
+            result?.yOrigin = yOrigin
             //result.resetAnimator();
-            result.animator!!.duration = duration
+            result?.animator?.duration = duration
             return result
         }
 
@@ -59,7 +59,7 @@ class AnimatedMoveViewJob : AnimatedViewPortJob {
 
     }
 
-    override fun onAnimationUpdate(animation: ValueAnimator?) {
+    override fun onAnimationUpdate(animation: ValueAnimator) {
         pts[0] = xOrigin + (xValue - xOrigin) * phase
         pts[1] = yOrigin + (yValue - yOrigin) * phase
         mTrans!!.pointValuesToPixel(pts)

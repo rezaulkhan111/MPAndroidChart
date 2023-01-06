@@ -2,7 +2,7 @@ package com.github.mikephil.charting.buffer
 
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
 
-class HorizontalBarBuffer : BarBuffer {
+open class HorizontalBarBuffer : BarBuffer {
 
     constructor(size: Int, dataSetCount: Int, containsStacks: Boolean) : super(
         size,
@@ -24,7 +24,7 @@ class HorizontalBarBuffer : BarBuffer {
             val x = e.getX()
             var y = e.getY()
             val vals = e.getYVals()
-            if (!mContainsStacks || vals == null) {
+            if (!mContainsStacks) {
                 val bottom = x - barWidthHalf
                 val top = x + barWidthHalf
                 var left: Float
@@ -46,7 +46,7 @@ class HorizontalBarBuffer : BarBuffer {
                 var yStart = 0f
 
                 // fill the stack
-                for (k in vals.indices) {
+                for (k in vals!!.indices) {
                     val value = vals[k]
                     if (value >= 0f) {
                         y = posY

@@ -14,7 +14,8 @@ import com.github.mikephil.charting.utils.Utils.convertDpToPixel
 class YAxisRendererHorizontalBarChart : YAxisRenderer {
 
     constructor(
-        viewPortHandler: ViewPortHandler?, yAxis: YAxis?,
+        viewPortHandler: ViewPortHandler,
+        yAxis: YAxis,
         trans: Transformer?
     ) : super(viewPortHandler, yAxis, trans) {
         mLimitLinePaint!!.textAlign = Align.LEFT

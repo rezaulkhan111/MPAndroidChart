@@ -37,9 +37,9 @@ import com.xxmassdeveloper.mpchartexample.R
         return v
     }
 
-//    companion object {
-//        fun newInstance(): Fragment {
-//            return ComplexityFragment()
-//        }
-//    }
+    companion object {
+        fun newInstance(): Fragment {
+            return ComplexityFragment()
+        }
+    }
 }

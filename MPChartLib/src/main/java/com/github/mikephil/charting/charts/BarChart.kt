@@ -16,7 +16,7 @@ import com.github.mikephil.charting.renderer.BarChartRenderer
  *
  * @author Philipp Jahoda
  */
-open class BarChart : BarLineChartBase<BarData>, BarDataProvider {
+open class BarChart : BarLineChartBase<BarData?>, BarDataProvider {
 
     /**
      * flag that indicates whether the highlight should be full-bar oriented, or single-value?
@@ -56,7 +56,7 @@ open class BarChart : BarLineChartBase<BarData>, BarDataProvider {
         getXAxis()!!.setSpaceMax(0.5f)
     }
 
-    protected override fun calcMinMax() {
+    override fun calcMinMax() {
         if (mFitBars) {
             mXAxis!!.calculate(
                 mData!!.getXMin() - mData!!.getBarWidth() / 2f,
@@ -135,7 +135,7 @@ open class BarChart : BarLineChartBase<BarData>, BarDataProvider {
         val top: Float = if (y >= 0) y else 0f
         val bottom: Float = if (y <= 0) y else 0f
         outputRect[left, top, right] = bottom
-        getTransformer(set.getAxisDependency()).rectValueToPixel(outputRect)
+        getTransformer(set.getAxisDependency())!!.rectValueToPixel(outputRect)
     }
 
     /**
@@ -200,10 +200,10 @@ open class BarChart : BarLineChartBase<BarData>, BarDataProvider {
      *
      * @param x
      * @param dataSetIndex
-     * @param stackIndex   the index inside the stack - only relevant for stacked entries
+     * @param dataIndex   the index inside the stack - only relevant for stacked entries
      */
-    override fun highlightValue(x: Float, dataSetIndex: Int, stackIndex: Int) {
-        highlightValue(Highlight(x, dataSetIndex, stackIndex), false)
+    override fun highlightValue(x: Float, dataSetIndex: Int, dataIndex: Int) {
+        highlightValue(Highlight(x, dataSetIndex, dataIndex), false)
     }
 
     override fun getBarData(): BarData? {

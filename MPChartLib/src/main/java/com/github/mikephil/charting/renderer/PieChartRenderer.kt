@@ -50,8 +50,9 @@ open class PieChartRenderer : DataRenderer {
     protected var mBitmapCanvas: Canvas? = null
 
     constructor(
-        chart: PieChart?, animator: ChartAnimator?,
-        viewPortHandler: ViewPortHandler?
+        chart: PieChart,
+        animator: ChartAnimator,
+        viewPortHandler: ViewPortHandler
     ) : super(animator, viewPortHandler) {
         mChart = chart
         mHolePaint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -110,8 +111,8 @@ open class PieChartRenderer : DataRenderer {
         }
         drawBitmap!!.eraseColor(Color.TRANSPARENT)
         val pieData = mChart!!.getData()
-        for (set in pieData!!.getDataSets()!!) {
-            if (set.isVisible() && set.getEntryCount() > 0) drawDataSet(c, set)
+        for (set in pieData!!.getDataSets()) {
+            if (set!!.isVisible() && set.getEntryCount() > 0) drawDataSet(c, set)
         }
     }
 
@@ -199,7 +200,7 @@ open class PieChartRenderer : DataRenderer {
         var visibleAngleCount = 0
         for (j in 0 until entryCount) {
             // draw only if the value is greater than zero
-            if (Math.abs(dataSet.getEntryForIndex(j).getY()) > Utils.FLOAT_EPSILON) {
+            if (Math.abs(dataSet.getEntryForIndex(j)!!.getY()) > Utils.FLOAT_EPSILON) {
                 visibleAngleCount++
             }
         }
@@ -207,7 +208,7 @@ open class PieChartRenderer : DataRenderer {
         for (j in 0 until entryCount) {
             val sliceAngle = drawAngles!![j]
             var innerRadius = userInnerRadius
-            val e: Entry = dataSet.getEntryForIndex(j)
+            val e: Entry = dataSet.getEntryForIndex(j)!!
 
             // draw only if the value is greater than zero
             if (Math.abs(e.getY()) <= Utils.FLOAT_EPSILON) {
@@ -369,15 +370,15 @@ open class PieChartRenderer : DataRenderer {
         }
         val labelRadius = radius - labelRadiusOffset
         val data = mChart!!.getData()
-        val dataSets: List<IPieDataSet>? = data!!.getDataSets()
+        val dataSets = data!!.getDataSets()
         val yValueSum = data.getYValueSum()
         val drawEntryLabels = mChart!!.isDrawEntryLabelsEnabled()
         var angle: Float
         var xIndex = 0
         c!!.save()
         val offset = Utils.convertDpToPixel(5f)
-        for (i in dataSets!!.indices) {
-            val dataSet = dataSets[i]
+        for (i in dataSets.indices) {
+            val dataSet = dataSets[i]!!
             val drawValues = dataSet.isDrawValuesEnabled()
             if (!drawValues && !drawEntryLabels) continue
             val xValuePosition = dataSet.getXValuePosition()
@@ -387,17 +388,17 @@ open class PieChartRenderer : DataRenderer {
             applyValueTextStyle(dataSet)
             val lineHeight = (Utils.calcTextHeight(mValuePaint!!, "Q")
                     + Utils.convertDpToPixel(4f))
-            val formatter = dataSet.getValueFormatter()
+            val formatter = dataSet.getValueFormatter()!!
             val entryCount = dataSet.getEntryCount()
             val isUseValueColorForLineEnabled = dataSet.isUseValueColorForLineEnabled()
             val valueLineColor = dataSet.getValueLineColor()
             mValueLinePaint!!.strokeWidth = Utils.convertDpToPixel(dataSet.getValueLineWidth())
             val sliceSpace = getSliceSpace(dataSet)
-            val iconsOffset = MPPointF.getInstance(dataSet.getIconsOffset())
+            val iconsOffset = MPPointF.getInstance(dataSet.getIconsOffset()!!)
             iconsOffset.x = Utils.convertDpToPixel(iconsOffset.x)
             iconsOffset.y = Utils.convertDpToPixel(iconsOffset.y)
             for (j in 0 until entryCount) {
-                val entry = dataSet.getEntryForIndex(j)
+                val entry = dataSet.getEntryForIndex(j)!!
                 angle = if (xIndex == 0) 0f else absoluteAngles!![xIndex - 1] * phaseX
                 val sliceAngle = drawAngles!![xIndex]
                 val sliceSpaceMiddleAngle = sliceSpace / (Utils.FDEG2RAD * labelRadius)
@@ -482,7 +483,7 @@ open class PieChartRenderer : DataRenderer {
                             0,
                             labelPtx,
                             labelPty,
-                            dataSet.getValueTextColor(j)
+                            dataSet.getValueTextColor(j)!!
                         )
                         if (j < data.getEntryCount() && entryLabel != null) {
                             drawEntryLabel(c, entryLabel, labelPtx, labelPty + lineHeight)
@@ -500,8 +501,7 @@ open class PieChartRenderer : DataRenderer {
                             0,
                             labelPtx,
                             labelPty + lineHeight / 2f,
-                            dataSet
-                                .getValueTextColor(j)
+                            dataSet.getValueTextColor(j)!!
                         )
                     }
                 }
@@ -513,7 +513,7 @@ open class PieChartRenderer : DataRenderer {
 
                     // draw everything, depending on settings
                     if (drawXInside && drawYInside) {
-                        drawValue(c, formatter, value, entry, 0, x, y, dataSet.getValueTextColor(j))
+                        drawValue(c, formatter, value, entry, 0, x, y, dataSet.getValueTextColor(j)!!)
                         if (j < data.getEntryCount() && entryLabel != null) {
                             drawEntryLabel(c, entryLabel, x, y + lineHeight)
                         }
@@ -530,7 +530,7 @@ open class PieChartRenderer : DataRenderer {
                             0,
                             x,
                             y + lineHeight / 2f,
-                            dataSet.getValueTextColor(j)
+                            dataSet.getValueTextColor(j)!!
                         )
                     }
                 }
@@ -707,7 +707,7 @@ open class PieChartRenderer : DataRenderer {
             var visibleAngleCount = 0
             for (j in 0 until entryCount) {
                 // draw only if the value is greater than zero
-                if (Math.abs(set.getEntryForIndex(j).getY()) > Utils.FLOAT_EPSILON) {
+                if (Math.abs(set.getEntryForIndex(j)!!.getY()) > Utils.FLOAT_EPSILON) {
                     visibleAngleCount++
                 }
             }
@@ -851,7 +851,7 @@ open class PieChartRenderer : DataRenderer {
         var angle = mChart!!.getRotationAngle()
         for (j in 0 until dataSet.getEntryCount()) {
             val sliceAngle = drawAngles!![j]
-            val e: Entry = dataSet.getEntryForIndex(j)
+            val e: Entry = dataSet.getEntryForIndex(j)!!
 
             // draw only if the value is greater than zero
             if (Math.abs(e.getY()) > Utils.FLOAT_EPSILON) {

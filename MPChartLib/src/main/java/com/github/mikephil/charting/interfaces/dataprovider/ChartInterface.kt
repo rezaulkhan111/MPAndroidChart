@@ -53,15 +53,15 @@ interface ChartInterface {
 
     fun getHeight(): Int
 
-    fun getCenterOfView(): MPPointF
+    fun getCenterOfView(): MPPointF?
 
-    fun getCenterOffsets(): MPPointF
+    fun getCenterOffsets(): MPPointF?
 
-    fun getContentRect(): RectF
+    fun getContentRect(): RectF?
 
-    fun getDefaultValueFormatter(): IValueFormatter
+    fun getDefaultValueFormatter(): IValueFormatter?
 
-    fun getData(): ChartData<*>
+    fun getData(): ChartData<*>?
 
     fun getMaxVisibleCount(): Int
 }

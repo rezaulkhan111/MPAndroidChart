@@ -124,7 +124,7 @@ class BarChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSelect
 
     private fun setData(count: Int, range: Float) {
         val start = 1f
-        val values: MutableList<BarEntry> = mutableListOf()
+        val values: MutableList<BarEntry?> = mutableListOf()
         var i = start.toInt()
         while (i < start + count) {
             val valFloat = (Math.random() * (range + 1)).toFloat()
@@ -139,11 +139,11 @@ class BarChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSelect
         val set1: BarDataSet?
 
         if (chart.getData() != null &&
-            chart.getData().getDataSetCount() > 0
+            chart.getData()!!.getDataSetCount() > 0
         ) {
-            set1 = chart.getData().getDataSetByIndex(0) as BarDataSet?
+            set1 = chart.getData()!!.getDataSetByIndex(0) as BarDataSet?
             set1!!.setValues(values)
-            chart.getData().notifyDataChanged()
+            chart.getData()!!.notifyDataChanged()
             chart.notifyDataSetChanged()
         } else {
             set1 = BarDataSet(values, "The year 2017")
@@ -165,7 +165,7 @@ class BarChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSelect
             gradientFills.add(Fill(startColor4, endColor4))
             gradientFills.add(Fill(startColor5, endColor5))
             set1.setFills(gradientFills)
-            val dataSets = ArrayList<IBarDataSet>()
+            val dataSets = ArrayList<IBarDataSet?>()
             dataSets.add(set1)
             val data = BarData(dataSets)
             data.setValueTextSize(10f)
@@ -190,18 +190,18 @@ class BarChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSelect
                 startActivity(i)
             }
             R.id.actionToggleValues -> {
-                for (set in chart.getData()
-                    .getDataSets()!!) set.setDrawValues(!set.isDrawValuesEnabled())
+                for (set in chart.getData()!!
+                    .getDataSets()!!) set!!.setDrawValues(!set.isDrawValuesEnabled())
                 chart.invalidate()
             }
             R.id.actionToggleIcons -> {
-                for (set in chart.getData()
-                    .getDataSets()!!) set.setDrawIcons(!set.isDrawIconsEnabled())
+                for (set in chart.getData()!!
+                    .getDataSets()!!) set!!.setDrawIcons(!set.isDrawIconsEnabled())
                 chart.invalidate()
             }
             R.id.actionToggleHighlight -> {
                 if (chart.getData() != null) {
-                    chart.getData().setHighlightEnabled(!chart.getData().isHighlightEnabled())
+                    chart.getData()!!.setHighlightEnabled(!chart.getData()!!.isHighlightEnabled())
                     chart.invalidate()
                 }
             }
@@ -216,7 +216,8 @@ class BarChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSelect
                 chart.notifyDataSetChanged()
             }
             R.id.actionToggleBarBorders -> {
-                for (set in chart.getData().getDataSets()!!) (set as BarDataSet).setBarBorderWidth(
+                for (set in chart.getData()!!
+                    .getDataSets()!!) (set as BarDataSet).setBarBorderWidth(
                     if (set.getBarBorderWidth() == 1f) 0f else 1f
                 )
                 chart.invalidate()
@@ -259,7 +260,7 @@ class BarChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSelect
     override fun onStartTrackingTouch(seekBar: SeekBar) {}
     override fun onStopTrackingTouch(seekBar: SeekBar) {}
     private val onValueSelectedRectF = RectF()
-    override fun onValueSelected(e: Entry, h: Highlight) {
+    override fun onValueSelected(e: Entry?, h: Highlight?) {
         if (e == null) return
         val bounds = onValueSelectedRectF
         chart.getBarBounds((e as BarEntry?)!!, bounds)

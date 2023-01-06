@@ -107,7 +107,7 @@ class PiePolylineChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartVal
     }
 
     private fun setData(count: Int, range: Float) {
-        val entries = mutableListOf<PieEntry>()
+        val entries = mutableListOf<PieEntry?>()
 
         // NOTE: The order of the entries when being added to the entries array determines their position around the center of
         // the chart.
@@ -167,7 +167,7 @@ class PiePolylineChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartVal
             }
             R.id.actionToggleValues -> {
                 for (set in chart.getData()!!
-                    .getDataSets()!!) set.setDrawValues(!set.isDrawValuesEnabled())
+                    .getDataSets()) set!!.setDrawValues(!set.isDrawValuesEnabled())
                 chart.invalidate()
             }
             R.id.actionToggleHole -> {
@@ -261,12 +261,12 @@ class PiePolylineChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartVal
         return s
     }
 
-    override fun onValueSelected(e: Entry, h: Highlight) {
+    override fun onValueSelected(e: Entry?, h: Highlight?) {
         if (e == null) return
         Log.i(
             "VAL SELECTED",
             "Value: " + e.getY() + ", xIndex: " + e.getX()
-                    + ", DataSet index: " + h.getDataSetIndex()
+                    + ", DataSet index: " + h!!.getDataSetIndex()
         )
     }
 

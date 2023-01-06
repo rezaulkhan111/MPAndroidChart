@@ -14,7 +14,7 @@ import com.github.mikephil.charting.renderer.BubbleChartRenderer
  *
  * @author Philipp Jahoda
  */
-class BubbleChart : BarLineChartBase<BubbleData>, BubbleDataProvider {
+class BubbleChart : BarLineChartBase<BubbleData?>, BubbleDataProvider {
 
     constructor(context: Context?) : super(context) {
     }

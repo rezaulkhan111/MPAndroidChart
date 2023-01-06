@@ -12,7 +12,7 @@ import com.github.mikephil.charting.interfaces.datasets.IBarLineScatterCandleBub
  * @author Philipp Jahoda
  */
 class CombinedData() :
-    BarLineScatterCandleBubbleData<IBarLineScatterCandleBubbleDataSet<out Entry>>() {
+    BarLineScatterCandleBubbleData<IBarLineScatterCandleBubbleDataSet<out Entry?>?>() {
 
     private var mLineData: LineData? = null
     private var mBarData: BarData? = null
@@ -61,14 +61,14 @@ class CombinedData() :
         val allData = getAllData()
         for (data in allData) {
             data.calcMinMax()
-            val sets: List<IBarLineScatterCandleBubbleDataSet<out Entry>>? = data.getDataSets()
+            val sets = data.getDataSets()
             mDataSets!!.addAll(sets!!)
             if (data.getYMax() > mYMax) mYMax = data.getYMax()
             if (data.getYMin() < mYMin) mYMin = data.getYMin()
             if (data.getXMax() > mXMax) mXMax = data.getXMax()
             if (data.getXMin() < mXMin) mXMin = data.getXMin()
             for (dataset in sets) {
-                if (dataset.getAxisDependency() === AxisDependency.LEFT) {
+                if (dataset!!.getAxisDependency() == AxisDependency.LEFT) {
                     if (dataset.getYMax() > mLeftAxisMax) {
                         mLeftAxisMax = dataset.getYMax()
                     }
@@ -148,8 +148,8 @@ class CombinedData() :
         // The value of the highlighted entry could be NaN -
         //   if we are not interested in highlighting a specific value.
         val entries = data.getDataSetByIndex(highlight.getDataSetIndex())!!
-            .getEntriesForXValue(highlight.getX())
-        for (entry in entries) if (entry.getY() == highlight.getY() ||
+            .getEntriesForXValue(highlight.getX())!!
+        for (entry in entries) if (entry!!.getY() == highlight.getY() ||
             java.lang.Float.isNaN(highlight.getY())
         ) return entry
         return null
@@ -161,7 +161,7 @@ class CombinedData() :
      * @param highlight current highlight
      * @return dataset related to highlight
      */
-    fun getDataSetByHighlight(highlight: Highlight): IBarLineScatterCandleBubbleDataSet<out Entry>? {
+    fun getDataSetByHighlight(highlight: Highlight): IBarLineScatterCandleBubbleDataSet<out Entry?>? {
         if (highlight.getDataIndex() >= getAllData().size) return null
         val data = getDataByIndex(highlight.getDataIndex())
         return if (highlight.getDataSetIndex() >= data.getDataSetCount()) null else data.getDataSets()!![highlight.getDataSetIndex()]
@@ -172,7 +172,7 @@ class CombinedData() :
         return getAllData().indexOf(data)
     }
 
-    override fun removeDataSet(d: IBarLineScatterCandleBubbleDataSet<out Entry>?): Boolean {
+    override fun removeDataSet(d: IBarLineScatterCandleBubbleDataSet<out Entry?>?): Boolean {
         val datas = getAllData()
         var success = false
         for (data in datas) {

@@ -15,7 +15,9 @@ import com.github.mikephil.charting.components.Legend
 import com.xxmassdeveloper.mpchartexample.R
 
 class PieChartFrag : SimpleFragment() {
-    private var chart: PieChart? = null
+
+    private lateinit var chart: PieChart
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -23,22 +25,29 @@ class PieChartFrag : SimpleFragment() {
     ): View? {
         val v = inflater.inflate(R.layout.frag_simple_pie, container, false)
         chart = v.findViewById(R.id.pieChart1)
-        chart.description!!.isEnabled = false
+
+        chart.getDescription()!!.setEnabled(false)
+
         val tf = Typeface.createFromAsset(context!!.assets, "OpenSans-Light.ttf")
+
         chart.setCenterTextTypeface(tf)
-        chart.centerText = generateCenterText()
+        chart.setCenterText(generateCenterText())
         chart.setCenterTextSize(10f)
         chart.setCenterTextTypeface(tf)
 
         // radius of the center hole in percent of maximum radius
-        chart.holeRadius = 45f
-        chart.transparentCircleRadius = 50f
-        val l: Legend? = chart.legend
-        l!!.verticalAlignment = Legend.LegendVerticalAlignment.TOP
-        l.horizontalAlignment = Legend.LegendHorizontalAlignment.RIGHT
-        l.orientation = Legend.LegendOrientation.VERTICAL
+
+        // radius of the center hole in percent of maximum radius
+        chart.setHoleRadius(45f)
+        chart.setTransparentCircleRadius(50f)
+
+        val l = chart.getLegend()
+        l!!.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP)
+        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT)
+        l.setOrientation(Legend.LegendOrientation.VERTICAL)
         l.setDrawInside(false)
-        chart.data = generatePieData()
+
+        chart.setData(generatePieData())
         return v
     }
 

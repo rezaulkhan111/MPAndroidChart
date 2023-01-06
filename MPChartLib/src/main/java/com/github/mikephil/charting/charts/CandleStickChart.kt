@@ -11,7 +11,7 @@ import com.github.mikephil.charting.renderer.CandleStickChartRenderer
  *
  * @author Philipp Jahoda
  */
-class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvider {
+class CandleStickChart : BarLineChartBase<CandleData?>, CandleDataProvider {
 
     constructor(context: Context?) : super(context) {}
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {}

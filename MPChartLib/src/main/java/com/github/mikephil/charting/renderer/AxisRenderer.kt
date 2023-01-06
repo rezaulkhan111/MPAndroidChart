@@ -42,7 +42,7 @@ abstract class AxisRenderer : Renderer {
      */
     protected var mLimitLinePaint: Paint? = null
 
-    constructor(viewPortHandler: ViewPortHandler?, trans: Transformer?, axis: AxisBase?) : super(
+    constructor(viewPortHandler: ViewPortHandler, trans: Transformer?, axis: AxisBase) : super(
         viewPortHandler
     ) {
         mTrans = trans

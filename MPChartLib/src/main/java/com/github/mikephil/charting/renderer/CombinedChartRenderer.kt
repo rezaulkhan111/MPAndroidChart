@@ -20,12 +20,12 @@ class CombinedChartRenderer : DataRenderer {
      */
     protected var mRenderers: MutableList<DataRenderer> = ArrayList(5)
 
-    protected var mChart: WeakReference<Chart<*>>? = null
+    protected var mChart: WeakReference<Chart<*>>
 
     constructor(
         chart: CombinedChart,
         animator: ChartAnimator,
-        viewPortHandler: ViewPortHandler?
+        viewPortHandler: ViewPortHandler
     ) : super(animator, viewPortHandler) {
         mChart = WeakReference(chart)
         createRenderers()
@@ -37,7 +37,7 @@ class CombinedChartRenderer : DataRenderer {
      */
     fun createRenderers() {
         mRenderers.clear()
-        val chart = mChart!!.get() as CombinedChart? ?: return
+        val chart = mChart.get() as CombinedChart? ?: return
         val orders = chart.getDrawOrder()
         for (order in orders!!) {
             when (order) {
@@ -45,24 +45,24 @@ class CombinedChartRenderer : DataRenderer {
                     BarChartRenderer(
                         chart,
                         mAnimator!!,
-                        mViewPortHandler
+                        mViewPortHandler!!
                     )
                 )
                 DrawOrder.BUBBLE -> if (chart.getBubbleData() != null) mRenderers.add(
-                    BubbleChartRenderer(chart, mAnimator!!, mViewPortHandler)
+                    BubbleChartRenderer(chart, mAnimator!!, mViewPortHandler!!)
                 )
                 DrawOrder.LINE -> if (chart.getLineData() != null) mRenderers.add(
                     LineChartRenderer(
                         chart,
-                        mAnimator,
-                        mViewPortHandler
+                        mAnimator!!,
+                        mViewPortHandler!!
                     )
                 )
                 DrawOrder.CANDLE -> if (chart.getCandleData() != null) mRenderers.add(
-                    CandleStickChartRenderer(chart, mAnimator!!, mViewPortHandler)
+                    CandleStickChartRenderer(chart, mAnimator!!, mViewPortHandler!!)
                 )
                 DrawOrder.SCATTER -> if (chart.getScatterData() != null) mRenderers.add(
-                    ScatterChartRenderer(chart, mAnimator!!, mViewPortHandler)
+                    ScatterChartRenderer(chart, mAnimator!!, mViewPortHandler!!)
                 )
             }
         }

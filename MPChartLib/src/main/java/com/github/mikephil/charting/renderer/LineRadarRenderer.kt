@@ -11,8 +11,8 @@ import com.github.mikephil.charting.utils.ViewPortHandler
  */
 abstract class LineRadarRenderer : LineScatterCandleRadarRenderer {
 
-    constructor(animator: ChartAnimator?, viewPortHandler: ViewPortHandler?) : super(
-        animator!!,
+    constructor(animator: ChartAnimator, viewPortHandler: ViewPortHandler) : super(
+        animator,
         viewPortHandler
     ) {
     }

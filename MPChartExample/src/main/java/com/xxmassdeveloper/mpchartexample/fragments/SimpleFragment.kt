@@ -34,9 +34,9 @@ abstract class SimpleFragment : Fragment() {
     }
 
     fun generateBarData(dataSets: Int, range: Float, count: Int): BarData {
-        val sets = mutableListOf<IBarDataSet>()
+        val sets = mutableListOf<IBarDataSet?>()
         for (i in 0 until dataSets) {
-            val entries = mutableListOf<BarEntry>()
+            val entries = mutableListOf<BarEntry?>()
             for (j in 0 until count) {
                 entries.add(BarEntry(j.toFloat(), (Math.random() * range).toFloat() + range / 4))
             }
@@ -50,10 +50,10 @@ abstract class SimpleFragment : Fragment() {
     }
 
     fun generateScatterData(dataSets: Int, range: Float, count: Int): ScatterData {
-        val sets = mutableListOf<IScatterDataSet>()
+        val sets = mutableListOf<IScatterDataSet?>()
         val shapes = allDefaultShapes
         for (i in 0 until dataSets) {
-            val entries = mutableListOf<Entry>()
+            val entries = mutableListOf<Entry?>()
             for (j in 0 until count) {
                 entries.add(Entry(j.toFloat(), (Math.random() * range).toFloat() + range / 4))
             }
@@ -75,7 +75,7 @@ abstract class SimpleFragment : Fragment() {
      */
     fun generatePieData(): PieData {
         val count = 4
-        val entries1 = ArrayList<PieEntry>()
+        val entries1 = ArrayList<PieEntry?>()
         for (i in 0 until count) {
             entries1.add(PieEntry((Math.random() * 60 + 40).toFloat(), "Quarter " + (i + 1)))
         }
@@ -90,7 +90,7 @@ abstract class SimpleFragment : Fragment() {
     }
 
     fun generateLineData(): LineData {
-        val sets = ArrayList<ILineDataSet>()
+        val sets = ArrayList<ILineDataSet?>()
         val ds1 = LineDataSet(
             loadEntriesFromAssets(
                 requireContext().assets, "sine.txt"
@@ -123,7 +123,7 @@ abstract class SimpleFragment : Fragment() {
     // load DataSets from files in assets folder
     val complexity: LineData
         get() {
-            val sets = ArrayList<ILineDataSet>()
+            val sets = ArrayList<ILineDataSet?>()
             val ds1 = LineDataSet(
                 loadEntriesFromAssets(
                     requireContext().assets, "n.txt"

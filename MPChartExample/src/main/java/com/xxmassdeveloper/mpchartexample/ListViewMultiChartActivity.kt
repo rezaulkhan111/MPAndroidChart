@@ -80,7 +80,7 @@ class ListViewMultiChartActivity : DemoBase() {
      * @return Line data
      */
     private fun generateDataLine(cnt: Int): LineData {
-        val values1 = mutableListOf<Entry>()
+        val values1 = mutableListOf<Entry?>()
         for (i in 0..11) {
             values1.add(Entry(i.toFloat(), ((Math.random() * 65).toInt() + 40).toFloat()))
         }
@@ -91,10 +91,10 @@ class ListViewMultiChartActivity : DemoBase() {
         d1.setHighLightColor(Color.rgb(244, 117, 117))
         d1.setDrawValues(false)
 
-        val values2 = java.util.ArrayList<Entry>()
+        val values2 = java.util.ArrayList<Entry?>()
 
         for (i in 0..11) {
-            values2.add(Entry(i.toFloat(), values1[i].getY() - 30))
+            values2.add(Entry(i.toFloat(), values1[i]!!.getY() - 30))
         }
 
         val d2 = LineDataSet(values2, "New DataSet $cnt, (2)")
@@ -105,7 +105,7 @@ class ListViewMultiChartActivity : DemoBase() {
         d2.setCircleColor(ColorTemplate.VORDIPLOM_COLORS[0])
         d2.setDrawValues(false)
 
-        val sets = java.util.ArrayList<ILineDataSet>()
+        val sets = java.util.ArrayList<ILineDataSet?>()
         sets.add(d1)
         sets.add(d2)
         return LineData(sets)
@@ -117,12 +117,12 @@ class ListViewMultiChartActivity : DemoBase() {
      * @return Bar data
      */
     private fun generateDataBar(cnt: Int): BarData {
-        val entries = mutableListOf<BarEntry>()
+        val entries = mutableListOf<BarEntry?>()
         for (i in 0..11) {
             entries.add(BarEntry(i.toFloat(), (Math.random() * 70).toInt().toFloat() + 30))
         }
         val d = BarDataSet(entries, "New DataSet $cnt")
-        d.setColors(*ColorTemplate.VORDIPLOM_COLORS)
+        d.setColors(ColorTemplate.VORDIPLOM_COLORS)
         d.setHighLightAlpha(255)
 
         val cd = BarData(d)
@@ -136,7 +136,7 @@ class ListViewMultiChartActivity : DemoBase() {
      * @return Pie data
      */
     private fun generateDataPie(): PieData {
-        val entries = mutableListOf<PieEntry>()
+        val entries = mutableListOf<PieEntry?>()
         for (i in 0..3) {
             entries.add(PieEntry((Math.random() * 70 + 30).toFloat(), "Quarter " + (i + 1)))
         }
@@ -144,7 +144,7 @@ class ListViewMultiChartActivity : DemoBase() {
         val d = PieDataSet(entries, "")
         // space between slices
         d.setSliceSpace(2f)
-        d.setColors(*ColorTemplate.VORDIPLOM_COLORS)
+        d.setColors(ColorTemplate.VORDIPLOM_COLORS)
         return PieData(d)
     }
 

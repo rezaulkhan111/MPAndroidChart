@@ -12,9 +12,9 @@ class YAxisRendererRadarChart : YAxisRenderer {
     private var mChart: RadarChart? = null
 
     constructor(
-        viewPortHandler: ViewPortHandler?,
-        yAxis: YAxis?,
-        chart: RadarChart?
+        viewPortHandler: ViewPortHandler,
+        yAxis: YAxis,
+        chart: RadarChart
     ) : super(viewPortHandler, yAxis, null) {
         mChart = chart
     }
@@ -169,7 +169,7 @@ class YAxisRendererRadarChart : YAxisRenderer {
             val r = (l.getLimit() - mChart!!.getYChartMin()) * factor
             val limitPath = mRenderLimitLinesPathBuffer
             limitPath.reset()
-            for (j in 0 until mChart!!.getData().getMaxEntryCountSet()!!.getEntryCount()) {
+            for (j in 0 until mChart!!.getData()!!.getMaxEntryCountSet()!!.getEntryCount()) {
                 Utils.getPosition(center, r, sliceangle * j + mChart!!.getRotationAngle(), pOut)
                 if (j == 0) limitPath.moveTo(pOut.x, pOut.y) else limitPath.lineTo(pOut.x, pOut.y)
             }

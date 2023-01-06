@@ -21,8 +21,10 @@ class XAxisRendererHorizontalBarChart : XAxisRenderer {
     protected var mChart: BarChart? = null
 
     constructor(
-        viewPortHandler: ViewPortHandler?, xAxis: XAxis?,
-        trans: Transformer?, chart: BarChart?
+        viewPortHandler: ViewPortHandler,
+        xAxis: XAxis,
+        trans: Transformer?,
+        chart: BarChart
     ) : super(viewPortHandler, xAxis, trans) {
         mChart = chart
     }

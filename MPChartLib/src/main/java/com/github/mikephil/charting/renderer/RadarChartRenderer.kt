@@ -26,9 +26,9 @@ class RadarChartRenderer : LineRadarRenderer {
     protected var mHighlightCirclePaint: Paint? = null
 
     constructor(
-        chart: RadarChart?,
-        animator: ChartAnimator?,
-        viewPortHandler: ViewPortHandler?
+        chart: RadarChart,
+        animator: ChartAnimator,
+        viewPortHandler: ViewPortHandler
     ) : super(animator, viewPortHandler) {
         mChart = chart
         mHighlightPaint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -52,7 +52,7 @@ class RadarChartRenderer : LineRadarRenderer {
         val radarData: RadarData? = mChart!!.getData()
         val mostEntries = radarData!!.getMaxEntryCountSet()!!.getEntryCount()
         for (set in radarData.getDataSets()!!) {
-            if (set.isVisible()) {
+            if (set!!.isVisible()) {
                 drawDataSet(c!!, set, mostEntries)
             }
         }
@@ -82,9 +82,9 @@ class RadarChartRenderer : LineRadarRenderer {
         var hasMovedToPoint = false
         for (j in 0 until dataSet.getEntryCount()) {
             mRenderPaint!!.color = dataSet.getColor(j)
-            val e = dataSet.getEntryForIndex(j)
+            val e = dataSet.getEntryForIndex(j)!!
             getPosition(
-                center!!,
+                center,
                 (e.getY() - mChart!!.getYChartMin()) * factor * phaseY,
                 sliceangle * j * phaseX + mChart!!.getRotationAngle(), pOut
             )
@@ -131,19 +131,19 @@ class RadarChartRenderer : LineRadarRenderer {
         val pOut = getInstance(0f, 0f)
         val pIcon = getInstance(0f, 0f)
         val yoffset = convertDpToPixel(5f)
-        for (i in 0 until mChart!!.getData().getDataSetCount()) {
-            val dataSet: IRadarDataSet = mChart!!.getData().getDataSetByIndex(i)!!
+        for (i in 0 until mChart!!.getData()!!.getDataSetCount()) {
+            val dataSet: IRadarDataSet = mChart!!.getData()!!.getDataSetByIndex(i)!!
             if (!shouldDrawValues(dataSet)) continue
 
             // apply the text-styling defined by the DataSet
             applyValueTextStyle(dataSet)
-            val iconsOffset = getInstance(dataSet.getIconsOffset())
+            val iconsOffset = getInstance(dataSet.getIconsOffset()!!)
             iconsOffset.x = convertDpToPixel(iconsOffset.x)
             iconsOffset.y = convertDpToPixel(iconsOffset.y)
             for (j in 0 until dataSet.getEntryCount()) {
-                val entry = dataSet.getEntryForIndex(j)
+                val entry = dataSet.getEntryForIndex(j)!!
                 getPosition(
-                    center!!,
+                    center,
                     (entry.getY() - mChart!!.getYChartMin()) * factor * phaseY,
                     sliceangle * j * phaseX + mChart!!.getRotationAngle(),
                     pOut
@@ -151,13 +151,13 @@ class RadarChartRenderer : LineRadarRenderer {
                 if (dataSet.isDrawValuesEnabled()) {
                     drawValue(
                         c!!,
-                        dataSet.getValueFormatter(),
+                        dataSet.getValueFormatter()!!,
                         entry.getY(),
                         entry,
                         i,
                         pOut.x,
                         pOut.y - yoffset,
-                        dataSet.getValueTextColor(j)
+                        dataSet.getValueTextColor(j)!!
                     )
                 }
                 if (entry.getIcon() != null && dataSet.isDrawIconsEnabled()) {
@@ -204,7 +204,7 @@ class RadarChartRenderer : LineRadarRenderer {
         mWebPaint!!.color = mChart!!.getWebColor()
         mWebPaint!!.alpha = mChart!!.getWebAlpha()
         val xIncrements = 1 + mChart!!.getSkipWebLineCount()
-        val maxEntryCount: Int = mChart!!.getData().getMaxEntryCountSet()!!.getEntryCount()
+        val maxEntryCount: Int = mChart!!.getData()!!.getMaxEntryCountSet()!!.getEntryCount()
         val p = getInstance(0f, 0f)
         var i = 0
         while (i < maxEntryCount) {
@@ -227,7 +227,7 @@ class RadarChartRenderer : LineRadarRenderer {
         val p1out = getInstance(0f, 0f)
         val p2out = getInstance(0f, 0f)
         for (j in 0 until labelCount) {
-            for (i in 0 until mChart!!.getData().getEntryCount()) {
+            for (i in 0 until mChart!!.getData()!!.getEntryCount()) {
                 val r = (mChart!!.getYAxis()!!.mEntries[j] - mChart!!.getYChartMin()) * factor
                 getPosition(center, r, sliceangle * i + rotationangle, p1out)
                 getPosition(center, r, sliceangle * (i + 1) + rotationangle, p2out)
@@ -250,11 +250,11 @@ class RadarChartRenderer : LineRadarRenderer {
         for (high in indices!!) {
             val set = radarData!!.getDataSetByIndex(high.getDataSetIndex())
             if (set == null || !set.isHighlightEnabled()) continue
-            val e = set.getEntryForIndex(high.getX().toInt())
+            val e = set.getEntryForIndex(high.getX().toInt())!!
             if (!isInBoundsX(e, set)) continue
             val y = e.getY() - mChart!!.getYChartMin()
             getPosition(
-                center!!,
+                center,
                 y * factor * mAnimator!!.getPhaseY(),
                 sliceangle * high.getX() * mAnimator!!.getPhaseX() + mChart!!.getRotationAngle(),
                 pOut
@@ -285,7 +285,7 @@ class RadarChartRenderer : LineRadarRenderer {
                 }
             }
         }
-        recycleInstance(center!!)
+        recycleInstance(center)
         recycleInstance(pOut)
     }
 
@@ -299,17 +299,17 @@ class RadarChartRenderer : LineRadarRenderer {
         strokeColor: Int,
         strokeWidth: Float
     ) {
-        var innerRadius = innerRadius
-        var outerRadius = outerRadius
+        var mInnRadius = innerRadius
+        var mOuterRadius = outerRadius
         c.save()
-        outerRadius = convertDpToPixel(outerRadius)
-        innerRadius = convertDpToPixel(innerRadius)
+        mOuterRadius = convertDpToPixel(mOuterRadius)
+        mInnRadius = convertDpToPixel(mInnRadius)
         if (fillColor != ColorTemplate.COLOR_NONE) {
             val p = mDrawHighlightCirclePathBuffer
             p.reset()
-            p.addCircle(point.x, point.y, outerRadius, Path.Direction.CW)
-            if (innerRadius > 0f) {
-                p.addCircle(point.x, point.y, innerRadius, Path.Direction.CCW)
+            p.addCircle(point.x, point.y, mOuterRadius, Path.Direction.CW)
+            if (mInnRadius > 0f) {
+                p.addCircle(point.x, point.y, mInnRadius, Path.Direction.CCW)
             }
             mHighlightCirclePaint!!.color = fillColor
             mHighlightCirclePaint!!.style = Paint.Style.FILL
@@ -319,7 +319,7 @@ class RadarChartRenderer : LineRadarRenderer {
             mHighlightCirclePaint!!.color = strokeColor
             mHighlightCirclePaint!!.style = Paint.Style.STROKE
             mHighlightCirclePaint!!.strokeWidth = convertDpToPixel(strokeWidth)
-            c.drawCircle(point.x, point.y, outerRadius, mHighlightCirclePaint!!)
+            c.drawCircle(point.x, point.y, mOuterRadius, mHighlightCirclePaint!!)
         }
         c.restore()
     }

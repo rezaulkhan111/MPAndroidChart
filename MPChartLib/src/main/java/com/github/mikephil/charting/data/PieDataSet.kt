@@ -3,7 +3,7 @@ package com.github.mikephil.charting.data
 import com.github.mikephil.charting.interfaces.datasets.IPieDataSet
 import com.github.mikephil.charting.utils.Utils.convertDpToPixel
 
-class PieDataSet : DataSet<PieEntry>, IPieDataSet {
+class PieDataSet : DataSet<PieEntry?>, IPieDataSet {
 
     /**
      * the space in pixels between the chart-slices, default 0f
@@ -27,14 +27,14 @@ class PieDataSet : DataSet<PieEntry>, IPieDataSet {
     private var mValueLineVariableLength = true
     private var mHighlightColor: Int? = null
 
-    constructor(yVals: MutableList<PieEntry>, label: String) : super(yVals, label) {
+    constructor(yVals: MutableList<PieEntry?>?, label: String) : super(yVals, label) {
 //        mShift = Utils.convertDpToPixel(12f);
     }
 
-    override fun copy(): DataSet<PieEntry> {
-        val entries: MutableList<PieEntry> = ArrayList()
+    override fun copy(): DataSet<PieEntry?> {
+        val entries: MutableList<PieEntry?> = ArrayList()
         for (i in mEntries!!.indices) {
-            entries.add(mEntries!![i].copy())
+            entries.add(mEntries!![i]!!.copy())
         }
         val copied = PieDataSet(entries, getLabel())
         copy(copied)

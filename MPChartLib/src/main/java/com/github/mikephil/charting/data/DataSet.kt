@@ -8,7 +8,7 @@ package com.github.mikephil.charting.data
  *
  * @author Philipp Jahoda
  */
-abstract class DataSet<T : Entry> : BaseDataSet<T> {
+abstract class DataSet<T : Entry?> : BaseDataSet<T> {
 
     /**
      * the entries that this DataSet represents / holds together
@@ -87,12 +87,12 @@ abstract class DataSet<T : Entry> : BaseDataSet<T> {
     }
 
     protected open fun calcMinMaxX(e: T) {
-        if (e.getX() < mXMin) mXMin = e.getX()
+        if (e!!.getX() < mXMin) mXMin = e.getX()
         if (e.getX() > mXMax) mXMax = e.getX()
     }
 
     protected open fun calcMinMaxY(e: T) {
-        if (e.getY() < mYMin) mYMin = e.getY()
+        if (e!!.getY() < mYMin) mYMin = e.getY()
         if (e.getY() > mYMax) mYMax = e.getY()
     }
 
@@ -196,13 +196,13 @@ abstract class DataSet<T : Entry> : BaseDataSet<T> {
         return mXMax
     }
 
-    override fun addEntryOrdered(e: T?) {
+    override fun addEntryOrdered(e: T) {
         if (e == null) return
         if (mEntries == null) {
             mEntries = ArrayList()
         }
         calcMinMax(e)
-        if (mEntries!!.size > 0 && mEntries!![mEntries!!.size - 1].getX() > e.getX()) {
+        if (mEntries!!.size > 0 && mEntries!![mEntries!!.size - 1]!!.getX() > e.getX()) {
             val closestIndex = getEntryIndex(e.getX(), e.getY(), Rounding.UP)
             mEntries!!.add(closestIndex, e)
         } else {
@@ -215,7 +215,7 @@ abstract class DataSet<T : Entry> : BaseDataSet<T> {
         notifyDataSetChanged()
     }
 
-    override fun addEntry(e: T?): Boolean {
+    override fun addEntry(e: T): Boolean {
         if (e == null) return false
         var values = getEntries()
         if (values == null) {
@@ -227,7 +227,7 @@ abstract class DataSet<T : Entry> : BaseDataSet<T> {
         return values.add(e)
     }
 
-    override fun removeEntry(e: T?): Boolean {
+    override fun removeEntry(e: T): Boolean {
         if (e == null) return false
         if (mEntries == null) return false
 
@@ -239,11 +239,11 @@ abstract class DataSet<T : Entry> : BaseDataSet<T> {
         return removed
     }
 
-    override fun getEntryIndex(e: T): Int {
+    override fun getEntryIndex(e: Entry?): Int {
         return mEntries!!.indexOf(e)
     }
 
-    override fun getEntryForXValue(xValue: Float, closestToY: Float, rounding: Rounding): T? {
+    override fun getEntryForXValue(xValue: Float, closestToY: Float, rounding: Rounding?): T? {
         val index = getEntryIndex(xValue, closestToY, rounding)
         return if (index > -1) mEntries!!.get(index) else null
     }
@@ -256,15 +256,15 @@ abstract class DataSet<T : Entry> : BaseDataSet<T> {
         return mEntries!![index]
     }
 
-    override fun getEntryIndex(xValue: Float, closestToY: Float, rounding: Rounding): Int {
+    override fun getEntryIndex(xValue: Float, closestToY: Float, rounding: Rounding?): Int {
         if (mEntries == null || mEntries!!.isEmpty()) return -1
         var low = 0
         var high = mEntries!!.size - 1
         var closest = high
         while (low < high) {
             val m = (low + high) / 2
-            val d1 = mEntries!![m].getX() - xValue
-            val d2 = mEntries!![m + 1].getX() - xValue
+            val d1 = mEntries!![m]!!.getX() - xValue
+            val d2 = mEntries!![m + 1]!!.getX() - xValue
             val ad1 = Math.abs(d1)
             val ad2 = Math.abs(d2)
             if (ad2 < ad1) {
@@ -288,7 +288,7 @@ abstract class DataSet<T : Entry> : BaseDataSet<T> {
             closest = high
         }
         if (closest != -1) {
-            val closestXValue = mEntries!![closest].getX()
+            val closestXValue = mEntries!![closest]!!.getX()
             if (rounding == Rounding.UP) {
                 // If rounding up, and found x-value is lower than specified x, and we can go upper...
                 if (closestXValue < xValue && closest < mEntries!!.size - 1) {
@@ -303,13 +303,13 @@ abstract class DataSet<T : Entry> : BaseDataSet<T> {
 
             // Search by closest to y-value
             if (!java.lang.Float.isNaN(closestToY)) {
-                while (closest > 0 && mEntries!![closest - 1].getX() == closestXValue) closest -= 1
-                var closestYValue = mEntries!![closest].getY()
+                while (closest > 0 && mEntries!![closest - 1]!!.getX() == closestXValue) closest -= 1
+                var closestYValue = mEntries!![closest]!!.getY()
                 var closestYIndex = closest
                 while (true) {
                     closest += 1
                     if (closest >= mEntries!!.size) break
-                    val value: Entry = mEntries!![closest]
+                    val value: Entry = mEntries!![closest]!!
                     if (value.getX() != closestXValue) break
                     if (Math.abs(value.getY() - closestToY) <= Math.abs(closestYValue - closestToY)) {
                         closestYValue = closestToY
@@ -328,16 +328,16 @@ abstract class DataSet<T : Entry> : BaseDataSet<T> {
         var high = mEntries!!.size - 1
         while (low <= high) {
             var m = (high + low) / 2
-            var entry = mEntries!![m]
+            var entry = mEntries!![m]!!
 
             // if we have a match
             if (xValue == entry.getX()) {
-                while (m > 0 && mEntries!![m - 1].getX() == xValue) m--
+                while (m > 0 && mEntries!![m - 1]!!.getX() == xValue) m--
                 high = mEntries!!.size
 
                 // loop over all "equal" entries
                 while (m < high) {
-                    entry = mEntries!![m]
+                    entry = mEntries!![m]!!
                     if (entry.getX() == xValue) {
                         entries.add(entry)
                     } else {

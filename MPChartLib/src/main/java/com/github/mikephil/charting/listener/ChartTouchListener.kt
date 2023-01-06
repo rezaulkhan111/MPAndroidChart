@@ -10,7 +10,7 @@ import com.github.mikephil.charting.highlight.Highlight
 /**
  * Created by philipp on 12/06/15.
  */
-abstract class ChartTouchListener<T : Chart<*>> : SimpleOnGestureListener, OnTouchListener {
+abstract class ChartTouchListener<T : Chart<*>?> : SimpleOnGestureListener, OnTouchListener {
 
     enum class ChartGesture {
         NONE, DRAG, X_ZOOM, Y_ZOOM, PINCH_ZOOM, ROTATE, SINGLE_TAP, DOUBLE_TAP, LONG_PRESS, FLING
@@ -52,7 +52,7 @@ abstract class ChartTouchListener<T : Chart<*>> : SimpleOnGestureListener, OnTou
 
     constructor(chart: T) {
         mChart = chart
-        mGestureDetector = GestureDetector(chart.context, this)
+        mGestureDetector = GestureDetector(chart!!.context, this)
     }
 
     /**
@@ -61,7 +61,7 @@ abstract class ChartTouchListener<T : Chart<*>> : SimpleOnGestureListener, OnTou
      * @param me
      */
     open fun startAction(me: MotionEvent?) {
-        val l = mChart.getOnChartGestureListener()
+        val l = mChart!!.getOnChartGestureListener()
         l?.onChartGestureStart(me!!, mLastGesture)
     }
 
@@ -71,7 +71,7 @@ abstract class ChartTouchListener<T : Chart<*>> : SimpleOnGestureListener, OnTou
      * @param me
      */
     open fun endAction(me: MotionEvent?) {
-        val l = mChart.getOnChartGestureListener()
+        val l = mChart!!.getOnChartGestureListener()
         l?.onChartGestureEnd(me!!, mLastGesture)
     }
 
@@ -110,10 +110,10 @@ abstract class ChartTouchListener<T : Chart<*>> : SimpleOnGestureListener, OnTou
      */
     protected open fun performHighlight(h: Highlight?, e: MotionEvent?) {
         mLastHighlighted = if (h == null || h.equalTo(mLastHighlighted)) {
-            mChart.highlightValue(null, true)
+            mChart!!.highlightValue(null, true)
             null
         } else {
-            mChart.highlightValue(h, true)
+            mChart!!.highlightValue(h, true)
             h
         }
     }

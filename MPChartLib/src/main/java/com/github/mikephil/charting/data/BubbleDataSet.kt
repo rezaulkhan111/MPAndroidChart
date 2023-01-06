@@ -3,13 +3,13 @@ package com.github.mikephil.charting.data
 import com.github.mikephil.charting.interfaces.datasets.IBubbleDataSet
 import com.github.mikephil.charting.utils.Utils.convertDpToPixel
 
-class BubbleDataSet : BarLineScatterCandleBubbleDataSet<BubbleEntry>, IBubbleDataSet {
+class BubbleDataSet : BarLineScatterCandleBubbleDataSet<BubbleEntry?>, IBubbleDataSet {
 
     private var mMaxSize = 0f
     private var mNormalizeSize = true
     private var mHighlightCircleWidth = 2.5f
 
-    constructor(yVals: MutableList<BubbleEntry>, label: String) : super(yVals, label) {
+    constructor(yVals: MutableList<BubbleEntry?>, label: String) : super(yVals, label) {
     }
 
     override fun setHighlightCircleWidth(width: Float) {
@@ -28,10 +28,10 @@ class BubbleDataSet : BarLineScatterCandleBubbleDataSet<BubbleEntry>, IBubbleDat
         }
     }
 
-    override fun copy(): DataSet<BubbleEntry> {
-        val entries: MutableList<BubbleEntry> = ArrayList()
+    override fun copy(): DataSet<BubbleEntry?> {
+        val entries: MutableList<BubbleEntry?> = ArrayList()
         for (i in mEntries!!.indices) {
-            entries.add(mEntries!![i].copy())
+            entries.add(mEntries!![i]!!.copy())
         }
         val copied = BubbleDataSet(entries, getLabel())
         copy(copied)

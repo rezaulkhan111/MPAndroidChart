@@ -12,10 +12,10 @@ import com.github.mikephil.charting.interfaces.datasets.IPieDataSet
  *
  * @author Philipp Jahoda
  */
-class PieData : ChartData<IPieDataSet> {
+class PieData : ChartData<IPieDataSet?> {
 
     constructor() : super() {}
-    constructor(dataSet: IPieDataSet) : super(dataSet) {}
+    constructor(dataSet: IPieDataSet?) : super(dataSet) {}
 
     /**
      * Sets the PieDataSet this data object should represent.
@@ -35,11 +35,11 @@ class PieData : ChartData<IPieDataSet> {
      * @return
      */
     fun getDataSet(): IPieDataSet {
-        return mDataSets!![0]
+        return mDataSets!![0]!!
     }
 
-    override fun getDataSets(): MutableList<IPieDataSet>? {
-        val dataSets: MutableList<IPieDataSet>? = super.getDataSets()
+    override fun getDataSets(): MutableList<IPieDataSet?> {
+        val dataSets: MutableList<IPieDataSet?>? = super.getDataSets()
         if (dataSets!!.size < 1) {
             Log.e(
                 "MPAndroidChart",
@@ -61,13 +61,13 @@ class PieData : ChartData<IPieDataSet> {
 
     override fun getDataSetByLabel(label: String, ignorecase: Boolean): IPieDataSet? {
         return if (ignorecase) if (label.equals(
-                mDataSets!![0].getLabel(),
+                mDataSets!![0]!!.getLabel(),
                 ignoreCase = true
             )
-        ) mDataSets!![0] else null else if (label == mDataSets!![0].getLabel()) mDataSets!![0] else null
+        ) mDataSets!![0] else null else if (label == mDataSets!![0]!!.getLabel()) mDataSets!![0] else null
     }
 
-    override fun getEntryForHighlight(highlight: Highlight): Entry {
+    override fun getEntryForHighlight(highlight: Highlight): Entry? {
         return getDataSet().getEntryForIndex(highlight.getX().toInt())
     }
 
@@ -78,7 +78,7 @@ class PieData : ChartData<IPieDataSet> {
      */
     fun getYValueSum(): Float {
         var sum = 0f
-        for (i in 0 until getDataSet().getEntryCount()) sum += getDataSet().getEntryForIndex(i)
+        for (i in 0 until getDataSet().getEntryCount()) sum += getDataSet().getEntryForIndex(i)!!
             .getY()
         return sum
     }

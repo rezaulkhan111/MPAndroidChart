@@ -6,7 +6,6 @@ import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.View
 import com.github.mikephil.charting.charts.LineChart
-import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.XAxis.XAxisPosition
 import com.github.mikephil.charting.data.ChartData
 import com.github.mikephil.charting.data.LineData
@@ -34,25 +33,28 @@ class LineChartItem(cd: ChartData<*>, c: Context) : ChartItem(cd) {
 
         // apply styling
         // holder.chart.setValueTypeface(mTf);
-        holder.chart!!.description!!.isEnabled = false
+        holder.chart!!.getDescription()!!.setEnabled(false)
         holder.chart!!.setDrawGridBackground(false)
-        val xAxis: XAxis? = holder.chart!!.xAxis
-        xAxis!!.position = XAxisPosition.BOTTOM
-        xAxis.typeface = mTf
+
+        val xAxis = holder.chart!!.getXAxis()
+        xAxis!!.setPosition(XAxisPosition.BOTTOM)
+        xAxis.setTypeface(mTf)
         xAxis.setDrawGridLines(false)
         xAxis.setDrawAxisLine(true)
-        val leftAxis = holder.chart!!.axisLeft
-        leftAxis!!.typeface = mTf
+
+        val leftAxis = holder.chart!!.getAxisLeft()
+        leftAxis!!.setTypeface(mTf)
         leftAxis.setLabelCount(5, false)
-        leftAxis.axisMinimum = 0f // this replaces setStartAtZero(true)
-        val rightAxis = holder.chart!!.axisRight
-        rightAxis!!.typeface = mTf
+        leftAxis.setAxisMinimum(0f) // this replaces setStartAtZero(true)
+
+        val rightAxis = holder.chart!!.getAxisRight()
+        rightAxis!!.setTypeface(mTf)
         rightAxis.setLabelCount(5, false)
         rightAxis.setDrawGridLines(false)
-        rightAxis.axisMinimum = 0f // this replaces setStartAtZero(true)
+        rightAxis.setAxisMinimum(0f) // this replaces setStartAtZero(true)
 
         // set data
-        holder.chart!!.data = mChartData as LineData
+        holder.chart!!.setData(mChartData as LineData)
 
         // do not forget to refresh the chart
         // holder.chart.invalidate();

@@ -36,11 +36,11 @@ object Easing {
 
     val EaseInOutQuad: EasingFunction = object : EasingFunction {
         override fun getInterpolation(input: Float): Float {
-            var input = input
-            input *= 2f
-            return if (input < 1f) {
-                0.5f * input * input
-            } else -0.5f * (--input * (input - 2f) - 1f)
+            var mInput = input
+            mInput *= 2f
+            return if (mInput < 1f) {
+                0.5f * mInput * mInput
+            } else -0.5f * (--mInput * (mInput - 2f) - 1f)
         }
     }
 
@@ -52,21 +52,21 @@ object Easing {
 
     val EaseOutCubic: EasingFunction = object : EasingFunction {
         override fun getInterpolation(input: Float): Float {
-            var input = input
-            input--
-            return Math.pow(input.toDouble(), 3.0).toFloat() + 1f
+            var mInput = input
+            mInput--
+            return Math.pow(mInput.toDouble(), 3.0).toFloat() + 1f
         }
     }
 
     val EaseInOutCubic: EasingFunction = object : EasingFunction {
         override fun getInterpolation(input: Float): Float {
-            var input = input
-            input *= 2f
-            if (input < 1f) {
-                return 0.5f * Math.pow(input.toDouble(), 3.0).toFloat()
+            var mInput = input
+            mInput *= 2f
+            if (mInput < 1f) {
+                return 0.5f * Math.pow(mInput.toDouble(), 3.0).toFloat()
             }
-            input -= 2f
-            return 0.5f * (Math.pow(input.toDouble(), 3.0).toFloat() + 2f)
+            mInput -= 2f
+            return 0.5f * (Math.pow(mInput.toDouble(), 3.0).toFloat() + 2f)
         }
     }
 
@@ -78,21 +78,21 @@ object Easing {
 
     val EaseOutQuart: EasingFunction = object : EasingFunction {
         override fun getInterpolation(input: Float): Float {
-            var input = input
-            input--
-            return -(Math.pow(input.toDouble(), 4.0).toFloat() - 1f)
+            var mInput = input
+            mInput--
+            return -(Math.pow(mInput.toDouble(), 4.0).toFloat() - 1f)
         }
     }
 
     val EaseInOutQuart: EasingFunction = object : EasingFunction {
         override fun getInterpolation(input: Float): Float {
-            var input = input
-            input *= 2f
-            if (input < 1f) {
-                return 0.5f * Math.pow(input.toDouble(), 4.0).toFloat()
+            var mInput = input
+            mInput *= 2f
+            if (mInput < 1f) {
+                return 0.5f * Math.pow(mInput.toDouble(), 4.0).toFloat()
             }
-            input -= 2f
-            return -0.5f * (Math.pow(input.toDouble(), 4.0).toFloat() - 2f)
+            mInput -= 2f
+            return -0.5f * (Math.pow(mInput.toDouble(), 4.0).toFloat() - 2f)
         }
     }
 
@@ -129,16 +129,16 @@ object Easing {
 
     val EaseInOutExpo: EasingFunction = object : EasingFunction {
         override fun getInterpolation(input: Float): Float {
-            var input = input
-            if (input == 0f) {
+            var mInput = input
+            if (mInput == 0f) {
                 return 0f
-            } else if (input == 1f) {
+            } else if (mInput == 1f) {
                 return 1f
             }
-            input *= 2f
-            return if (input < 1f) {
-                0.5f * Math.pow(2.0, (10f * (input - 1f)).toDouble()).toFloat()
-            } else 0.5f * (-Math.pow(2.0, (-10f * --input).toDouble()).toFloat() + 2f)
+            mInput *= 2f
+            return if (mInput < 1f) {
+                0.5f * Math.pow(2.0, (10f * (mInput - 1f)).toDouble()).toFloat()
+            } else 0.5f * (-Math.pow(2.0, (-10f * --mInput).toDouble()).toFloat() + 2f)
         }
     }
 
@@ -150,35 +150,35 @@ object Easing {
 
     val EaseOutCirc: EasingFunction = object : EasingFunction {
         override fun getInterpolation(input: Float): Float {
-            var input = input
-            input--
-            return Math.sqrt((1f - input * input).toDouble()).toFloat()
+            var mInput = input
+            mInput--
+            return Math.sqrt((1f - mInput * mInput).toDouble()).toFloat()
         }
     }
 
     val EaseInOutCirc: EasingFunction = object : EasingFunction {
         override fun getInterpolation(input: Float): Float {
-            var input = input
-            input *= 2f
-            return if (input < 1f) {
-                -0.5f * (Math.sqrt((1f - input * input).toDouble()).toFloat() - 1f)
-            } else 0.5f * (Math.sqrt((1f - 2f.let { input -= it; input } * input).toDouble())
+            var mInput = input
+            mInput *= 2f
+            return if (mInput < 1f) {
+                -0.5f * (Math.sqrt((1f - mInput * mInput).toDouble()).toFloat() - 1f)
+            } else 0.5f * (Math.sqrt((1f - 2f.let { mInput -= it; mInput } * mInput).toDouble())
                 .toFloat() + 1f)
         }
     }
 
     val EaseInElastic: EasingFunction = object : EasingFunction {
         override fun getInterpolation(input: Float): Float {
-            var input = input
-            if (input == 0f) {
+            var mInput = input
+            if (mInput == 0f) {
                 return 0f
-            } else if (input == 1f) {
+            } else if (mInput == 1f) {
                 return 1f
             }
             val p = 0.3f
             val s = p / DOUBLE_PI * Math.asin(1.0).toFloat()
-            return -(Math.pow(2.0, (10f * 1f.let { input -= it; input }).toDouble())
-                .toFloat() * Math.sin(((input - s) * DOUBLE_PI / p).toDouble()).toFloat())
+            return -(Math.pow(2.0, (10f * 1f.let { mInput -= it; mInput }).toDouble())
+                .toFloat() * Math.sin(((mInput - s) * DOUBLE_PI / p).toDouble()).toFloat())
         }
     }
 
@@ -199,23 +199,23 @@ object Easing {
 
     val EaseInOutElastic: EasingFunction = object : EasingFunction {
         override fun getInterpolation(input: Float): Float {
-            var input = input
-            if (input == 0f) {
+            var mInput = input
+            if (mInput == 0f) {
                 return 0f
             }
-            input *= 2f
-            if (input == 2f) {
+            mInput *= 2f
+            if (mInput == 2f) {
                 return 1f
             }
             val p = 1f / 0.45f
             val s = 0.45f / DOUBLE_PI * Math.asin(1.0).toFloat()
-            return if (input < 1f) {
+            return if (mInput < 1f) {
                 (-0.5f
-                        * (Math.pow(2.0, (10f * 1f.let { input -= it; input }).toDouble())
-                    .toFloat() * Math.sin(((input * 1f - s) * DOUBLE_PI * p).toDouble()).toFloat()))
+                        * (Math.pow(2.0, (10f * 1f.let { mInput -= it; mInput }).toDouble())
+                    .toFloat() * Math.sin(((mInput * 1f - s) * DOUBLE_PI * p).toDouble()).toFloat()))
             } else 1f + (0.5f
-                    * Math.pow(2.0, (-10f * 1f.let { input -= it; input }).toDouble())
-                .toFloat() * Math.sin(((input * 1f - s) * DOUBLE_PI * p).toDouble()).toFloat())
+                    * Math.pow(2.0, (-10f * 1f.let { mInput -= it; mInput }).toDouble())
+                .toFloat() * Math.sin(((mInput * 1f - s) * DOUBLE_PI * p).toDouble()).toFloat())
         }
     }
 
@@ -228,21 +228,21 @@ object Easing {
 
     val EaseOutBack: EasingFunction = object : EasingFunction {
         override fun getInterpolation(input: Float): Float {
-            var input = input
+            var mInput = input
             val s = 1.70158f
-            input--
-            return input * input * ((s + 1f) * input + s) + 1f
+            mInput--
+            return mInput * mInput * ((s + 1f) * mInput + s) + 1f
         }
     }
 
     val EaseInOutBack: EasingFunction = object : EasingFunction {
         override fun getInterpolation(input: Float): Float {
-            var input = input
+            var mInput = input
             var s = 1.70158f
-            input *= 2f
-            return if (input < 1f) {
-                0.5f * (input * input * ((1.525f.let { s *= it; s } + 1f) * input - s))
-            } else 0.5f * (2f.let { input -= it; input } * input * ((1.525f.let { s *= it; s } + 1f) * input + s) + 2f)
+            mInput *= 2f
+            return if (mInput < 1f) {
+                0.5f * (mInput * mInput * ((1.525f.let { s *= it; s } + 1f) * mInput - s))
+            } else 0.5f * (2f.let { mInput -= it; mInput } * mInput * ((1.525f.let { s *= it; s } + 1f) * mInput + s) + 2f)
         }
     }
 
@@ -254,16 +254,16 @@ object Easing {
 
     val EaseOutBounce: EasingFunction = object : EasingFunction {
         override fun getInterpolation(input: Float): Float {
-            var input = input
+            var mInput = input
             val s = 7.5625f
-            if (input < 1f / 2.75f) {
-                return s * input * input
-            } else if (input < 2f / 2.75f) {
-                return s * (1.5f / 2.75f).let { input -= it; input } * input + 0.75f
-            } else if (input < 2.5f / 2.75f) {
-                return s * (2.25f / 2.75f).let { input -= it; input } * input + 0.9375f
+            if (mInput < 1f / 2.75f) {
+                return s * mInput * mInput
+            } else if (mInput < 2f / 2.75f) {
+                return s * (1.5f / 2.75f).let { mInput -= it; mInput } * mInput + 0.75f
+            } else if (mInput < 2.5f / 2.75f) {
+                return s * (2.25f / 2.75f).let { mInput -= it; mInput } * mInput + 0.9375f
             }
-            return s * (2.625f / 2.75f).let { input -= it; input } * input + 0.984375f
+            return s * (2.625f / 2.75f).let { mInput -= it; mInput } * mInput + 0.984375f
         }
     }
 

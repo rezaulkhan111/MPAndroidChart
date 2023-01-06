@@ -22,7 +22,11 @@ open class XAxisRenderer : AxisRenderer {
 
     protected var mXAxis: XAxis? = null
 
-    constructor(viewPortHandler: ViewPortHandler?, xAxis: XAxis?, trans: Transformer?) : super(
+    constructor(
+        viewPortHandler: ViewPortHandler,
+        xAxis: XAxis,
+        trans: Transformer?
+    ) : super(
         viewPortHandler,
         trans,
         xAxis

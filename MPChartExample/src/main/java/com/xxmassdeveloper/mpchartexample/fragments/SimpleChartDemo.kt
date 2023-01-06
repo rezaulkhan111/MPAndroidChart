@@ -46,11 +46,11 @@ class SimpleChartDemo : DemoBase() {
         override fun getItem(pos: Int): Fragment {
             var f: Fragment? = null
             when (pos) {
-                0 -> f = SineCosineFragment.Companion.newInstance()
+                0 -> f = SineCosineFragment.newInstance()
                 1 -> f = ComplexityFragment.Companion.newInstance()
-                2 -> f = BarChartFrag.Companion.newInstance()
-                3 -> f = ScatterChartFrag.Companion.newInstance()
-                4 -> f = PieChartFrag.Companion.newInstance()
+                2 -> f = BarChartFrag.newInstance()
+                3 -> f = ScatterChartFrag.newInstance()
+                4 -> f = PieChartFrag.newInstance()
             }
             return f!!
         }

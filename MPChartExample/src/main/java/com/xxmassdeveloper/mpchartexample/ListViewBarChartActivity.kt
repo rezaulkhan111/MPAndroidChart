@@ -114,14 +114,14 @@ class ListViewBarChartActivity : DemoBase() {
      * @return Bar data
      */
     private fun generateData(cnt: Int): BarData {
-        val entries = mutableListOf<BarEntry>()
+        val entries = mutableListOf<BarEntry?>()
         for (i in 0..11) {
             entries.add(BarEntry(i.toFloat(), (Math.random() * 70).toFloat() + 30))
         }
         val d = BarDataSet(entries, "New DataSet $cnt")
-        d.setColors(*ColorTemplate.VORDIPLOM_COLORS)
+        d.setColors(ColorTemplate.VORDIPLOM_COLORS)
         d.setBarShadowColor(Color.rgb(203, 203, 203))
-        val sets = mutableListOf<IBarDataSet>()
+        val sets = mutableListOf<IBarDataSet?>()
         sets.add(d)
         val cd = BarData(sets)
         cd.setBarWidth(0.9f)

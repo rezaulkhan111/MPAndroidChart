@@ -13,7 +13,7 @@ abstract class Renderer {
      */
     protected var mViewPortHandler: ViewPortHandler? = null
 
-    constructor(viewPortHandler: ViewPortHandler?) {
+    constructor(viewPortHandler: ViewPortHandler) {
         mViewPortHandler = viewPortHandler
     }
 }

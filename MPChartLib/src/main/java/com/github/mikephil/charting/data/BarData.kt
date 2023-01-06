@@ -7,15 +7,15 @@ import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
  *
  * @author Philipp Jahoda
  */
-class BarData : BarLineScatterCandleBubbleData<IBarDataSet> {
+class BarData : BarLineScatterCandleBubbleData<IBarDataSet?> {
     /**
      * the width of the bars on the x-axis, in values (not pixels)
      */
     private var mBarWidth = 0.85f
 
     constructor() : super() {}
-    constructor(vararg dataSets: IBarDataSet) : super(*dataSets) {}
-    constructor(dataSets: MutableList<IBarDataSet>) : super(dataSets) {}
+    constructor(vararg dataSets: IBarDataSet?) : super(*dataSets) {}
+    constructor(dataSets: MutableList<IBarDataSet?>?) : super(dataSets) {}
 
     /**
      * Sets the width each bar should have on the x-axis (in values, not pixels).
@@ -59,7 +59,7 @@ class BarData : BarLineScatterCandleBubbleData<IBarDataSet> {
             for (set in mDataSets!!) {
                 fromX += barSpaceHalf
                 fromX += barWidthHalf
-                if (i < set.getEntryCount()) {
+                if (i < set!!.getEntryCount()) {
                     val entry = set.getEntryForIndex(i)
                     if (entry != null) {
                         entry.setX(fromX)

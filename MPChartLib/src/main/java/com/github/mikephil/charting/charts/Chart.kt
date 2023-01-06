@@ -43,13 +43,16 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.OutputStream
+import kotlin.math.abs
+import kotlin.math.max
 
 /**
  * Baseclass of all Chart-Views.
  *
  * @author Philipp Jahoda
  */
-abstract class Chart<T : ChartData<out IDataSet<out Entry>>> : ViewGroup, ChartInterface {
+abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, ChartInterface {
+
     val LOG_TAG = "MPAndroidChart"
 
     /**
@@ -66,7 +69,7 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry>>> : ViewGroup, ChartI
     /**
      * Flag that indicates if highlighting per tap (touch) is enabled
      */
-    protected var mHighLightPerTapEnabled = true
+    private var mHighLightPerTapEnabled = true
 
     /**
      * If set to true, chart continues to scroll after touch up
@@ -84,19 +87,19 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry>>> : ViewGroup, ChartI
     /**
      * default value-formatter, number of digits depends on provided chart-data
      */
-    protected var mDefaultValueFormatter = DefaultValueFormatter(0)
+    private var mDefaultValueFormatter = DefaultValueFormatter(0)
 
     /**
      * paint object used for drawing the description text in the bottom right
      * corner of the chart
      */
-    protected var mDescPaint: Paint? = null
+    private var mDescPaint: Paint? = null
 
     /**
      * paint object for drawing the information text when there are no values in
      * the chart
      */
-    protected var mInfoPaint: Paint? = null
+    private var mInfoPaint: Paint? = null
 
     /**
      * the object representing the labels on the x-axis
@@ -111,7 +114,7 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry>>> : ViewGroup, ChartI
     /**
      * the object responsible for representing the description text
      */
-    protected var mDescription: Description? = null
+    private var mDescription: Description? = null
 
     /**
      * the legend object containing all data associated with the legend
@@ -121,7 +124,7 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry>>> : ViewGroup, ChartI
     /**
      * listener that is called when a value on the chart is selected
      */
-    protected var mSelectionListener: OnChartValueSelectedListener? = null
+    private var mSelectionListener: OnChartValueSelectedListener? = null
 
     protected var mChartTouchListener: ChartTouchListener<*>? = null
 
@@ -214,7 +217,7 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry>>> : ViewGroup, ChartI
         mMaxHighlightDistance = convertDpToPixel(500f)
         mDescription = Description()
         mLegend = Legend()
-        mLegendRenderer = LegendRenderer(mViewPortHandler, mLegend)
+        mLegendRenderer = LegendRenderer(mViewPortHandler, mLegend!!)
         mXAxis = XAxis()
         mDescPaint = Paint(Paint.ANTI_ALIAS_FLAG)
         mInfoPaint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -233,14 +236,11 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry>>> : ViewGroup, ChartI
     open fun setData(data: T) {
         mData = data
         mOffsetsCalculated = false
-        if (data == null) {
-            return
-        }
 
         // calculate how many digits are needed
-        setupDefaultFormatter(data.getYMin(), data.getYMax())
-        for (set: IDataSet<*> in mData!!.getDataSets()!!) {
-            if (set.needsFormatter() || set.getValueFormatter() === mDefaultValueFormatter) set.setValueFormatter(
+        setupDefaultFormatter(data!!.getYMin(), data.getYMax())
+        for (set in mData!!.getDataSets()!!) {
+            if (set!!.needsFormatter() || set.getValueFormatter() == mDefaultValueFormatter) set.setValueFormatter(
                 mDefaultValueFormatter
             )
         }
@@ -308,14 +308,12 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry>>> : ViewGroup, ChartI
      * drawn in the chart (if enabled), and creates the default-value-formatter
      */
     protected open fun setupDefaultFormatter(min: Float, max: Float) {
-        var reference = 0f
-        if (mData == null || mData!!.getEntryCount() < 2) {
-            reference = Math.max(Math.abs(min), Math.abs(max))
+        val reference = if (mData == null || mData!!.getEntryCount() < 2) {
+            max(abs(min), abs(max))
         } else {
-            reference = Math.abs(max - min)
+            abs(max - min)
         }
         val digits = getDecimals(reference)
-
         // setup the formatter with a new number of digits
         mDefaultValueFormatter.setup(digits)
     }
@@ -355,7 +353,6 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry>>> : ViewGroup, ChartI
      * Draws the description text in the bottom right corner of the chart (per default)
      */
     protected open fun drawDescription(c: Canvas) {
-
         // check if description should be drawn
         if (mDescription != null && mDescription!!.isEnabled()) {
             val position = mDescription!!.getPosition()
@@ -703,7 +700,7 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry>>> : ViewGroup, ChartI
             val e = mData!!.getEntryForHighlight(
                 mIndicesToHighlight!![i]!!
             )
-            val entryIndex = set.getEntryIndex(e as Nothing)
+            val entryIndex = set.getEntryIndex(e)
 
             // make sure entry not null
             if (e == null || entryIndex > set.getEntryCount() * mAnimator!!.getPhaseX()) continue
@@ -1364,8 +1361,8 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry>>> : ViewGroup, ChartI
      *
      * @return
      */
-    override fun getData(): T {
-        return mData!!
+    override fun getData(): T? {
+        return mData
     }
 
     /**
@@ -1599,11 +1596,11 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry>>> : ViewGroup, ChartI
      *
      * @param job
      */
-    open fun addViewportJob(job: Runnable) {
+    open fun addViewportJob(job: Runnable?) {
         if (mViewPortHandler.hasChartDimens()) {
             post(job)
         } else {
-            mJobs.add(job)
+            mJobs.add(job!!)
         }
     }
 

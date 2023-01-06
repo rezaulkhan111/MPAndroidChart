@@ -10,7 +10,7 @@ import com.github.mikephil.charting.interfaces.datasets.IDataSet
 /**
  * Created by Philipp Jahoda on 12/09/15.
  */
-class CombinedHighlighter : ChartHighlighter<CombinedDataProvider>, IHighlighter {
+class CombinedHighlighter : ChartHighlighter<CombinedDataProvider?>, IHighlighter {
 
     /**
      * bar highlighter for supporting stacked highlighting

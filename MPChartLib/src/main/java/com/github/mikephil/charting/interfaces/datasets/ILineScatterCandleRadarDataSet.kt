@@ -6,7 +6,7 @@ import com.github.mikephil.charting.data.Entry
 /**
  * Created by Philipp Jahoda on 21/10/15.
  */
-interface ILineScatterCandleRadarDataSet<T : Entry> : IBarLineScatterCandleBubbleDataSet<T> {
+interface ILineScatterCandleRadarDataSet<T : Entry?> : IBarLineScatterCandleBubbleDataSet<T> {
     /**
      * Returns true if vertical highlight indicator lines are enabled (drawn)
      * @return
@@ -29,5 +29,5 @@ interface ILineScatterCandleRadarDataSet<T : Entry> : IBarLineScatterCandleBubbl
      * Returns the DashPathEffect that is used for highlighting.
      * @return
      */
-    fun getDashPathEffectHighlight(): DashPathEffect
+    fun getDashPathEffectHighlight(): DashPathEffect?
 }

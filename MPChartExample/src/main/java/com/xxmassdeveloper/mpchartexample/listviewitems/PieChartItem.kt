@@ -15,7 +15,7 @@ import com.github.mikephil.charting.data.ChartData
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.formatter.PercentFormatter
 import com.github.mikephil.charting.utils.ColorTemplate
-import com.github.mikephil.charting.utils.ColorTemplate.holoBlue
+import com.github.mikephil.charting.utils.ColorTemplate.getHoloBlue
 import com.xxmassdeveloper.mpchartexample.R
 
 class PieChartItem(cd: ChartData<*>, c: Context) : ChartItem(cd) {
@@ -26,46 +26,51 @@ class PieChartItem(cd: ChartData<*>, c: Context) : ChartItem(cd) {
 
     @SuppressLint("InflateParams")
     override fun getView(position: Int, convertView: View?, c: Context?): View? {
-        var convertView = convertView
+        var mConveView = convertView
         val holder: ViewHolder
-        if (convertView == null) {
+        if (mConveView == null) {
             holder = ViewHolder()
-            convertView = LayoutInflater.from(c).inflate(
+            mConveView = LayoutInflater.from(c).inflate(
                 R.layout.list_item_piechart, null
             )
-            holder.chart = convertView.findViewById(R.id.chart)
-            convertView.tag = holder
+            holder.chart = mConveView.findViewById(R.id.chart)
+            mConveView.tag = holder
         } else {
-            holder = convertView.tag as ViewHolder
+            holder = mConveView.tag as ViewHolder
         }
 
         // apply styling
-        holder.chart!!.description!!.isEnabled = false
-        holder.chart!!.holeRadius = 52f
-        holder.chart!!.transparentCircleRadius = 57f
-        holder.chart!!.centerText = mCenterText
+
+        // apply styling
+        holder.chart!!.getDescription()!!.setEnabled(false)
+        holder.chart!!.setHoleRadius(52f)
+        holder.chart!!.setTransparentCircleRadius(57f)
+        holder.chart!!.setCenterText(mCenterText)
         holder.chart!!.setCenterTextTypeface(mTf)
         holder.chart!!.setCenterTextSize(9f)
         holder.chart!!.setUsePercentValues(true)
         holder.chart!!.setExtraOffsets(5f, 10f, 50f, 10f)
+
         mChartData.setValueFormatter(PercentFormatter())
         mChartData.setValueTypeface(mTf)
         mChartData.setValueTextSize(11f)
         mChartData.setValueTextColor(Color.WHITE)
         // set data
-        holder.chart!!.data = mChartData as PieData
-        val l: Legend? = holder.chart!!.legend
-        l!!.verticalAlignment = Legend.LegendVerticalAlignment.TOP
-        l.horizontalAlignment = Legend.LegendHorizontalAlignment.RIGHT
-        l.orientation = Legend.LegendOrientation.VERTICAL
+        // set data
+        holder.chart!!.setData(mChartData as PieData)
+
+        val l = holder.chart!!.getLegend()
+        l!!.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP)
+        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT)
+        l.setOrientation(Legend.LegendOrientation.VERTICAL)
         l.setDrawInside(false)
-        l.yEntrySpace = 0f
-        l.yOffset = 0f
+        l.setYEntrySpace(0f)
+        l.setYOffset(0f)
 
         // do not forget to refresh the chart
         // holder.chart.invalidate();
         holder.chart!!.animateY(900)
-        return convertView
+        return mConveView
     }
 
     private fun generateCenterText(): SpannableString {
@@ -75,7 +80,7 @@ class PieChartItem(cd: ChartData<*>, c: Context) : ChartItem(cd) {
         s.setSpan(RelativeSizeSpan(.9f), 14, 25, 0)
         s.setSpan(ForegroundColorSpan(Color.GRAY), 14, 25, 0)
         s.setSpan(RelativeSizeSpan(1.4f), 25, s.length, 0)
-        s.setSpan(ForegroundColorSpan(holoBlue), 25, s.length, 0)
+        s.setSpan(ForegroundColorSpan(getHoloBlue()), 25, s.length, 0)
         return s
     }
 

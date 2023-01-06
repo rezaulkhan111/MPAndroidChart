@@ -11,7 +11,7 @@ import com.github.mikephil.charting.animation.Easing.EasingFunction
  * @author Philipp Jahoda
  * @author Mick Ashton
  */
-class ChartAnimator {
+open class ChartAnimator {
     /** object that is updated upon animation update  */
     private var mListener: AnimatorUpdateListener? = null
 
@@ -160,13 +160,13 @@ class ChartAnimator {
      * @param phase float value between 0 - 1
      */
     fun setPhaseY(phase: Float) {
-        var phase = phase
-        if (phase > 1f) {
-            phase = 1f
-        } else if (phase < 0f) {
-            phase = 0f
+        var mPhase = phase
+        if (mPhase > 1f) {
+            mPhase = 1f
+        } else if (mPhase < 0f) {
+            mPhase = 0f
         }
-        mPhaseY = phase
+        mPhaseY = mPhase
     }
 
     /**
@@ -184,12 +184,12 @@ class ChartAnimator {
      * @param phase float value between 0 - 1
      */
     fun setPhaseX(phase: Float) {
-        var phase = phase
-        if (phase > 1f) {
-            phase = 1f
-        } else if (phase < 0f) {
-            phase = 0f
+        var mPhase = phase
+        if (mPhase > 1f) {
+            mPhase = 1f
+        } else if (mPhase < 0f) {
+            mPhase = 0f
         }
-        mPhaseX = phase
+        mPhaseX = mPhase
     }
 }

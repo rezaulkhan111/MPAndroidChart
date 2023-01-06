@@ -8,7 +8,7 @@ import com.github.mikephil.charting.utils.MPPointD.Companion.recycleInstance
 /**
  * Created by Philipp Jahoda on 22/07/15.
  */
-open class BarHighlighter : ChartHighlighter<BarDataProvider> {
+open class BarHighlighter : ChartHighlighter<BarDataProvider?> {
 
     constructor(chart: BarDataProvider) : super(chart) {
     }
@@ -54,10 +54,10 @@ open class BarHighlighter : ChartHighlighter<BarDataProvider> {
         if (entry.getYVals() == null) {
             return high
         } else {
-            val ranges = entry.getRanges()
+            val ranges = entry.getRanges()!!
             if (ranges.size > 0) {
                 val stackIndex = getClosestStackIndex(ranges, yVal)
-                val pixels = mChart!!.getTransformer(set.getAxisDependency())
+                val pixels = mChart!!.getTransformer(set.getAxisDependency())!!
                     .getPixelForValues(high.getX(), ranges[stackIndex].to)
                 val stackedHigh = Highlight(
                     entry.getX(),

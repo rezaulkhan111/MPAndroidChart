@@ -35,7 +35,7 @@ class LegendRenderer : Renderer {
      */
     protected var mLegend: Legend? = null
 
-    constructor(viewPortHandler: ViewPortHandler?, legend: Legend?) : super(viewPortHandler) {
+    constructor(viewPortHandler: ViewPortHandler, legend: Legend) : super(viewPortHandler) {
         mLegend = legend
         mLegendLabelPaint = Paint(Paint.ANTI_ALIAS_FLAG)
         mLegendLabelPaint!!.textSize = convertDpToPixel(9f)
@@ -77,17 +77,17 @@ class LegendRenderer : Renderer {
             // loop for building up the colors and labels used in the legend
             for (i in 0 until data.getDataSetCount()) {
                 val dataSet = data.getDataSetByIndex(i) ?: continue
-                val clrs: List<Int> = dataSet.getColors()
+                val clrs = dataSet.getColors()
                 val entryCount = dataSet.getEntryCount()
 
                 // if we have a barchart with stacked bars
                 if (dataSet is IBarDataSet && dataSet.isStacked()) {
                     val bds = dataSet
                     val sLabels = bds.getStackLabels()
-                    val minEntries = Math.min(clrs.size, bds.getStackSize())
+                    val minEntries = Math.min(clrs!!.size, bds.getStackSize())
                     for (j in 0 until minEntries) {
                         var label: String?
-                        label = if (sLabels.size > 0) {
+                        label = if (sLabels!!.size > 0) {
                             val labelIndex = j % minEntries
                             if (labelIndex < sLabels.size) sLabels[labelIndex] else null
                         } else {
@@ -96,11 +96,11 @@ class LegendRenderer : Renderer {
                         computedEntries.add(
                             LegendEntry(
                                 label!!,
-                                dataSet.getForm(),
+                                dataSet.getForm()!!,
                                 dataSet.getFormSize(),
                                 dataSet.getFormLineWidth(),
                                 dataSet.getFormLineDashEffect(),
-                                clrs[j]
+                                clrs[j]!!
                             )
                         )
                     }
@@ -118,11 +118,11 @@ class LegendRenderer : Renderer {
                 } else if (dataSet is IPieDataSet) {
                     val pds = dataSet
                     var j = 0
-                    while (j < clrs.size && j < entryCount) {
+                    while (j < clrs!!.size && j < entryCount) {
                         computedEntries.add(
                             LegendEntry(
-                                pds.getEntryForIndex(j).getLabel()!!,
-                                dataSet.getForm(),
+                                pds.getEntryForIndex(j)?.getLabel()!!,
+                                dataSet.getForm()!!,
                                 dataSet.getFormSize(),
                                 dataSet.getFormLineWidth(),
                                 dataSet.getFormLineDashEffect(),
@@ -150,7 +150,7 @@ class LegendRenderer : Renderer {
                     computedEntries.add(
                         LegendEntry(
                             null,
-                            dataSet.getForm(),
+                            dataSet.getForm()!!,
                             dataSet.getFormSize(),
                             dataSet.getFormLineWidth(),
                             dataSet.getFormLineDashEffect(),
@@ -160,7 +160,7 @@ class LegendRenderer : Renderer {
                     computedEntries.add(
                         LegendEntry(
                             dataSet.getLabel(),
-                            dataSet.getForm(),
+                            dataSet.getForm()!!,
                             dataSet.getFormSize(),
                             dataSet.getFormLineWidth(),
                             dataSet.getFormLineDashEffect(),
@@ -169,7 +169,7 @@ class LegendRenderer : Renderer {
                     )
                 } else { // all others
                     var j = 0
-                    while (j < clrs.size && j < entryCount) {
+                    while (j < clrs!!.size && j < entryCount) {
                         var label: String?
 
                         // if multiple colors are set for a DataSet, group them
@@ -180,8 +180,8 @@ class LegendRenderer : Renderer {
                         }
                         computedEntries.add(
                             LegendEntry(
-                                label!!,
-                                dataSet.getForm(),
+                                label,
+                                dataSet.getForm()!!,
                                 dataSet.getFormSize(),
                                 dataSet.getFormLineWidth(),
                                 dataSet.getFormLineDashEffect(),
@@ -193,7 +193,7 @@ class LegendRenderer : Renderer {
                 }
             }
             if (mLegend!!.getExtraEntries() != null) {
-                Collections.addAll(computedEntries.toMutableList(), *mLegend!!.getExtraEntries())
+                Collections.addAll(computedEntries.toMutableList(), mLegend!!.getExtraEntries()!!)
             }
             mLegend!!.setEntries(computedEntries)
         }

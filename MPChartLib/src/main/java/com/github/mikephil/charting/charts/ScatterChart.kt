@@ -13,7 +13,7 @@ import com.github.mikephil.charting.renderer.ScatterChartRenderer
  *
  * @author Philipp Jahoda
  */
-class ScatterChart : BarLineChartBase<ScatterData>, ScatterDataProvider {
+class ScatterChart : BarLineChartBase<ScatterData?>, ScatterDataProvider {
 
     constructor(context: Context?) : super(context) {}
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {}

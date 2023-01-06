@@ -97,7 +97,7 @@ class StackedBarActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSele
     override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
         tvX.text = seekBarX.progress.toString()
         tvY.text = seekBarY.progress.toString()
-        val values = mutableListOf<BarEntry>()
+        val values = mutableListOf<BarEntry?>()
         for (i in 0 until seekBarX.progress) {
             val mul = (seekBarY.progress + 1).toFloat()
             val val1 = (Math.random() * mul).toFloat() + mul / 3
@@ -113,18 +113,18 @@ class StackedBarActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSele
 
         val set1: BarDataSet?
         if (chart.getData() != null &&
-            chart.getData().getDataSetCount() > 0
+            chart.getData()!!.getDataSetCount() > 0
         ) {
-            set1 = chart.getData().getDataSetByIndex(0) as BarDataSet?
+            set1 = chart.getData()!!.getDataSetByIndex(0) as BarDataSet?
             set1!!.setValues(values)
-            chart.getData().notifyDataChanged()
+            chart.getData()!!.notifyDataChanged()
             chart.notifyDataSetChanged()
         } else {
             set1 = BarDataSet(values, "Statistics Vienna 2014")
             set1.setDrawIcons(false)
             set1.setColors(getColors())
             set1.setStackLabels(arrayOf("Births", "Divorces", "Marriages"))
-            val dataSets = ArrayList<IBarDataSet>()
+            val dataSets = mutableListOf<IBarDataSet?>()
             dataSets.add(set1)
             val data = BarData(dataSets)
             data.setValueFormatter(MyValueFormatter())
@@ -149,7 +149,7 @@ class StackedBarActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSele
                 startActivity(i)
             }
             R.id.actionToggleValues -> {
-                val sets: List<IBarDataSet>? = chart.getData()
+                val sets = chart.getData()!!
                     .getDataSets()
                 for (iSet in sets!!) {
                     val set = iSet as BarDataSet
@@ -158,7 +158,7 @@ class StackedBarActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSele
                 chart.invalidate()
             }
             R.id.actionToggleIcons -> {
-                val sets: List<IBarDataSet>? = chart.getData()
+                val sets = chart.getData()!!
                     .getDataSets()
                 for (iSet in sets!!) {
                     val set = iSet as BarDataSet
@@ -168,7 +168,7 @@ class StackedBarActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSele
             }
             R.id.actionToggleHighlight -> {
                 if (chart.getData() != null) {
-                    chart.getData().setHighlightEnabled(!chart.getData().isHighlightEnabled())
+                    chart.getData()!!.setHighlightEnabled(!chart.getData()!!.isHighlightEnabled())
                     chart.invalidate()
                 }
             }
@@ -183,7 +183,8 @@ class StackedBarActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSele
                 chart.notifyDataSetChanged()
             }
             R.id.actionToggleBarBorders -> {
-                for (set in chart.getData().getDataSets()!!) (set as BarDataSet).setBarBorderWidth(
+                for (set in chart.getData()!!
+                    .getDataSets()!!) (set as BarDataSet).setBarBorderWidth(
                     if (set.getBarBorderWidth() == 1f) 0f else 1f
                 )
                 chart.invalidate()
@@ -218,11 +219,11 @@ class StackedBarActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSele
 
     override fun onStartTrackingTouch(seekBar: SeekBar) {}
     override fun onStopTrackingTouch(seekBar: SeekBar) {}
-    override fun onValueSelected(e: Entry, h: Highlight) {
+    override fun onValueSelected(e: Entry?, h: Highlight?) {
         val entry = e as BarEntry?
         if (entry!!.getYVals() != null) Log.i(
             "VAL SELECTED",
-            "Value: " + entry.getYVals()!![h.getStackIndex()]
+            "Value: " + entry.getYVals()!![h!!.getStackIndex()]
         ) else Log.i("VAL SELECTED", "Value: " + entry.getY())
     }
 

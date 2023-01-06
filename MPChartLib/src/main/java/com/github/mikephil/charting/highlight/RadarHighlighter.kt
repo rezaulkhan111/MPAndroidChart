@@ -8,7 +8,7 @@ import com.github.mikephil.charting.utils.Utils.getPosition
 /**
  * Created by philipp on 12/06/16.
  */
-class RadarHighlighter : PieRadarHighlighter<RadarChart> {
+class RadarHighlighter : PieRadarHighlighter<RadarChart?> {
 
     constructor(chart: RadarChart) : super(chart) {}
 
@@ -44,9 +44,9 @@ class RadarHighlighter : PieRadarHighlighter<RadarChart> {
         val sliceangle = mChart!!.getSliceAngle()
         val factor = mChart!!.getFactor()
         val pOut = getInstance(0f, 0f)
-        for (i in 0 until mChart!!.getData().getDataSetCount()) {
-            val dataSet: IDataSet<*> = mChart!!.getData().getDataSetByIndex(i)!!
-            val entry = dataSet.getEntryForIndex(index)
+        for (i in 0 until mChart!!.getData()!!.getDataSetCount()) {
+            val dataSet: IDataSet<*> = mChart!!.getData()!!.getDataSetByIndex(i)!!
+            val entry = dataSet.getEntryForIndex(index)!!
             val y = entry.getY() - mChart!!.getYChartMin()
             getPosition(
                 mChart!!.getCenterOffsets(), y * factor * phaseY,

@@ -4,7 +4,7 @@ import android.graphics.Color
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
 import com.github.mikephil.charting.utils.Fill
 
-class BarDataSet : BarLineScatterCandleBubbleDataSet<BarEntry>, IBarDataSet {
+class BarDataSet : BarLineScatterCandleBubbleDataSet<BarEntry?>, IBarDataSet {
     /**
      * the maximum number of bars that are stacked upon each other, this value
      * is calculated from the Entries that are added to the DataSet
@@ -33,20 +33,20 @@ class BarDataSet : BarLineScatterCandleBubbleDataSet<BarEntry>, IBarDataSet {
     /**
      * array of labels used to describe the different values of the stacked bars
      */
-    private var mStackLabels = arrayOf<String>()
+    private var mStackLabels = arrayOf<String?>()
 
-    protected lateinit var mFills: MutableList<Fill>
+    protected var mFills: MutableList<Fill>? = null
 
-    constructor(yVals: MutableList<BarEntry>, label: String) : super(yVals, label) {
+    constructor(yVals: MutableList<BarEntry?>, label: String) : super(yVals, label) {
         mHighLightColor = Color.rgb(0, 0, 0)
         calcStackSize(yVals)
         calcEntryCountIncludingStacks(yVals)
     }
 
-    override fun copy(): DataSet<BarEntry> {
-        val entries: MutableList<BarEntry> = ArrayList()
+    override fun copy(): DataSet<BarEntry?> {
+        val entries: MutableList<BarEntry?> = ArrayList()
         for (i in mEntries!!.indices) {
-            entries.add(mEntries!![i].copy()!!)
+            entries.add(mEntries!![i]!!.copy())
         }
         val copied = BarDataSet(entries, getLabel())
         copy(copied)
@@ -62,12 +62,12 @@ class BarDataSet : BarLineScatterCandleBubbleDataSet<BarEntry>, IBarDataSet {
         barDataSet.mHighLightAlpha = mHighLightAlpha
     }
 
-    override fun getFills(): MutableList<Fill> {
+    override fun getFills(): MutableList<Fill>? {
         return mFills
     }
 
     override fun getFill(index: Int): Fill {
-        return mFills[index % mFills.size]
+        return mFills!![index % mFills!!.size]
     }
 
     /**
@@ -76,7 +76,7 @@ class BarDataSet : BarLineScatterCandleBubbleDataSet<BarEntry>, IBarDataSet {
      */
     @Deprecated("")
     fun getGradients(): MutableList<Fill> {
-        return mFills
+        return mFills!!
     }
 
     /**
@@ -86,7 +86,7 @@ class BarDataSet : BarLineScatterCandleBubbleDataSet<BarEntry>, IBarDataSet {
      * @param index
      */
     @Deprecated("")
-    fun getGradient(index: Int): Fill? {
+    fun getGradient(index: Int): Fill {
         return getFill(index)
     }
 
@@ -125,10 +125,10 @@ class BarDataSet : BarLineScatterCandleBubbleDataSet<BarEntry>, IBarDataSet {
      * Calculates the total number of entries this DataSet represents, including
      * stacks. All values belonging to a stack are calculated separately.
      */
-    private fun calcEntryCountIncludingStacks(yVals: List<BarEntry>) {
+    private fun calcEntryCountIncludingStacks(yVals: MutableList<BarEntry?>) {
         mEntryCountStacks = 0
         for (i in yVals.indices) {
-            val vals = yVals[i].getYVals()
+            val vals = yVals[i]?.getYVals()
             if (vals == null) mEntryCountStacks++ else mEntryCountStacks += vals.size
         }
     }
@@ -139,7 +139,7 @@ class BarDataSet : BarLineScatterCandleBubbleDataSet<BarEntry>, IBarDataSet {
      */
     private fun calcStackSize(yVals: List<BarEntry?>) {
         for (i in yVals.indices) {
-            val vals = yVals[i]!!.getYVals()
+            val vals = yVals[i]?.getYVals()
             if (vals != null && vals.size > mStackSize) mStackSize = vals.size
         }
     }
@@ -247,11 +247,11 @@ class BarDataSet : BarLineScatterCandleBubbleDataSet<BarEntry>, IBarDataSet {
      *
      * @param labels
      */
-    fun setStackLabels(labels: Array<String>) {
+    fun setStackLabels(labels: Array<String?>) {
         mStackLabels = labels
     }
 
-    override fun getStackLabels(): Array<String> {
+    override fun getStackLabels(): Array<String?> {
         return mStackLabels
     }
 }

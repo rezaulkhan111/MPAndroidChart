@@ -49,7 +49,7 @@ class ScrollViewActivity : DemoBase() {
     }
 
     private fun setData(count: Int) {
-        val values = mutableListOf<BarEntry>()
+        val values = mutableListOf<BarEntry?>()
         for (i in 0 until count) {
             val valFloat1 = (Math.random() * count).toFloat() + 15
             values.add(BarEntry(i.toFloat(), valFloat1.toInt().toFloat()))

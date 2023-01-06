@@ -35,7 +35,7 @@ import com.github.mikephil.charting.utils.Utils.convertDpToPixel
  * @author Philipp Jahoda
  */
 @SuppressLint("RtlHardcoded")
-abstract class BarLineChartBase<T : BarLineScatterCandleBubbleData<out IBarLineScatterCandleBubbleDataSet<out Entry>>> :
+abstract class BarLineChartBase<T : BarLineScatterCandleBubbleData<out IBarLineScatterCandleBubbleDataSet<out Entry?>?>?> :
     Chart<T>,
     BarLineScatterCandleBubbleDataProvider {
 
@@ -152,9 +152,9 @@ abstract class BarLineChartBase<T : BarLineScatterCandleBubbleData<out IBarLineS
         mAxisRight = YAxis(AxisDependency.RIGHT)
         mLeftAxisTransformer = Transformer(mViewPortHandler)
         mRightAxisTransformer = Transformer(mViewPortHandler)
-        mAxisRendererLeft = YAxisRenderer(mViewPortHandler, mAxisLeft, mLeftAxisTransformer)
-        mAxisRendererRight = YAxisRenderer(mViewPortHandler, mAxisRight, mRightAxisTransformer)
-        mXAxisRenderer = XAxisRenderer(mViewPortHandler, mXAxis, mLeftAxisTransformer)
+        mAxisRendererLeft = YAxisRenderer(mViewPortHandler, mAxisLeft!!, mLeftAxisTransformer)
+        mAxisRendererRight = YAxisRenderer(mViewPortHandler, mAxisRight!!, mRightAxisTransformer)
+        mXAxisRenderer = XAxisRenderer(mViewPortHandler, mXAxis!!, mLeftAxisTransformer)
         setHighlighter(ChartHighlighter(this))
         mChartTouchListener =
             BarLineChartTouchListener(this, mViewPortHandler.getMatrixTouch()!!, 3f)
@@ -264,7 +264,7 @@ abstract class BarLineChartBase<T : BarLineScatterCandleBubbleData<out IBarLineS
             val drawtime = System.currentTimeMillis() - starttime
             totalTime += drawtime
             drawCycles += 1
-            val average = totalTime / drawCycles
+            totalTime / drawCycles
         }
     }
 
@@ -346,7 +346,7 @@ abstract class BarLineChartBase<T : BarLineScatterCandleBubbleData<out IBarLineS
         calculateOffsets()
     }
 
-    protected override fun calcMinMax() {
+    override fun calcMinMax() {
         mXAxis!!.calculate(mData!!.getXMin(), mData!!.getXMax())
 
         // calculate axis range (min / max) according to provided data
@@ -494,7 +494,7 @@ abstract class BarLineChartBase<T : BarLineScatterCandleBubbleData<out IBarLineS
      *
      * @return
      */
-    override fun getTransformer(axis: AxisDependency): Transformer {
+    override fun getTransformer(axis: AxisDependency?): Transformer? {
         return if (axis === AxisDependency.LEFT) mLeftAxisTransformer!! else mRightAxisTransformer!!
     }
 
@@ -832,7 +832,7 @@ abstract class BarLineChartBase<T : BarLineScatterCandleBubbleData<out IBarLineS
         )
 
         val yInView = getAxisRange(axis) / mViewPortHandler.getScaleY()
-        val job: Runnable = getInstance(
+        val job: Runnable? = getInstance(
             mViewPortHandler, xValue, yValue + yInView / 2f,
             getTransformer(axis), this,
             bounds.x.toFloat(),
@@ -903,7 +903,7 @@ abstract class BarLineChartBase<T : BarLineScatterCandleBubbleData<out IBarLineS
         )
         val yInView = getAxisRange(axis) / mViewPortHandler.getScaleY()
         val xInView = getXAxis()!!.mAxisRange / mViewPortHandler.getScaleX()
-        val job: Runnable = getInstance(
+        val job: Runnable? = getInstance(
             mViewPortHandler,
             xValue - xInView / 2f, yValue + yInView / 2f,
             getTransformer(axis), this, bounds.x.toFloat(), bounds.y.toFloat(), duration
@@ -1001,7 +1001,7 @@ abstract class BarLineChartBase<T : BarLineScatterCandleBubbleData<out IBarLineS
         if (e == null) return null
         mGetPositionBuffer[0] = e.getX()
         mGetPositionBuffer[1] = e.getY()
-        getTransformer(axis).pointValuesToPixel(mGetPositionBuffer)
+        getTransformer(axis)!!.pointValuesToPixel(mGetPositionBuffer)
         return getInstance(mGetPositionBuffer[0], mGetPositionBuffer[1])
     }
 
@@ -1298,7 +1298,7 @@ abstract class BarLineChartBase<T : BarLineScatterCandleBubbleData<out IBarLineS
      * @return
      */
     open fun getPixelForValues(x: Float, y: Float, axis: AxisDependency): MPPointD? {
-        return getTransformer(axis).getPixelForValues(x, y)
+        return getTransformer(axis)!!.getPixelForValues(x, y)
     }
 
     /**
@@ -1341,7 +1341,7 @@ abstract class BarLineChartBase<T : BarLineScatterCandleBubbleData<out IBarLineS
      * @return
      */
     override fun getLowestVisibleX(): Float {
-        getTransformer(AxisDependency.LEFT).getValuesByTouchPoint(
+        getTransformer(AxisDependency.LEFT)!!.getValuesByTouchPoint(
             mViewPortHandler.contentLeft(),
             mViewPortHandler.contentBottom(), posForGetLowestVisibleX
         )
@@ -1360,7 +1360,7 @@ abstract class BarLineChartBase<T : BarLineScatterCandleBubbleData<out IBarLineS
      * @return
      */
     override fun getHighestVisibleX(): Float {
-        getTransformer(AxisDependency.LEFT).getValuesByTouchPoint(
+        getTransformer(AxisDependency.LEFT)!!.getValuesByTouchPoint(
             mViewPortHandler.contentRight(),
             mViewPortHandler.contentBottom(), posForGetHighestVisibleX
         )
@@ -1380,14 +1380,14 @@ abstract class BarLineChartBase<T : BarLineScatterCandleBubbleData<out IBarLineS
      * returns the current x-scale factor
      */
     override fun getScaleX(): Float {
-        return if (mViewPortHandler == null) 1f else mViewPortHandler.getScaleX()
+        return mViewPortHandler.getScaleX()
     }
 
     /**
      * returns the current y-scale factor
      */
     override fun getScaleY(): Float {
-        return if (mViewPortHandler == null) 1f else mViewPortHandler.getScaleY()
+        return mViewPortHandler.getScaleY()
     }
 
     /**
@@ -1430,8 +1430,8 @@ abstract class BarLineChartBase<T : BarLineScatterCandleBubbleData<out IBarLineS
         return if (axis === AxisDependency.LEFT) mAxisLeft else mAxisRight
     }
 
-    override fun isInverted(axis: AxisDependency): Boolean {
-        return getAxis(axis)!!.isInverted()
+    override fun isInverted(axis: AxisDependency?): Boolean {
+        return getAxis(axis!!)!!.isInverted()
     }
 
     /**
@@ -1575,7 +1575,7 @@ abstract class BarLineChartBase<T : BarLineScatterCandleBubbleData<out IBarLineS
         return null
     }
 
-    protected var mOnSizeChangedBuffer = FloatArray(2)
+    private var mOnSizeChangedBuffer = FloatArray(2)
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
 
@@ -1585,7 +1585,7 @@ abstract class BarLineChartBase<T : BarLineScatterCandleBubbleData<out IBarLineS
         if (mKeepPositionOnRotation) {
             mOnSizeChangedBuffer[0] = mViewPortHandler.contentLeft()
             mOnSizeChangedBuffer[1] = mViewPortHandler.contentTop()
-            getTransformer(AxisDependency.LEFT).pixelsToValue(mOnSizeChangedBuffer)
+            getTransformer(AxisDependency.LEFT)!!.pixelsToValue(mOnSizeChangedBuffer)
         }
 
         //Superclass transforms chart.
@@ -1593,7 +1593,7 @@ abstract class BarLineChartBase<T : BarLineScatterCandleBubbleData<out IBarLineS
         if (mKeepPositionOnRotation) {
 
             //Restoring old position of chart.
-            getTransformer(AxisDependency.LEFT).pointValuesToPixel(mOnSizeChangedBuffer)
+            getTransformer(AxisDependency.LEFT)!!.pointValuesToPixel(mOnSizeChangedBuffer)
             mViewPortHandler.centerViewPort(mOnSizeChangedBuffer, this)
         } else {
             mViewPortHandler.refresh(mViewPortHandler.getMatrixTouch()!!, this, true)

@@ -14,7 +14,7 @@ abstract class LineScatterCandleRadarRenderer : BarLineScatterCandleBubbleRender
      */
     private val mHighlightLinePath = Path()
 
-    constructor(animator: ChartAnimator, viewPortHandler: ViewPortHandler?) : super(
+    constructor(animator: ChartAnimator, viewPortHandler: ViewPortHandler) : super(
         animator,
         viewPortHandler
     ) {

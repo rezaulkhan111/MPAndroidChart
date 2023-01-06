@@ -16,14 +16,14 @@ interface OnDrawListener {
      * @param entry
      * the last drawn entry
      */
-    fun onEntryAdded(entry: Entry)
+    fun onEntryAdded(entry: Entry?)
 
     /**
      * Called whenever an entry is moved by the user after beeing highlighted
      *
      * @param entry
      */
-    fun onEntryMoved(entry: Entry)
+    fun onEntryMoved(entry: Entry?)
 
     /**
      * Called when drawing finger is lifted and the draw is finished.
@@ -31,5 +31,5 @@ interface OnDrawListener {
      * @param dataSet
      * the last drawn DataSet
      */
-    fun onDrawFinished(dataSet: DataSet<*>)
+    fun onDrawFinished(dataSet: DataSet<*>?)
 }

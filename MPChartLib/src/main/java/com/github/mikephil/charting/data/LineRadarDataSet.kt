@@ -11,7 +11,7 @@ import com.github.mikephil.charting.utils.Utils.convertDpToPixel
  *
  * @author Philipp Jahoda
  */
-abstract class LineRadarDataSet<T : Entry> : LineScatterCandleRadarDataSet<T>,
+abstract class LineRadarDataSet<T : Entry?> : LineScatterCandleRadarDataSet<T>,
     ILineRadarDataSet<T> {
 
     // TODO: Move to using `Fill` class

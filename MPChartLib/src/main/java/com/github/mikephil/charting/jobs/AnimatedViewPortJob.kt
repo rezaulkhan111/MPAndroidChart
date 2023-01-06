@@ -13,7 +13,8 @@ import com.github.mikephil.charting.utils.ViewPortHandler
  * Created by Philipp Jahoda on 19/02/16.
  */
 @SuppressLint("NewApi")
-abstract class AnimatedViewPortJob : ViewPortJob, AnimatorUpdateListener,
+abstract class AnimatedViewPortJob : ViewPortJob,
+    AnimatorUpdateListener,
     Animator.AnimatorListener {
 
     protected var animator: ObjectAnimator? = null
@@ -74,9 +75,9 @@ abstract class AnimatedViewPortJob : ViewPortJob, AnimatorUpdateListener,
         animator!!.addListener(this)
     }
 
-    override fun onAnimationStart(animation: Animator?) {}
+    override fun onAnimationStart(animation: Animator) {}
 
-    override fun onAnimationEnd(animation: Animator?) {
+    override fun onAnimationEnd(animation: Animator) {
         try {
             recycleSelf()
         } catch (e: IllegalArgumentException) {
@@ -84,7 +85,7 @@ abstract class AnimatedViewPortJob : ViewPortJob, AnimatorUpdateListener,
         }
     }
 
-    override fun onAnimationCancel(animation: Animator?) {
+    override fun onAnimationCancel(animation: Animator) {
         try {
             recycleSelf()
         } catch (e: IllegalArgumentException) {
@@ -92,7 +93,7 @@ abstract class AnimatedViewPortJob : ViewPortJob, AnimatorUpdateListener,
         }
     }
 
-    override fun onAnimationRepeat(animation: Animator?) {}
+    override fun onAnimationRepeat(animation: Animator) {}
 
-    override fun onAnimationUpdate(animation: ValueAnimator?) {}
+    override fun onAnimationUpdate(animation: ValueAnimator) {}
 }

@@ -28,14 +28,14 @@ class HorizontalBarHighlighter : BarHighlighter {
         return high
     }
 
-     override fun buildHighlights(
+    override fun buildHighlights(
         set: IDataSet<*>?,
         dataSetIndex: Int,
         xVal: Float,
         rounding: Rounding?
     ): MutableList<Highlight> {
         val highlights = mutableListOf<Highlight>()
-        var entries = set!!.getEntriesForXValue(xVal)
+        var entries = set!!.getEntriesForXValue(xVal)!!
         if (entries.size == 0) {
             // Try to find closest x-value and take all entries for that x-value
             val closest = set.getEntryForXValue(
@@ -43,14 +43,14 @@ class HorizontalBarHighlighter : BarHighlighter {
                 rounding!!
             )
             if (closest != null) {
-                entries = set.getEntriesForXValue(closest.getX())
+                entries = set.getEntriesForXValue(closest.getX())!!
             }
         }
         if (entries.size == 0) return highlights
         for (e in entries) {
             val pixels = mChart!!.getTransformer(
                 set.getAxisDependency()
-            ).getPixelForValues(e.getY(), e.getX())
+            )!!.getPixelForValues(e!!.getY(), e.getX())
             highlights.add(
                 Highlight(
                     e.getX(), e.getY(), pixels!!.x.toFloat(), pixels.y.toFloat(),

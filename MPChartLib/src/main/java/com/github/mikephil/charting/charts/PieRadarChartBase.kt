@@ -22,7 +22,7 @@ import com.github.mikephil.charting.utils.Utils.getNormalizedAngle
  *
  * @author Philipp Jahoda
  */
-abstract class PieRadarChartBase<T : ChartData<out IDataSet<out Entry>>> : Chart<T> {
+abstract class PieRadarChartBase<T : ChartData<out IDataSet<out Entry?>?>?> : Chart<T> {
     /**
      * holds the normalized version of the current rotation angle of the chart
      */

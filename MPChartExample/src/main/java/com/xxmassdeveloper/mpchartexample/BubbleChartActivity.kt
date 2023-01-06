@@ -92,9 +92,9 @@ class BubbleChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSel
         val range = seekBarY!!.progress
         tvX!!.text = count.toString()
         tvY!!.text = range.toString()
-        val values1 = mutableListOf<BubbleEntry>()
-        val values2 = mutableListOf<BubbleEntry>()
-        val values3 = mutableListOf<BubbleEntry>()
+        val values1 = mutableListOf<BubbleEntry?>()
+        val values2 = mutableListOf<BubbleEntry?>()
+        val values3 = mutableListOf<BubbleEntry?>()
         for (i in 0 until count) {
             values1.add(
                 BubbleEntry(
@@ -139,7 +139,7 @@ class BubbleChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSel
         set3.setColor(ColorTemplate.COLORFUL_COLORS[2], 130)
         set3.setDrawValues(true)
 
-        val dataSets = ArrayList<IBubbleDataSet>()
+        val dataSets = ArrayList<IBubbleDataSet?>()
         dataSets.add(set1) // add the data sets
 
         dataSets.add(set2)
@@ -174,17 +174,17 @@ class BubbleChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSel
             }
             R.id.actionToggleValues -> {
                 for (set in chart.getData()
-                    .getDataSets()!!) set.setDrawValues(!set.isDrawValuesEnabled())
+                    !!.getDataSets()!!) set!!.setDrawValues(!set.isDrawValuesEnabled())
                 chart.invalidate()
             }
             R.id.actionToggleIcons -> {
-                for (set in chart.getData()
-                    .getDataSets()!!) set.setDrawIcons(!set.isDrawIconsEnabled())
+                for (set in chart.getData()!!
+                    .getDataSets()!!) set!!.setDrawIcons(!set.isDrawIconsEnabled())
                 chart.invalidate()
             }
             R.id.actionToggleHighlight -> {
                 if (chart.getData() != null) {
-                    chart.getData().setHighlightEnabled(!chart.getData().isHighlightEnabled())
+                    chart.getData()!!.setHighlightEnabled(!chart.getData()!!.isHighlightEnabled())
                     chart.invalidate()
                 }
             }
@@ -226,7 +226,7 @@ class BubbleChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSel
         saveToGallery(chart!!, "BubbleChartActivity")
     }
 
-    override fun onValueSelected(e: Entry, h: Highlight) {
+    override fun onValueSelected(e: Entry?, h: Highlight?) {
     }
 
     override fun onNothingSelected() {}

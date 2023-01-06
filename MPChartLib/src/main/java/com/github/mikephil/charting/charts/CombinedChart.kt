@@ -4,12 +4,14 @@ import android.content.Context
 import android.graphics.Canvas
 import android.util.AttributeSet
 import android.util.Log
+import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.highlight.CombinedHighlighter
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.interfaces.dataprovider.CombinedDataProvider
 import com.github.mikephil.charting.interfaces.datasets.IDataSet
 import com.github.mikephil.charting.renderer.CombinedChartRenderer
+import com.github.mikephil.charting.utils.Transformer
 
 /**
  * This chart class allows the combination of lines, bars, scatter and candle
@@ -17,7 +19,7 @@ import com.github.mikephil.charting.renderer.CombinedChartRenderer
  *
  * @author Philipp Jahoda
  */
-class CombinedChart : BarLineChartBase<CombinedData>, CombinedDataProvider {
+class CombinedChart : BarLineChartBase<CombinedData?>, CombinedDataProvider {
 
     /**
      * if set to true, all values are drawn above their bars, instead of below
@@ -37,7 +39,7 @@ class CombinedChart : BarLineChartBase<CombinedData>, CombinedDataProvider {
      */
     private var mDrawBarShadow = false
 
-    protected lateinit var mDrawOrder: Array<DrawOrder>
+    protected var mDrawOrder: Array<DrawOrder>? = null
 
     /**
      * enum that allows to specify the order in which the different data objects
@@ -81,7 +83,7 @@ class CombinedChart : BarLineChartBase<CombinedData>, CombinedDataProvider {
         return mData
     }
 
-    override fun setData(data: CombinedData) {
+    override fun setData(data: CombinedData?) {
         super.setData(data)
         setHighlighter(CombinedHighlighter(this, this))
         (mRenderer as CombinedChartRenderer).createRenderers()
@@ -113,6 +115,14 @@ class CombinedChart : BarLineChartBase<CombinedData>, CombinedDataProvider {
 
     override fun getLineData(): LineData? {
         return if (mData == null) null else mData!!.getLineData()
+    }
+
+    override fun getTransformer(axis: YAxis.AxisDependency?): Transformer? {
+        return null
+    }
+
+    override fun isInverted(axis: YAxis.AxisDependency?): Boolean {
+        return false
     }
 
     override fun getBarData(): BarData? {
@@ -203,14 +213,13 @@ class CombinedChart : BarLineChartBase<CombinedData>, CombinedDataProvider {
      * draws all MarkerViews on the highlighted positions
      */
     override fun drawMarkers(canvas: Canvas?) {
-
         // if there is no marker view or drawing marker is disabled
         if (mMarker == null || !isDrawMarkersEnabled() || !valuesToHighlight()) return
         for (i in 0 until mIndicesToHighlight!!.size) {
             val highlight = mIndicesToHighlight!![i]
             val set: IDataSet<*>? = mData!!.getDataSetByHighlight(highlight)
             val e = mData!!.getEntryForHighlight(highlight) ?: continue
-            val entryIndex = set!!.getEntryIndex(e as Nothing)
+            val entryIndex = set!!.getEntryIndex(e)
 
             // make sure entry not null
             if (entryIndex > set.getEntryCount() * mAnimator!!.getPhaseX()) continue

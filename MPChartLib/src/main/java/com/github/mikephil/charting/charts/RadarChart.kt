@@ -20,7 +20,7 @@ import com.github.mikephil.charting.utils.Utils.getNormalizedAngle
  *
  * @author Philipp Jahoda
  */
-class RadarChart : PieRadarChartBase<RadarData> {
+class RadarChart : PieRadarChartBase<RadarData?> {
     /**
      * width of the main web lines
      */
@@ -79,7 +79,7 @@ class RadarChart : PieRadarChartBase<RadarData> {
         mYAxis!!.setLabelXOffset(10f)
         mWebLineWidth = convertDpToPixel(1.5f)
         mInnerWebLineWidth = convertDpToPixel(0.75f)
-        mRenderer = RadarChartRenderer(this, mAnimator, mViewPortHandler)
+        mRenderer = RadarChartRenderer(this, mAnimator!!, mViewPortHandler)
         mYAxisRenderer = YAxisRendererRadarChart(mViewPortHandler, mYAxis!!, this)
         mXAxisRenderer = XAxisRendererRadarChart(mViewPortHandler, mXAxis!!, this)
         mHighlighter = RadarHighlighter(this)

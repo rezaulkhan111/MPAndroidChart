@@ -21,11 +21,11 @@ class MPPointD : Poolable {
         }
 
         @JvmStatic
-        fun recycleInstance(instance: MPPointD) {
-            pool!!.recycle(instance)
+        fun recycleInstance(instance: MPPointD?) {
+            pool!!.recycle(instance!!)
         }
 
-        fun recycleInstances(instances: List<MPPointD>?) {
+        fun recycleInstances(instances: MutableList<MPPointD>?) {
             pool!!.recycle(instances!!)
         }
 

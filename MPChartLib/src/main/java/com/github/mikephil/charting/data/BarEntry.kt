@@ -15,12 +15,12 @@ class BarEntry : Entry {
     /**
      * the values the stacked barchart holds
      */
-    private lateinit var mYVals: FloatArray
+    private var mYVals: FloatArray? = null
 
     /**
      * the ranges for the individual stack values - automatically calculated
      */
-    private lateinit var mRanges: Array<Range>
+    private var mRanges: Array<Range>? = null
 
     /**
      * the sum of all negative values this entry (if stacked) contains
@@ -151,7 +151,7 @@ class BarEntry : Entry {
      *
      * @return
      */
-    fun getYVals(): FloatArray {
+    fun getYVals(): FloatArray? {
         return mYVals
     }
 
@@ -160,7 +160,7 @@ class BarEntry : Entry {
      *
      * @param vals
      */
-    fun setVals(vals: FloatArray) {
+    fun setVals(vals: FloatArray?) {
         setY(calcSum(vals))
         mYVals = vals
         calcPosNegSum()
@@ -181,7 +181,7 @@ class BarEntry : Entry {
      *
      * @return
      */
-    fun getRanges(): Array<Range> {
+    fun getRanges(): Array<Range>? {
         return mRanges
     }
 
@@ -205,9 +205,9 @@ class BarEntry : Entry {
     fun getSumBelow(stackIndex: Int): Float {
         if (mYVals == null) return 0f
         var remainder = 0f
-        var index = mYVals.size - 1
+        var index = mYVals?.size!! - 1
         while (index > stackIndex && index >= 0) {
-            remainder += mYVals[index]
+            remainder += mYVals!![index]
             index--
         }
         return remainder
@@ -267,13 +267,13 @@ class BarEntry : Entry {
 
         var negRemain = -getNegativeSum()
         var posRemain = 0f
-        for (i in mRanges.indices) {
+        for (i in mRanges!!.indices) {
             val value = values[i]
             if (value < 0) {
-                mRanges[i] = Range(negRemain, negRemain - value)
+                mRanges!![i] = Range(negRemain, negRemain - value)
                 negRemain -= value
             } else {
-                mRanges[i] = Range(posRemain, posRemain + value)
+                mRanges!![i] = Range(posRemain, posRemain + value)
                 posRemain += value
             }
         }

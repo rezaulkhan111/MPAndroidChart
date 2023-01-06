@@ -102,7 +102,7 @@ class DynamicalAddingActivity : DemoBase(), OnChartValueSelectedListener {
         } else {
             val count = data.getDataSetCount() + 1
             val amount = data.getDataSetByIndex(0)!!.getEntryCount()
-            val values = mutableListOf<Entry>()
+            val values = mutableListOf<Entry?>()
             for (i in 0 until amount) {
                 values.add(Entry(i.toFloat(), (Math.random() * 50f).toFloat() + 50f * count))
             }
@@ -144,7 +144,7 @@ class DynamicalAddingActivity : DemoBase(), OnChartValueSelectedListener {
         return set
     }
 
-    override fun onValueSelected(e: Entry, h: Highlight) {
+    override fun onValueSelected(e: Entry?, h: Highlight?) {
         Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show()
     }
 

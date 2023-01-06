@@ -124,17 +124,17 @@ class LineChartActivity2 : DemoBase(), OnSeekBarChangeListener, OnChartValueSele
     }
 
     private fun setData(count: Int, range: Float) {
-        val values1 = mutableListOf<Entry>()
+        val values1 = mutableListOf<Entry?>()
         for (i in 0 until count) {
             val valF1 = (Math.random() * (range / 2f)).toFloat() + 50
             values1.add(Entry(i.toFloat(), valF1))
         }
-        val values2 = mutableListOf<Entry>()
+        val values2 = mutableListOf<Entry?>()
         for (i in 0 until count) {
             val valF2 = (Math.random() * range).toFloat() + 450
             values2.add(Entry(i.toFloat(), valF2))
         }
-        val values3 = mutableListOf<Entry>()
+        val values3 = mutableListOf<Entry?>()
         for (i in 0 until count) {
             val valF3 = (Math.random() * range).toFloat() + 500
             values3.add(Entry(i.toFloat(), valF3))
@@ -144,15 +144,15 @@ class LineChartActivity2 : DemoBase(), OnSeekBarChangeListener, OnChartValueSele
         val set3: LineDataSet?
 
         if (chart.getData() != null &&
-            chart.getData().getDataSetCount() > 0
+            chart.getData()!!.getDataSetCount() > 0
         ) {
-            set1 = chart.getData().getDataSetByIndex(0) as LineDataSet?
-            set2 = chart.getData().getDataSetByIndex(1) as LineDataSet?
-            set3 = chart.getData().getDataSetByIndex(2) as LineDataSet?
+            set1 = chart.getData()!!.getDataSetByIndex(0) as LineDataSet?
+            set2 = chart.getData()!!.getDataSetByIndex(1) as LineDataSet?
+            set3 = chart.getData()!!.getDataSetByIndex(2) as LineDataSet?
             set1!!.setValues(values1)
             set2!!.setValues(values2)
             set3!!.setValues(values3)
-            chart.getData().notifyDataChanged()
+            chart.getData()!!.notifyDataChanged()
             chart.notifyDataSetChanged()
         } else {
             // create a dataset and give it a type
@@ -218,8 +218,7 @@ class LineChartActivity2 : DemoBase(), OnSeekBarChangeListener, OnChartValueSele
                 startActivity(i)
             }
             R.id.actionToggleValues -> {
-                val sets: List<ILineDataSet>? = chart.getData()
-                    .getDataSets()
+                val sets = chart.getData()!!.getDataSets()
                 for (iSet in sets!!) {
                     val set = iSet as LineDataSet
                     set.setDrawValues(!set.isDrawValuesEnabled())
@@ -228,13 +227,12 @@ class LineChartActivity2 : DemoBase(), OnSeekBarChangeListener, OnChartValueSele
             }
             R.id.actionToggleHighlight -> {
                 if (chart.getData() != null) {
-                    chart.getData().setHighlightEnabled(!chart.getData().isHighlightEnabled())
+                    chart.getData()!!.setHighlightEnabled(!chart.getData()!!.isHighlightEnabled())
                     chart.invalidate()
                 }
             }
             R.id.actionToggleFilled -> {
-                val sets: List<ILineDataSet>? = chart.getData()
-                    .getDataSets()
+                val sets = chart.getData()!!.getDataSets()
                 for (iSet in sets!!) {
                     val set = iSet as LineDataSet
                     if (set.isDrawFilledEnabled()) set.setDrawFilled(false) else set.setDrawFilled(
@@ -244,8 +242,7 @@ class LineChartActivity2 : DemoBase(), OnSeekBarChangeListener, OnChartValueSele
                 chart.invalidate()
             }
             R.id.actionToggleCircles -> {
-                val sets: List<ILineDataSet>? = chart.getData()
-                    .getDataSets()
+                val sets = chart.getData()!!.getDataSets()
                 for (iSet in sets!!) {
                     val set = iSet as LineDataSet
                     if (set.isDrawCirclesEnabled()) set.setDrawCircles(false) else set.setDrawCircles(
@@ -255,8 +252,7 @@ class LineChartActivity2 : DemoBase(), OnSeekBarChangeListener, OnChartValueSele
                 chart.invalidate()
             }
             R.id.actionToggleCubic -> {
-                val sets: List<ILineDataSet>? = chart.getData()
-                    .getDataSets()
+                val sets = chart.getData()!!.getDataSets()
                 for (iSet in sets!!) {
                     val set = iSet as LineDataSet
                     set.setMode(if (set.getMode() == LineDataSet.Mode.CUBIC_BEZIER) LineDataSet.Mode.LINEAR else LineDataSet.Mode.CUBIC_BEZIER)
@@ -264,8 +260,7 @@ class LineChartActivity2 : DemoBase(), OnSeekBarChangeListener, OnChartValueSele
                 chart.invalidate()
             }
             R.id.actionToggleStepped -> {
-                val sets: List<ILineDataSet>? = chart.getData()
-                    .getDataSets()
+                val sets = chart.getData()!!.getDataSets()
                 for (iSet in sets!!) {
                     val set = iSet as LineDataSet
                     set.setMode(if (set.getMode() == LineDataSet.Mode.STEPPED) LineDataSet.Mode.LINEAR else LineDataSet.Mode.STEPPED)
@@ -273,8 +268,7 @@ class LineChartActivity2 : DemoBase(), OnSeekBarChangeListener, OnChartValueSele
                 chart.invalidate()
             }
             R.id.actionToggleHorizontalCubic -> {
-                val sets: List<ILineDataSet>? = chart.getData()
-                    .getDataSets()
+                val sets = chart.getData()!!.getDataSets()
                 for (iSet in sets!!) {
                     val set = iSet as LineDataSet
                     set.setMode(if (set.getMode() == LineDataSet.Mode.HORIZONTAL_BEZIER) LineDataSet.Mode.LINEAR else LineDataSet.Mode.HORIZONTAL_BEZIER)
@@ -328,13 +322,13 @@ class LineChartActivity2 : DemoBase(), OnSeekBarChangeListener, OnChartValueSele
         saveToGallery(chart!!, "LineChartActivity2")
     }
 
-    override fun onValueSelected(e: Entry, h: Highlight) {
+    override fun onValueSelected(e: Entry?, h: Highlight?) {
         Log.i("Entry selected", e.toString())
 
         chart.centerViewToAnimated(
-            e.getX(),
+            e!!.getX(),
             e.getY(),
-            chart.getData().getDataSetByIndex(h.getDataSetIndex())!!.getAxisDependency(),
+            chart.getData()!!.getDataSetByIndex(h!!.getDataSetIndex())!!.getAxisDependency()!!,
             500
         )
         //chart.zoomAndCenterAnimated(2.5f, 2.5f, e.getX(), e.getY(), chart.getData().getDataSetByIndex(dataSetIndex)

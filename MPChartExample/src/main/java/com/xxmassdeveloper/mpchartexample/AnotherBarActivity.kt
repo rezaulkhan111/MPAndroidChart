@@ -77,7 +77,7 @@ class AnotherBarActivity : DemoBase(), OnSeekBarChangeListener {
     override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
         tvX!!.text = seekBarX.progress.toString()
         tvY!!.text = seekBarY.progress.toString()
-        val values = mutableListOf<BarEntry>()
+        val values = mutableListOf<BarEntry?>()
         for (i in 0 until seekBarX.progress) {
             val multi = (seekBarY.progress + 1).toFloat()
             val `val` = (Math.random() * multi).toFloat() + multi / 3
@@ -86,17 +86,17 @@ class AnotherBarActivity : DemoBase(), OnSeekBarChangeListener {
         val set1: BarDataSet?
 
         if (chart.getData() != null &&
-            chart.getData().getDataSetCount() > 0
+            chart.getData()!!.getDataSetCount() > 0
         ) {
-            set1 = chart.getData().getDataSetByIndex(0) as BarDataSet?
+            set1 = chart.getData()!!.getDataSetByIndex(0) as BarDataSet?
             set1!!.setValues(values)
-            chart.getData().notifyDataChanged()
+            chart.getData()!!.notifyDataChanged()
             chart.notifyDataSetChanged()
         } else {
             set1 = BarDataSet(values, "Data Set")
             set1.setColors(ColorTemplate.VORDIPLOM_COLORS)
             set1.setDrawValues(false)
-            val dataSets = mutableListOf<IBarDataSet>()
+            val dataSets = mutableListOf<IBarDataSet?>()
             dataSets.add(set1)
             val data = BarData(dataSets)
             chart.setData(data)
@@ -120,13 +120,13 @@ class AnotherBarActivity : DemoBase(), OnSeekBarChangeListener {
                 startActivity(i)
             }
             R.id.actionToggleValues -> {
-                for (set in chart.getData()
-                    .getDataSets()!!) set.setDrawValues(!set.isDrawValuesEnabled())
+                for (set in chart.getData()!!
+                    .getDataSets()!!) set!!.setDrawValues(!set.isDrawValuesEnabled())
                 chart.invalidate()
             }
             R.id.actionToggleHighlight -> {
                 if (chart.getData() != null) {
-                    chart.getData().setHighlightEnabled(!chart.getData().isHighlightEnabled())
+                    chart.getData()!!.setHighlightEnabled(!chart.getData()!!.isHighlightEnabled())
                     chart.invalidate()
                 }
             }
@@ -141,7 +141,7 @@ class AnotherBarActivity : DemoBase(), OnSeekBarChangeListener {
                 chart.notifyDataSetChanged()
             }
             R.id.actionToggleBarBorders -> {
-                for (set in chart.getData().getDataSets()!!) (set as BarDataSet).setBarBorderWidth(
+                for (set in chart.getData()!!.getDataSets()!!) (set as BarDataSet).setBarBorderWidth(
                     if (set.getBarBorderWidth() == 1f) 0f else 1f
                 )
                 chart.invalidate()

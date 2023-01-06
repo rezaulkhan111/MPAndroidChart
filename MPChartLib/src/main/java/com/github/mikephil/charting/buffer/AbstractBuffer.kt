@@ -38,16 +38,16 @@ abstract class AbstractBuffer<T> {
 
     /** limits the drawing on the x-axis  */
     open fun limitFrom(from: Int) {
-        var from = from
-        if (from < 0) from = 0
-        mFrom = from
+        var mFrom = from
+        if (mFrom < 0) mFrom = 0
+        this.mFrom = mFrom
     }
 
     /** limits the drawing on the x-axis  */
     open fun limitTo(to: Int) {
-        var to = to
-        if (to < 0) to = 0
-        mTo = to
+        var mTo = to
+        if (mTo < 0) mTo = 0
+        this.mTo = mTo
     }
 
     /**

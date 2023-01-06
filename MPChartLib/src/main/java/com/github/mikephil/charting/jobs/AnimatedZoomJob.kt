@@ -89,7 +89,7 @@ class AnimatedZoomJob : AnimatedViewPortJob, Animator.AnimatorListener {
 
 
     private var mOnAnimationUpdateMatrixBuffer = Matrix()
-    override fun onAnimationUpdate(animation: ValueAnimator?) {
+    override fun onAnimationUpdate(animation: ValueAnimator) {
         val scaleX = xOrigin + (xValue - xOrigin) * phase
         val scaleY = yOrigin + (yValue - yOrigin) * phase
         val save = mOnAnimationUpdateMatrixBuffer
@@ -104,18 +104,18 @@ class AnimatedZoomJob : AnimatedViewPortJob, Animator.AnimatorListener {
         mViewPortHandler!!.refresh(save, view!!, true)
     }
 
-    override fun onAnimationEnd(animation: Animator?) {
+    override fun onAnimationEnd(animation: Animator) {
         (view as BarLineChartBase<*>).calculateOffsets()
         view?.postInvalidate()
     }
 
-    override fun onAnimationCancel(animation: Animator?) {}
+    override fun onAnimationCancel(animation: Animator) {}
 
-    override fun onAnimationRepeat(animation: Animator?) {}
+    override fun onAnimationRepeat(animation: Animator) {}
 
     override fun recycleSelf() {}
 
-    override fun onAnimationStart(animation: Animator?) {}
+    override fun onAnimationStart(animation: Animator) {}
 
     override fun instantiate(): Poolable {
         return AnimatedZoomJob(

@@ -40,7 +40,7 @@ class MPPointF : ObjectPool.Poolable {
             pool!!.recycle(instance)
         }
 
-        fun recycleInstances(instances: List<MPPointF>?) {
+        fun recycleInstances(instances: MutableList<MPPointF>?) {
             pool!!.recycle(instances!!)
         }
 

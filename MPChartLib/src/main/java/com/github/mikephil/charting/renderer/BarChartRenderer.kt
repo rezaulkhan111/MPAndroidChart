@@ -22,14 +22,14 @@ open class BarChartRenderer : BarLineScatterCandleBubbleRenderer {
      */
     protected var mBarRect = RectF()
 
-    protected lateinit var mBarBuffers: Array<BarBuffer?>
+    protected var mBarBuffers: Array<BarBuffer?>? = null
 
     protected var mShadowPaint: Paint? = null
     protected var mBarBorderPaint: Paint? = null
 
     constructor(
-        chart: BarDataProvider?, animator: ChartAnimator,
-        viewPortHandler: ViewPortHandler?
+        chart: BarDataProvider, animator: ChartAnimator,
+        viewPortHandler: ViewPortHandler
     ) : super(animator, viewPortHandler) {
         mChart = chart
         mHighlightPaint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -47,9 +47,9 @@ open class BarChartRenderer : BarLineScatterCandleBubbleRenderer {
         val barData = mChart!!.getBarData()
         mBarBuffers = arrayOfNulls(barData!!.getDataSetCount())
         mBarBuffers
-        for (i in mBarBuffers.indices) {
+        for (i in mBarBuffers!!.indices) {
             val set = barData.getDataSetByIndex(i)
-            mBarBuffers[i] = BarBuffer(
+            mBarBuffers!![i] = BarBuffer(
                 set!!.getEntryCount() * 4 * if (set.isStacked()) set.getStackSize() else 1,
                 barData.getDataSetCount(), set.isStacked()
             )
@@ -69,7 +69,7 @@ open class BarChartRenderer : BarLineScatterCandleBubbleRenderer {
     private val mBarShadowRectBuffer = RectF()
 
     protected open fun drawDataSet(c: Canvas, dataSet: IBarDataSet?, index: Int) {
-        val trans = mChart!!.getTransformer(dataSet!!.getAxisDependency())
+        val trans = mChart!!.getTransformer(dataSet!!.getAxisDependency())!!
         mBarBorderPaint!!.color = dataSet.getBarBorderColor()
         mBarBorderPaint!!.strokeWidth = convertDpToPixel(
             dataSet.getBarBorderWidth()
@@ -91,7 +91,7 @@ open class BarChartRenderer : BarLineScatterCandleBubbleRenderer {
                 dataSet.getEntryCount()
             )
             while (i < count) {
-                val e = dataSet.getEntryForIndex(i)
+                val e = dataSet.getEntryForIndex(i)!!
                 x = e.getX()
                 mBarShadowRectBuffer.left = x - barWidthHalf
                 mBarShadowRectBuffer.right = x + barWidthHalf
@@ -109,15 +109,15 @@ open class BarChartRenderer : BarLineScatterCandleBubbleRenderer {
         }
 
         // initialize the buffer
-        val buffer = mBarBuffers[index]
+        val buffer = mBarBuffers!![index]
         buffer?.setPhases(phaseX!!.toFloat(), phaseY!!.toFloat())
         buffer?.setDataSet(index)
         buffer?.setInverted(mChart!!.isInverted(dataSet.getAxisDependency()))
         buffer?.setBarWidth(mChart!!.getBarData()!!.getBarWidth())
         buffer?.feed(dataSet)
         trans.pointValuesToPixel(buffer?.buffer)
-        val isCustomFill = dataSet.getFills() != null && !dataSet.getFills().isEmpty()
-        val isSingleColor = dataSet.getColors().size == 1
+        val isCustomFill = dataSet.getFills() != null && !dataSet.getFills()!!.isEmpty()
+        val isSingleColor = dataSet.getColors()!!.size == 1
         val isInverted = mChart!!.isInverted(dataSet.getAxisDependency())
         if (isSingleColor) {
             mRenderPaint?.color = dataSet.getColor()
@@ -137,15 +137,14 @@ open class BarChartRenderer : BarLineScatterCandleBubbleRenderer {
                 mRenderPaint?.color = dataSet.getColor(pos)
             }
             if (isCustomFill) {
-                dataSet.getFill(pos)
-                    .fillRect(
-                        c, mRenderPaint!!,
-                        buffer.buffer[j],
-                        buffer.buffer[j + 1],
-                        buffer.buffer[j + 2],
-                        buffer.buffer[j + 3],
-                        if (isInverted) Fill.Direction.DOWN else Fill.Direction.UP
-                    )
+                dataSet.getFill(pos)!!.fillRect(
+                    c, mRenderPaint!!,
+                    buffer.buffer[j],
+                    buffer.buffer[j + 1],
+                    buffer.buffer[j + 2],
+                    buffer.buffer[j + 3],
+                    if (isInverted) Fill.Direction.DOWN else Fill.Direction.UP
+                )
             } else {
                 c.drawRect(
                     buffer.buffer[j], buffer.buffer[j + 1], buffer.buffer[j + 2],
@@ -179,13 +178,13 @@ open class BarChartRenderer : BarLineScatterCandleBubbleRenderer {
     override fun drawValues(c: Canvas?) {
         // if values are drawn
         if (isDrawingValuesAllowed(mChart!!)) {
-            val dataSets: List<IBarDataSet>? = mChart!!.getBarData()!!.getDataSets()
+            val dataSets: MutableList<IBarDataSet?>? = mChart!!.getBarData()!!.getDataSets()
             val valueOffsetPlus = convertDpToPixel(4.5f)
             var posOffset = 0f
             var negOffset = 0f
             val drawValueAboveBar = mChart!!.isDrawValueAboveBarEnabled()
             for (i in 0 until mChart!!.getBarData()!!.getDataSetCount()) {
-                val dataSet = dataSets!![i]
+                val dataSet = dataSets!![i]!!
                 if (!shouldDrawValues(dataSet)) continue
 
                 // apply the text-styling defined by the DataSet
@@ -205,9 +204,9 @@ open class BarChartRenderer : BarLineScatterCandleBubbleRenderer {
                 }
 
                 // get the buffer
-                val buffer = mBarBuffers[i]
+                val buffer = mBarBuffers!![i]
                 val phaseY = mAnimator!!.getPhaseY()
-                val iconsOffset = getInstance(dataSet.getIconsOffset())
+                val iconsOffset = getInstance(dataSet.getIconsOffset()!!)
                 iconsOffset.x = convertDpToPixel(iconsOffset.x)
                 iconsOffset.y = convertDpToPixel(iconsOffset.y)
 
@@ -223,13 +222,13 @@ open class BarChartRenderer : BarLineScatterCandleBubbleRenderer {
                             j += 4
                             continue
                         }
-                        val entry = dataSet.getEntryForIndex(j / 4)
+                        val entry = dataSet.getEntryForIndex(j / 4)!!
                         val yValue = entry.getY()
                         if (dataSet.isDrawValuesEnabled()) {
                             drawValue(
-                                c!!, dataSet.getValueFormatter(), yValue, entry, i, x,
+                                c!!, dataSet.getValueFormatter()!!, yValue, entry, i, x,
                                 if (yValue >= 0) buffer.buffer[j + 1] + posOffset else buffer.buffer[j + 3] + negOffset,
-                                dataSet.getValueTextColor(j / 4)
+                                dataSet.getValueTextColor(j / 4)!!
                             )
                         }
                         if (entry.getIcon() != null && dataSet.isDrawIconsEnabled()) {
@@ -251,14 +250,14 @@ open class BarChartRenderer : BarLineScatterCandleBubbleRenderer {
 
                     // if we have stacks
                 } else {
-                    val trans = mChart!!.getTransformer(dataSet.getAxisDependency())
+                    val trans = mChart!!.getTransformer(dataSet.getAxisDependency())!!
                     var bufferIndex = 0
                     var index = 0
                     while (index < dataSet.getEntryCount() * mAnimator!!.getPhaseX()) {
-                        val entry = dataSet.getEntryForIndex(index)
+                        val entry = dataSet.getEntryForIndex(index)!!
                         val vals = entry.getYVals()
                         val x = (buffer!!.buffer[bufferIndex] + buffer.buffer[bufferIndex + 2]) / 2f
-                        val color = dataSet.getValueTextColor(index)
+                        val color = dataSet.getValueTextColor(index)!!
 
                         // we still draw stacked bars, but there is one
                         // non-stacked
@@ -270,10 +269,9 @@ open class BarChartRenderer : BarLineScatterCandleBubbleRenderer {
                             ) continue
                             if (dataSet.isDrawValuesEnabled()) {
                                 drawValue(
-                                    c!!, dataSet.getValueFormatter(), entry.getY(), entry, i, x,
+                                    c!!, dataSet.getValueFormatter()!!, entry.getY(), entry, i, x,
                                     buffer.buffer[bufferIndex + 1] +
-                                            if (entry.getY() >= 0) posOffset else negOffset,
-                                    color
+                                            if (entry.getY() >= 0) posOffset else negOffset, color
                                 )
                             }
                             if (entry.getIcon() != null && dataSet.isDrawIconsEnabled()) {
@@ -335,7 +333,7 @@ open class BarChartRenderer : BarLineScatterCandleBubbleRenderer {
                                 if (dataSet.isDrawValuesEnabled()) {
                                     drawValue(
                                         c!!,
-                                        dataSet.getValueFormatter(),
+                                        dataSet.getValueFormatter()!!,
                                         vals[k / 2],
                                         entry,
                                         i,
@@ -375,7 +373,7 @@ open class BarChartRenderer : BarLineScatterCandleBubbleRenderer {
             if (set == null || !set.isHighlightEnabled()) continue
             val e = set.getEntryForXValue(high.getX(), high.getY())
             if (!isInBoundsX(e, set)) continue
-            val trans = mChart!!.getTransformer(set.getAxisDependency())
+            val trans = mChart!!.getTransformer(set.getAxisDependency())!!
             mHighlightPaint!!.color = set.getHighLightColor()
             mHighlightPaint!!.alpha = set.getHighLightAlpha()
             val isStack = if (high.getStackIndex() >= 0 && e!!.isStacked()) true else false
@@ -386,7 +384,7 @@ open class BarChartRenderer : BarLineScatterCandleBubbleRenderer {
                     y1 = e!!.getPositiveSum()
                     y2 = -e.getNegativeSum()
                 } else {
-                    val range = e!!.getRanges()[high.getStackIndex()]
+                    val range = e!!.getRanges()!![high.getStackIndex()]
                     y1 = range.from
                     y2 = range.to
                 }

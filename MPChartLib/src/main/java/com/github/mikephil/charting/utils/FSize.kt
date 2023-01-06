@@ -23,11 +23,11 @@ class FSize : Poolable {
         }
 
         @JvmStatic
-        fun recycleInstance(instance: FSize) {
-            pool!!.recycle(instance)
+        fun recycleInstance(instance: FSize?) {
+            pool!!.recycle(instance!!)
         }
 
-        fun recycleInstances(instances: List<FSize>?) {
+        fun recycleInstances(instances: MutableList<FSize>?) {
             pool!!.recycle(instances!!)
         }
 

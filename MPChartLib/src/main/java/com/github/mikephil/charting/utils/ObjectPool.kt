@@ -13,7 +13,7 @@ package com.github.mikephil.charting.utils
  *
  * Created by Tony Patino on 6/20/16.
  */
-class ObjectPool<T : ObjectPool.Poolable> {
+class ObjectPool<T : ObjectPool.Poolable?> {
 
     private var poolId = 0
     private var desiredCapacity = 0
@@ -120,44 +120,44 @@ class ObjectPool<T : ObjectPool.Poolable> {
      * Recycle an instance of Poolable that this pool is capable of generating.
      * The T instance passed must not already exist inside this or any other ObjectPool instance.
      *
-     * @param object An object of type T to recycle
+     * @param `object` An object of type T to recycle
      */
     @Synchronized
-    fun recycle(`object`: T) {
-        if (`object`.currentOwnerId != Poolable.NO_OWNER) {
-            require(`object`.currentOwnerId != poolId) { "The object passed is already stored in this pool!" }
-            throw IllegalArgumentException("The object to recycle already belongs to poolId " + `object`.currentOwnerId + ".  Object cannot belong to two different pool instances simultaneously!")
+    fun recycle(anyObj: T) {
+        if (anyObj!!.currentOwnerId != Poolable.NO_OWNER) {
+            require(anyObj.currentOwnerId != poolId) { "The object passed is already stored in this pool!" }
+            throw IllegalArgumentException("The object to recycle already belongs to poolId " + anyObj.currentOwnerId + ".  Object cannot belong to two different pool instances simultaneously!")
         }
         objectsPointer++
         if (objectsPointer >= objects.size) {
             resizePool()
         }
-        `object`.currentOwnerId = poolId
-        objects[objectsPointer] = `object`
+        anyObj.currentOwnerId = poolId
+        objects[objectsPointer] = anyObj
     }
 
     /**
      * Recycle a List of Poolables that this pool is capable of generating.
      * The T instances passed must not already exist inside this or any other ObjectPool instance.
      *
-     * @param objects A list of objects of type T to recycle
+     * @param listAnyObj A list of objects of type T to recycle
      */
     @Synchronized
-    fun recycle(objects: List<T>) {
-        while (objects.size + objectsPointer + 1 > desiredCapacity) {
+    fun recycle(listAnyObj: MutableList<T>) {
+        while (listAnyObj.size + objectsPointer + 1 > desiredCapacity) {
             resizePool()
         }
-        val objectsListSize = objects.size
+        val objectsListSize = listAnyObj.size
 
         // Not relying on recycle(T object) because this is more performant.
         for (i in 0 until objectsListSize) {
-            val `object` = objects[i]
-            if (`object`.currentOwnerId != Poolable.NO_OWNER) {
-                require(`object`.currentOwnerId != poolId) { "The object passed is already stored in this pool!" }
-                throw IllegalArgumentException("The object to recycle already belongs to poolId " + `object`.currentOwnerId + ".  Object cannot belong to two different pool instances simultaneously!")
+            val mObject = listAnyObj[i]
+            if (mObject!!.currentOwnerId != Poolable.NO_OWNER) {
+                require(mObject.currentOwnerId != poolId) { "The object passed is already stored in this pool!" }
+                throw IllegalArgumentException("The object to recycle already belongs to poolId " + mObject.currentOwnerId + ".  Object cannot belong to two different pool instances simultaneously!")
             }
-            `object`.currentOwnerId = poolId
-            this.objects[objectsPointer + 1 + i] = `object`
+            mObject.currentOwnerId = poolId
+            this.objects[objectsPointer + 1 + i] = mObject
         }
         objectsPointer += objectsListSize
     }

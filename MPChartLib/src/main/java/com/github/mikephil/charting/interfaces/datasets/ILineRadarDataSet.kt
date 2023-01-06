@@ -6,7 +6,7 @@ import com.github.mikephil.charting.data.Entry
 /**
  * Created by Philipp Jahoda on 21/10/15.
  */
-interface ILineRadarDataSet<T : Entry> : ILineScatterCandleRadarDataSet<T> {
+interface ILineRadarDataSet<T : Entry?> : ILineScatterCandleRadarDataSet<T> {
     /**
      * Returns the color that is used for filling the line surface area.
      *
@@ -19,7 +19,7 @@ interface ILineRadarDataSet<T : Entry> : ILineScatterCandleRadarDataSet<T> {
      *
      * @return
      */
-    fun getFillDrawable(): Drawable
+    fun getFillDrawable(): Drawable?
 
     /**
      * Returns the alpha value that is used for filling the line surface,

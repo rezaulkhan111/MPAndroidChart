@@ -49,7 +49,7 @@ open class BarBuffer : AbstractBuffer<IBarDataSet> {
             val x = e.getX()
             var y = e.getY()
             val vals = e.getYVals()
-            if (!mContainsStacks || vals == null) {
+            if (!mContainsStacks) {
                 val left = x - barWidthHalf
                 val right = x + barWidthHalf
                 var bottom: Float
@@ -71,7 +71,7 @@ open class BarBuffer : AbstractBuffer<IBarDataSet> {
                 var yStart = 0f
 
                 // fill the stack
-                for (k in vals.indices) {
+                for (k in vals!!.indices) {
                     val value = vals[k]
                     if (value == 0.0f && (posY == 0.0f || negY == 0.0f)) {
                         // Take care of the situation of a 0.0 value, which overlaps a non-zero bar

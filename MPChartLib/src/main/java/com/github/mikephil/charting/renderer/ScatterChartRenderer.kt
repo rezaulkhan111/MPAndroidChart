@@ -17,9 +17,9 @@ class ScatterChartRenderer : LineScatterCandleRadarRenderer {
     public var mChart: ScatterDataProvider? = null
 
     constructor(
-        chart: ScatterDataProvider?,
+        chart: ScatterDataProvider,
         animator: ChartAnimator,
-        viewPortHandler: ViewPortHandler?
+        viewPortHandler: ViewPortHandler
     ) : super(animator, viewPortHandler) {
         mChart = chart
     }
@@ -29,7 +29,7 @@ class ScatterChartRenderer : LineScatterCandleRadarRenderer {
     override fun drawData(c: Canvas?) {
         val scatterData = mChart!!.getScatterData()
         for (set in scatterData!!.getDataSets()!!) {
-            if (set.isVisible()) drawDataSet(c, set)
+            if (set!!.isVisible()) drawDataSet(c, set)
         }
     }
 
@@ -38,7 +38,7 @@ class ScatterChartRenderer : LineScatterCandleRadarRenderer {
     protected fun drawDataSet(c: Canvas?, dataSet: IScatterDataSet) {
         if (dataSet.getEntryCount() < 1) return
         val viewPortHandler = mViewPortHandler!!
-        val trans = mChart!!.getTransformer(dataSet.getAxisDependency())
+        val trans = mChart!!.getTransformer(dataSet.getAxisDependency())!!
         val phaseY = mAnimator!!.getPhaseY()
         val renderer = dataSet.getShapeRenderer()
         if (renderer == null) {
@@ -51,7 +51,7 @@ class ScatterChartRenderer : LineScatterCandleRadarRenderer {
         )
             .toInt()
         for (i in 0 until max) {
-            val e = dataSet.getEntryForIndex(i)
+            val e = dataSet.getEntryForIndex(i)!!
             mPixelBuffer[0] = e.getX()
             mPixelBuffer[1] = e.getY() * phaseY
             trans.pointValuesToPixel(mPixelBuffer)
@@ -71,21 +71,21 @@ class ScatterChartRenderer : LineScatterCandleRadarRenderer {
     override fun drawValues(c: Canvas?) {
         // if values are drawn
         if (isDrawingValuesAllowed(mChart!!)) {
-            val dataSets: List<IScatterDataSet>? = mChart!!.getScatterData()!!.getDataSets()
+            val dataSets: MutableList<IScatterDataSet?>? = mChart!!.getScatterData()!!.getDataSets()
             for (i in 0 until mChart!!.getScatterData()!!.getDataSetCount()) {
                 val dataSet = dataSets!![i]
-                if (!shouldDrawValues(dataSet) || dataSet.getEntryCount() < 1) continue
+                if (!shouldDrawValues(dataSet!!) || dataSet.getEntryCount() < 1) continue
 
                 // apply the text-styling defined by the DataSet
                 applyValueTextStyle(dataSet)
                 mXBounds[mChart!!] = dataSet
-                val positions = mChart!!.getTransformer(dataSet.getAxisDependency())
+                val positions = mChart!!.getTransformer(dataSet.getAxisDependency())!!
                     .generateTransformedValuesScatter(
                         dataSet,
                         mAnimator!!.getPhaseX(), mAnimator!!.getPhaseY(), mXBounds.min, mXBounds.max
                     )
                 val shapeSize = convertDpToPixel(dataSet.getScatterShapeSize())
-                val iconsOffset = getInstance(dataSet.getIconsOffset())
+                val iconsOffset = getInstance(dataSet.getIconsOffset()!!)
                 iconsOffset.x = convertDpToPixel(iconsOffset.x)
                 iconsOffset.y = convertDpToPixel(iconsOffset.y)
                 var j = 0
@@ -99,17 +99,17 @@ class ScatterChartRenderer : LineScatterCandleRadarRenderer {
                         j += 2
                         continue
                     }
-                    val entry = dataSet.getEntryForIndex(j / 2 + mXBounds.min)
+                    val entry = dataSet.getEntryForIndex(j / 2 + mXBounds.min)!!
                     if (dataSet.isDrawValuesEnabled()) {
                         drawValue(
                             c!!,
-                            dataSet.getValueFormatter(),
+                            dataSet.getValueFormatter()!!,
                             entry.getY(),
                             entry,
                             i,
                             positions[j],
                             positions[j + 1] - shapeSize,
-                            dataSet.getValueTextColor(j / 2 + mXBounds.min)
+                            dataSet.getValueTextColor(j / 2 + mXBounds.min)!!
                         )
                     }
                     if (entry.getIcon() != null && dataSet.isDrawIconsEnabled()) {
@@ -139,7 +139,7 @@ class ScatterChartRenderer : LineScatterCandleRadarRenderer {
             if (set == null || !set.isHighlightEnabled()) continue
             val e = set.getEntryForXValue(high.getX(), high.getY())
             if (!isInBoundsX(e, set)) continue
-            val pix = mChart!!.getTransformer(set.getAxisDependency()).getPixelForValues(
+            val pix = mChart!!.getTransformer(set.getAxisDependency())!!.getPixelForValues(
                 e!!.getX(), e.getY() * mAnimator!!.getPhaseY()
             )
             high.setDraw(pix!!.x.toFloat(), pix.y.toFloat())

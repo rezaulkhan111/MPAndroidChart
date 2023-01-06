@@ -13,7 +13,7 @@ import com.github.mikephil.charting.interfaces.datasets.IDataSet
  *
  * @author Philipp Jahoda
  */
-abstract class ChartData<T : IDataSet<out Entry>> {
+abstract class ChartData<T : IDataSet<out Entry?>?> {
     /**
      * maximum y-value in the value array across all axes
      */
@@ -61,7 +61,7 @@ abstract class ChartData<T : IDataSet<out Entry>> {
      * @param dataSets
      */
     constructor(vararg dataSets: T) {
-        mDataSets = arrayToList(dataSets as Nothing)
+        mDataSets = arrayToList(dataSets)
         notifyDataChanged()
     }
 
@@ -71,7 +71,7 @@ abstract class ChartData<T : IDataSet<out Entry>> {
      * @param array
      * @return
      */
-    private fun arrayToList(array: Array<T>): MutableList<T> {
+    private fun arrayToList(array: Array<out T>): MutableList<T> {
         val list: MutableList<T> = ArrayList()
         for (set in array) {
             list.add(set)
@@ -107,7 +107,7 @@ abstract class ChartData<T : IDataSet<out Entry>> {
      */
     open fun calcMinMaxY(fromX: Float, toX: Float) {
         for (set in mDataSets!!) {
-            set.calcMinMaxY(fromX, toX)
+            set!!.calcMinMaxY(fromX, toX)
         }
 
         // apply the new data
@@ -137,7 +137,7 @@ abstract class ChartData<T : IDataSet<out Entry>> {
             mLeftAxisMax = firstLeft.getYMax()
             mLeftAxisMin = firstLeft.getYMin()
             for (dataSet in mDataSets!!) {
-                if (dataSet.getAxisDependency() === AxisDependency.LEFT) {
+                if (dataSet!!.getAxisDependency() == AxisDependency.LEFT) {
                     if (dataSet.getYMin() < mLeftAxisMin) mLeftAxisMin = dataSet.getYMin()
                     if (dataSet.getYMax() > mLeftAxisMax) mLeftAxisMax = dataSet.getYMax()
                 }
@@ -150,7 +150,7 @@ abstract class ChartData<T : IDataSet<out Entry>> {
             mRightAxisMax = firstRight.getYMax()
             mRightAxisMin = firstRight.getYMin()
             for (dataSet in mDataSets!!) {
-                if (dataSet.getAxisDependency() === AxisDependency.RIGHT) {
+                if (dataSet!!.getAxisDependency() == AxisDependency.RIGHT) {
                     if (dataSet.getYMin() < mRightAxisMin) mRightAxisMin = dataSet.getYMin()
                     if (dataSet.getYMax() > mRightAxisMax) mRightAxisMax = dataSet.getYMax()
                 }
@@ -263,17 +263,17 @@ abstract class ChartData<T : IDataSet<out Entry>> {
      * @return
      */
     protected open fun getDataSetIndexByLabel(
-        dataSets: List<T>?, label: String,
+        dataSets: MutableList<T>?, label: String,
         ignorecase: Boolean
     ): Int {
         if (ignorecase) {
             for (i in dataSets!!.indices) if (label.equals(
-                    dataSets[i].getLabel(),
+                    dataSets[i]!!.getLabel(),
                     ignoreCase = true
                 )
             ) return i
         } else {
-            for (i in dataSets!!.indices) if (label == dataSets[i].getLabel()) return i
+            for (i in dataSets!!.indices) if (label == dataSets[i]!!.getLabel()) return i
         }
         return -1
     }
@@ -286,7 +286,7 @@ abstract class ChartData<T : IDataSet<out Entry>> {
     open fun getDataSetLabels(): Array<String?>? {
         val types = arrayOfNulls<String>(mDataSets!!.size)
         for (i in mDataSets!!.indices) {
-            types[i] = mDataSets!![i].getLabel()
+            types[i] = mDataSets!![i]!!.getLabel()
         }
         return types
     }
@@ -299,7 +299,7 @@ abstract class ChartData<T : IDataSet<out Entry>> {
      */
     open fun getEntryForHighlight(highlight: Highlight): Entry? {
         return if (highlight.getDataSetIndex() >= mDataSets!!.size) null else {
-            mDataSets!![highlight.getDataSetIndex()].getEntryForXValue(
+            mDataSets!![highlight.getDataSetIndex()]!!.getEntryForXValue(
                 highlight.getX(),
                 highlight.getY()
             )
@@ -375,10 +375,10 @@ abstract class ChartData<T : IDataSet<out Entry>> {
      */
     open fun addEntry(e: Entry, dataSetIndex: Int) {
         if (mDataSets!!.size > dataSetIndex && dataSetIndex >= 0) {
-            val set: IDataSet<*> = mDataSets!![dataSetIndex]
+            val set: IDataSet<*> = mDataSets!![dataSetIndex]!!
             // add the entry to the dataset
             if (!set.addEntry(e as Nothing)) return
-            calcMinMax(e, set.getAxisDependency())
+            calcMinMax(e, set.getAxisDependency()!!)
         } else {
             Log.e("addEntry", "Cannot add Entry because dataSetIndex too high or too low.")
         }
@@ -395,7 +395,7 @@ abstract class ChartData<T : IDataSet<out Entry>> {
         if (mYMin > e.getY()) mYMin = e.getY()
         if (mXMax < e.getX()) mXMax = e.getX()
         if (mXMin > e.getX()) mXMin = e.getX()
-        if (axis === AxisDependency.LEFT) {
+        if (axis == AxisDependency.LEFT) {
             if (mLeftAxisMax < e.getY()) mLeftAxisMax = e.getY()
             if (mLeftAxisMin > e.getY()) mLeftAxisMin = e.getY()
         } else {
@@ -410,11 +410,11 @@ abstract class ChartData<T : IDataSet<out Entry>> {
      * @param d
      */
     protected open fun calcMinMax(d: T) {
-        if (mYMax < d.getYMax()) mYMax = d.getYMax()
+        if (mYMax < d!!.getYMax()) mYMax = d.getYMax()
         if (mYMin > d.getYMin()) mYMin = d.getYMin()
         if (mXMax < d.getXMax()) mXMax = d.getXMax()
         if (mXMin > d.getXMin()) mXMin = d.getXMin()
-        if (d.getAxisDependency() === AxisDependency.LEFT) {
+        if (d.getAxisDependency() == AxisDependency.LEFT) {
             if (mLeftAxisMax < d.getYMax()) mLeftAxisMax = d.getYMax()
             if (mLeftAxisMin > d.getYMin()) mLeftAxisMin = d.getYMin()
         } else {
@@ -432,10 +432,10 @@ abstract class ChartData<T : IDataSet<out Entry>> {
     open fun removeEntry(e: Entry?, dataSetIndex: Int): Boolean {
         // entry null, outofbounds
         if (e == null || dataSetIndex >= mDataSets!!.size) return false
-        val set: IDataSet<*> = mDataSets!![dataSetIndex]
+        val set: IDataSet<*> = mDataSets!![dataSetIndex]!!
         return if (set != null) {
             // remove the entry from the dataset
-            val removed: Boolean = set.removeEntry(e as Nothing?)
+            val removed: Boolean = set.removeEntry(e as Nothing)
             if (removed) {
                 notifyDataChanged()
             }
@@ -454,7 +454,7 @@ abstract class ChartData<T : IDataSet<out Entry>> {
      */
     open fun removeEntry(xValue: Float, dataSetIndex: Int): Boolean {
         if (dataSetIndex >= mDataSets!!.size) return false
-        val dataSet: IDataSet<*> = mDataSets!![dataSetIndex]
+        val dataSet: IDataSet<*> = mDataSets!![dataSetIndex]!!
         val e = dataSet.getEntryForXValue(xValue, Float.NaN) ?: return false
         return removeEntry(e, dataSetIndex)
     }
@@ -470,7 +470,7 @@ abstract class ChartData<T : IDataSet<out Entry>> {
         if (e == null) return null
         for (i in mDataSets!!.indices) {
             val set = mDataSets!![i]
-            for (j in 0 until set.getEntryCount()) {
+            for (j in 0 until set!!.getEntryCount()) {
                 if (e.equalTo(set.getEntryForXValue(e.getX(), e.getY()))) return set
             }
         }
@@ -487,12 +487,12 @@ abstract class ChartData<T : IDataSet<out Entry>> {
         if (mDataSets == null) return null
         var clrcnt = 0
         for (i in mDataSets!!.indices) {
-            clrcnt += mDataSets!![i].getColors().size
+            clrcnt += mDataSets!![i]!!.getColors()!!.size
         }
         val colors = IntArray(clrcnt)
         var cnt = 0
         for (i in mDataSets!!.indices) {
-            val clrs: List<Int> = mDataSets!![i].getColors()
+            val clrs: List<Int> = mDataSets!![i]!!.getColors()!!
             for (clr in clrs) {
                 colors[cnt] = clr
                 cnt++
@@ -519,7 +519,7 @@ abstract class ChartData<T : IDataSet<out Entry>> {
      */
     protected open fun getFirstLeft(sets: List<T>): T? {
         for (dataSet in sets) {
-            if (dataSet.getAxisDependency() === AxisDependency.LEFT) return dataSet
+            if (dataSet!!.getAxisDependency() == AxisDependency.LEFT) return dataSet
         }
         return null
     }
@@ -532,7 +532,7 @@ abstract class ChartData<T : IDataSet<out Entry>> {
      */
     open fun getFirstRight(sets: MutableList<T>): T? {
         for (dataSet in sets) {
-            if (dataSet.getAxisDependency() === AxisDependency.RIGHT) return dataSet
+            if (dataSet!!.getAxisDependency() == AxisDependency.RIGHT) return dataSet
         }
         return null
     }
@@ -542,10 +542,10 @@ abstract class ChartData<T : IDataSet<out Entry>> {
      *
      * @param f
      */
-    open fun setValueFormatter(f: IValueFormatter) {
+    open fun setValueFormatter(f: IValueFormatter?) {
         if (f == null) return else {
             for (set in mDataSets!!) {
-                set.setValueFormatter(f)
+                set!!.setValueFormatter(f)
             }
         }
     }
@@ -558,7 +558,7 @@ abstract class ChartData<T : IDataSet<out Entry>> {
      */
     open fun setValueTextColor(color: Int) {
         for (set in mDataSets!!) {
-            set.setValueTextColor(color)
+            set!!.setValueTextColor(color)
         }
     }
 
@@ -570,7 +570,7 @@ abstract class ChartData<T : IDataSet<out Entry>> {
      */
     open fun setValueTextColors(colors: MutableList<Int>) {
         for (set in mDataSets!!) {
-            set.setValueTextColors(colors)
+            set!!.setValueTextColors(colors)
         }
     }
 
@@ -582,7 +582,7 @@ abstract class ChartData<T : IDataSet<out Entry>> {
      */
     open fun setValueTypeface(tf: Typeface?) {
         for (set in mDataSets!!) {
-            set.setValueTypeface(tf!!)
+            set!!.setValueTypeface(tf!!)
         }
     }
 
@@ -594,7 +594,7 @@ abstract class ChartData<T : IDataSet<out Entry>> {
      */
     open fun setValueTextSize(size: Float) {
         for (set in mDataSets!!) {
-            set.setValueTextSize(size)
+            set!!.setValueTextSize(size)
         }
     }
 
@@ -606,7 +606,7 @@ abstract class ChartData<T : IDataSet<out Entry>> {
      */
     open fun setDrawValues(enabled: Boolean) {
         for (set in mDataSets!!) {
-            set.setDrawValues(enabled)
+            set!!.setDrawValues(enabled)
         }
     }
 
@@ -617,7 +617,7 @@ abstract class ChartData<T : IDataSet<out Entry>> {
      */
     open fun setHighlightEnabled(enabled: Boolean) {
         for (set in mDataSets!!) {
-            set.setHighlightEnabled(enabled)
+            set!!.setHighlightEnabled(enabled)
         }
     }
 
@@ -629,7 +629,7 @@ abstract class ChartData<T : IDataSet<out Entry>> {
      */
     open fun isHighlightEnabled(): Boolean {
         for (set in mDataSets!!) {
-            if (!set.isHighlightEnabled()) return false
+            if (!set!!.isHighlightEnabled()) return false
         }
         return true
     }
@@ -667,7 +667,7 @@ abstract class ChartData<T : IDataSet<out Entry>> {
     open fun getEntryCount(): Int {
         var count = 0
         for (set in mDataSets!!) {
-            count += set.getEntryCount()
+            count += set!!.getEntryCount()
         }
         return count
     }
@@ -681,7 +681,7 @@ abstract class ChartData<T : IDataSet<out Entry>> {
         if (mDataSets == null || mDataSets!!.isEmpty()) return null
         var max = mDataSets!![0]
         for (set in mDataSets!!) {
-            if (set.getEntryCount() > max.getEntryCount()) max = set
+            if (set!!.getEntryCount() > max!!.getEntryCount()) max = set
         }
         return max
     }

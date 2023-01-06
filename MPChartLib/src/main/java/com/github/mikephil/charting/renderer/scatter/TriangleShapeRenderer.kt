@@ -18,13 +18,13 @@ class TriangleShapeRenderer : IShapeRenderer {
 
     override fun renderShape(
         c: Canvas,
-        dataSet: IScatterDataSet,
-        viewPortHandler: ViewPortHandler,
+        dataSet: IScatterDataSet?,
+        viewPortHandler: ViewPortHandler?,
         posX: Float,
         posY: Float,
         renderPaint: Paint
     ) {
-        val shapeSize = dataSet.getScatterShapeSize()
+        val shapeSize = dataSet!!.getScatterShapeSize()
         val shapeHalf = shapeSize / 2f
         val shapeHoleSizeHalf = convertDpToPixel(dataSet.getScatterShapeHoleRadius())
         val shapeHoleSize = shapeHoleSizeHalf * 2f

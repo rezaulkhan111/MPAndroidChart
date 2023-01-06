@@ -65,7 +65,7 @@ class DrawChartActivity : DemoBase(), OnChartValueSelectedListener, OnDrawListen
     }
 
     private fun initWithDummyData() {
-        val values = mutableListOf<Entry>()
+        val values = mutableListOf<Entry?>()
 
         // create a dataset and give it a type (0)
         val set1 = LineDataSet(values, "DataSet")
@@ -86,8 +86,7 @@ class DrawChartActivity : DemoBase(), OnChartValueSelectedListener, OnDrawListen
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.actionToggleValues -> {
-                val sets: List<ILineDataSet>? = chart.getData()
-                    .getDataSets()
+                val sets = chart.getData()!!.getDataSets()
                 for (iSet in sets!!) {
                     val set = iSet as LineDataSet
                     set.setDrawValues(!set.isDrawValuesEnabled())
@@ -96,7 +95,7 @@ class DrawChartActivity : DemoBase(), OnChartValueSelectedListener, OnDrawListen
             }
             R.id.actionToggleHighlight -> {
                 if (chart.getData() != null) {
-                    chart.getData().setHighlightEnabled(!chart.getData().isHighlightEnabled())
+                    chart.getData()!!.setHighlightEnabled(!chart.getData()!!.isHighlightEnabled())
                     chart.invalidate()
                 }
             }
@@ -129,22 +128,22 @@ class DrawChartActivity : DemoBase(), OnChartValueSelectedListener, OnDrawListen
         saveToGallery(chart!!, "DrawChartActivity")
     }
 
-    override fun onValueSelected(e: Entry, h: Highlight) {
+    override fun onValueSelected(e: Entry?, h: Highlight?) {
 
     }
 
     override fun onNothingSelected() {}
 
     /** callback for each new entry drawn with the finger  */
-    override fun onEntryAdded(entry: Entry) {
+    override fun onEntryAdded(entry: Entry?) {
     }
 
     /** callback when a DataSet has been drawn (when lifting the finger)  */
-    override fun onDrawFinished(dataSet: DataSet<*>) {
+    override fun onDrawFinished(dataSet: DataSet<*>?) {
         // prepare the legend again
-        chart.getLegendRenderer()!!.computeLegend(chart.getData())
+        chart.getLegendRenderer()!!.computeLegend(chart.getData()!!)
     }
 
-    override fun onEntryMoved(entry: Entry) {
+    override fun onEntryMoved(entry: Entry?) {
     }
 }

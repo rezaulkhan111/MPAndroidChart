@@ -22,8 +22,8 @@ class CandleStickChartRenderer : LineScatterCandleRadarRenderer {
     private val mCloseBuffers = FloatArray(4)
 
     constructor(
-        chart: CandleDataProvider?, animator: ChartAnimator,
-        viewPortHandler: ViewPortHandler?
+        chart: CandleDataProvider, animator: ChartAnimator,
+        viewPortHandler: ViewPortHandler
     ) : super(animator, viewPortHandler) {
         mChart = chart
     }
@@ -33,12 +33,12 @@ class CandleStickChartRenderer : LineScatterCandleRadarRenderer {
     override fun drawData(c: Canvas?) {
         val candleData = mChart!!.getCandleData()
         for (set in candleData!!.getDataSets()!!) {
-            if (set.isVisible()) drawDataSet(c!!, set)
+            if (set!!.isVisible()) drawDataSet(c!!, set)
         }
     }
 
     protected fun drawDataSet(c: Canvas, dataSet: ICandleDataSet) {
-        val trans = mChart!!.getTransformer(dataSet.getAxisDependency())
+        val trans = mChart!!.getTransformer(dataSet.getAxisDependency())!!
         val phaseY = mAnimator!!.getPhaseY()
         val barSpace = dataSet.getBarSpace()
         val showCandleBar = dataSet.getShowCandleBar()
@@ -192,14 +192,14 @@ class CandleStickChartRenderer : LineScatterCandleRadarRenderer {
     override fun drawValues(c: Canvas?) {
         // if values are drawn
         if (isDrawingValuesAllowed(mChart!!)) {
-            val dataSets: List<ICandleDataSet>? = mChart!!.getCandleData()!!.getDataSets()
+            val dataSets: MutableList<ICandleDataSet?>? = mChart!!.getCandleData()!!.getDataSets()
             for (i in dataSets!!.indices) {
                 val dataSet = dataSets[i]
-                if (!shouldDrawValues(dataSet) || dataSet.getEntryCount() < 1) continue
+                if (!shouldDrawValues(dataSet!!) || dataSet.getEntryCount() < 1) continue
 
                 // apply the text-styling defined by the DataSet
                 applyValueTextStyle(dataSet)
-                val trans = mChart!!.getTransformer(dataSet.getAxisDependency())
+                val trans = mChart!!.getTransformer(dataSet.getAxisDependency())!!
                 mXBounds[mChart!!] = dataSet
                 val positions = trans.generateTransformedValuesCandle(
                     dataSet,
@@ -209,7 +209,7 @@ class CandleStickChartRenderer : LineScatterCandleRadarRenderer {
                     mXBounds.max
                 )
                 val yOffset = convertDpToPixel(5f)
-                val iconsOffset = getInstance(dataSet.getIconsOffset())
+                val iconsOffset = getInstance(dataSet.getIconsOffset()!!)
                 iconsOffset.x = convertDpToPixel(iconsOffset.x)
                 iconsOffset.y = convertDpToPixel(iconsOffset.y)
                 var j = 0
@@ -221,18 +221,17 @@ class CandleStickChartRenderer : LineScatterCandleRadarRenderer {
                         j += 2
                         continue
                     }
-                    val entry = dataSet.getEntryForIndex(j / 2 + mXBounds.min)
+                    val entry = dataSet.getEntryForIndex(j / 2 + mXBounds.min)!!
                     if (dataSet.isDrawValuesEnabled()) {
                         drawValue(
                             c!!,
-                            dataSet.getValueFormatter(),
+                            dataSet.getValueFormatter()!!,
                             entry.getHigh(),
                             entry,
                             i,
                             x,
                             y - yOffset,
-                            dataSet
-                                .getValueTextColor(j / 2)
+                            dataSet.getValueTextColor(j / 2)!!
                         )
                     }
                     if (entry.getIcon() != null && dataSet.isDrawIconsEnabled()) {
@@ -264,7 +263,7 @@ class CandleStickChartRenderer : LineScatterCandleRadarRenderer {
             val highValue = e.getHigh() * mAnimator?.getPhaseY()!!
             val y = (lowValue + highValue) / 2f
             val pix =
-                mChart!!.getTransformer(set.getAxisDependency()).getPixelForValues(e.getX(), y)
+                mChart!!.getTransformer(set.getAxisDependency())!!.getPixelForValues(e.getX(), y)
             high.setDraw(pix!!.x.toFloat(), pix.y.toFloat())
 
             // draw the lines

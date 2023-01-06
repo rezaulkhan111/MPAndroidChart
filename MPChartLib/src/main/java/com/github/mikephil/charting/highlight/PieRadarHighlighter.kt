@@ -6,7 +6,7 @@ import com.github.mikephil.charting.charts.PieRadarChartBase
 /**
  * Created by philipp on 12/06/16.
  */
-abstract class PieRadarHighlighter<T : PieRadarChartBase<*>> : IHighlighter {
+abstract class PieRadarHighlighter<T : PieRadarChartBase<*>?> : IHighlighter {
 
     protected var mChart: T? = null
 

@@ -89,9 +89,9 @@ class ScatterChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSe
     override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
         tvX.text = seekBarX.progress.toString()
         tvY.text = seekBarY.progress.toString()
-        val values1 = mutableListOf<Entry>()
-        val values2 = mutableListOf<Entry>()
-        val values3 = mutableListOf<Entry>()
+        val values1 = mutableListOf<Entry?>()
+        val values2 = mutableListOf<Entry?>()
+        val values3 = mutableListOf<Entry?>()
         for (i in 0 until seekBarX.progress) {
             val valFloat1 = (Math.random() * seekBarY.progress).toFloat() + 3
             values1.add(Entry(i.toFloat(), valFloat1))
@@ -122,7 +122,7 @@ class ScatterChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSe
         set2.setScatterShapeSize(8f)
         set3.setScatterShapeSize(8f)
 
-        val dataSets = ArrayList<IScatterDataSet>()
+        val dataSets = ArrayList<IScatterDataSet?>()
         dataSets.add(set1) // add the data sets
 
         dataSets.add(set2)
@@ -150,7 +150,7 @@ class ScatterChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSe
                 startActivity(i)
             }
             R.id.actionToggleValues -> {
-                val sets: List<IScatterDataSet>? = chart.getData()
+                val sets = chart.getData()!!
                     .getDataSets()
                 for (iSet in sets!!) {
                     val set = iSet as ScatterDataSet
@@ -160,7 +160,7 @@ class ScatterChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSe
             }
             R.id.actionToggleHighlight -> {
                 if (chart.getData() != null) {
-                    chart.getData().setHighlightEnabled(!chart.getData().isHighlightEnabled())
+                    chart.getData()!!.setHighlightEnabled(!chart.getData()!!.isHighlightEnabled())
                     chart.invalidate()
                 }
             }
@@ -202,11 +202,11 @@ class ScatterChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSe
         saveToGallery(chart, "ScatterChartActivity")
     }
 
-    override fun onValueSelected(e: Entry, h: Highlight) {
+    override fun onValueSelected(e: Entry?, h: Highlight?) {
         Log.i(
             "VAL SELECTED",
-            "Value: " + e.getY() + ", xIndex: " + e.getX()
-                    + ", DataSet index: " + h.getDataSetIndex()
+            "Value: " + e!!.getY() + ", xIndex: " + e.getX()
+                    + ", DataSet index: " + h!!.getDataSetIndex()
         )
     }
 

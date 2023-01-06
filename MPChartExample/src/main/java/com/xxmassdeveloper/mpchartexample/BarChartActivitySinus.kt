@@ -89,7 +89,7 @@ class BarChartActivitySinus : DemoBase(), OnSeekBarChangeListener {
     }
 
     private fun setData(count: Int) {
-        val entries = mutableListOf<BarEntry>()
+        val entries = mutableListOf<BarEntry?>()
         for (i in 0 until count) {
             entries.add(data!![i])
         }
@@ -97,11 +97,11 @@ class BarChartActivitySinus : DemoBase(), OnSeekBarChangeListener {
         val set: BarDataSet?
 
         if (chart.getData() != null &&
-            chart.getData().getDataSetCount() > 0
+            chart.getData()!!.getDataSetCount() > 0
         ) {
-            set = chart.getData().getDataSetByIndex(0) as BarDataSet?
+            set = chart.getData()!!.getDataSetByIndex(0) as BarDataSet?
             set!!.setValues(entries)
-            chart.getData().notifyDataChanged()
+            chart.getData()!!.notifyDataChanged()
             chart.notifyDataSetChanged()
         } else {
             set = BarDataSet(entries, "Sinus Function")
@@ -131,13 +131,13 @@ class BarChartActivitySinus : DemoBase(), OnSeekBarChangeListener {
                 startActivity(i)
             }
             R.id.actionToggleValues -> {
-                for (set in chart.getData()
-                    .getDataSets()!!) set.setDrawValues(!set.isDrawValuesEnabled())
+                for (set in chart.getData()!!
+                    .getDataSets()!!) set!!.setDrawValues(!set.isDrawValuesEnabled())
                 chart.invalidate()
             }
             R.id.actionToggleHighlight -> {
                 if (chart.getData() != null) {
-                    chart.getData().setHighlightEnabled(!chart.getData().isHighlightEnabled())
+                    chart.getData()!!.setHighlightEnabled(!chart.getData()!!.isHighlightEnabled())
                     chart.invalidate()
                 }
             }
@@ -152,7 +152,7 @@ class BarChartActivitySinus : DemoBase(), OnSeekBarChangeListener {
                 chart.notifyDataSetChanged()
             }
             R.id.actionToggleBarBorders -> {
-                for (set in chart.getData().getDataSets()!!) (set as BarDataSet).setBarBorderWidth(
+                for (set in chart.getData()!!.getDataSets()!!) (set as BarDataSet).setBarBorderWidth(
                     if (set.getBarBorderWidth() == 1f) 0f else 1f
                 )
                 chart.invalidate()

@@ -12,7 +12,7 @@ import kotlin.math.hypot
 /**
  * Created by Philipp Jahoda on 21/07/15.
  */
-open class ChartHighlighter<T : BarLineScatterCandleBubbleDataProvider> : IHighlighter {
+open class ChartHighlighter<T : BarLineScatterCandleBubbleDataProvider?> : IHighlighter {
 
     /**
      * instance of the data-provider
@@ -48,7 +48,7 @@ open class ChartHighlighter<T : BarLineScatterCandleBubbleDataProvider> : IHighl
      */
     protected open fun getValsForTouch(x: Float, y: Float): MPPointD {
         // take any transformer to determine the x-axis value
-        return mChart!!.getTransformer(AxisDependency.LEFT).getValuesByTouchPoint(x, y)!!
+        return mChart!!.getTransformer(AxisDependency.LEFT)!!.getValuesByTouchPoint(x, y)!!
     }
 
     /**
@@ -159,7 +159,7 @@ open class ChartHighlighter<T : BarLineScatterCandleBubbleDataProvider> : IHighl
         rounding: Rounding?
     ): MutableList<Highlight> {
         val highlights = mutableListOf<Highlight>()
-        var entries = set!!.getEntriesForXValue(xVal)
+        var entries = set!!.getEntriesForXValue(xVal)!!
         if (entries.size == 0) {
             // Try to find closest x-value and take all entries for that x-value
             val closest = set.getEntryForXValue(
@@ -167,14 +167,14 @@ open class ChartHighlighter<T : BarLineScatterCandleBubbleDataProvider> : IHighl
                 rounding!!
             )
             if (closest != null) {
-                entries = set.getEntriesForXValue(closest.getX())
+                entries = set.getEntriesForXValue(closest.getX())!!
             }
         }
         if (entries.size == 0) return highlights
         for (e in entries) {
             val pixels = mChart!!.getTransformer(
                 set.getAxisDependency()
-            ).getPixelForValues(e.getX(), e.getY())
+            )!!.getPixelForValues(e!!.getX(), e.getY())
             highlights.add(
                 Highlight(
                     e.getX(), e.getY(), pixels!!.x.toFloat(), pixels.y.toFloat(),

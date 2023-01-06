@@ -79,7 +79,7 @@ class Legend : ComponentBase {
      * Entries that will be appended to the end of the auto calculated entries after calculating the legend.
      * (if the legend has already been calculated, you will need to call notifyDataSetChanged() to let the changes take effect)
      */
-    private lateinit var mExtraEntries: Array<LegendEntry?>
+    private var mExtraEntries: Array<LegendEntry?>?=null
 
     /**
      * Are the legend labels/colors a custom value or auto calculated? If false,
@@ -215,7 +215,7 @@ class Legend : ComponentBase {
         return max
     }
 
-    fun getExtraEntries(): Array<LegendEntry?> {
+    fun getExtraEntries(): Array<LegendEntry?>? {
         return mExtraEntries
     }
 

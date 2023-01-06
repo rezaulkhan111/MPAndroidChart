@@ -12,7 +12,7 @@ import com.github.mikephil.charting.renderer.LineChartRenderer
  *
  * @author Philipp Jahoda
  */
-class LineChart : BarLineChartBase<LineData>, LineDataProvider {
+class LineChart : BarLineChartBase<LineData?>, LineDataProvider {
 
     constructor(context: Context?) : super(context) {}
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {}
@@ -25,7 +25,7 @@ class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 
     override fun init() {
         super.init()
-        mRenderer = LineChartRenderer(this, mAnimator, mViewPortHandler)
+        mRenderer = LineChartRenderer(this, mAnimator!!, mViewPortHandler)
     }
 
     override fun getLineData(): LineData? {

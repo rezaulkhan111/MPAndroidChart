@@ -86,7 +86,7 @@ class HalfPieChartActivity : DemoBase() {
     }
 
     private fun setData(count: Int, range: Float) {
-        val values = mutableListOf<PieEntry>()
+        val values = mutableListOf<PieEntry?>()
         for (i in 0 until count) {
             values.add(
                 PieEntry(
@@ -99,7 +99,7 @@ class HalfPieChartActivity : DemoBase() {
         dataSet.setSliceSpace(3f)
         dataSet.setSelectionShift(5f)
 
-        dataSet.setColors(*ColorTemplate.MATERIAL_COLORS)
+        dataSet.setColors(ColorTemplate.MATERIAL_COLORS)
         //dataSet.setSelectionShift(0f);
         val data = PieData(dataSet)
         data.setValueFormatter(PercentFormatter())

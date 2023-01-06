@@ -103,7 +103,7 @@ class CubicLineChartActivity : DemoBase(), OnSeekBarChangeListener {
     }
 
     private fun setData(count: Int, range: Float) {
-        val values = mutableListOf<Entry>()
+        val values = mutableListOf<Entry?>()
         for (i in 0 until count) {
             val `val` = (Math.random() * (range + 1)).toFloat() + 20
             values.add(Entry(i.toFloat(), `val`))
@@ -111,11 +111,11 @@ class CubicLineChartActivity : DemoBase(), OnSeekBarChangeListener {
         val set1: LineDataSet?
 
         if (chart.getData() != null &&
-            chart.getData().getDataSetCount() > 0
+            chart.getData()!!.getDataSetCount() > 0
         ) {
-            set1 = chart.getData().getDataSetByIndex(0) as LineDataSet?
+            set1 = chart.getData()!!.getDataSetByIndex(0) as LineDataSet?
             set1!!.setValues(values)
-            chart.getData().notifyDataChanged()
+            chart.getData()!!.notifyDataChanged()
             chart.notifyDataSetChanged()
         } else {
             // create a dataset and give it a type
@@ -164,19 +164,18 @@ class CubicLineChartActivity : DemoBase(), OnSeekBarChangeListener {
                 startActivity(i)
             }
             R.id.actionToggleValues -> {
-                for (set in chart.getData()
-                    .getDataSets()!!) set.setDrawValues(!set.isDrawValuesEnabled())
+                for (set in chart.getData()!!
+                    .getDataSets()!!) set!!.setDrawValues(!set.isDrawValuesEnabled())
                 chart.invalidate()
             }
             R.id.actionToggleHighlight -> {
                 if (chart.getData() != null) {
-                    chart.getData().setHighlightEnabled(!chart.getData().isHighlightEnabled())
+                    chart.getData()!!.setHighlightEnabled(!chart.getData()!!.isHighlightEnabled())
                     chart.invalidate()
                 }
             }
             R.id.actionToggleFilled -> {
-                val sets: List<ILineDataSet>? = chart.getData()
-                    .getDataSets()
+                val sets = chart.getData()!!.getDataSets()
                 for (iSet in sets!!) {
                     val set = iSet as LineDataSet
                     if (set.isDrawFilledEnabled()) set.setDrawFilled(false) else set.setDrawFilled(
@@ -186,8 +185,7 @@ class CubicLineChartActivity : DemoBase(), OnSeekBarChangeListener {
                 chart.invalidate()
             }
             R.id.actionToggleCircles -> {
-                val sets: List<ILineDataSet>? = chart.getData()
-                    .getDataSets()
+                val sets = chart.getData()!!.getDataSets()
                 for (iSet in sets!!) {
                     val set = iSet as LineDataSet
                     if (set.isDrawCirclesEnabled()) set.setDrawCircles(false) else set.setDrawCircles(
@@ -197,8 +195,7 @@ class CubicLineChartActivity : DemoBase(), OnSeekBarChangeListener {
                 chart.invalidate()
             }
             R.id.actionToggleCubic -> {
-                val sets: List<ILineDataSet>? = chart.getData()
-                    .getDataSets()
+                val sets = chart.getData()!!.getDataSets()
                 for (iSet in sets!!) {
                     val set = iSet as LineDataSet
                     set.setMode(if (set.getMode() === LineDataSet.Mode.CUBIC_BEZIER) LineDataSet.Mode.LINEAR else LineDataSet.Mode.CUBIC_BEZIER)
@@ -206,8 +203,7 @@ class CubicLineChartActivity : DemoBase(), OnSeekBarChangeListener {
                 chart.invalidate()
             }
             R.id.actionToggleStepped -> {
-                val sets: List<ILineDataSet>? = chart.getData()
-                    .getDataSets()
+                val sets = chart.getData()!!.getDataSets()
                 for (iSet in sets!!) {
                     val set = iSet as LineDataSet
                     set.setMode(if (set.getMode() === LineDataSet.Mode.STEPPED) LineDataSet.Mode.LINEAR else LineDataSet.Mode.STEPPED)
@@ -215,8 +211,7 @@ class CubicLineChartActivity : DemoBase(), OnSeekBarChangeListener {
                 chart.invalidate()
             }
             R.id.actionToggleHorizontalCubic -> {
-                val sets: List<ILineDataSet>? = chart.getData()
-                    .getDataSets()
+                val sets = chart.getData()!!.getDataSets()
                 for (iSet in sets!!) {
                     val set = iSet as LineDataSet
                     set.setMode(if (set.getMode() === LineDataSet.Mode.HORIZONTAL_BEZIER) LineDataSet.Mode.LINEAR else LineDataSet.Mode.HORIZONTAL_BEZIER)

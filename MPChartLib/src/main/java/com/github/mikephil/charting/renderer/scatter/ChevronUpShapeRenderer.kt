@@ -14,13 +14,13 @@ class ChevronUpShapeRenderer : IShapeRenderer {
 
     override fun renderShape(
         c: Canvas,
-        dataSet: IScatterDataSet,
-        viewPortHandler: ViewPortHandler,
+        dataSet: IScatterDataSet?,
+        viewPortHandler: ViewPortHandler?,
         posX: Float,
         posY: Float,
         renderPaint: Paint
     ) {
-        val shapeHalf = dataSet.getScatterShapeSize() / 2f
+        val shapeHalf = dataSet!!.getScatterShapeSize() / 2f
         renderPaint.style = Paint.Style.STROKE
         renderPaint.strokeWidth = convertDpToPixel(1f)
         c.drawLine(

@@ -23,7 +23,7 @@ object FileUtils {
      * @param path the name of the file on the sd-card (+ path if needed)
      * @return
      */
-    fun loadEntriesFromFile(path: String?): List<Entry>? {
+    fun loadEntriesFromFile(path: String?): MutableList<Entry> {
         val sdcard = Environment.getExternalStorageDirectory()
 
         // Get the text file
@@ -62,7 +62,7 @@ object FileUtils {
      * @param path the name of the file in the assets folder (+ path if needed)
      * @return
      */
-    fun loadEntriesFromAssets(am: AssetManager, path: String?): List<Entry> {
+    fun loadEntriesFromAssets(am: AssetManager, path: String?): MutableList<Entry> {
         val entries: MutableList<Entry> = ArrayList()
         var reader: BufferedReader? = null
         try {
@@ -104,7 +104,7 @@ object FileUtils {
      * @param entries
      * @param path
      */
-    fun saveToSdCard(entries: List<Entry>, path: String?) {
+    fun saveToSdCard(entries: MutableList<Entry>, path: String?) {
         val sdcard = Environment.getExternalStorageDirectory()
         val saved = File(sdcard, path)
         if (!saved.exists()) {

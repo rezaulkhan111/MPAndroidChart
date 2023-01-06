@@ -10,7 +10,7 @@ import com.github.mikephil.charting.utils.Utils.convertDpToPixel
  *
  * @author Philipp Jahoda
  */
-class CandleDataSet : LineScatterCandleRadarDataSet<CandleEntry>, ICandleDataSet {
+class CandleDataSet : LineScatterCandleRadarDataSet<CandleEntry?>, ICandleDataSet {
 
     /**
      * the width of the shadow of the candle
@@ -69,14 +69,14 @@ class CandleDataSet : LineScatterCandleRadarDataSet<CandleEntry>, ICandleDataSet
      */
     private var mShadowColor = ColorTemplate.COLOR_SKIP
 
-    constructor(yVals: MutableList<CandleEntry>, label: String) : super(yVals, label) {
+    constructor(yVals: MutableList<CandleEntry?>, label: String) : super(yVals, label) {
 
     }
 
-    override fun copy(): DataSet<CandleEntry> {
-        val entries: MutableList<CandleEntry> = ArrayList()
+    override fun copy(): DataSet<CandleEntry?> {
+        val entries: MutableList<CandleEntry?> = ArrayList()
         for (i in mEntries!!.indices) {
-            entries.add(mEntries!![i].copy())
+            entries.add(mEntries!![i]!!.copy())
         }
         val copied = CandleDataSet(entries, getLabel())
         copy(copied)
@@ -105,8 +105,8 @@ class CandleDataSet : LineScatterCandleRadarDataSet<CandleEntry>, ICandleDataSet
         calcMinMaxX(e)
     }
 
-    override fun calcMinMaxY(e: CandleEntry) {
-        if (e.getHigh() < mYMin) mYMin = e.getHigh()
+    override fun calcMinMaxY(e: CandleEntry?) {
+        if (e!!.getHigh() < mYMin) mYMin = e.getHigh()
 
         if (e.getHigh() > mYMax) mYMax = e.getHigh()
 
@@ -122,10 +122,10 @@ class CandleDataSet : LineScatterCandleRadarDataSet<CandleEntry>, ICandleDataSet
      * @param space
      */
     fun setBarSpace(space: Float) {
-        var space = space
-        if (space < 0f) space = 0f
-        if (space > 0.45f) space = 0.45f
-        mBarSpace = space
+        var mSpace = space
+        if (mSpace < 0f) mSpace = 0f
+        if (mSpace > 0.45f) mSpace = 0.45f
+        mBarSpace = mSpace
     }
 
     override fun getBarSpace(): Float {

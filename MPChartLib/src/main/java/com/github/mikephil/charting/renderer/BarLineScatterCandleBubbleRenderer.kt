@@ -19,7 +19,7 @@ abstract class BarLineScatterCandleBubbleRenderer : DataRenderer {
 
     constructor(
         animator: ChartAnimator,
-        viewPortHandler: ViewPortHandler?
+        viewPortHandler: ViewPortHandler
     ) : super(animator, viewPortHandler) {
     }
 
@@ -41,8 +41,11 @@ abstract class BarLineScatterCandleBubbleRenderer : DataRenderer {
      * @return
      */
     protected fun isInBoundsX(e: Entry?, set: IBarLineScatterCandleBubbleDataSet<*>): Boolean {
-        if (e == null) return false
-        val entryIndex = set.getEntryIndex(e as Nothing).toFloat()
+//        if (e == null) {
+//            return false
+//        }
+
+        val entryIndex = set.getEntryIndex(e).toFloat()
         return !(e == null || entryIndex >= set.getEntryCount() * mAnimator!!.getPhaseX())
     }
 
@@ -80,8 +83,8 @@ abstract class BarLineScatterCandleBubbleRenderer : DataRenderer {
             val high = chart.getHighestVisibleX()
             val entryFrom = dataSet.getEntryForXValue(low, Float.NaN, DataSet.Rounding.DOWN)
             val entryTo = dataSet.getEntryForXValue(high, Float.NaN, DataSet.Rounding.UP)
-            min = if (entryFrom == null) 0 else dataSet.getEntryIndex(entryFrom as Nothing)
-            max = if (entryTo == null) 0 else dataSet.getEntryIndex(entryTo as Nothing)
+            min = if (entryFrom == null) 0 else dataSet.getEntryIndex(entryFrom)
+            max = if (entryTo == null) 0 else dataSet.getEntryIndex(entryTo)
             range = ((max - min) * phaseX).toInt()
         }
     }

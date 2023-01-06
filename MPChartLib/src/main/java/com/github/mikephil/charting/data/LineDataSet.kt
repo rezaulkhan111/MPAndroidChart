@@ -10,7 +10,7 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.github.mikephil.charting.utils.ColorTemplate.createColors
 import com.github.mikephil.charting.utils.Utils.convertDpToPixel
 
-class LineDataSet : LineRadarDataSet<Entry>, ILineDataSet {
+class LineDataSet : LineRadarDataSet<Entry?>, ILineDataSet {
     /**
      * Drawing mode for this line dataset
      */
@@ -59,7 +59,7 @@ class LineDataSet : LineRadarDataSet<Entry>, ILineDataSet {
     private var mDrawCircleHole = true
 
 
-    constructor(yVals: MutableList<Entry>, label: String) : super(yVals, label) {
+    constructor(yVals: MutableList<Entry?>, label: String) : super(yVals, label) {
         // mCircleRadius = Utils.convertDpToPixel(4f);
         // mLineWidth = Utils.convertDpToPixel(1f);
         if (mCircleColors == null) {
@@ -73,10 +73,10 @@ class LineDataSet : LineRadarDataSet<Entry>, ILineDataSet {
         mCircleColors!!.add(Color.rgb(140, 234, 255))
     }
 
-    override fun copy(): DataSet<Entry> {
-        val entries: MutableList<Entry> = ArrayList()
+    override fun copy(): DataSet<Entry?> {
+        val entries: MutableList<Entry?> = ArrayList()
         for (i in mEntries!!.indices) {
-            entries.add(mEntries!![i].copy())
+            entries.add(mEntries!![i]!!.copy())
         }
         val copied = LineDataSet(entries, getLabel())
         copy(copied)
@@ -219,8 +219,8 @@ class LineDataSet : LineRadarDataSet<Entry>, ILineDataSet {
         return if (mDashPathEffect == null) false else true
     }
 
-    override fun getDashPathEffect(): DashPathEffect {
-        return mDashPathEffect!!
+    override fun getDashPathEffect(): DashPathEffect? {
+        return mDashPathEffect
     }
 
     /**

@@ -84,8 +84,8 @@ class RadarChartActivity : DemoBase() {
         val mul = 80f
         val min = 20f
         val cnt = 5
-        val entries1 = mutableListOf<RadarEntry>()
-        val entries2 = mutableListOf<RadarEntry>()
+        val entries1 = mutableListOf<RadarEntry?>()
+        val entries2 = mutableListOf<RadarEntry?>()
 
         // NOTE: The order of the entries when being added to the entries array determines their position around the center of
         // the chart.
@@ -113,7 +113,7 @@ class RadarChartActivity : DemoBase() {
         set2.setDrawHighlightCircleEnabled(true)
         set2.setDrawHighlightIndicators(false)
 
-        val sets = mutableListOf<IRadarDataSet>()
+        val sets = mutableListOf<IRadarDataSet?>()
         sets.add(set1)
         sets.add(set2)
 
@@ -141,13 +141,13 @@ class RadarChartActivity : DemoBase() {
                 startActivity(i)
             }
             R.id.actionToggleValues -> {
-                for (set in chart.getData()
-                    .getDataSets()) set.setDrawValues(!set.isDrawValuesEnabled())
+                for (set in chart.getData()!!.getDataSets()!!)
+                    set!!.setDrawValues(!set.isDrawValuesEnabled())
                 chart.invalidate()
             }
             R.id.actionToggleHighlight -> {
                 if (chart.getData() != null) {
-                    chart.getData().setHighlightEnabled(!chart.getData().isHighlightEnabled())
+                    chart.getData()!!.setHighlightEnabled(!chart.getData()!!.isHighlightEnabled())
                     chart.invalidate()
                 }
             }
@@ -158,19 +158,17 @@ class RadarChartActivity : DemoBase() {
                 chart.invalidate()
             }
             R.id.actionToggleFilled -> {
-                for (set in chart.getData()
-                    .getDataSets()) {
-                    if (set.isDrawFilledEnabled()) set.setDrawFilled(false) else set.setDrawFilled(
+                for (set in chart.getData()!!.getDataSets()!!) {
+                    if (set!!.isDrawFilledEnabled()) set.setDrawFilled(false) else set.setDrawFilled(
                         true
                     )
                 }
                 chart.invalidate()
             }
             R.id.actionToggleHighlightCircle -> {
-                val sets = chart.getData()
-                    .getDataSets() as ArrayList<IRadarDataSet>
+                val sets = chart.getData()!!.getDataSets()!!
                 for (set in sets) {
-                    set.setDrawHighlightCircleEnabled(!set.isDrawHighlightCircleEnabled())
+                    set!!.setDrawHighlightCircleEnabled(!set.isDrawHighlightCircleEnabled())
                 }
                 chart.invalidate()
             }

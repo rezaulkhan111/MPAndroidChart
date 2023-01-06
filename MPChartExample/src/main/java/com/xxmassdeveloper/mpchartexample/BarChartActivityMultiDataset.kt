@@ -119,16 +119,16 @@ class BarChartActivityMultiDataset : DemoBase(), OnSeekBarChangeListener,
         val barSpace = 0.03f // x4 DataSet
         val barWidth = 0.2f // x4 DataSet
         // (0.2 + 0.03) * 4 + 0.08 = 1.00 -> interval per "group"
-        val groupCount = seekBarX!!.progress + 1
+        val groupCount = seekBarX.progress + 1
         val startYear = 1980
         val endYear = startYear + groupCount
-        tvX!!.text = String.format(Locale.ENGLISH, "%d-%d", startYear, endYear)
-        tvY!!.text = seekBarY!!.progress.toString()
-        val values1 = mutableListOf<BarEntry>()
-        val values2 = mutableListOf<BarEntry>()
-        val values3 = mutableListOf<BarEntry>()
-        val values4 = mutableListOf<BarEntry>()
-        val randomMultiplier = seekBarY!!.progress * 100000f
+        tvX.text = String.format(Locale.ENGLISH, "%d-%d", startYear, endYear)
+        tvY.text = seekBarY.progress.toString()
+        val values1 = mutableListOf<BarEntry?>()
+        val values2 = mutableListOf<BarEntry?>()
+        val values3 = mutableListOf<BarEntry?>()
+        val values4 = mutableListOf<BarEntry?>()
+        val randomMultiplier = seekBarY.progress * 100000f
         for (i in startYear until endYear) {
             values1.add(BarEntry(i.toFloat(), (Math.random() * randomMultiplier).toFloat()))
             values2.add(BarEntry(i.toFloat(), (Math.random() * randomMultiplier).toFloat()))
@@ -139,16 +139,16 @@ class BarChartActivityMultiDataset : DemoBase(), OnSeekBarChangeListener,
         val set2: BarDataSet?
         val set3: BarDataSet?
         val set4: BarDataSet?
-        if (chart.getData() != null && chart.getData().getDataSetCount() > 0) {
-            set1 = chart.getData().getDataSetByIndex(0) as BarDataSet?
-            set2 = chart.getData().getDataSetByIndex(1) as BarDataSet?
-            set3 = chart.getData().getDataSetByIndex(2) as BarDataSet?
-            set4 = chart.getData().getDataSetByIndex(3) as BarDataSet?
+        if (chart.getData() != null && chart.getData()!!.getDataSetCount() > 0) {
+            set1 = chart.getData()!!.getDataSetByIndex(0) as BarDataSet?
+            set2 = chart.getData()!!.getDataSetByIndex(1) as BarDataSet?
+            set3 = chart.getData()!!.getDataSetByIndex(2) as BarDataSet?
+            set4 = chart.getData()!!.getDataSetByIndex(3) as BarDataSet?
             set1!!.setValues(values1)
             set2!!.setValues(values2)
             set3!!.setValues(values3)
             set4!!.setValues(values4)
-            chart.getData().notifyDataChanged()
+            chart.getData()!!.notifyDataChanged()
             chart.notifyDataSetChanged()
         } else {
             // create 4 DataSets
@@ -193,8 +193,8 @@ class BarChartActivityMultiDataset : DemoBase(), OnSeekBarChangeListener,
                 startActivity(i)
             }
             R.id.actionToggleValues -> {
-                for (set in chart.getData()
-                    .getDataSets()!!) set.setDrawValues(!set.isDrawValuesEnabled())
+                for (set in chart.getData()!!
+                    .getDataSets()!!) set!!.setDrawValues(!set.isDrawValuesEnabled())
                 chart.invalidate()
             }
             R.id.actionTogglePinch -> {
@@ -208,14 +208,15 @@ class BarChartActivityMultiDataset : DemoBase(), OnSeekBarChangeListener,
                 chart.notifyDataSetChanged()
             }
             R.id.actionToggleBarBorders -> {
-                for (set in chart.getData().getDataSets()!!) (set as BarDataSet).setBarBorderWidth(
+                for (set in chart.getData()!!
+                    .getDataSets()!!) (set as BarDataSet).setBarBorderWidth(
                     if (set.getBarBorderWidth() == 1f) 0f else 1f
                 )
                 chart.invalidate()
             }
             R.id.actionToggleHighlight -> {
                 if (chart.getData() != null) {
-                    chart.getData().setHighlightEnabled(!chart.getData().isHighlightEnabled())
+                    chart.getData()!!.setHighlightEnabled(!chart.getData()!!.isHighlightEnabled())
                     chart.invalidate()
                 }
             }
@@ -250,7 +251,7 @@ class BarChartActivityMultiDataset : DemoBase(), OnSeekBarChangeListener,
     override fun onStartTrackingTouch(seekBar: SeekBar) {}
     override fun onStopTrackingTouch(seekBar: SeekBar) {}
 
-    override fun onValueSelected(e: Entry, h: Highlight) {
+    override fun onValueSelected(e: Entry?, h: Highlight?) {
     }
 
     override fun onNothingSelected() {

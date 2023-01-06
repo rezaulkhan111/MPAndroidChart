@@ -197,7 +197,7 @@ class RealtimeLineChartActivity : DemoBase(), OnChartValueSelectedListener {
         saveToGallery(chart, "RealtimeLineChartActivity")
     }
 
-    override fun onValueSelected(e: Entry, h: Highlight) {
+    override fun onValueSelected(e: Entry?, h: Highlight?) {
         Log.i("Entry selected", e.toString())
     }
 

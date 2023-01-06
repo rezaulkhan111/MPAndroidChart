@@ -61,7 +61,7 @@ class PerformanceLineChart : DemoBase(), OnSeekBarChangeListener {
     }
 
     private fun setData(count: Int, range: Float) {
-        val values = mutableListOf<Entry>()
+        val values = mutableListOf<Entry?>()
         for (i in 0 until count) {
             val `val` = (Math.random() * (range + 1)).toFloat() + 3
             values.add(Entry(i * 0.001f, `val`))

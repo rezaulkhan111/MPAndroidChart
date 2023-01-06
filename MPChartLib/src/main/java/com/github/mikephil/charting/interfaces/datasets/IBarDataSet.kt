@@ -6,11 +6,11 @@ import com.github.mikephil.charting.utils.Fill
 /**
  * Created by philipp on 21/10/15.
  */
-interface IBarDataSet : IBarLineScatterCandleBubbleDataSet<BarEntry> {
+interface IBarDataSet : IBarLineScatterCandleBubbleDataSet<BarEntry?> {
 
-    fun getFills(): MutableList<Fill>
+    fun getFills(): MutableList<Fill>?
 
-    fun getFill(index: Int): Fill
+    fun getFill(index: Int): Fill?
 
     /**
      * Returns true if this DataSet is stacked (stacksize > 1) or not.
@@ -65,5 +65,5 @@ interface IBarDataSet : IBarLineScatterCandleBubbleDataSet<BarEntry> {
      *
      * @return
      */
-    fun getStackLabels(): Array<String>
+    fun getStackLabels(): Array<String?>?
 }

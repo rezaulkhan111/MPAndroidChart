@@ -92,7 +92,7 @@ class LineChartActivityColored : DemoBase() {
     }
 
     private fun getData(count: Int, range: Float): LineData {
-        val values = mutableListOf<Entry>()
+        val values = mutableListOf<Entry?>()
         for (i in 0 until count) {
             val valF0 = (Math.random() * range).toFloat() + 3
             values.add(Entry(i.toFloat(), valF0))

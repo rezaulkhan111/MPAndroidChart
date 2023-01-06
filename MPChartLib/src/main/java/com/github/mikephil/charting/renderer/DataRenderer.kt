@@ -42,8 +42,8 @@ abstract class DataRenderer : Renderer {
     protected var mValuePaint: Paint? = null
 
     constructor(
-        animator: ChartAnimator?,
-        viewPortHandler: ViewPortHandler?
+        animator: ChartAnimator,
+        viewPortHandler: ViewPortHandler
     ) : super(viewPortHandler) {
         mAnimator = animator
         mRenderPaint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -60,7 +60,7 @@ abstract class DataRenderer : Renderer {
     }
 
     protected open fun isDrawingValuesAllowed(chart: ChartInterface): Boolean {
-        return chart.getData()
+        return chart.getData()!!
             .getEntryCount() < chart.getMaxVisibleCount() * mViewPortHandler!!.getScaleX()
     }
 

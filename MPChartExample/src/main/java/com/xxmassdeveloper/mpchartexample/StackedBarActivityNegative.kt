@@ -94,7 +94,7 @@ class StackedBarActivityNegative : DemoBase(), OnChartValueSelectedListener {
         // IMPORTANT: When using negative values in stacked bars, always make sure the negative values are in the array first
 
         // IMPORTANT: When using negative values in stacked bars, always make sure the negative values are in the array first
-        val values = ArrayList<BarEntry>()
+        val values = ArrayList<BarEntry?>()
         values.add(BarEntry(5f, floatArrayOf(-10f, 10f)))
         values.add(BarEntry(15f, floatArrayOf(-12f, 13f)))
         values.add(BarEntry(25f, floatArrayOf(-15f, 15f)))
@@ -140,7 +140,7 @@ class StackedBarActivityNegative : DemoBase(), OnChartValueSelectedListener {
                 startActivity(i)
             }
             R.id.actionToggleValues -> {
-                val sets: List<IBarDataSet>? = chart.getData()
+                val sets = chart.getData()!!
                     .getDataSets()
                 for (iSet in sets!!) {
                     val set = iSet as BarDataSet
@@ -149,7 +149,7 @@ class StackedBarActivityNegative : DemoBase(), OnChartValueSelectedListener {
                 chart.invalidate()
             }
             R.id.actionToggleIcons -> {
-                val sets: List<IBarDataSet>? = chart.getData()
+                val sets = chart.getData()!!
                     .getDataSets()
                 for (iSet in sets!!) {
                     val set = iSet as BarDataSet
@@ -159,7 +159,7 @@ class StackedBarActivityNegative : DemoBase(), OnChartValueSelectedListener {
             }
             R.id.actionToggleHighlight -> {
                 if (chart.getData() != null) {
-                    chart.getData().setHighlightEnabled(!chart.getData().isHighlightEnabled())
+                    chart.getData()!!.setHighlightEnabled(!chart.getData()!!.isHighlightEnabled())
                     chart.invalidate()
                 }
             }
@@ -174,7 +174,8 @@ class StackedBarActivityNegative : DemoBase(), OnChartValueSelectedListener {
                 chart.notifyDataSetChanged()
             }
             R.id.actionToggleBarBorders -> {
-                for (set in chart.getData().getDataSets()!!) (set as BarDataSet).setBarBorderWidth(
+                for (set in chart.getData()!!
+                    .getDataSets()!!) (set as BarDataSet).setBarBorderWidth(
                     if (set.getBarBorderWidth() == 1f) 0f else 1f
                 )
                 chart.invalidate()
@@ -207,11 +208,11 @@ class StackedBarActivityNegative : DemoBase(), OnChartValueSelectedListener {
         saveToGallery(chart!!, "StackedBarActivityNegative")
     }
 
-    override fun onValueSelected(e: Entry, h: Highlight) {
+    override fun onValueSelected(e: Entry?, h: Highlight?) {
         val entry = e as BarEntry?
         Log.i(
             "VAL SELECTED",
-            "Value: " + Math.abs(entry!!.getYVals()!![h.getStackIndex()])
+            "Value: " + Math.abs(entry!!.getYVals()!![h!!.getStackIndex()])
         )
     }
 

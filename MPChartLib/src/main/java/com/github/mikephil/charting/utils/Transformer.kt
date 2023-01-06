@@ -29,7 +29,7 @@ open class Transformer {
 
     protected var mViewPortHandler: ViewPortHandler? = null
 
-    constructor(viewPortHandler: ViewPortHandler?) {
+    constructor(viewPortHandler: ViewPortHandler) {
         mViewPortHandler = viewPortHandler
     }
 
@@ -138,7 +138,7 @@ open class Transformer {
         val valuePoints = valuePointsForGenerateTransformedValuesBubble
         var j = 0
         while (j < count) {
-            val e: Entry = data.getEntryForIndex(j / 2 + from)
+            val e: Entry? = data.getEntryForIndex(j / 2 + from)
             if (e != null) {
                 valuePoints[j] = e.getX()
                 valuePoints[j + 1] = e.getY() * phaseY

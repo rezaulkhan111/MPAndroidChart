@@ -83,8 +83,8 @@ class HorizontalBarNegativeChartActivity : DemoBase(), OnSeekBarChangeListener,
         //        yl.setInverted(true);
         val yr = chart.getAxisRight()
         yr!!.setTypeface(tfLight!!)
-        yr!!.setDrawAxisLine(true)
-        yr!!.setDrawGridLines(false)
+        yr.setDrawAxisLine(true)
+        yr.setDrawGridLines(false)
 //        yr.setInverted(true);
         chart.setFitBars(true)
         chart.animateY(2500)
@@ -94,17 +94,17 @@ class HorizontalBarNegativeChartActivity : DemoBase(), OnSeekBarChangeListener,
 
         val l = chart.getLegend()
         l!!.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM)
-        l!!.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT)
-        l!!.setOrientation(Legend.LegendOrientation.HORIZONTAL)
-        l!!.setDrawInside(false)
-        l!!.setFormSize(8f)
-        l!!.setXEntrySpace(4f)
+        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT)
+        l.setOrientation(Legend.LegendOrientation.HORIZONTAL)
+        l.setDrawInside(false)
+        l.setFormSize(8f)
+        l.setXEntrySpace(4f)
     }
 
     private fun setData(count: Int, range: Float) {
         val barWidth = 9f
         val spaceForBar = 10f
-        val values = mutableListOf<BarEntry>()
+        val values = mutableListOf<BarEntry?>()
         for (i in 0 until count) {
             val yFloat = (Math.random() * range - range / 2).toFloat()
             values.add(
@@ -118,16 +118,16 @@ class HorizontalBarNegativeChartActivity : DemoBase(), OnSeekBarChangeListener,
         val set1: BarDataSet?
 
         if (chart.getData() != null &&
-            chart.getData().getDataSetCount() > 0
+            chart.getData()!!.getDataSetCount() > 0
         ) {
-            set1 = chart.getData().getDataSetByIndex(0) as BarDataSet?
+            set1 = chart.getData()!!.getDataSetByIndex(0) as BarDataSet?
             set1!!.setValues(values)
-            chart.getData().notifyDataChanged()
+            chart.getData()!!.notifyDataChanged()
             chart.notifyDataSetChanged()
         } else {
             set1 = BarDataSet(values, "DataSet 1")
             set1.setDrawIcons(false)
-            val dataSets = ArrayList<IBarDataSet>()
+            val dataSets = ArrayList<IBarDataSet?>()
             dataSets.add(set1)
             val data = BarData(dataSets)
             data.setValueTextSize(10f)
@@ -151,24 +151,22 @@ class HorizontalBarNegativeChartActivity : DemoBase(), OnSeekBarChangeListener,
                 startActivity(i)
             }
             R.id.actionToggleValues -> {
-                val sets: List<IBarDataSet>? = chart.getData()
-                    .getDataSets()
+                val sets = chart.getData()!!.getDataSets()
                 for (iSet in sets!!) {
-                    iSet.setDrawValues(!iSet.isDrawValuesEnabled())
+                    iSet!!.setDrawValues(!iSet.isDrawValuesEnabled())
                 }
                 chart.invalidate()
             }
             R.id.actionToggleIcons -> {
-                val sets: List<IBarDataSet>? = chart.getData()
-                    .getDataSets()
+                val sets = chart.getData()!!.getDataSets()
                 for (iSet in sets!!) {
-                    iSet.setDrawIcons(!iSet.isDrawIconsEnabled())
+                    iSet!!.setDrawIcons(!iSet.isDrawIconsEnabled())
                 }
                 chart.invalidate()
             }
             R.id.actionToggleHighlight -> {
                 if (chart.getData() != null) {
-                    chart.getData().setHighlightEnabled(!chart.getData().isHighlightEnabled())
+                    chart.getData()!!.setHighlightEnabled(!chart.getData()!!.isHighlightEnabled())
                     chart.invalidate()
                 }
             }
@@ -183,7 +181,8 @@ class HorizontalBarNegativeChartActivity : DemoBase(), OnSeekBarChangeListener,
                 chart.notifyDataSetChanged()
             }
             R.id.actionToggleBarBorders -> {
-                for (set in chart.getData().getDataSets()!!) (set as BarDataSet).setBarBorderWidth(
+                for (set in chart.getData()!!
+                    .getDataSets()!!) (set as BarDataSet).setBarBorderWidth(
                     if (set.getBarBorderWidth() == 1f) 0f else 1f
                 )
                 chart.invalidate()
@@ -227,12 +226,12 @@ class HorizontalBarNegativeChartActivity : DemoBase(), OnSeekBarChangeListener,
     override fun onStartTrackingTouch(seekBar: SeekBar) {}
     override fun onStopTrackingTouch(seekBar: SeekBar) {}
     private val mOnValueSelectedRectF = RectF()
-    override fun onValueSelected(e: Entry, h: Highlight) {
+    override fun onValueSelected(e: Entry?, h: Highlight?) {
         if (e == null) return
         val bounds = mOnValueSelectedRectF
         chart.getBarBounds((e as BarEntry), bounds)
         val position = chart.getPosition(
-            e, chart.getData().getDataSetByIndex(h.getDataSetIndex())!!.getAxisDependency()
+            e, chart.getData()!!.getDataSetByIndex(h!!.getDataSetIndex())!!.getAxisDependency()!!
         )
         recycleInstance(position!!)
     }

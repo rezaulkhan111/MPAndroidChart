@@ -223,7 +223,7 @@ class HorizontalBarChart : BarChart {
         val vals = mGetPositionBuffer
         vals[0] = e.getY()
         vals[1] = e.getX()
-        getTransformer(axis).pointValuesToPixel(vals)
+        getTransformer(axis)!!.pointValuesToPixel(vals)
         return MPPointF.getInstance(vals[0], vals[1])
     }
 
@@ -243,7 +243,7 @@ class HorizontalBarChart : BarChart {
     }
 
     override fun getLowestVisibleX(): Float {
-        getTransformer(AxisDependency.LEFT).getValuesByTouchPoint(
+        getTransformer(AxisDependency.LEFT)!!.getValuesByTouchPoint(
             mViewPortHandler.contentLeft(),
             mViewPortHandler.contentBottom(), posForGetLowestVisibleX
         )
@@ -251,7 +251,7 @@ class HorizontalBarChart : BarChart {
     }
 
     override fun getHighestVisibleX(): Float {
-        getTransformer(AxisDependency.LEFT).getValuesByTouchPoint(
+        getTransformer(AxisDependency.LEFT)!!.getValuesByTouchPoint(
             mViewPortHandler.contentLeft(),
             mViewPortHandler.contentTop(), posForGetHighestVisibleX
         )

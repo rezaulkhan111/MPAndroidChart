@@ -79,7 +79,7 @@ class CandleStickChartActivity : DemoBase(), OnSeekBarChangeListener {
         tvX!!.text = progress.toString()
         tvY!!.text = seekBarY!!.progress.toString()
         chart!!.resetTracking()
-        val values = mutableListOf<CandleEntry>()
+        val values = mutableListOf<CandleEntry?>()
         for (i in 0 until progress) {
             val multi = (seekBarY!!.progress + 1).toFloat()
             val `val` = (Math.random() * 40).toFloat() + multi
@@ -130,18 +130,18 @@ class CandleStickChartActivity : DemoBase(), OnSeekBarChangeListener {
                 startActivity(i)
             }
             R.id.actionToggleValues -> {
-                for (set in chart.getData()
-                    .getDataSets()!!) set.setDrawValues(!set.isDrawValuesEnabled())
+                for (set in chart.getData()!!
+                    .getDataSets()!!) set!!.setDrawValues(!set.isDrawValuesEnabled())
                 chart.invalidate()
             }
             R.id.actionToggleIcons -> {
-                for (set in chart.getData()
-                    .getDataSets()!!) set.setDrawIcons(!set.isDrawIconsEnabled())
+                for (set in chart.getData()!!
+                    .getDataSets()!!) set!!.setDrawIcons(!set.isDrawIconsEnabled())
                 chart.invalidate()
             }
             R.id.actionToggleHighlight -> {
                 if (chart.getData() != null) {
-                    chart.getData().setHighlightEnabled(!chart.getData().isHighlightEnabled())
+                    chart.getData()!!.setHighlightEnabled(!chart.getData()!!.isHighlightEnabled())
                     chart.invalidate()
                 }
             }
@@ -156,7 +156,7 @@ class CandleStickChartActivity : DemoBase(), OnSeekBarChangeListener {
                 chart.notifyDataSetChanged()
             }
             R.id.actionToggleMakeShadowSameColorAsCandle -> {
-                for (set in chart.getData().getDataSets()!!) {
+                for (set in chart.getData()!!.getDataSets()!!) {
                     (set as CandleDataSet).setShadowColorSameAsCandle(!set.getShadowColorSameAsCandle())
                 }
                 chart.invalidate()

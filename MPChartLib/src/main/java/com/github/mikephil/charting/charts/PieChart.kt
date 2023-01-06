@@ -22,7 +22,7 @@ import com.github.mikephil.charting.utils.Utils.getNormalizedAngle
  *
  * @author Philipp Jahoda
  */
-open class PieChart : PieRadarChartBase<PieData> {
+open class PieChart : PieRadarChartBase<PieData?> {
     /**
      * rect object that represents the bounds of the piechart, needed for
      * drawing the circle
@@ -114,7 +114,7 @@ open class PieChart : PieRadarChartBase<PieData> {
 
     override fun init() {
         super.init()
-        mRenderer = PieChartRenderer(this, mAnimator, mViewPortHandler)
+        mRenderer = PieChartRenderer(this, mAnimator!!, mViewPortHandler)
         mXAxis = null
         mHighlighter = PieHighlighter(this)
     }
@@ -205,16 +205,16 @@ open class PieChart : PieRadarChartBase<PieData> {
             }
         }
         val yValueSum = mData!!.getYValueSum()
-        val dataSets: MutableList<IPieDataSet>? = mData!!.getDataSets();
+        val dataSets = mData!!.getDataSets();
         val hasMinAngle = mMinAngleForSlices != 0f && entryCount * mMinAngleForSlices <= mMaxAngle
         val minAngles = FloatArray(entryCount)
         var cnt = 0
         var offset = 0f
         var diff = 0f
         for (i in 0 until mData!!.getDataSetCount()) {
-            val set = dataSets!![i]
-            for (j in 0 until set.getEntryCount()) {
-                val drawAngle = calcAngle(Math.abs(set.getEntryForIndex(j).getY()), yValueSum)
+            val set = dataSets[i]
+            for (j in 0 until set!!.getEntryCount()) {
+                val drawAngle = calcAngle(Math.abs(set.getEntryForIndex(j)!!.getY()), yValueSum)
                 if (hasMinAngle) {
                     val temp = drawAngle - mMinAngleForSlices
                     if (temp <= 0) {
@@ -312,9 +312,9 @@ open class PieChart : PieRadarChartBase<PieData> {
      * @return
      */
     fun getDataSetIndexForIndex(xIndex: Int): Int {
-        val dataSets: List<IPieDataSet>? = mData!!.getDataSets()
-        for (i in dataSets!!.indices) {
-            if (dataSets[i].getEntryForXValue(xIndex.toFloat(), Float.NaN) != null) return i
+        val dataSets = mData!!.getDataSets()
+        for (i in dataSets.indices) {
+            if (dataSets[i]!!.getEntryForXValue(xIndex.toFloat(), Float.NaN) != null) return i
         }
         return -1
     }

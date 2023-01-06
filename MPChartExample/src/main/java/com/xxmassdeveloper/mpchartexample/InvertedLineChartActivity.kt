@@ -108,7 +108,7 @@ class InvertedLineChartActivity : DemoBase(), OnSeekBarChangeListener,
     }
 
     private fun setData(count: Int, range: Float) {
-        val entries = mutableListOf<Entry>()
+        val entries = mutableListOf<Entry?>()
         for (i in 0 until count) {
             val xVal = (Math.random() * range).toFloat()
             val yVal = (Math.random() * range).toFloat()
@@ -141,8 +141,7 @@ class InvertedLineChartActivity : DemoBase(), OnSeekBarChangeListener,
                 startActivity(i)
             }
             R.id.actionToggleValues -> {
-                val sets: List<ILineDataSet>? = chart.getData()
-                    .getDataSets()
+                val sets = chart.getData()!!.getDataSets()
                 for (iSet in sets!!) {
                     val set = iSet as LineDataSet
                     set.setDrawValues(!set.isDrawValuesEnabled())
@@ -151,13 +150,12 @@ class InvertedLineChartActivity : DemoBase(), OnSeekBarChangeListener,
             }
             R.id.actionToggleHighlight -> {
                 if (chart.getData() != null) {
-                    chart.getData().setHighlightEnabled(!chart.getData().isHighlightEnabled())
+                    chart.getData()!!.setHighlightEnabled(!chart.getData()!!.isHighlightEnabled())
                     chart.invalidate()
                 }
             }
             R.id.actionToggleFilled -> {
-                val sets: List<ILineDataSet>? = chart.getData()
-                    .getDataSets()
+                val sets = chart.getData()!!.getDataSets()
                 for (iSet in sets!!) {
                     val set = iSet as LineDataSet
                     if (set.isDrawFilledEnabled()) set.setDrawFilled(false) else set.setDrawFilled(
@@ -167,8 +165,7 @@ class InvertedLineChartActivity : DemoBase(), OnSeekBarChangeListener,
                 chart.invalidate()
             }
             R.id.actionToggleCircles -> {
-                val sets: List<ILineDataSet>? = chart.getData()
-                    .getDataSets()
+                val sets = chart.getData()!!.getDataSets()
                 for (iSet in sets!!) {
                     val set = iSet as LineDataSet
                     if (set.isDrawCirclesEnabled()) set.setDrawCircles(false) else set.setDrawCircles(
@@ -224,7 +221,7 @@ class InvertedLineChartActivity : DemoBase(), OnSeekBarChangeListener,
         saveToGallery(chart!!, "InvertedLineChartActivity")
     }
 
-    override fun onValueSelected(e: Entry, h: Highlight) {
+    override fun onValueSelected(e: Entry?, h: Highlight?) {
     }
 
     override fun onNothingSelected() {}

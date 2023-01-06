@@ -10,10 +10,10 @@ abstract class BaseEntry {
     private var y = 0f
 
     /** optional spot for additional data this Entry represents  */
-    private lateinit var mData: Any
+    private var mData: Any? = null
 
     /** optional icon image  */
-    private lateinit var mIcon: Drawable
+    private var mIcon: Drawable? = null
 
     constructor() {}
 
@@ -82,7 +82,7 @@ abstract class BaseEntry {
      *
      * @return
      */
-    open fun getData(): Any {
+    open fun getData(): Any? {
         return mData
     }
 

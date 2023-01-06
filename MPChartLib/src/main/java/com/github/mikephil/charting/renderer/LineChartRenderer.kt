@@ -44,8 +44,8 @@ class LineChartRenderer : LineRadarRenderer {
     protected var cubicFillPath = Path()
 
     constructor(
-        chart: LineDataProvider?, animator: ChartAnimator?,
-        viewPortHandler: ViewPortHandler?
+        chart: LineDataProvider, animator: ChartAnimator,
+        viewPortHandler: ViewPortHandler
     ) : super(animator, viewPortHandler) {
         mChart = chart
         mCirclePaintInner = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -71,7 +71,7 @@ class LineChartRenderer : LineRadarRenderer {
         drawBitmap!!.eraseColor(Color.TRANSPARENT)
         val lineData = mChart!!.getLineData()
         for (set in lineData!!.getDataSets()!!) {
-            if (set.isVisible()) drawDataSet(c, set)
+            if (set!!.isVisible()) drawDataSet(c, set)
         }
         c?.drawBitmap(drawBitmap, 0f, 0f, mRenderPaint)
     }
@@ -91,18 +91,18 @@ class LineChartRenderer : LineRadarRenderer {
 
     protected fun drawHorizontalBezier(dataSet: ILineDataSet) {
         val phaseY = mAnimator!!.getPhaseY()
-        val trans = mChart!!.getTransformer(dataSet.getAxisDependency())
+        val trans = mChart!!.getTransformer(dataSet.getAxisDependency())!!
         mXBounds[mChart!!] = dataSet
         cubicPath.reset()
         if (mXBounds.range >= 1) {
-            var prev = dataSet.getEntryForIndex(mXBounds.min)
+            var prev = dataSet.getEntryForIndex(mXBounds.min)!!
             var cur = prev
 
             // let the spline start
             cubicPath.moveTo(cur.getX(), cur.getY() * phaseY)
             for (j in mXBounds.min + 1..mXBounds.range + mXBounds.min) {
                 prev = cur
-                cur = dataSet.getEntryForIndex(j)
+                cur = dataSet.getEntryForIndex(j)!!
                 val cpx = (prev.getX()
                         + (cur.getX() - prev.getX()) / 2.0f)
                 cubicPath.cubicTo(
@@ -129,7 +129,7 @@ class LineChartRenderer : LineRadarRenderer {
 
     protected fun drawCubicBezier(dataSet: ILineDataSet) {
         val phaseY = mAnimator!!.getPhaseY()
-        val trans = mChart!!.getTransformer(dataSet.getAxisDependency())
+        val trans = mChart!!.getTransformer(dataSet.getAxisDependency())!!
         mXBounds[mChart!!] = dataSet
         val intensity = dataSet.getCubicIntensity()
         cubicPath.reset()
@@ -147,7 +147,7 @@ class LineChartRenderer : LineRadarRenderer {
             val lastIndex = mXBounds.min + mXBounds.range
             var prevPrev: Entry?
             var prev: Entry? = dataSet.getEntryForIndex(Math.max(firstIndex - 2, 0))
-            var cur = dataSet.getEntryForIndex(Math.max(firstIndex - 1, 0))
+            var cur = dataSet.getEntryForIndex(Math.max(firstIndex - 1, 0))!!
             var next = cur
             var nextIndex = -1
             if (cur == null) return
@@ -157,12 +157,12 @@ class LineChartRenderer : LineRadarRenderer {
             for (j in mXBounds.min + 1..mXBounds.range + mXBounds.min) {
                 prevPrev = prev
                 prev = cur
-                cur = if (nextIndex == j) next else dataSet.getEntryForIndex(j)
+                cur = if (nextIndex == j) next else dataSet.getEntryForIndex(j)!!
                 nextIndex = if (j + 1 < dataSet.getEntryCount()) j + 1 else j
-                next = dataSet.getEntryForIndex(nextIndex)
+                next = dataSet.getEntryForIndex(nextIndex)!!
                 prevDx = (cur.getX() - prevPrev!!.getX()) * intensity
                 prevDy = (cur.getY() - prevPrev.getY()) * intensity
-                curDx = (next.getX() - prev!!.getX()) * intensity
+                curDx = (next.getX() - prev.getX()) * intensity
                 curDy = (next.getY() - prev.getY()) * intensity
                 cubicPath.cubicTo(
                     prev.getX() + prevDx, (prev.getY() + prevDy) * phaseY,
@@ -192,10 +192,9 @@ class LineChartRenderer : LineRadarRenderer {
         trans: Transformer,
         bounds: XBounds
     ) {
-        val fillMin = dataSet.getFillFormatter()
-            .getFillLinePosition(dataSet, mChart!!)
-        spline.lineTo(dataSet.getEntryForIndex(bounds.min + bounds.range).getX(), fillMin)
-        spline.lineTo(dataSet.getEntryForIndex(bounds.min).getX(), fillMin)
+        val fillMin = dataSet.getFillFormatter()?.getFillLinePosition(dataSet, mChart!!)!!
+        spline.lineTo(dataSet.getEntryForIndex(bounds.min + bounds.range)!!.getX(), fillMin)
+        spline.lineTo(dataSet.getEntryForIndex(bounds.min)!!.getX(), fillMin)
         spline.close()
         trans.pathValueToPixel(spline)
         val drawable = dataSet.getFillDrawable()
@@ -218,7 +217,7 @@ class LineChartRenderer : LineRadarRenderer {
         val entryCount = dataSet.getEntryCount()
         val isDrawSteppedEnabled = dataSet.isDrawSteppedEnabled()
         val pointsPerEntryPair = if (isDrawSteppedEnabled) 4 else 2
-        val trans = mChart!!.getTransformer(dataSet.getAxisDependency())
+        val trans = mChart!!.getTransformer(dataSet.getAxisDependency())!!
         val phaseY = mAnimator!!.getPhaseY()
         mRenderPaint!!.style = Paint.Style.STROKE
         var canvas: Canvas? = null
@@ -237,7 +236,7 @@ class LineChartRenderer : LineRadarRenderer {
         }
 
         // more than 1 color
-        if (dataSet.getColors().size > 1) {
+        if (dataSet.getColors()!!.size > 1) {
             val numberOfFloats = pointsPerEntryPair * 2
             if (mLineBuffer.size <= numberOfFloats) mLineBuffer = FloatArray(numberOfFloats * 2)
             val max = mXBounds.min + mXBounds.range
@@ -247,7 +246,7 @@ class LineChartRenderer : LineRadarRenderer {
                 mLineBuffer[0] = e.getX()
                 mLineBuffer[1] = e.getY() * phaseY
                 if (j < mXBounds.max) {
-                    e = dataSet.getEntryForIndex(j + 1)
+                    e = dataSet.getEntryForIndex(j + 1)!!
                     if (e == null) break
                     if (isDrawSteppedEnabled) {
                         mLineBuffer[2] = e.getX()
@@ -309,12 +308,12 @@ class LineChartRenderer : LineRadarRenderer {
             )
             var e1: Entry
             var e2: Entry
-            e1 = dataSet.getEntryForIndex(mXBounds.min)
+            e1 = dataSet.getEntryForIndex(mXBounds.min)!!
             if (e1 != null) {
                 var j = 0
                 for (x in mXBounds.min..mXBounds.range + mXBounds.min) {
-                    e1 = dataSet.getEntryForIndex(if (x == 0) 0 else x - 1)
-                    e2 = dataSet.getEntryForIndex(x)
+                    e1 = dataSet.getEntryForIndex(if (x == 0) 0 else x - 1)!!
+                    e2 = dataSet.getEntryForIndex(x)!!
                     if (e1 == null || e2 == null) continue
                     mLineBuffer[j++] = e1.getX()
                     mLineBuffer[j++] = e1.getY() * phaseY
@@ -397,14 +396,14 @@ class LineChartRenderer : LineRadarRenderer {
         endIndex: Int,
         outputPath: Path
     ) {
-        val fillMin = dataSet.getFillFormatter().getFillLinePosition(
+        val fillMin = dataSet.getFillFormatter()?.getFillLinePosition(
             dataSet,
             mChart!!
-        )
+        )!!
         val phaseY = mAnimator!!.getPhaseY()
         val isDrawSteppedEnabled = dataSet.getMode() === LineDataSet.Mode.STEPPED
         outputPath.reset()
-        val entry = dataSet.getEntryForIndex(startIndex)
+        val entry = dataSet.getEntryForIndex(startIndex)!!
         outputPath.moveTo(entry.getX(), fillMin)
         outputPath.lineTo(entry.getX(), entry.getY() * phaseY)
 
@@ -412,7 +411,7 @@ class LineChartRenderer : LineRadarRenderer {
         var currentEntry: Entry? = null
         var previousEntry = entry
         for (x in startIndex + 1..endIndex) {
-            currentEntry = dataSet.getEntryForIndex(x)
+            currentEntry = dataSet.getEntryForIndex(x)!!
             if (isDrawSteppedEnabled) {
                 outputPath.lineTo(currentEntry.getX(), previousEntry.getY() * phaseY)
             }
@@ -429,14 +428,14 @@ class LineChartRenderer : LineRadarRenderer {
 
     override fun drawValues(c: Canvas?) {
         if (isDrawingValuesAllowed(mChart!!)) {
-            val dataSets: List<ILineDataSet>? = mChart!!.getLineData()!!.getDataSets()
+            val dataSets: MutableList<ILineDataSet?>? = mChart!!.getLineData()!!.getDataSets()
             for (i in dataSets!!.indices) {
                 val dataSet = dataSets[i]
-                if (!shouldDrawValues(dataSet) || dataSet.getEntryCount() < 1) continue
+                if (!shouldDrawValues(dataSet!!) || dataSet.getEntryCount() < 1) continue
 
                 // apply the text-styling defined by the DataSet
                 applyValueTextStyle(dataSet)
-                val trans = mChart!!.getTransformer(dataSet.getAxisDependency())
+                val trans = mChart!!.getTransformer(dataSet.getAxisDependency())!!
 
                 // make sure the values do not interfear with the circles
                 var valOffset = (dataSet.getCircleRadius() * 1.75f).toInt()
@@ -446,7 +445,7 @@ class LineChartRenderer : LineRadarRenderer {
                     dataSet, mAnimator!!.getPhaseX(), mAnimator!!
                         .getPhaseY(), mXBounds.min, mXBounds.max
                 )
-                val iconsOffset = getInstance(dataSet.getIconsOffset())
+                val iconsOffset = getInstance(dataSet.getIconsOffset()!!)
                 iconsOffset.x = convertDpToPixel(iconsOffset.x)
                 iconsOffset.y = convertDpToPixel(iconsOffset.y)
                 var j = 0
@@ -458,11 +457,11 @@ class LineChartRenderer : LineRadarRenderer {
                         j += 2
                         continue
                     }
-                    val entry = dataSet.getEntryForIndex(j / 2 + mXBounds.min)
+                    val entry = dataSet.getEntryForIndex(j / 2 + mXBounds.min)!!
                     if (dataSet.isDrawValuesEnabled()) {
                         drawValue(
-                            c!!, dataSet.getValueFormatter(), entry.getY(), entry, i, x,
-                            y - valOffset, dataSet.getValueTextColor(j / 2)
+                            c!!, dataSet.getValueFormatter()!!, entry.getY(), entry, i, x,
+                            y - valOffset, dataSet.getValueTextColor(j / 2)!!
                         )
                     }
                     if (entry.getIcon() != null && dataSet.isDrawIconsEnabled()) {
@@ -500,12 +499,12 @@ class LineChartRenderer : LineRadarRenderer {
         val phaseY = mAnimator!!.getPhaseY()
         mCirclesBuffer[0] = 0f
         mCirclesBuffer[1] = 0f
-        val dataSets: List<ILineDataSet>? = mChart!!.getLineData()!!.getDataSets()
+        val dataSets: MutableList<ILineDataSet?>? = mChart!!.getLineData()!!.getDataSets()
         for (i in dataSets!!.indices) {
-            val dataSet = dataSets[i]
+            val dataSet = dataSets[i]!!
             if (!dataSet.isVisible() || !dataSet.isDrawCirclesEnabled() || dataSet.getEntryCount() == 0) continue
             mCirclePaintInner!!.color = dataSet.getCircleHoleColor()
-            val trans = mChart!!.getTransformer(dataSet.getAxisDependency())
+            val trans = mChart!!.getTransformer(dataSet.getAxisDependency())!!
             mXBounds[mChart!!] = dataSet
             val circleRadius = dataSet.getCircleRadius()
             val circleHoleRadius = dataSet.getCircleHoleRadius()
@@ -556,7 +555,7 @@ class LineChartRenderer : LineRadarRenderer {
             if (set == null || !set.isHighlightEnabled()) continue
             val e = set.getEntryForXValue(high.getX(), high.getY())
             if (!isInBoundsX(e, set)) continue
-            val pix = mChart!!.getTransformer(set.getAxisDependency()).getPixelForValues(
+            val pix = mChart!!.getTransformer(set.getAxisDependency())?.getPixelForValues(
                 e!!.getX(), e.getY() * mAnimator!!.getPhaseY()
             )
             high.setDraw(pix!!.x.toFloat(), pix.y.toFloat())

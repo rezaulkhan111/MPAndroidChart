@@ -7,7 +7,7 @@ import com.github.mikephil.charting.utils.Utils.convertDpToPixel
 /**
  * Created by Philipp Jahoda on 11/07/15.
  */
-abstract class LineScatterCandleRadarDataSet<T : Entry> :
+abstract class LineScatterCandleRadarDataSet<T : Entry?> :
     BarLineScatterCandleBubbleDataSet<T>,
     ILineScatterCandleRadarDataSet<T> {
 
@@ -99,11 +99,11 @@ abstract class LineScatterCandleRadarDataSet<T : Entry> :
      * @return
      */
     open fun isDashedHighlightLineEnabled(): Boolean {
-        return if (mHighlightDashPathEffect == null) false else true
+        return mHighlightDashPathEffect != null
     }
 
-    override fun getDashPathEffectHighlight(): DashPathEffect {
-        return mHighlightDashPathEffect!!
+    override fun getDashPathEffectHighlight(): DashPathEffect? {
+        return mHighlightDashPathEffect
     }
 
     protected open fun copy(lineScatterCandleRadarDataSet: LineScatterCandleRadarDataSet<*>) {

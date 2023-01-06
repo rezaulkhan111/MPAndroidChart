@@ -41,6 +41,7 @@ import com.xxmassdeveloper.mpchartexample.notimportant.DemoBase
  * @version 3.1.0
  */
 class LineChartActivity1 : DemoBase(), OnSeekBarChangeListener, OnChartValueSelectedListener {
+
     private lateinit var chart: LineChart
     private lateinit var seekBarX: SeekBar
     private lateinit var seekBarY: SeekBar
@@ -168,7 +169,7 @@ class LineChartActivity1 : DemoBase(), OnSeekBarChangeListener, OnChartValueSele
     }
 
     private fun setData(count: Int, range: Float) {
-        val values = mutableListOf<Entry>()
+        val values = mutableListOf<Entry?>()
         for (i in 0 until count) {
             val `val` = (Math.random() * range).toFloat() - 30
             values.add(Entry(i.toFloat(), `val`, resources.getDrawable(R.drawable.star)))
@@ -176,12 +177,12 @@ class LineChartActivity1 : DemoBase(), OnSeekBarChangeListener, OnChartValueSele
         val set1: LineDataSet?
 
         if (chart.getData() != null &&
-            chart.getData().getDataSetCount() > 0
+            chart.getData()!!.getDataSetCount() > 0
         ) {
-            set1 = chart.getData().getDataSetByIndex(0) as LineDataSet?
+            set1 = chart.getData()!!.getDataSetByIndex(0) as LineDataSet?
             set1!!.setValues(values)
-            set1!!.notifyDataSetChanged()
-            chart.getData().notifyDataChanged()
+            set1.notifyDataSetChanged()
+            chart.getData()!!.notifyDataChanged()
             chart.notifyDataSetChanged()
         } else {
             // create a dataset and give it a type
@@ -232,7 +233,7 @@ class LineChartActivity1 : DemoBase(), OnSeekBarChangeListener, OnChartValueSele
             } else {
                 set1.setFillColor(Color.BLACK)
             }
-            val dataSets = java.util.ArrayList<ILineDataSet>()
+            val dataSets = mutableListOf<ILineDataSet?>()
             dataSets.add(set1) // add the data sets
 
             // create a data object with the data sets
@@ -257,8 +258,7 @@ class LineChartActivity1 : DemoBase(), OnSeekBarChangeListener, OnChartValueSele
                 startActivity(i)
             }
             R.id.actionToggleValues -> {
-                val sets: List<ILineDataSet>? = chart.getData()
-                    .getDataSets()
+                val sets = chart.getData()!!.getDataSets()
                 for (iSet in sets!!) {
                     val set = iSet as LineDataSet
                     set.setDrawValues(!set.isDrawValuesEnabled())
@@ -266,8 +266,7 @@ class LineChartActivity1 : DemoBase(), OnSeekBarChangeListener, OnChartValueSele
                 chart.invalidate()
             }
             R.id.actionToggleIcons -> {
-                val sets: List<ILineDataSet>? = chart.getData()
-                    .getDataSets()
+                val sets = chart.getData()!!.getDataSets()
                 for (iSet in sets!!) {
                     val set = iSet as LineDataSet
                     set.setDrawIcons(!set.isDrawIconsEnabled())
@@ -276,13 +275,12 @@ class LineChartActivity1 : DemoBase(), OnSeekBarChangeListener, OnChartValueSele
             }
             R.id.actionToggleHighlight -> {
                 if (chart.getData() != null) {
-                    chart.getData().setHighlightEnabled(!chart.getData().isHighlightEnabled())
+                    chart.getData()!!.setHighlightEnabled(!chart.getData()!!.isHighlightEnabled())
                     chart.invalidate()
                 }
             }
             R.id.actionToggleFilled -> {
-                val sets: List<ILineDataSet>? = chart.getData()
-                    .getDataSets()
+                val sets = chart.getData()!!.getDataSets()
                 for (iSet in sets!!) {
                     val set = iSet as LineDataSet
                     if (set.isDrawFilledEnabled()) set.setDrawFilled(false) else set.setDrawFilled(
@@ -292,8 +290,7 @@ class LineChartActivity1 : DemoBase(), OnSeekBarChangeListener, OnChartValueSele
                 chart.invalidate()
             }
             R.id.actionToggleCircles -> {
-                val sets: List<ILineDataSet>? = chart.getData()
-                    .getDataSets()
+                val sets = chart.getData()!!.getDataSets()
                 for (iSet in sets!!) {
                     val set = iSet as LineDataSet
                     if (set.isDrawCirclesEnabled()) set.setDrawCircles(false) else set.setDrawCircles(
@@ -303,29 +300,26 @@ class LineChartActivity1 : DemoBase(), OnSeekBarChangeListener, OnChartValueSele
                 chart.invalidate()
             }
             R.id.actionToggleCubic -> {
-                val sets: List<ILineDataSet>? = chart.getData()
-                    .getDataSets()
+                val sets = chart.getData()!!.getDataSets()
                 for (iSet in sets!!) {
                     val set = iSet as LineDataSet
-                    set.setMode(if (set.getMode() === LineDataSet.Mode.CUBIC_BEZIER) LineDataSet.Mode.LINEAR else LineDataSet.Mode.CUBIC_BEZIER)
+                    set.setMode(if (set.getMode() == LineDataSet.Mode.CUBIC_BEZIER) LineDataSet.Mode.LINEAR else LineDataSet.Mode.CUBIC_BEZIER)
                 }
                 chart.invalidate()
             }
             R.id.actionToggleStepped -> {
-                val sets: List<ILineDataSet>? = chart.getData()
-                    .getDataSets()
+                val sets = chart.getData()!!.getDataSets()
                 for (iSet in sets!!) {
                     val set = iSet as LineDataSet
-                    set.setMode(if (set.getMode() === LineDataSet.Mode.STEPPED) LineDataSet.Mode.LINEAR else LineDataSet.Mode.STEPPED)
+                    set.setMode(if (set.getMode() == LineDataSet.Mode.STEPPED) LineDataSet.Mode.LINEAR else LineDataSet.Mode.STEPPED)
                 }
                 chart.invalidate()
             }
             R.id.actionToggleHorizontalCubic -> {
-                val sets: List<ILineDataSet>? = chart.getData()
-                    .getDataSets()
+                val sets = chart.getData()!!.getDataSets()
                 for (iSet in sets!!) {
                     val set = iSet as LineDataSet
-                    set.setMode(if (set.getMode() === LineDataSet.Mode.HORIZONTAL_BEZIER) LineDataSet.Mode.LINEAR else LineDataSet.Mode.HORIZONTAL_BEZIER)
+                    set.setMode(if (set.getMode() == LineDataSet.Mode.HORIZONTAL_BEZIER) LineDataSet.Mode.LINEAR else LineDataSet.Mode.HORIZONTAL_BEZIER)
                 }
                 chart.invalidate()
             }
@@ -378,7 +372,7 @@ class LineChartActivity1 : DemoBase(), OnSeekBarChangeListener, OnChartValueSele
 
     override fun onStartTrackingTouch(seekBar: SeekBar) {}
     override fun onStopTrackingTouch(seekBar: SeekBar) {}
-    override fun onValueSelected(e: Entry, h: Highlight) {
+    override fun onValueSelected(e: Entry?, h: Highlight?) {
         Log.i("Entry selected", e.toString())
         Log.i(
             "LOW HIGH",

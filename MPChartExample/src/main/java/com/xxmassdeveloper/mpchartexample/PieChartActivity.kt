@@ -110,7 +110,7 @@ class PieChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSelect
     }
 
     private fun setData(count: Int, range: Float) {
-        val entries = mutableListOf<PieEntry>()
+        val entries = mutableListOf<PieEntry?>()
 
         // NOTE: The order of the entries when being added to the entries array determines their position around the center of
         // the chart.
@@ -169,12 +169,12 @@ class PieChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSelect
             }
             R.id.actionToggleValues -> {
                 for (set in chart.getData()!!
-                    .getDataSets()!!) set.setDrawValues(!set.isDrawValuesEnabled())
+                    .getDataSets()) set!!.setDrawValues(!set.isDrawValuesEnabled())
                 chart.invalidate()
             }
             R.id.actionToggleIcons -> {
                 for (set in chart.getData()!!
-                    .getDataSets()!!) set.setDrawIcons(!set.isDrawIconsEnabled())
+                    .getDataSets()) set!!.setDrawIcons(!set.isDrawIconsEnabled())
                 chart.invalidate()
             }
             R.id.actionToggleHole -> {
@@ -268,11 +268,11 @@ class PieChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartValueSelect
         return s
     }
 
-    override fun onValueSelected(e: Entry, h: Highlight) {
+    override fun onValueSelected(e: Entry?, h: Highlight?) {
         if (e == null) return
         Log.i(
             "VAL SELECTED",
-            "Value: " + e.getY() + ", index: " + h.getX()
+            "Value: " + e.getY() + ", index: " + h!!.getX()
                     + ", DataSet index: " + h.getDataSetIndex()
         )
     }

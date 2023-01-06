@@ -6,7 +6,7 @@ import com.github.mikephil.charting.data.PieEntry
 /**
  * Created by Philipp Jahoda on 03/11/15.
  */
-interface IPieDataSet : IDataSet<PieEntry> {
+interface IPieDataSet : IDataSet<PieEntry?> {
     /**
      * Returns the space that is set to be between the piechart-slices of this
      * DataSet, in pixels.
@@ -31,8 +31,8 @@ interface IPieDataSet : IDataSet<PieEntry> {
      */
     fun getSelectionShift(): Float
 
-    fun getXValuePosition(): ValuePosition
-    fun getYValuePosition(): ValuePosition
+    fun getXValuePosition(): ValuePosition?
+    fun getYValuePosition(): ValuePosition?
 
     /**
      * When valuePosition is OutsideSlice, indicates line color

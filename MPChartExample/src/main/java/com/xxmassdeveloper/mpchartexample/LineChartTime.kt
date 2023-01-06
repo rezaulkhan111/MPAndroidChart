@@ -110,7 +110,7 @@ class LineChartTime : DemoBase(), OnSeekBarChangeListener {
     private fun setData(count: Int, range: Float) {
         // now in hours
         val now = TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis())
-        val values = mutableListOf<Entry>()
+        val values = mutableListOf<Entry?>()
 
         // count = hours
         val to = (now + count).toFloat()
@@ -159,8 +159,7 @@ class LineChartTime : DemoBase(), OnSeekBarChangeListener {
                 startActivity(i)
             }
             R.id.actionToggleValues -> {
-                val sets: List<ILineDataSet>? = chart.getData()
-                    .getDataSets()
+                val sets = chart.getData()!!.getDataSets()
                 for (iSet in sets!!) {
                     val set = iSet as LineDataSet
                     set.setDrawValues(!set.isDrawValuesEnabled())
@@ -169,13 +168,12 @@ class LineChartTime : DemoBase(), OnSeekBarChangeListener {
             }
             R.id.actionToggleHighlight -> {
                 if (chart.getData() != null) {
-                    chart.getData().setHighlightEnabled(!chart.getData().isHighlightEnabled())
+                    chart.getData()!!.setHighlightEnabled(!chart.getData()!!.isHighlightEnabled())
                     chart.invalidate()
                 }
             }
             R.id.actionToggleFilled -> {
-                val sets: List<ILineDataSet>? = chart.getData()
-                    .getDataSets()
+                val sets = chart.getData()!!.getDataSets()
                 for (iSet in sets!!) {
                     val set = iSet as LineDataSet
                     if (set.isDrawFilledEnabled()) set.setDrawFilled(false) else set.setDrawFilled(
@@ -185,8 +183,7 @@ class LineChartTime : DemoBase(), OnSeekBarChangeListener {
                 chart.invalidate()
             }
             R.id.actionToggleCircles -> {
-                val sets: List<ILineDataSet>? = chart.getData()
-                    .getDataSets()
+                val sets = chart.getData()!!.getDataSets()
                 for (iSet in sets!!) {
                     val set = iSet as LineDataSet
                     if (set.isDrawCirclesEnabled()) set.setDrawCircles(false) else set.setDrawCircles(
@@ -196,8 +193,7 @@ class LineChartTime : DemoBase(), OnSeekBarChangeListener {
                 chart.invalidate()
             }
             R.id.actionToggleCubic -> {
-                val sets: List<ILineDataSet>? = chart.getData()
-                    .getDataSets()
+                val sets = chart.getData()!!.getDataSets()
                 for (iSet in sets!!) {
                     val set = iSet as LineDataSet
                     if (set.getMode() === LineDataSet.Mode.CUBIC_BEZIER) set.setMode(LineDataSet.Mode.LINEAR) else set.setMode(
@@ -207,8 +203,7 @@ class LineChartTime : DemoBase(), OnSeekBarChangeListener {
                 chart.invalidate()
             }
             R.id.actionToggleStepped -> {
-                val sets: List<ILineDataSet>? = chart.getData()
-                    .getDataSets()
+                val sets = chart.getData()!!.getDataSets()
                 for (iSet in sets!!) {
                     val set = iSet as LineDataSet
                     if (set.getMode() === LineDataSet.Mode.STEPPED) set.setMode(LineDataSet.Mode.LINEAR) else set.setMode(

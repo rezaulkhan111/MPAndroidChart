@@ -91,7 +91,7 @@ class CombinedChartActivity : DemoBase() {
 
     private fun generateLineData(): LineData {
         val d = LineData()
-        val entries = mutableListOf<Entry>()
+        val entries = mutableListOf<Entry?>()
         for (index in 0 until count) entries.add(Entry(index + 0.5f, getRandom(15f, 5f)))
 
         val set = LineDataSet(entries, "Line DataSet")
@@ -111,8 +111,8 @@ class CombinedChartActivity : DemoBase() {
     }
 
     private fun generateBarData(): BarData {
-        val entries1 = mutableListOf<BarEntry>()
-        val entries2 = mutableListOf<BarEntry>()
+        val entries1 = mutableListOf<BarEntry?>()
+        val entries2 = mutableListOf<BarEntry?>()
         for (index in 0 until count) {
             entries1.add(BarEntry(0f, getRandom(25f, 25f)))
             // stacked
@@ -146,7 +146,7 @@ class CombinedChartActivity : DemoBase() {
 
     private fun generateScatterData(): ScatterData {
         val d = ScatterData()
-        val entries = mutableListOf<Entry>()
+        val entries = mutableListOf<Entry?>()
         var index = 0f
         while (index < count) {
             entries.add(Entry(index + 0.25f, getRandom(10f, 55f)))
@@ -164,7 +164,7 @@ class CombinedChartActivity : DemoBase() {
 
     private fun generateCandleData(): CandleData {
         val d = CandleData()
-        val entries = mutableListOf<CandleEntry>()
+        val entries = mutableListOf<CandleEntry?>()
         var index = 0
         while (index < count) {
             entries.add(CandleEntry(index + 1f, 90f, 70f, 85f, 75f))
@@ -182,7 +182,7 @@ class CombinedChartActivity : DemoBase() {
 
     private fun generateBubbleData(): BubbleData {
         val bd = BubbleData()
-        val entries = mutableListOf<BubbleEntry>()
+        val entries = mutableListOf<BubbleEntry?>()
         for (index in 0 until count) {
             val y = getRandom(10f, 105f)
             val size = getRandom(100f, 105f)
@@ -213,21 +213,21 @@ class CombinedChartActivity : DemoBase() {
                 startActivity(i)
             }
             R.id.actionToggleLineValues -> {
-                for (set in chart.getData().getDataSets()!!) {
+                for (set in chart.getData()!!.getDataSets()!!) {
                     (set as? LineDataSet)?.setDrawValues(!set.isDrawValuesEnabled())
                 }
                 chart.invalidate()
             }
             R.id.actionToggleBarValues -> {
-                for (set in chart.getData().getDataSets()!!) {
+                for (set in chart.getData()!!.getDataSets()!!) {
                     (set as? BarDataSet)?.setDrawValues(!set.isDrawValuesEnabled())
                 }
                 chart.invalidate()
             }
             R.id.actionRemoveDataSet -> {
-                val rnd = getRandom(chart.getData().getDataSetCount().toFloat(), 0f).toInt()
-                chart.getData().removeDataSet(chart.getData().getDataSetByIndex(rnd)!!)
-                chart.getData().notifyDataChanged()
+                val rnd = getRandom(chart.getData()!!.getDataSetCount().toFloat(), 0f).toInt()
+                chart.getData()!!.removeDataSet(chart.getData()!!.getDataSetByIndex(rnd)!!)
+                chart.getData()!!.notifyDataChanged()
                 chart.notifyDataSetChanged()
                 chart.invalidate()
             }

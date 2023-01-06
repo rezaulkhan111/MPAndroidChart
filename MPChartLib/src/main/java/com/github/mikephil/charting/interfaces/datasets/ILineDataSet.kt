@@ -8,13 +8,13 @@ import com.github.mikephil.charting.formatter.IFillFormatter
 /**
  * Created by Philpp Jahoda on 21/10/15.
  */
-interface ILineDataSet : ILineRadarDataSet<Entry> {
+interface ILineDataSet : ILineRadarDataSet<Entry?> {
     /**
      * Returns the drawing mode for this line dataset
      *
      * @return
      */
-    fun getMode(): LineDataSet.Mode
+    fun getMode(): LineDataSet.Mode?
 
     /**
      * Returns the intensity of the cubic lines (the effect intensity).
@@ -82,7 +82,7 @@ interface ILineDataSet : ILineRadarDataSet<Entry> {
      *
      * @return
      */
-    fun getDashPathEffect(): DashPathEffect
+    fun getDashPathEffect(): DashPathEffect?
 
     /**
      * Returns true if the dashed-line effect is enabled, false if not.
@@ -97,5 +97,5 @@ interface ILineDataSet : ILineRadarDataSet<Entry> {
      *
      * @return
      */
-    fun getFillFormatter(): IFillFormatter
+    fun getFillFormatter(): IFillFormatter?
 }

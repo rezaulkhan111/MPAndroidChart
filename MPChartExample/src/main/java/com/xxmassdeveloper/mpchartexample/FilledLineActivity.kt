@@ -66,12 +66,12 @@ class FilledLineActivity : DemoBase() {
     }
 
     private fun setData(count: Int, range: Float) {
-        val values1 = mutableListOf<Entry>()
+        val values1 = mutableListOf<Entry?>()
         for (i in 0 until count) {
             val valFloat1 = (Math.random() * range).toFloat() + 50
             values1.add(Entry(i.toFloat(), valFloat1))
         }
-        val values2 = mutableListOf<Entry>()
+        val values2 = mutableListOf<Entry?>()
         for (i in 0 until count) {
             val valFloat2 = (Math.random() * range).toFloat() + 450
             values2.add(Entry(i.toFloat(), valFloat2))
@@ -80,13 +80,13 @@ class FilledLineActivity : DemoBase() {
         val set2: LineDataSet?
 
         if (chart.getData() != null &&
-            chart.getData().getDataSetCount() > 0
+            chart.getData()!!.getDataSetCount() > 0
         ) {
-            set1 = chart.getData().getDataSetByIndex(0) as LineDataSet?
-            set2 = chart.getData().getDataSetByIndex(1) as LineDataSet?
+            set1 = chart.getData()!!.getDataSetByIndex(0) as LineDataSet?
+            set2 = chart.getData()!!.getDataSetByIndex(1) as LineDataSet?
             set1!!.setValues(values1)
             set2!!.setValues(values2)
-            chart.getData().notifyDataChanged()
+            chart.getData()!!.notifyDataChanged()
             chart.notifyDataSetChanged()
         } else {
             // create a dataset and give it a type
@@ -136,7 +136,7 @@ class FilledLineActivity : DemoBase() {
                 }
             })
 
-            val dataSets = ArrayList<ILineDataSet>()
+            val dataSets = ArrayList<ILineDataSet?>()
             dataSets.add(set1) // add the data sets
             dataSets.add(set2)
 

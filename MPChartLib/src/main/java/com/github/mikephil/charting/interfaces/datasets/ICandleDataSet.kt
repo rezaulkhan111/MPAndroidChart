@@ -6,7 +6,7 @@ import com.github.mikephil.charting.data.CandleEntry
 /**
  * Created by philipp on 21/10/15.
  */
-interface ICandleDataSet : ILineScatterCandleRadarDataSet<CandleEntry> {
+interface ICandleDataSet : ILineScatterCandleRadarDataSet<CandleEntry?> {
     /**
      * Returns the space that is left out on the left and right side of each
      * candle.
@@ -65,14 +65,14 @@ interface ICandleDataSet : ILineScatterCandleRadarDataSet<CandleEntry> {
      *
      * @return
      */
-    fun getIncreasingPaintStyle(): Paint.Style
+    fun getIncreasingPaintStyle(): Paint.Style?
 
     /**
      * Returns paint style when open > close
      *
      * @return
      */
-    fun getDecreasingPaintStyle(): Paint.Style
+    fun getDecreasingPaintStyle(): Paint.Style?
 
     /**
      * Is the shadow color same as the candle color?

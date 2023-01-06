@@ -7,7 +7,7 @@ package com.github.mikephil.charting.utils
  */
 class TransformerHorizontalBarChart : Transformer {
 
-    constructor(viewPortHandler: ViewPortHandler?) : super(viewPortHandler) {
+    constructor(viewPortHandler: ViewPortHandler) : super(viewPortHandler) {
     }
 
     /**

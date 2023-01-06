@@ -92,7 +92,7 @@ class BarChartPositiveNegative : DemoBase() {
     }
 
     private fun setData(dataList: List<Data>) {
-        val values = mutableListOf<BarEntry>()
+        val values = mutableListOf<BarEntry?>()
         val colors: MutableList<Int> = ArrayList()
         val green = Color.rgb(110, 190, 102)
         val red = Color.rgb(211, 74, 88)
@@ -108,11 +108,11 @@ class BarChartPositiveNegative : DemoBase() {
         val set: BarDataSet?
 
         if (chart.getData() != null &&
-            chart.getData().getDataSetCount() > 0
+            chart.getData()!!.getDataSetCount() > 0
         ) {
-            set = chart.getData().getDataSetByIndex(0) as BarDataSet?
+            set = chart.getData()!!.getDataSetByIndex(0) as BarDataSet?
             set!!.setValues(values)
-            chart.getData().notifyDataChanged()
+            chart.getData()!!.notifyDataChanged()
             chart.notifyDataSetChanged()
         } else {
             set = BarDataSet(values, "Values")

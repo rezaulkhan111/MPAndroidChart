@@ -16,7 +16,11 @@ open class YAxisRenderer : AxisRenderer {
 
     protected var mZeroLinePaint: Paint? = null
 
-    constructor(viewPortHandler: ViewPortHandler?, yAxis: YAxis?, trans: Transformer?) : super(
+    constructor(
+        viewPortHandler: ViewPortHandler,
+        yAxis: YAxis,
+        trans: Transformer?
+    ) : super(
         viewPortHandler,
         trans,
         yAxis

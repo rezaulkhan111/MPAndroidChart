@@ -89,9 +89,9 @@ class MultiLineChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartGestu
         progress = seekBarX.progress
         tvX.text = seekBarX.progress.toString()
         tvY.text = seekBarY.progress.toString()
-        val dataSets = mutableListOf<ILineDataSet>()
+        val dataSets = mutableListOf<ILineDataSet?>()
         for (z in 0..2) {
-            val values = mutableListOf<Entry>()
+            val values = mutableListOf<Entry?>()
             for (i in 0 until progress) {
                 val `val` = Math.random() * seekBarY.progress + 3
                 values.add(Entry(i.toFloat(), `val`.toFloat()))
@@ -108,7 +108,7 @@ class MultiLineChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartGestu
 
         // make the first DataSet dashed
         (dataSets[0] as LineDataSet).enableDashedLine(10f, 10f, 0f)
-        (dataSets[0] as LineDataSet).setColors(*ColorTemplate.VORDIPLOM_COLORS)
+        (dataSets[0] as LineDataSet).setColors(ColorTemplate.VORDIPLOM_COLORS)
         (dataSets[0] as LineDataSet).setCircleColors(*ColorTemplate.VORDIPLOM_COLORS)
         val data = LineData(dataSets)
         chart.setData(data)
@@ -130,8 +130,7 @@ class MultiLineChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartGestu
                 startActivity(i)
             }
             R.id.actionToggleValues -> {
-                val sets: List<ILineDataSet>? = chart.getData()
-                    .getDataSets()
+                val sets = chart.getData()!!.getDataSets()
                 for (iSet in sets!!) {
                     val set = iSet as LineDataSet
                     set.setDrawValues(!set.isDrawValuesEnabled())
@@ -150,13 +149,12 @@ class MultiLineChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartGestu
             }
             R.id.actionToggleHighlight -> {
                 if (chart.getData() != null) {
-                    chart.getData().setHighlightEnabled(!chart.getData().isHighlightEnabled())
+                    chart.getData()!!.setHighlightEnabled(!chart.getData()!!.isHighlightEnabled())
                     chart.invalidate()
                 }
             }
             R.id.actionToggleFilled -> {
-                val sets: List<ILineDataSet>? = chart.getData()
-                    .getDataSets()
+                val sets = chart.getData()!!.getDataSets()
                 for (iSet in sets!!) {
                     val set = iSet as LineDataSet
                     if (set.isDrawFilledEnabled()) set.setDrawFilled(false) else set.setDrawFilled(
@@ -166,8 +164,7 @@ class MultiLineChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartGestu
                 chart.invalidate()
             }
             R.id.actionToggleCircles -> {
-                val sets: List<ILineDataSet>? = chart.getData()
-                    .getDataSets()
+                val sets = chart.getData()!!.getDataSets()
                 for (iSet in sets!!) {
                     val set = iSet as LineDataSet
                     if (set.isDrawCirclesEnabled()) set.setDrawCircles(false) else set.setDrawCircles(
@@ -177,8 +174,7 @@ class MultiLineChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartGestu
                 chart.invalidate()
             }
             R.id.actionToggleCubic -> {
-                val sets: List<ILineDataSet>? = chart.getData()
-                    .getDataSets()
+                val sets = chart.getData()!!.getDataSets()
                 for (iSet in sets!!) {
                     val set = iSet as LineDataSet
                     set.setMode(if (set.getMode() === LineDataSet.Mode.CUBIC_BEZIER) LineDataSet.Mode.LINEAR else LineDataSet.Mode.CUBIC_BEZIER)
@@ -186,8 +182,7 @@ class MultiLineChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartGestu
                 chart.invalidate()
             }
             R.id.actionToggleStepped -> {
-                val sets: List<ILineDataSet>? = chart.getData()
-                    .getDataSets()
+                val sets = chart.getData()!!.getDataSets()
                 for (iSet in sets!!) {
                     val set = iSet as LineDataSet
                     set.setMode(if (set.getMode() === LineDataSet.Mode.STEPPED) LineDataSet.Mode.LINEAR else LineDataSet.Mode.STEPPED)
@@ -195,8 +190,7 @@ class MultiLineChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartGestu
                 chart.invalidate()
             }
             R.id.actionToggleHorizontalCubic -> {
-                val sets: List<ILineDataSet>? = chart.getData()
-                    .getDataSets()
+                val sets = chart.getData()!!.getDataSets()
                 for (iSet in sets!!) {
                     val set = iSet as LineDataSet
                     set.setMode(if (set.getMode() === LineDataSet.Mode.HORIZONTAL_BEZIER) LineDataSet.Mode.LINEAR else LineDataSet.Mode.HORIZONTAL_BEZIER)
@@ -231,48 +225,48 @@ class MultiLineChartActivity : DemoBase(), OnSeekBarChangeListener, OnChartGestu
         saveToGallery(chart!!, "MultiLineChartActivity")
     }
 
-    override fun onChartGestureStart(me: MotionEvent, lastPerformedGesture: ChartGesture) {
+    override fun onChartGestureStart(me: MotionEvent?, lastPerformedGesture: ChartGesture?) {
         Log.i("Gesture", "START, x: " + me!!.x + ", y: " + me.y)
     }
 
-    override fun onChartGestureEnd(me: MotionEvent, lastPerformedGesture: ChartGesture) {
+    override fun onChartGestureEnd(me: MotionEvent?, lastPerformedGesture: ChartGesture?) {
         Log.i("Gesture", "END, lastGesture: $lastPerformedGesture")
 
         // un-highlight values after the gesture is finished and no single-tap
         if (lastPerformedGesture !== ChartGesture.SINGLE_TAP) chart!!.highlightValues(null) // or highlightTouch(null) for callback to onNothingSelected(...)
     }
 
-    override fun onChartLongPressed(me: MotionEvent) {
+    override fun onChartLongPressed(me: MotionEvent?) {
         Log.i("LongPress", "Chart long pressed.")
     }
 
-    override fun onChartDoubleTapped(me: MotionEvent) {
+    override fun onChartDoubleTapped(me: MotionEvent?) {
         Log.i("DoubleTap", "Chart double-tapped.")
     }
 
-    override fun onChartSingleTapped(me: MotionEvent) {
+    override fun onChartSingleTapped(me: MotionEvent?) {
         Log.i("SingleTap", "Chart single-tapped.")
     }
 
     override fun onChartFling(
-        me1: MotionEvent,
-        me2: MotionEvent,
+        me1: MotionEvent?,
+        me2: MotionEvent?,
         velocityX: Float,
         velocityY: Float
     ) {
         Log.i("Fling", "Chart fling. VelocityX: $velocityX, VelocityY: $velocityY")
     }
 
-    override fun onChartScale(me: MotionEvent, scaleX: Float, scaleY: Float) {
+    override fun onChartScale(me: MotionEvent?, scaleX: Float, scaleY: Float) {
         Log.i("Scale / Zoom", "ScaleX: $scaleX, ScaleY: $scaleY")
     }
 
-    override fun onChartTranslate(me: MotionEvent, dX: Float, dY: Float) {
+    override fun onChartTranslate(me: MotionEvent?, dX: Float, dY: Float) {
         Log.i("Translate / Move", "dX: $dX, dY: $dY")
     }
 
-    override fun onValueSelected(e: Entry, h: Highlight) {
-       
+    override fun onValueSelected(e: Entry?, h: Highlight?) {
+
     }
 
     override fun onNothingSelected() {}

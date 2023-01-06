@@ -13,19 +13,19 @@ import com.github.mikephil.charting.utils.ViewPortHandler
 class CustomScatterShapeRenderer : IShapeRenderer {
     override fun renderShape(
         c: Canvas,
-        dataSet: IScatterDataSet,
-        viewPortHandler: ViewPortHandler,
+        dataSet: IScatterDataSet?,
+        viewPortHandler: ViewPortHandler?,
         posX: Float,
         posY: Float,
         renderPaint: Paint
     ) {
-        val shapeHalf: Float = dataSet.getScatterShapeSize() / 2f
+        val shapeHalf: Float = dataSet!!.getScatterShapeSize() / 2f
         c.drawLine(
             posX - shapeHalf,
             posY - shapeHalf,
             posX + shapeHalf,
             posY + shapeHalf,
-            renderPaint!!
+            renderPaint
         )
     }
 }

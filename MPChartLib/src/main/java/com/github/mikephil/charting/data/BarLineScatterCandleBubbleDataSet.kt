@@ -8,7 +8,7 @@ import com.github.mikephil.charting.interfaces.datasets.IBarLineScatterCandleBub
  *
  * @author Philipp Jahoda
  */
-abstract class BarLineScatterCandleBubbleDataSet<T : Entry> : DataSet<T>,
+abstract class BarLineScatterCandleBubbleDataSet<T : Entry?> : DataSet<T>,
     IBarLineScatterCandleBubbleDataSet<T> {
     /**
      * default highlight color
