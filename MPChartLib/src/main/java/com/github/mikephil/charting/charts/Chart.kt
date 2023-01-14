@@ -388,12 +388,12 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
      * array of Highlight objects that reference the highlighted slices in the
      * chart
      */
-    protected var mIndicesToHighlight: Array<Highlight>? = null
+    protected var mIndicesToHighlight: Array<Highlight?>? = null
 
     /**
      * The maximum distance in dp away from an entry causing it to highlight.
      */
-    protected var mMaxHighlightDistance = 0f
+    private var mMaxHighlightDistance = 0f
 
     override fun getMaxHighlightDistance(): Float {
         return mMaxHighlightDistance
@@ -415,7 +415,7 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
      *
      * @return
      */
-    open fun getHighlighted(): Array<Highlight>? {
+    open fun getHighlighted(): Array<Highlight?>? {
         return mIndicesToHighlight
     }
 
@@ -446,7 +446,7 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
      * @return
      */
     open fun valuesToHighlight(): Boolean {
-        return if (mIndicesToHighlight == null || mIndicesToHighlight!!.size <= 0 || mIndicesToHighlight!![0] == null) false else true
+        return !(mIndicesToHighlight == null || mIndicesToHighlight!!.isEmpty() || mIndicesToHighlight!![0] == null)
     }
 
     /**
@@ -454,8 +454,8 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
      *
      * @param highs
      */
-    protected open fun setLastHighlighted(highs: Array<Highlight>?) {
-        if (highs == null || highs.size <= 0 || highs[0] == null) {
+    protected open fun setLastHighlighted(highs: Array<Highlight?>?) {
+        if (highs == null || highs.isEmpty() || highs[0] == null) {
             mChartTouchListener!!.setLastHighlighted(null)
         } else {
             mChartTouchListener!!.setLastHighlighted(highs[0])
@@ -470,7 +470,7 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
      *
      * @param highs
      */
-    open fun highlightValues(highs: Array<Highlight>?) {
+    open fun highlightValues(highs: Array<Highlight?>?) {
 
         // set the indices to highlight
         mIndicesToHighlight = highs

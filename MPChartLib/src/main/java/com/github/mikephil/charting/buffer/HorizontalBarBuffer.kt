@@ -43,7 +43,7 @@ open class HorizontalBarBuffer : BarBuffer {
             } else {
                 var posY = 0f
                 var negY = -e.getNegativeSum()
-                var yStart = 0f
+                var yStart: Float
 
                 // fill the stack
                 for (k in vals!!.indices) {
