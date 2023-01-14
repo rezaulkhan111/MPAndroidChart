@@ -18,17 +18,17 @@ import com.github.mikephil.charting.utils.Utils.getDefaultValueFormatter
  * This is the base dataset of all DataSets. It's purpose is to implement critical methods
  * provided by the IDataSet interface.
  */
-abstract class BaseDataSet<T : Entry?> : IDataSet<T> {
+abstract class BaseDataSet<T : Entry?>() : IDataSet<T> {
 
     /**
      * List representing all colors that are used for this DataSet
      */
-    protected var mColors: MutableList<Int>? = null
+    private var mColors: MutableList<Int>? = null
 
     /**
      * List representing all colors that are used for drawing the actual values for this DataSet
      */
-    protected var mValueColors: MutableList<Int>? = null
+    private var mValueColors: MutableList<Int>? = null
 
     /**
      * label that describes the DataSet or the data the DataSet represents
@@ -38,12 +38,12 @@ abstract class BaseDataSet<T : Entry?> : IDataSet<T> {
     /**
      * this specifies which axis this DataSet should be plotted against
      */
-    protected var mAxisDependency = AxisDependency.LEFT
+    private var mAxisDependency = AxisDependency.LEFT
 
     /**
      * if true, value highlightning is enabled
      */
-    protected var mHighlightEnabled = true
+    private var mHighlightEnabled = true
 
     /**
      * custom formatter that is used instead of the auto-formatter if set
@@ -54,7 +54,7 @@ abstract class BaseDataSet<T : Entry?> : IDataSet<T> {
     /**
      * the typeface used for the value text
      */
-    protected var mValueTypeface: Typeface? = null
+    private var mValueTypeface: Typeface? = null
 
     private var mForm = LegendForm.DEFAULT
     private var mFormSize = Float.NaN
@@ -64,32 +64,32 @@ abstract class BaseDataSet<T : Entry?> : IDataSet<T> {
     /**
      * if true, y-values are drawn on the chart
      */
-    protected var mDrawValues = true
+    private var mDrawValues = true
 
     /**
      * if true, y-icons are drawn on the chart
      */
-    protected var mDrawIcons = true
+    private var mDrawIcons = true
 
     /**
      * the offset for drawing icons (in dp)
      */
-    protected var mIconsOffset = MPPointF()
+    private var mIconsOffset = MPPointF()
 
     /**
      * the size of the value-text labels
      */
-    protected var mValueTextSize = 17f
+    private var mValueTextSize = 17f
 
     /**
      * flag that indicates if the DataSet is visible or not
      */
-    protected var mVisible = true
+    private var mVisible = true
 
     /**
      * Default constructor.
      */
-    constructor() {
+    init {
         mColors = ArrayList()
         mValueColors = ArrayList()
 
@@ -103,8 +103,8 @@ abstract class BaseDataSet<T : Entry?> : IDataSet<T> {
      *
      * @param label
      */
-    constructor(label: String) {
-        mLabel = label
+    constructor(label: String?) : this() {
+        mLabel = label!!
     }
 
     /**
@@ -248,7 +248,7 @@ abstract class BaseDataSet<T : Entry?> : IDataSet<T> {
         mLabel = label
     }
 
-    override fun getLabel(): String {
+    override fun getLabel(): String? {
         return mLabel
     }
 
@@ -281,7 +281,7 @@ abstract class BaseDataSet<T : Entry?> : IDataSet<T> {
         mValueColors = colors
     }
 
-    override fun setValueTypeface(tf: Typeface) {
+    override fun setValueTypeface(tf: Typeface?) {
         mValueTypeface = tf
     }
 

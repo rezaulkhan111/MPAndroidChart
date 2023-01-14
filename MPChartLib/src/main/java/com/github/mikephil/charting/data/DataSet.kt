@@ -44,7 +44,7 @@ abstract class DataSet<T : Entry?> : BaseDataSet<T> {
      * @param entries
      * @param label
      */
-    constructor(entries: MutableList<T>?, label: String) : super(label) {
+    constructor(entries: MutableList<T>?, label: String?) : super(label) {
         mEntries = entries
         if (mEntries == null) mEntries = ArrayList()
         calcMinMax()
@@ -61,7 +61,7 @@ abstract class DataSet<T : Entry?> : BaseDataSet<T> {
         }
     }
 
-    override fun calcMinMaxY(fromX: Float, toX: Float) {
+    override fun calcMinMaxY(fromX: Float, toX: Float?) {
         mYMax = -Float.MAX_VALUE
         mYMin = Float.MAX_VALUE
         if (mEntries == null || mEntries!!.isEmpty()) return
@@ -227,12 +227,12 @@ abstract class DataSet<T : Entry?> : BaseDataSet<T> {
         return values.add(e)
     }
 
-    override fun removeEntry(e: T): Boolean {
+    override fun removeEntry(e: Entry?): Boolean {
         if (e == null) return false
         if (mEntries == null) return false
 
         // remove the entry
-        val removed = mEntries!!.remove(e)
+        val removed = mEntries!!.remove(e as Entry?)
         if (removed) {
             calcMinMax()
         }
@@ -243,7 +243,7 @@ abstract class DataSet<T : Entry?> : BaseDataSet<T> {
         return mEntries!!.indexOf(e)
     }
 
-    override fun getEntryForXValue(xValue: Float, closestToY: Float, rounding: Rounding?): T? {
+    override fun getEntryForXValue(xValue: Float?, closestToY: Float, rounding: Rounding?): T? {
         val index = getEntryIndex(xValue, closestToY, rounding)
         return if (index > -1) mEntries!!.get(index) else null
     }
@@ -252,18 +252,18 @@ abstract class DataSet<T : Entry?> : BaseDataSet<T> {
         return getEntryForXValue(xValue, closestToY, Rounding.CLOSEST)
     }
 
-    override fun getEntryForIndex(index: Int): T {
+    override fun getEntryForIndex(index: Int): T? {
         return mEntries!![index]
     }
 
-    override fun getEntryIndex(xValue: Float, closestToY: Float, rounding: Rounding?): Int {
+    override fun getEntryIndex(xValue: Float?, closestToY: Float, rounding: Rounding?): Int {
         if (mEntries == null || mEntries!!.isEmpty()) return -1
         var low = 0
         var high = mEntries!!.size - 1
         var closest = high
         while (low < high) {
             val m = (low + high) / 2
-            val d1 = mEntries!![m]!!.getX() - xValue
+            val d1 = mEntries!![m]!!.getX() - xValue!!
             val d2 = mEntries!![m + 1]!!.getX() - xValue
             val ad1 = Math.abs(d1)
             val ad2 = Math.abs(d2)
@@ -291,12 +291,12 @@ abstract class DataSet<T : Entry?> : BaseDataSet<T> {
             val closestXValue = mEntries!![closest]!!.getX()
             if (rounding == Rounding.UP) {
                 // If rounding up, and found x-value is lower than specified x, and we can go upper...
-                if (closestXValue < xValue && closest < mEntries!!.size - 1) {
+                if (closestXValue < xValue!! && closest < mEntries!!.size - 1) {
                     ++closest
                 }
             } else if (rounding == Rounding.DOWN) {
                 // If rounding down, and found x-value is upper than specified x, and we can go lower...
-                if (closestXValue > xValue && closest > 0) {
+                if (closestXValue > xValue!! && closest > 0) {
                     --closest
                 }
             }

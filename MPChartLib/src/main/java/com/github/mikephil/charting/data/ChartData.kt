@@ -105,7 +105,7 @@ abstract class ChartData<T : IDataSet<out Entry?>?> {
      * @param fromX the x-value to start the calculation from
      * @param toX   the x-value to which the calculation should be performed
      */
-    open fun calcMinMaxY(fromX: Float, toX: Float) {
+    open fun calcMinMaxY(fromX: Float, toX: Float?) {
         for (set in mDataSets!!) {
             set!!.calcMinMaxY(fromX, toX)
         }
@@ -435,7 +435,7 @@ abstract class ChartData<T : IDataSet<out Entry?>?> {
         val set: IDataSet<*> = mDataSets!![dataSetIndex]!!
         return if (set != null) {
             // remove the entry from the dataset
-            val removed: Boolean = set.removeEntry(e as Nothing)
+            val removed: Boolean = set.removeEntry(e)
             if (removed) {
                 notifyDataChanged()
             }
@@ -582,7 +582,7 @@ abstract class ChartData<T : IDataSet<out Entry?>?> {
      */
     open fun setValueTypeface(tf: Typeface?) {
         for (set in mDataSets!!) {
-            set!!.setValueTypeface(tf!!)
+            set!!.setValueTypeface(tf)
         }
     }
 

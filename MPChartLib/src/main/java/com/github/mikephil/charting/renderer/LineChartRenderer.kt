@@ -127,9 +127,9 @@ class LineChartRenderer : LineRadarRenderer {
         mRenderPaint!!.pathEffect = null
     }
 
-    protected fun drawCubicBezier(dataSet: ILineDataSet) {
+    private fun drawCubicBezier(dataSet: ILineDataSet) {
         val phaseY = mAnimator!!.getPhaseY()
-        val trans = mChart!!.getTransformer(dataSet.getAxisDependency())!!
+        val trans = mChart?.getTransformer(dataSet.getAxisDependency())
         mXBounds[mChart!!] = dataSet
         val intensity = dataSet.getCubicIntensity()
         cubicPath.reset()
@@ -147,7 +147,7 @@ class LineChartRenderer : LineRadarRenderer {
             val lastIndex = mXBounds.min + mXBounds.range
             var prevPrev: Entry?
             var prev: Entry? = dataSet.getEntryForIndex(Math.max(firstIndex - 2, 0))
-            var cur = dataSet.getEntryForIndex(Math.max(firstIndex - 1, 0))!!
+            var cur = dataSet.getEntryForIndex(Math.max(firstIndex - 1, 0))
             var next = cur
             var nextIndex = -1
             if (cur == null) return
@@ -160,9 +160,9 @@ class LineChartRenderer : LineRadarRenderer {
                 cur = if (nextIndex == j) next else dataSet.getEntryForIndex(j)!!
                 nextIndex = if (j + 1 < dataSet.getEntryCount()) j + 1 else j
                 next = dataSet.getEntryForIndex(nextIndex)!!
-                prevDx = (cur.getX() - prevPrev!!.getX()) * intensity
+                prevDx = (cur?.getX()!! - prevPrev!!.getX()) * intensity
                 prevDy = (cur.getY() - prevPrev.getY()) * intensity
-                curDx = (next.getX() - prev.getX()) * intensity
+                curDx = (next.getX() - prev?.getX()!!) * intensity
                 curDy = (next.getY() - prev.getY()) * intensity
                 cubicPath.cubicTo(
                     prev.getX() + prevDx, (prev.getY() + prevDy) * phaseY,
@@ -180,23 +180,23 @@ class LineChartRenderer : LineRadarRenderer {
         }
         mRenderPaint!!.color = dataSet.getColor()
         mRenderPaint!!.style = Paint.Style.STROKE
-        trans.pathValueToPixel(cubicPath)
+        trans?.pathValueToPixel(cubicPath)
         mBitmapCanvas!!.drawPath(cubicPath, mRenderPaint!!)
         mRenderPaint!!.pathEffect = null
     }
 
-    protected fun drawCubicFill(
+    private fun drawCubicFill(
         c: Canvas?,
         dataSet: ILineDataSet,
         spline: Path,
-        trans: Transformer,
+        trans: Transformer?,
         bounds: XBounds
     ) {
         val fillMin = dataSet.getFillFormatter()?.getFillLinePosition(dataSet, mChart!!)!!
         spline.lineTo(dataSet.getEntryForIndex(bounds.min + bounds.range)!!.getX(), fillMin)
         spline.lineTo(dataSet.getEntryForIndex(bounds.min)!!.getX(), fillMin)
         spline.close()
-        trans.pathValueToPixel(spline)
+        trans?.pathValueToPixel(spline)
         val drawable = dataSet.getFillDrawable()
         if (drawable != null) {
             drawFilledPath(c!!, spline, drawable)
@@ -504,7 +504,7 @@ class LineChartRenderer : LineRadarRenderer {
             val dataSet = dataSets[i]!!
             if (!dataSet.isVisible() || !dataSet.isDrawCirclesEnabled() || dataSet.getEntryCount() == 0) continue
             mCirclePaintInner!!.color = dataSet.getCircleHoleColor()
-            val trans = mChart!!.getTransformer(dataSet.getAxisDependency())!!
+            val trans = mChart?.getTransformer(dataSet.getAxisDependency())
             mXBounds[mChart!!] = dataSet
             val circleRadius = dataSet.getCircleRadius()
             val circleHoleRadius = dataSet.getCircleHoleRadius()
@@ -530,7 +530,7 @@ class LineChartRenderer : LineRadarRenderer {
                 val e = dataSet.getEntryForIndex(j) ?: break
                 mCirclesBuffer[0] = e.getX()
                 mCirclesBuffer[1] = e.getY() * phaseY
-                trans.pointValuesToPixel(mCirclesBuffer)
+                trans?.pointValuesToPixel(mCirclesBuffer)
                 if (!mViewPortHandler!!.isInBoundsRight(mCirclesBuffer[0])) break
                 if (!mViewPortHandler!!.isInBoundsLeft(mCirclesBuffer[0]) ||
                     !mViewPortHandler!!.isInBoundsY(mCirclesBuffer[1])

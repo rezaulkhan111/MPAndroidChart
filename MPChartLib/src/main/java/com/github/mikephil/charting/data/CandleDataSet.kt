@@ -69,7 +69,7 @@ class CandleDataSet : LineScatterCandleRadarDataSet<CandleEntry?>, ICandleDataSe
      */
     private var mShadowColor = ColorTemplate.COLOR_SKIP
 
-    constructor(yVals: MutableList<CandleEntry?>, label: String) : super(yVals, label) {
+    constructor(yVals: MutableList<CandleEntry?>, label: String?) : super(yVals, label) {
 
     }
 

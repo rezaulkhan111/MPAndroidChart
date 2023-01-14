@@ -37,7 +37,7 @@ class BarDataSet : BarLineScatterCandleBubbleDataSet<BarEntry?>, IBarDataSet {
 
     protected var mFills: MutableList<Fill>? = null
 
-    constructor(yVals: MutableList<BarEntry?>, label: String) : super(yVals, label) {
+    constructor(yVals: MutableList<BarEntry?>, label: String?) : super(yVals, label) {
         mHighLightColor = Color.rgb(0, 0, 0)
         calcStackSize(yVals)
         calcEntryCountIncludingStacks(yVals)

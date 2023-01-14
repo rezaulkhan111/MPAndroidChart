@@ -100,7 +100,7 @@ class LegendRenderer : Renderer {
                                 dataSet.getFormSize(),
                                 dataSet.getFormLineWidth(),
                                 dataSet.getFormLineDashEffect(),
-                                clrs[j]!!
+                                clrs[j]
                             )
                         )
                     }
@@ -169,7 +169,7 @@ class LegendRenderer : Renderer {
                     )
                 } else { // all others
                     var j = 0
-                    while (j < clrs!!.size && j < entryCount) {
+                    while (j < clrs?.size!! && j < entryCount) {
                         var label: String?
 
                         // if multiple colors are set for a DataSet, group them

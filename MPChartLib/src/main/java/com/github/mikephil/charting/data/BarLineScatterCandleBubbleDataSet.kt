@@ -15,7 +15,7 @@ abstract class BarLineScatterCandleBubbleDataSet<T : Entry?> : DataSet<T>,
      */
     protected var mHighLightColor = Color.rgb(255, 187, 115)
 
-    constructor(yVals: MutableList<T>, label: String) : super(yVals, label) {
+    constructor(yVals: MutableList<T>, label: String?) : super(yVals, label) {
     }
 
     /**

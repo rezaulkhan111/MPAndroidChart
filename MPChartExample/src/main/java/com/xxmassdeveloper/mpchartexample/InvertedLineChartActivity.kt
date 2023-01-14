@@ -90,14 +90,6 @@ class InvertedLineChartActivity : DemoBase(), OnSeekBarChangeListener,
         // chart.centerViewPort(10, 50);
 
         // get the legend (only possible after setting data)
-
-        // // restrain the maximum scale-out factor
-        // chart.setScaleMinima(3f, 3f);
-        //
-        // // center the view to a specific position inside the chart
-        // chart.centerViewPort(10, 50);
-
-        // get the legend (only possible after setting data)
         val l = chart.getLegend()
 
         // modify the legend ...

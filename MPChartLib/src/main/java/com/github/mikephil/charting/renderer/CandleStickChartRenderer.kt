@@ -37,8 +37,8 @@ class CandleStickChartRenderer : LineScatterCandleRadarRenderer {
         }
     }
 
-    protected fun drawDataSet(c: Canvas, dataSet: ICandleDataSet) {
-        val trans = mChart!!.getTransformer(dataSet.getAxisDependency())!!
+    private fun drawDataSet(c: Canvas, dataSet: ICandleDataSet) {
+        val trans = mChart?.getTransformer(dataSet.getAxisDependency())
         val phaseY = mAnimator!!.getPhaseY()
         val barSpace = dataSet.getBarSpace()
         val showCandleBar = dataSet.getShowCandleBar()
@@ -77,7 +77,7 @@ class CandleStickChartRenderer : LineScatterCandleRadarRenderer {
                     mShadowBuffers[5] = low * phaseY
                     mShadowBuffers[7] = mShadowBuffers[3]
                 }
-                trans.pointValuesToPixel(mShadowBuffers)
+                trans?.pointValuesToPixel(mShadowBuffers)
 
                 // draw the shadows
                 if (dataSet.getShadowColorSameAsCandle()) {
@@ -103,7 +103,7 @@ class CandleStickChartRenderer : LineScatterCandleRadarRenderer {
                 mBodyBuffers[1] = close * phaseY
                 mBodyBuffers[2] = xPos + 0.5f - barSpace
                 mBodyBuffers[3] = open * phaseY
-                trans.pointValuesToPixel(mBodyBuffers)
+                trans?.pointValuesToPixel(mBodyBuffers)
 
                 // draw body differently for increasing and decreasing entry
                 if (open > close) { // decreasing
@@ -155,9 +155,9 @@ class CandleStickChartRenderer : LineScatterCandleRadarRenderer {
                 mCloseBuffers[1] = close * phaseY
                 mCloseBuffers[2] = xPos
                 mCloseBuffers[3] = close * phaseY
-                trans.pointValuesToPixel(mRangeBuffers)
-                trans.pointValuesToPixel(mOpenBuffers)
-                trans.pointValuesToPixel(mCloseBuffers)
+                trans?.pointValuesToPixel(mRangeBuffers)
+                trans?.pointValuesToPixel(mOpenBuffers)
+                trans?.pointValuesToPixel(mCloseBuffers)
 
                 // draw the ranges
                 var barColor: Int

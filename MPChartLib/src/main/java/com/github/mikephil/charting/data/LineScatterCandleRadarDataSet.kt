@@ -21,7 +21,7 @@ abstract class LineScatterCandleRadarDataSet<T : Entry?> :
     private var mHighlightDashPathEffect: DashPathEffect? = null
 
 
-    constructor(yVals: MutableList<T>, label: String) : super(yVals, label) {
+    constructor(yVals: MutableList<T>, label: String?) : super(yVals, label) {
         mHighlightLineWidth = convertDpToPixel(0.5f)
     }
 

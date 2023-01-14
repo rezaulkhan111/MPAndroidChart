@@ -35,10 +35,10 @@ class ScatterChartRenderer : LineScatterCandleRadarRenderer {
 
     var mPixelBuffer = FloatArray(2)
 
-    protected fun drawDataSet(c: Canvas?, dataSet: IScatterDataSet) {
+    private fun drawDataSet(c: Canvas?, dataSet: IScatterDataSet) {
         if (dataSet.getEntryCount() < 1) return
         val viewPortHandler = mViewPortHandler!!
-        val trans = mChart!!.getTransformer(dataSet.getAxisDependency())!!
+        val trans = mChart?.getTransformer(dataSet.getAxisDependency())
         val phaseY = mAnimator!!.getPhaseY()
         val renderer = dataSet.getShapeRenderer()
         if (renderer == null) {
@@ -54,7 +54,7 @@ class ScatterChartRenderer : LineScatterCandleRadarRenderer {
             val e = dataSet.getEntryForIndex(i)!!
             mPixelBuffer[0] = e.getX()
             mPixelBuffer[1] = e.getY() * phaseY
-            trans.pointValuesToPixel(mPixelBuffer)
+            trans?.pointValuesToPixel(mPixelBuffer)
             if (!viewPortHandler.isInBoundsRight(mPixelBuffer[0])) break
             if (!viewPortHandler.isInBoundsLeft(mPixelBuffer[0])
                 || !viewPortHandler.isInBoundsY(mPixelBuffer[1])
@@ -89,7 +89,7 @@ class ScatterChartRenderer : LineScatterCandleRadarRenderer {
                 iconsOffset.x = convertDpToPixel(iconsOffset.x)
                 iconsOffset.y = convertDpToPixel(iconsOffset.y)
                 var j = 0
-                while (j < positions!!.size) {
+                while (j < positions.size) {
                     if (!mViewPortHandler!!.isInBoundsRight(positions[j])) break
 
                     // make sure the lines don't do shitty things outside bounds

@@ -38,7 +38,7 @@ class BubbleChartRenderer : BarLineScatterCandleBubbleRenderer {
     private val sizeBuffer = FloatArray(4)
     private val pointBuffer = FloatArray(2)
 
-    protected fun getShapeSize(
+    private fun getShapeSize(
         entrySize: Float,
         maxSize: Float,
         reference: Float,
@@ -50,14 +50,14 @@ class BubbleChartRenderer : BarLineScatterCandleBubbleRenderer {
         return reference * factor
     }
 
-    protected fun drawDataSet(c: Canvas, dataSet: IBubbleDataSet) {
+    private fun drawDataSet(c: Canvas, dataSet: IBubbleDataSet) {
         if (dataSet.getEntryCount() < 1) return
-        val trans = mChart!!.getTransformer(dataSet.getAxisDependency())
+        val trans = mChart?.getTransformer(dataSet.getAxisDependency())
         val phaseY = mAnimator?.getPhaseY()
         mXBounds[mChart!!] = dataSet
         sizeBuffer[0] = 0f
         sizeBuffer[2] = 1f
-        trans!!.pointValuesToPixel(sizeBuffer)
+        trans?.pointValuesToPixel(sizeBuffer)
         val normalizeSize = dataSet.isNormalizeSizeEnabled()
 
         // calcualte the full width of 1 step on the x-axis
@@ -69,7 +69,7 @@ class BubbleChartRenderer : BarLineScatterCandleBubbleRenderer {
             val entry = dataSet.getEntryForIndex(j)!!
             pointBuffer[0] = entry.getX()
             pointBuffer[1] = entry.getY() * phaseY!!
-            trans.pointValuesToPixel(pointBuffer)
+            trans?.pointValuesToPixel(pointBuffer)
             val shapeHalf = getShapeSize(
                 entry.getSize(),
                 dataSet.getMaxSize(),
@@ -88,7 +88,7 @@ class BubbleChartRenderer : BarLineScatterCandleBubbleRenderer {
     }
 
     override fun drawValues(c: Canvas?) {
-        val bubbleData = mChart!!.getBubbleData() ?: return
+        val bubbleData = mChart?.getBubbleData() ?: return
         // if values are drawn
         if (isDrawingValuesAllowed(mChart!!)) {
             val dataSets: MutableList<IBubbleDataSet?>? = bubbleData.getDataSets()
@@ -99,17 +99,25 @@ class BubbleChartRenderer : BarLineScatterCandleBubbleRenderer {
 
                 // apply the text-styling defined by the DataSet
                 applyValueTextStyle(dataSet)
-                val phaseX = Math.max(0f, Math.min(1f, mAnimator!!.getPhaseX()))
-                val phaseY = mAnimator!!.getPhaseY()
+                val phaseX = Math.max(0f, Math.min(1f, mAnimator?.getPhaseX()!!))
+                val phaseY = mAnimator?.getPhaseY()!!
                 mXBounds[mChart!!] = dataSet
-                val positions = mChart!!.getTransformer(dataSet.getAxisDependency())!!
-                    .generateTransformedValuesBubble(dataSet, phaseY, mXBounds.min, mXBounds.max)
+                val positions =
+                    mChart!!
+                        .getTransformer(dataSet.getAxisDependency())!!
+                        .generateTransformedValuesBubble(
+                            dataSet,
+                            phaseY,
+                            mXBounds.min,
+                            mXBounds.max
+                        )
                 val alpha = if (phaseX == 1f) phaseY else phaseX
+
                 val iconsOffset = MPPointF.getInstance(dataSet.getIconsOffset()!!)
                 iconsOffset.x = Utils.convertDpToPixel(iconsOffset.x)
                 iconsOffset.y = Utils.convertDpToPixel(iconsOffset.y)
                 var j = 0
-                while (j < positions!!.size) {
+                while (j < positions.size) {
                     var valueTextColor = dataSet.getValueTextColor(j / 2 + mXBounds.min)!!
                     valueTextColor = Color.argb(
                         Math.round(255f * alpha), Color.red(valueTextColor),

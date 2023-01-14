@@ -15,7 +15,7 @@ import com.github.mikephil.charting.utils.Utils.drawImage
 
 open class BarChartRenderer : BarLineScatterCandleBubbleRenderer {
 
-    public var mChart: BarDataProvider? = null
+    var mChart: BarDataProvider? = null
 
     /**
      * the rect object that is used for drawing the bars
@@ -69,8 +69,8 @@ open class BarChartRenderer : BarLineScatterCandleBubbleRenderer {
     private val mBarShadowRectBuffer = RectF()
 
     protected open fun drawDataSet(c: Canvas, dataSet: IBarDataSet?, index: Int) {
-        val trans = mChart!!.getTransformer(dataSet!!.getAxisDependency())!!
-        mBarBorderPaint!!.color = dataSet.getBarBorderColor()
+        val trans = mChart?.getTransformer(dataSet?.getAxisDependency())
+        mBarBorderPaint!!.color = dataSet?.getBarBorderColor()!!
         mBarBorderPaint!!.strokeWidth = convertDpToPixel(
             dataSet.getBarBorderWidth()
         )
@@ -95,7 +95,7 @@ open class BarChartRenderer : BarLineScatterCandleBubbleRenderer {
                 x = e.getX()
                 mBarShadowRectBuffer.left = x - barWidthHalf
                 mBarShadowRectBuffer.right = x + barWidthHalf
-                trans.rectValueToPixel(mBarShadowRectBuffer)
+                trans?.rectValueToPixel(mBarShadowRectBuffer)
                 if (!mViewPortHandler!!.isInBoundsLeft(mBarShadowRectBuffer.right)) {
                     i++
                     continue
@@ -115,7 +115,7 @@ open class BarChartRenderer : BarLineScatterCandleBubbleRenderer {
         buffer?.setInverted(mChart!!.isInverted(dataSet.getAxisDependency()))
         buffer?.setBarWidth(mChart!!.getBarData()!!.getBarWidth())
         buffer?.feed(dataSet)
-        trans.pointValuesToPixel(buffer?.buffer)
+        trans?.pointValuesToPixel(buffer?.buffer)
         val isCustomFill = dataSet.getFills() != null && !dataSet.getFills()!!.isEmpty()
         val isSingleColor = dataSet.getColors()!!.size == 1
         val isInverted = mChart!!.isInverted(dataSet.getAxisDependency())
@@ -250,7 +250,7 @@ open class BarChartRenderer : BarLineScatterCandleBubbleRenderer {
 
                     // if we have stacks
                 } else {
-                    val trans = mChart!!.getTransformer(dataSet.getAxisDependency())!!
+                    val trans = mChart?.getTransformer(dataSet.getAxisDependency())
                     var bufferIndex = 0
                     var index = 0
                     while (index < dataSet.getEntryCount() * mAnimator!!.getPhaseX()) {
@@ -315,7 +315,7 @@ open class BarChartRenderer : BarLineScatterCandleBubbleRenderer {
                                     idx++
                                 }
                             }
-                            trans.pointValuesToPixel(transformed)
+                            trans?.pointValuesToPixel(transformed)
                             var k = 0
                             while (k < transformed.size) {
                                 val `val` = vals[k / 2]

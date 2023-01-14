@@ -82,7 +82,7 @@ open class Transformer {
         }
     }
 
-    protected var valuePointsForGenerateTransformedValuesScatter = FloatArray(1)
+    private var valuePointsForGenerateTransformedValuesScatter = FloatArray(1)
 
     /**
      * Transforms an List of Entry into a float array containing the x and
@@ -94,7 +94,7 @@ open class Transformer {
     open fun generateTransformedValuesScatter(
         data: IScatterDataSet, phaseX: Float,
         phaseY: Float, from: Int, to: Int
-    ): FloatArray? {
+    ): FloatArray {
         val count = ((to - from) * phaseX + 1).toInt() * 2
         if (valuePointsForGenerateTransformedValuesScatter.size != count) {
             valuePointsForGenerateTransformedValuesScatter = FloatArray(count)
@@ -116,7 +116,7 @@ open class Transformer {
         return valuePoints
     }
 
-    protected var valuePointsForGenerateTransformedValuesBubble = FloatArray(1)
+    private var valuePointsForGenerateTransformedValuesBubble = FloatArray(1)
 
     /**
      * Transforms an List of Entry into a float array containing the x and
@@ -126,11 +126,9 @@ open class Transformer {
      * @return
      */
     open fun generateTransformedValuesBubble(
-        data: IBubbleDataSet,
-        phaseY: Float,
-        from: Int,
-        to: Int
-    ): FloatArray? {
+        data: IBubbleDataSet, phaseY: Float,
+        from: Int, to: Int
+    ): FloatArray {
         val count = (to - from + 1) * 2 // (int) Math.ceil((to - from) * phaseX) * 2;
         if (valuePointsForGenerateTransformedValuesBubble.size != count) {
             valuePointsForGenerateTransformedValuesBubble = FloatArray(count)
@@ -152,7 +150,7 @@ open class Transformer {
         return valuePoints
     }
 
-    protected var valuePointsForGenerateTransformedValuesLine = FloatArray(1)
+    private var valuePointsForGenerateTransformedValuesLine = FloatArray(1)
 
     /**
      * Transforms an List of Entry into a float array containing the x and
@@ -187,7 +185,7 @@ open class Transformer {
         return valuePoints
     }
 
-    protected var valuePointsForGenerateTransformedValuesCandle = FloatArray(1)
+    private var valuePointsForGenerateTransformedValuesCandle = FloatArray(1)
 
     /**
      * Transforms an List of Entry into a float array containing the x and
@@ -329,7 +327,7 @@ open class Transformer {
         for (i in rects.indices) m.mapRect(rects[i])
     }
 
-    protected var mPixelToValueMatrixBuffer = Matrix()
+    private var mPixelToValueMatrixBuffer = Matrix()
 
     /**
      * Transforms the given array of touch positions (pixels) (x, y, x, y, ...)

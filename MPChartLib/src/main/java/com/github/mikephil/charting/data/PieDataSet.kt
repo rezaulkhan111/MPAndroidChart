@@ -27,7 +27,7 @@ class PieDataSet : DataSet<PieEntry?>, IPieDataSet {
     private var mValueLineVariableLength = true
     private var mHighlightColor: Int? = null
 
-    constructor(yVals: MutableList<PieEntry?>?, label: String) : super(yVals, label) {
+    constructor(yVals: MutableList<PieEntry?>?, label: String?) : super(yVals, label) {
 //        mShift = Utils.convertDpToPixel(12f);
     }
 

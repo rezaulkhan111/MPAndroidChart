@@ -30,7 +30,7 @@ class ScatterDataSet : LineScatterCandleRadarDataSet<Entry?>, IScatterDataSet {
      */
     private var mScatterShapeHoleColor = ColorTemplate.COLOR_NONE
 
-    constructor(yVals: MutableList<Entry?>, label: String) : super(yVals, label) {
+    constructor(yVals: MutableList<Entry?>, label: String?) : super(yVals, label) {
     }
 
     override fun copy(): DataSet<Entry?> {

@@ -31,7 +31,7 @@ class CombinedChart : BarLineChartBase<CombinedData?>, CombinedDataProvider {
     /**
      * flag that indicates whether the highlight should be full-bar oriented, or single-value?
      */
-    protected var mHighlightFullBarEnabled = false
+    private var mHighlightFullBarEnabled = false
 
     /**
      * if set to true, a grey area is drawn behind each bar that indicates the
@@ -39,7 +39,7 @@ class CombinedChart : BarLineChartBase<CombinedData?>, CombinedDataProvider {
      */
     private var mDrawBarShadow = false
 
-    protected var mDrawOrder: Array<DrawOrder>? = null
+    private var mDrawOrder: Array<DrawOrder>? = null
 
     /**
      * enum that allows to specify the order in which the different data objects
@@ -117,14 +117,6 @@ class CombinedChart : BarLineChartBase<CombinedData?>, CombinedDataProvider {
         return if (mData == null) null else mData!!.getLineData()
     }
 
-    override fun getTransformer(axis: YAxis.AxisDependency?): Transformer? {
-        return null
-    }
-
-    override fun isInverted(axis: YAxis.AxisDependency?): Boolean {
-        return false
-    }
-
     override fun getBarData(): BarData? {
         return if (mData == null) null else mData!!.getBarData()
     }
@@ -158,7 +150,6 @@ class CombinedChart : BarLineChartBase<CombinedData?>, CombinedDataProvider {
     fun setDrawValueAboveBar(enabled: Boolean) {
         mDrawValueAboveBar = enabled
     }
-
 
     /**
      * If set to true, a grey area is drawn behind each bar that indicates the

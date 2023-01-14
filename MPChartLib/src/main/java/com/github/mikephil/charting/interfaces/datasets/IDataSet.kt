@@ -64,7 +64,7 @@ interface IDataSet<T : Entry?> {
      * @param fromX
      * @param toX
      */
-    fun calcMinMaxY(fromX: Float, toX: Float)
+    fun calcMinMaxY(fromX: Float, toX: Float?)
 
     /**
      * Returns the first Entry object found at the given x-value with binary
@@ -80,7 +80,7 @@ interface IDataSet<T : Entry?> {
      * if there is no Entry matching the provided x-value
      * @return
      */
-    fun getEntryForXValue(xValue: Float, closestToY: Float, rounding: Rounding?): T?
+    fun getEntryForXValue(xValue: Float?, closestToY: Float, rounding: Rounding?): T?
 
     /**
      * Returns the first Entry object found at the given x-value with binary
@@ -114,7 +114,7 @@ interface IDataSet<T : Entry?> {
      * @param index
      * @return
      */
-    fun getEntryForIndex(index: Int): T
+    fun getEntryForIndex(index: Int): T?
 
     /**
      * Returns the first Entry index found at the given x-value with binary
@@ -130,7 +130,7 @@ interface IDataSet<T : Entry?> {
      * if there is no Entry matching the provided x-value
      * @return
      */
-    fun getEntryIndex(xValue: Float, closestToY: Float, rounding: Rounding?): Int
+    fun getEntryIndex(xValue: Float?, closestToY: Float, rounding: Rounding?): Int
 
     /**
      * Returns the position of the provided entry in the DataSets Entry array.
@@ -198,7 +198,7 @@ interface IDataSet<T : Entry?> {
      *
      * @param e
      */
-    fun removeEntry(e: T): Boolean
+    fun removeEntry(e: Entry?): Boolean
 
     /**
      * Removes the Entry object closest to the given x-value from the DataSet.
@@ -348,7 +348,7 @@ interface IDataSet<T : Entry?> {
      *
      * @param tf
      */
-    fun setValueTypeface(tf: Typeface)
+    fun setValueTypeface(tf: Typeface?)
 
     /**
      * Sets the text-size of the value-labels of this DataSet in dp.

@@ -28,6 +28,7 @@ import com.github.mikephil.charting.utils.MPPointD.Companion.recycleInstance
 import com.github.mikephil.charting.utils.MPPointF.Companion.getInstance
 import com.github.mikephil.charting.utils.MPPointF.Companion.recycleInstance
 import com.github.mikephil.charting.utils.Utils.convertDpToPixel
+import kotlin.math.min
 
 /**
  * Base-class of LineChart, BarChart, ScatterChart and CandleStickChart.
@@ -43,30 +44,30 @@ abstract class BarLineChartBase<T : BarLineScatterCandleBubbleData<out IBarLineS
      * the maximum number of entries to which values will be drawn
      * (entry numbers greater than this value will cause value-labels to disappear)
      */
-    protected var mMaxVisibleCount = 100
+    private var mMaxVisibleCount = 100
 
     /**
      * flag that indicates if auto scaling on the y axis is enabled
      */
-    protected var mAutoScaleMinMaxEnabled = false
+    private var mAutoScaleMinMaxEnabled = false
 
     /**
      * flag that indicates if pinch-zoom is enabled. if true, both x and y axis
      * can be scaled with 2 fingers, if false, x and y axis can be scaled
      * separately
      */
-    protected var mPinchZoomEnabled = false
+    private var mPinchZoomEnabled = false
 
     /**
      * flag that indicates if double tap zoom is enabled or not
      */
-    protected var mDoubleTapToZoomEnabled = true
+    private var mDoubleTapToZoomEnabled = true
 
     /**
      * flag that indicates if highlighting per dragging over a fully zoomed out
      * chart is enabled
      */
-    protected var mHighlightPerDragEnabled = true
+    private var mHighlightPerDragEnabled = true
 
     /**
      * if true, dragging is enabled for the chart
@@ -80,20 +81,20 @@ abstract class BarLineChartBase<T : BarLineScatterCandleBubbleData<out IBarLineS
     /**
      * paint object for the (by default) lightgrey background of the grid
      */
-    protected var mGridBackgroundPaint: Paint? = null
+    private var mGridBackgroundPaint: Paint? = null
 
-    protected var mBorderPaint: Paint? = null
+    private var mBorderPaint: Paint? = null
 
     /**
      * flag indicating if the grid background should be drawn or not
      */
-    protected var mDrawGridBackground = false
+    private var mDrawGridBackground = false
 
-    protected var mDrawBorders = false
+    private var mDrawBorders = false
 
-    protected var mClipValuesToContent = false
+    private var mClipValuesToContent = false
 
-    protected var mClipDataToContent = true
+    private var mClipDataToContent = true
 
     /**
      * Sets the minimum offset (padding) around the chart, defaults to 15
@@ -103,12 +104,12 @@ abstract class BarLineChartBase<T : BarLineScatterCandleBubbleData<out IBarLineS
     /**
      * flag indicating if the chart should stay at the same position after a rotation. Default is false.
      */
-    protected var mKeepPositionOnRotation = false
+    private var mKeepPositionOnRotation = false
 
     /**
      * the listener for user drawing on the chart
      */
-    protected var mDrawListener: OnDrawListener? = null
+    private var mDrawListener: OnDrawListener? = null
 
     /**
      * the object representing the labels on the left y-axis
@@ -127,12 +128,9 @@ abstract class BarLineChartBase<T : BarLineScatterCandleBubbleData<out IBarLineS
     protected var mRightAxisTransformer: Transformer? = null
 
     protected var mXAxisRenderer: XAxisRenderer? = null
-
     // /** the approximator object used for data filtering */
     // private Approximator mApproximator;
 
-    // /** the approximator object used for data filtering */
-    // private Approximator mApproximator;
     constructor(context: Context?, attrs: AttributeSet?, defStyle: Int) : super(
         context,
         attrs,
@@ -146,8 +144,9 @@ abstract class BarLineChartBase<T : BarLineScatterCandleBubbleData<out IBarLineS
     constructor(context: Context?) : super(context) {
     }
 
-    protected override fun init() {
+    override fun init() {
         super.init()
+
         mAxisLeft = YAxis(AxisDependency.LEFT)
         mAxisRight = YAxis(AxisDependency.RIGHT)
         mLeftAxisTransformer = Transformer(mViewPortHandler)
@@ -495,7 +494,7 @@ abstract class BarLineChartBase<T : BarLineScatterCandleBubbleData<out IBarLineS
      * @return
      */
     override fun getTransformer(axis: AxisDependency?): Transformer? {
-        return if (axis === AxisDependency.LEFT) mLeftAxisTransformer!! else mRightAxisTransformer!!
+        return if (axis === AxisDependency.LEFT) mLeftAxisTransformer else mRightAxisTransformer
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
@@ -1341,7 +1340,7 @@ abstract class BarLineChartBase<T : BarLineScatterCandleBubbleData<out IBarLineS
      * @return
      */
     override fun getLowestVisibleX(): Float {
-        getTransformer(AxisDependency.LEFT)!!.getValuesByTouchPoint(
+        getTransformer(AxisDependency.LEFT)?.getValuesByTouchPoint(
             mViewPortHandler.contentLeft(),
             mViewPortHandler.contentBottom(), posForGetLowestVisibleX
         )
@@ -1359,12 +1358,12 @@ abstract class BarLineChartBase<T : BarLineScatterCandleBubbleData<out IBarLineS
      *
      * @return
      */
-    override fun getHighestVisibleX(): Float {
-        getTransformer(AxisDependency.LEFT)!!.getValuesByTouchPoint(
+    override fun getHighestVisibleX(): Float? {
+        getTransformer(AxisDependency.LEFT)?.getValuesByTouchPoint(
             mViewPortHandler.contentRight(),
             mViewPortHandler.contentBottom(), posForGetHighestVisibleX
         )
-        return Math.min(mXAxis!!.mAxisMaximum.toDouble(), posForGetHighestVisibleX.x).toFloat()
+        return min(mXAxis!!.mAxisMaximum.toDouble(), posForGetHighestVisibleX.x).toFloat()
     }
 
     /**
@@ -1373,7 +1372,7 @@ abstract class BarLineChartBase<T : BarLineScatterCandleBubbleData<out IBarLineS
      * @return
      */
     open fun getVisibleXRange(): Float {
-        return Math.abs(getHighestVisibleX() - getLowestVisibleX())
+        return Math.abs(getHighestVisibleX()!! - getLowestVisibleX())
     }
 
     /**

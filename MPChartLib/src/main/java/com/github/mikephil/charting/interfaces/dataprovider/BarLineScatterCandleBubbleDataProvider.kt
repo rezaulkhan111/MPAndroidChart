@@ -11,7 +11,7 @@ interface BarLineScatterCandleBubbleDataProvider : ChartInterface {
     fun isInverted(axis: AxisDependency?): Boolean
 
     fun getLowestVisibleX(): Float
-    fun getHighestVisibleX(): Float
+    fun getHighestVisibleX(): Float?
 
     override fun getData(): BarLineScatterCandleBubbleData<*>?
 //    override fun getData(): ChartData<*>?
