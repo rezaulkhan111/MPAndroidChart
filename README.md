@@ -32,7 +32,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.rezaulkhan111:MPAndroidChart-ktx:1.0.3'
+    implementation 'com.github.rezaulkhan111:MPAndroidChart-ktx:Tag'
 }
 ```
 
