@@ -84,10 +84,10 @@ class CombinedChartRenderer : DataRenderer {
         for (renderer in mRenderers) renderer.drawExtras(c!!)
     }
 
-    protected var mHighlightBuffer: MutableList<Highlight> = ArrayList()
+    private var mHighlightBuffer: MutableList<Highlight> = ArrayList()
 
     override fun drawHighlighted(c: Canvas?, indices: Array<Highlight>?) {
-        val chart = mChart!!.get() ?: return
+        val chart = mChart.get() ?: return
         for (renderer in mRenderers) {
             var data: ChartData<*>? = null
             if (renderer is BarChartRenderer) {
@@ -106,7 +106,9 @@ class CombinedChartRenderer : DataRenderer {
                     .indexOf(data)
             mHighlightBuffer.clear()
             for (h in indices!!) {
-                if (h.getDataIndex() == dataIndex || h.getDataIndex() == -1) mHighlightBuffer.add(h)
+                if (h.getDataIndex() == dataIndex || h.getDataIndex() == -1) mHighlightBuffer.add(
+                    h
+                )
             }
             renderer.drawHighlighted(c!!, mHighlightBuffer.toTypedArray())
         }

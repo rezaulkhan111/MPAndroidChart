@@ -134,17 +134,17 @@ class LineChartRenderer : LineRadarRenderer {
         val intensity = dataSet.getCubicIntensity()
         cubicPath.reset()
         if (mXBounds.range >= 1) {
-            var prevDx = 0f
-            var prevDy = 0f
-            var curDx = 0f
-            var curDy = 0f
+            var prevDx: Float
+            var prevDy: Float
+            var curDx: Float
+            var curDy: Float
 
             // Take an extra point from the left, and an extra from the right.
             // That's because we need 4 points for a cubic bezier (cubic=4), otherwise we get lines moving and doing weird stuff on the edges of the chart.
             // So in the starting `prev` and `cur`, go -2, -1
             // And in the `lastIndex`, add +1
             val firstIndex = mXBounds.min + 1
-            val lastIndex = mXBounds.min + mXBounds.range
+            mXBounds.min + mXBounds.range
             var prevPrev: Entry?
             var prev: Entry? = dataSet.getEntryForIndex(Math.max(firstIndex - 2, 0))
             var cur = dataSet.getEntryForIndex(Math.max(firstIndex - 1, 0))
@@ -213,17 +213,16 @@ class LineChartRenderer : LineRadarRenderer {
      * @param c
      * @param dataSet
      */
-    protected fun drawLinear(c: Canvas?, dataSet: ILineDataSet) {
+    private fun drawLinear(c: Canvas?, dataSet: ILineDataSet) {
         val entryCount = dataSet.getEntryCount()
         val isDrawSteppedEnabled = dataSet.isDrawSteppedEnabled()
         val pointsPerEntryPair = if (isDrawSteppedEnabled) 4 else 2
         val trans = mChart!!.getTransformer(dataSet.getAxisDependency())!!
         val phaseY = mAnimator!!.getPhaseY()
         mRenderPaint!!.style = Paint.Style.STROKE
-        var canvas: Canvas? = null
 
         // if the data-set is dashed, draw on bitmap-canvas
-        canvas = if (dataSet.isDashedLineEnabled()) {
+        val canvas: Canvas? = if (dataSet.isDashedLineEnabled()) {
             mBitmapCanvas
         } else {
             c
@@ -338,7 +337,7 @@ class LineChartRenderer : LineRadarRenderer {
         mRenderPaint!!.pathEffect = null
     }
 
-    protected var mGenerateFilledPathBuffer = Path()
+    private var mGenerateFilledPathBuffer = Path()
 
     /**
      * Draws a filled linear path on the canvas.
@@ -348,7 +347,7 @@ class LineChartRenderer : LineRadarRenderer {
      * @param trans
      * @param bounds
      */
-    protected fun drawLinearFill(
+    private fun drawLinearFill(
         c: Canvas?,
         dataSet: ILineDataSet,
         trans: Transformer,
@@ -358,8 +357,8 @@ class LineChartRenderer : LineRadarRenderer {
         val startingIndex = bounds.min
         val endingIndex = bounds.range + bounds.min
         val indexInterval = 128
-        var currentStartIndex = 0
-        var currentEndIndex = indexInterval
+        var currentStartIndex: Int
+        var currentEndIndex: Int
         var iterations = 0
 
         // Doing this iteratively in order to avoid OutOfMemory errors that can happen on large bounds sets.

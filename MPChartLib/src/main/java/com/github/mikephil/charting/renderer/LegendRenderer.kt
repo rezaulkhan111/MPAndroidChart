@@ -142,11 +142,11 @@ class LegendRenderer : Renderer {
                             )
                         )
                     }
-                } else if (dataSet is ICandleDataSet && (dataSet as ICandleDataSet).getDecreasingColor() !=
+                } else if (dataSet is ICandleDataSet && dataSet.getDecreasingColor() !=
                     ColorTemplate.COLOR_NONE
                 ) {
-                    val decreasingColor = (dataSet as ICandleDataSet).getDecreasingColor()
-                    val increasingColor = (dataSet as ICandleDataSet).getIncreasingColor()
+                    val decreasingColor = dataSet.getDecreasingColor()
+                    val increasingColor = dataSet.getIncreasingColor()
                     computedEntries.add(
                         LegendEntry(
                             null,

@@ -57,10 +57,10 @@ class PieDataSet : DataSet<PieEntry?>, IPieDataSet {
      * @param spaceDp
      */
     fun setSliceSpace(spaceDp: Float) {
-        var spaceDp = spaceDp
-        if (spaceDp > 20) spaceDp = 20f
-        if (spaceDp < 0) spaceDp = 0f
-        mSliceSpace = convertDpToPixel(spaceDp)
+        var lSpaceDp = spaceDp
+        if (lSpaceDp > 20) lSpaceDp = 20f
+        if (lSpaceDp < 0) lSpaceDp = 0f
+        mSliceSpace = convertDpToPixel(lSpaceDp)
     }
 
     override fun getSliceSpace(): Float {

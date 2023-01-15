@@ -137,7 +137,7 @@ open class ChartHighlighter<T : BarLineScatterCandleBubbleDataProvider?> : IHigh
                 i++
                 continue
             }
-            mHighlightBuffer.addAll(buildHighlights(dataSet, i, xVal, Rounding.CLOSEST)!!)
+            mHighlightBuffer.addAll(buildHighlights(dataSet, i, xVal, Rounding.CLOSEST))
             i++
         }
         return mHighlightBuffer

@@ -433,14 +433,14 @@ abstract class ChartData<T : IDataSet<out Entry?>?> {
         // entry null, outofbounds
         if (e == null || dataSetIndex >= mDataSets!!.size) return false
         val set: IDataSet<*> = mDataSets!![dataSetIndex]!!
-        return if (set != null) {
+        return run {
             // remove the entry from the dataset
             val removed: Boolean = set.removeEntry(e)
             if (removed) {
                 notifyDataChanged()
             }
             removed
-        } else false
+        }
     }
 
     /**

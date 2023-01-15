@@ -9,13 +9,13 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.highlight.PieHighlighter
-import com.github.mikephil.charting.interfaces.datasets.IPieDataSet
 import com.github.mikephil.charting.renderer.PieChartRenderer
 import com.github.mikephil.charting.utils.MPPointF
 import com.github.mikephil.charting.utils.MPPointF.Companion.getInstance
 import com.github.mikephil.charting.utils.MPPointF.Companion.recycleInstance
 import com.github.mikephil.charting.utils.Utils.convertDpToPixel
 import com.github.mikephil.charting.utils.Utils.getNormalizedAngle
+import kotlin.math.min
 
 /**
  * View that represents a pie chart. Draws cake like slices.
@@ -143,7 +143,7 @@ open class PieChart : PieRadarChartBase<PieData?> {
 
         // create the circle box that will contain the pie-chart (the bounds of
         // the pie-chart)
-        mCircleBox!![c.x - radius + shift, c.y - radius + shift, c.x + radius - shift] =
+        mCircleBox[c.x - radius + shift, c.y - radius + shift, c.x + radius - shift] =
             c.y + radius - shift
         recycleInstance(c)
     }
@@ -152,7 +152,7 @@ open class PieChart : PieRadarChartBase<PieData?> {
         calcAngles()
     }
 
-    override fun getMarkerPosition(highlight: Highlight?): FloatArray {
+    override fun getMarkerPosition(high: Highlight?): FloatArray {
         val center = getCenterCircleBox()
         var r = getRadius()
         var off = r / 10f * 3.6f
@@ -161,7 +161,7 @@ open class PieChart : PieRadarChartBase<PieData?> {
         }
         r -= off // offset to keep things inside the chart
         val rotationAngle = getRotationAngle();
-        val entryIndex = highlight!!.getX().toInt()
+        val entryIndex = high!!.getX().toInt()
 
         // offset needed to center the drawn text in the slice
         val offset = mDrawAngles[entryIndex] / 2
@@ -432,7 +432,12 @@ open class PieChart : PieRadarChartBase<PieData?> {
     }
 
     override fun getRadius(): Float {
-        return if (mCircleBox == null) 0f else Math.min(
+//        return if (mCircleBox == null) 0f
+//        else Math.min(
+//            mCircleBox.width() / 2f,
+//            mCircleBox.height() / 2f
+//        )
+        return min(
             mCircleBox.width() / 2f,
             mCircleBox.height() / 2f
         )
@@ -453,7 +458,7 @@ open class PieChart : PieRadarChartBase<PieData?> {
      * @return
      */
     fun getCenterCircleBox(): MPPointF {
-        return getInstance(mCircleBox!!.centerX(), mCircleBox.centerY())
+        return getInstance(mCircleBox.centerX(), mCircleBox.centerY())
     }
 
     /**
@@ -695,10 +700,10 @@ open class PieChart : PieRadarChartBase<PieData?> {
      * @param maxangle min 90, max 360
      */
     fun setMaxAngle(maxangle: Float) {
-        var maxangle = maxangle
-        if (maxangle > 360) maxangle = 360f
-        if (maxangle < 90) maxangle = 90f
-        mMaxAngle = maxangle
+        var lMaxangle = maxangle
+        if (lMaxangle > 360) lMaxangle = 360f
+        if (lMaxangle < 90) lMaxangle = 90f
+        mMaxAngle = lMaxangle
     }
 
     /**
@@ -718,10 +723,10 @@ open class PieChart : PieRadarChartBase<PieData?> {
      * @param minAngle minimum 0, maximum is half of [.setMaxAngle]
      */
     fun setMinAngleForSlices(minAngle: Float) {
-        var minAngle = minAngle
-        if (minAngle > mMaxAngle / 2f) minAngle = mMaxAngle / 2f else if (minAngle < 0) minAngle =
+        var lMinAngle = minAngle
+        if (lMinAngle > mMaxAngle / 2f) lMinAngle = mMaxAngle / 2f else if (lMinAngle < 0) lMinAngle =
             0f
-        mMinAngleForSlices = minAngle
+        mMinAngleForSlices = lMinAngle
     }
 
     override fun onDetachedFromWindow() {

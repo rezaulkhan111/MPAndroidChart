@@ -78,10 +78,10 @@ class LimitLine : ComponentBase {
      * @param width
      */
     fun setLineWidth(width: Float) {
-        var width = width
-        if (width < 0.2f) width = 0.2f
-        if (width > 12.0f) width = 12.0f
-        mLineWidth = convertDpToPixel(width)
+        var lWidth = width
+        if (lWidth < 0.2f) lWidth = 0.2f
+        if (lWidth > 12.0f) lWidth = 12.0f
+        mLineWidth = convertDpToPixel(lWidth)
     }
 
     /**

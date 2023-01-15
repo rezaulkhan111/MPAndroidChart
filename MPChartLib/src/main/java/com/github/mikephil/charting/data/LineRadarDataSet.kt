@@ -94,10 +94,10 @@ abstract class LineRadarDataSet<T : Entry?> : LineScatterCandleRadarDataSet<T>,
      * @param width
      */
     open fun setLineWidth(width: Float) {
-        var width = width
-        if (width < 0.0f) width = 0.0f
-        if (width > 10.0f) width = 10.0f
-        mLineWidth = convertDpToPixel(width)
+        var lWidth = width
+        if (lWidth < 0.0f) lWidth = 0.0f
+        if (lWidth > 10.0f) lWidth = 10.0f
+        mLineWidth = convertDpToPixel(lWidth)
     }
 
     override fun getLineWidth(): Float {

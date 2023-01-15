@@ -11,18 +11,16 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 class DefaultFillFormatter : IFillFormatter {
 
     override fun getFillLinePosition(dataSet: ILineDataSet, dataProvider: LineDataProvider): Float {
-        var fillMin = 0f
+        val fillMin: Float
         val chartMaxY = dataProvider.getYChartMax()
         val chartMinY = dataProvider.getYChartMin()
         val data = dataProvider.getLineData()
-        if (dataSet.getYMax() > 0 && dataSet.getYMin() < 0) {
-            fillMin = 0f
+        fillMin = if (dataSet.getYMax() > 0 && dataSet.getYMin() < 0) {
+            0f
         } else {
-            val max: Float
-            val min: Float
-            max = if (data!!.getYMax() > 0) 0f else chartMaxY
-            min = if (data.getYMin() < 0) 0f else chartMinY
-            fillMin = if (dataSet.getYMin() >= 0) min else max
+            val max: Float = if (data!!.getYMax() > 0) 0f else chartMaxY
+            val min: Float = if (data.getYMin() < 0) 0f else chartMinY
+            if (dataSet.getYMin() >= 0) min else max
         }
         return fillMin
     }

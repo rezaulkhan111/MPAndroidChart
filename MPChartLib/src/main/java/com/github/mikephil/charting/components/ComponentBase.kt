@@ -108,10 +108,10 @@ abstract class ComponentBase {
      * @param size the text size, in DP
      */
     open fun setTextSize(size: Float) {
-        var size = size
-        if (size > 24f) size = 24f
-        if (size < 6f) size = 6f
-        mTextSize = convertDpToPixel(size)
+        var lSize = size
+        if (lSize > 24f) lSize = 24f
+        if (lSize < 6f) lSize = 6f
+        mTextSize = convertDpToPixel(lSize)
     }
 
     /**

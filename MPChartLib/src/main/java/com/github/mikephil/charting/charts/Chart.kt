@@ -388,7 +388,7 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
      * array of Highlight objects that reference the highlighted slices in the
      * chart
      */
-    protected var mIndicesToHighlight: Array<Highlight?>? = null
+    protected var mIndicesToHighlight: Array<Highlight>? = null
 
     /**
      * The maximum distance in dp away from an entry causing it to highlight.
@@ -415,7 +415,7 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
      *
      * @return
      */
-    open fun getHighlighted(): Array<Highlight?>? {
+    open fun getHighlighted(): Array<Highlight>? {
         return mIndicesToHighlight
     }
 
@@ -446,7 +446,7 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
      * @return
      */
     open fun valuesToHighlight(): Boolean {
-        return !(mIndicesToHighlight == null || mIndicesToHighlight!!.isEmpty() || mIndicesToHighlight!![0] == null)
+        return !(mIndicesToHighlight == null || mIndicesToHighlight!!.isEmpty())
     }
 
     /**
@@ -454,8 +454,8 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
      *
      * @param highs
      */
-    protected open fun setLastHighlighted(highs: Array<Highlight?>?) {
-        if (highs == null || highs.isEmpty() || highs[0] == null) {
+    protected open fun setLastHighlighted(highs: Array<Highlight>?) {
+        if (highs == null || highs.isEmpty()) {
             mChartTouchListener!!.setLastHighlighted(null)
         } else {
             mChartTouchListener!!.setLastHighlighted(highs[0])
@@ -470,7 +470,7 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
      *
      * @param highs
      */
-    open fun highlightValues(highs: Array<Highlight?>?) {
+    open fun highlightValues(highs: Array<Highlight>?) {
 
         // set the indices to highlight
         mIndicesToHighlight = highs
@@ -605,19 +605,19 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
      * @param callListener - call the listener
      */
     open fun highlightValue(high: Highlight?, callListener: Boolean) {
-        var high = high
+        var mHigh = high
         var e: Entry? = null
-        if (high == null) mIndicesToHighlight = null else {
-            if (mLogEnabled) Log.i(LOG_TAG, "Highlighted: $high")
-            e = mData!!.getEntryForHighlight(high)
+        if (mHigh == null) mIndicesToHighlight = null else {
+            if (mLogEnabled) Log.i(LOG_TAG, "Highlighted: $mHigh")
+            e = mData!!.getEntryForHighlight(mHigh)
             if (e == null) {
                 mIndicesToHighlight = null
-                high = null
+                mHigh = null
             } else {
 
                 // set the indices to highlight
                 mIndicesToHighlight = arrayOf(
-                    high
+                    mHigh
                 )
             }
         }
@@ -625,7 +625,7 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
         if (callListener && mSelectionListener != null) {
             if (!valuesToHighlight()) mSelectionListener!!.onNothingSelected() else {
                 // notify the listener
-                mSelectionListener!!.onValueSelected(e!!, high!!)
+                mSelectionListener!!.onValueSelected(e!!, mHigh!!)
             }
         }
 
@@ -696,9 +696,9 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
         if (mMarker == null || !isDrawMarkersEnabled() || !valuesToHighlight()) return
         for (i in mIndicesToHighlight!!.indices) {
             val highlight = mIndicesToHighlight!![i]
-            val set = mData!!.getDataSetByIndex(highlight!!.getDataSetIndex())!!
+            val set = mData!!.getDataSetByIndex(highlight.getDataSetIndex())!!
             val e = mData!!.getEntryForHighlight(
-                mIndicesToHighlight!![i]!!
+                mIndicesToHighlight!![i]
             )
             val entryIndex = set.getEntryIndex(e)
 
@@ -782,10 +782,10 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
      * @param newValue
      */
     open fun setDragDecelerationFrictionCoef(newValue: Float) {
-        var newValue = newValue
-        if (newValue < 0f) newValue = 0f
-        if (newValue >= 1f) newValue = 0.999f
-        mDragDecelerationFrictionCoef = newValue
+        var mNewValue = newValue
+        if (mNewValue < 0f) mNewValue = 0f
+        if (mNewValue >= 1f) mNewValue = 0.999f
+        mDragDecelerationFrictionCoef = mNewValue
     }
 
     /**
@@ -1450,7 +1450,7 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
      */
     open fun saveToPath(title: String, pathOnSD: String): Boolean {
         val b = getChartBitmap()
-        var stream: OutputStream? = null
+        val stream: OutputStream?
         try {
             stream = FileOutputStream(
                 Environment.getExternalStorageDirectory().path
@@ -1490,9 +1490,9 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
         quality: Int
     ): Boolean {
         // restrain quality
-        var fileName = fileName
-        var quality = quality
-        if (quality < 0 || quality > 100) quality = 50
+        var mFileName = fileName
+        var mQuality = quality
+        if (mQuality < 0 || mQuality > 100) mQuality = 50
         val currentTime = System.currentTimeMillis()
         val extBaseDir = Environment.getExternalStorageDirectory()
         val file = File(extBaseDir.absolutePath + "/DCIM/" + subFolderPath)
@@ -1501,31 +1501,31 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
                 return false
             }
         }
-        var mimeType: String = ""
+        val mimeType: String
         when (format) {
             CompressFormat.PNG -> {
                 mimeType = "image/png"
-                if (!fileName.endsWith(".png")) fileName += ".png"
+                if (!mFileName.endsWith(".png")) mFileName += ".png"
             }
             CompressFormat.WEBP -> {
                 mimeType = "image/webp"
-                if (!fileName.endsWith(".webp")) fileName += ".webp"
+                if (!mFileName.endsWith(".webp")) mFileName += ".webp"
             }
             CompressFormat.JPEG -> {
                 mimeType = "image/jpeg"
-                if (!(fileName.endsWith(".jpg") || fileName.endsWith(".jpeg"))) fileName += ".jpg"
+                if (!(mFileName.endsWith(".jpg") || mFileName.endsWith(".jpeg"))) mFileName += ".jpg"
             }
             else -> {
                 mimeType = "image/jpeg"
-                if (!(fileName.endsWith(".jpg") || fileName.endsWith(".jpeg"))) fileName += ".jpg"
+                if (!(mFileName.endsWith(".jpg") || mFileName.endsWith(".jpeg"))) mFileName += ".jpg"
             }
         }
-        val filePath = file.absolutePath + "/" + fileName
-        var out: FileOutputStream? = null
+        val filePath = file.absolutePath + "/" + mFileName
+        val out: FileOutputStream?
         try {
             out = FileOutputStream(filePath)
             val b = getChartBitmap()
-            b.compress(format, quality, out)
+            b.compress(format, mQuality, out)
             out.flush()
             out.close()
         } catch (e: IOException) {
@@ -1536,8 +1536,8 @@ abstract class Chart<T : ChartData<out IDataSet<out Entry?>?>?> : ViewGroup, Cha
         val values = ContentValues(8)
 
         // store the details
-        values.put(Images.Media.TITLE, fileName)
-        values.put(Images.Media.DISPLAY_NAME, fileName)
+        values.put(Images.Media.TITLE, mFileName)
+        values.put(Images.Media.DISPLAY_NAME, mFileName)
         values.put(Images.Media.DATE_ADDED, currentTime)
         values.put(Images.Media.MIME_TYPE, mimeType)
         values.put(Images.Media.DESCRIPTION, fileDescription)

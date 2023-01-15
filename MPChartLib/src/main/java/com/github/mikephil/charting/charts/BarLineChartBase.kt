@@ -670,7 +670,7 @@ abstract class BarLineChartBase<T : BarLineScatterCandleBubbleData<out IBarLineS
         recycleInstance(origin)
     }
 
-    protected var mFitScreenMatrixBuffer = Matrix()
+    private var mFitScreenMatrixBuffer = Matrix()
 
     /**
      * Resets all zooming and dragging and makes the chart fit exactly it's

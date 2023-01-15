@@ -180,7 +180,7 @@ open class BarChartRenderer : BarLineScatterCandleBubbleRenderer {
         if (isDrawingValuesAllowed(mChart!!)) {
             val dataSets: MutableList<IBarDataSet?>? = mChart!!.getBarData()!!.getDataSets()
             val valueOffsetPlus = convertDpToPixel(4.5f)
-            var posOffset = 0f
+            var posOffset: Float
             var negOffset = 0f
             val drawValueAboveBar = mChart!!.isDrawValueAboveBarEnabled()
             for (i in 0 until mChart!!.getBarData()!!.getDataSetCount()) {

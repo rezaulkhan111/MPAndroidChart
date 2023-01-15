@@ -96,7 +96,7 @@ class RadarChartRenderer : LineRadarRenderer {
         }
         if (dataSet.getEntryCount() > mostEntries) {
             // if this is not the largest set, draw a line to the center before closing
-            surface.lineTo(center!!.x, center.y)
+            surface.lineTo(center.x, center.y)
         }
         surface.close()
         if (dataSet.isDrawFilledEnabled()) {
@@ -115,7 +115,7 @@ class RadarChartRenderer : LineRadarRenderer {
             surface,
             mRenderPaint!!
         )
-        recycleInstance(center!!)
+        recycleInstance(center)
         recycleInstance(pOut)
     }
 
@@ -181,7 +181,7 @@ class RadarChartRenderer : LineRadarRenderer {
             }
             recycleInstance(iconsOffset)
         }
-        recycleInstance(center!!)
+        recycleInstance(center)
         recycleInstance(pOut)
         recycleInstance(pIcon)
     }

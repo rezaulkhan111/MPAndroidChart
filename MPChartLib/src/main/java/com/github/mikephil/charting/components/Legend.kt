@@ -224,9 +224,9 @@ class Legend : ComponentBase {
     }
 
     fun setExtra(entries: Array<LegendEntry?>?) {
-        var entries = entries
-        if (entries == null) entries = arrayOf()
-        mExtraEntries = entries
+        var lEntries = entries
+        if (lEntries == null) lEntries = arrayOf()
+        mExtraEntries = lEntries
     }
 
     /**

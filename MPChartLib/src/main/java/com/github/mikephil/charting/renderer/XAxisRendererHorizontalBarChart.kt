@@ -32,8 +32,8 @@ class XAxisRendererHorizontalBarChart : XAxisRenderer {
     override fun computeAxis(min: Float, max: Float, inverted: Boolean) {
         // calculate the starting and entry point of the y-labels (depending on
         // zoom / contentrect bounds)
-        var min = min
-        var max = max
+        var lMin = min
+        var lMax = max
         if (mViewPortHandler!!.contentWidth() > 10 && !mViewPortHandler!!.isFullyZoomedOutY()) {
             val p1 = mTrans!!.getValuesByTouchPoint(
                 mViewPortHandler!!.contentLeft(),
@@ -44,16 +44,16 @@ class XAxisRendererHorizontalBarChart : XAxisRenderer {
                 mViewPortHandler!!.contentTop()
             )!!
             if (inverted) {
-                min = p2.y.toFloat()
-                max = p1.y.toFloat()
+                lMin = p2.y.toFloat()
+                lMax = p1.y.toFloat()
             } else {
-                min = p1.y.toFloat()
-                max = p2.y.toFloat()
+                lMin = p1.y.toFloat()
+                lMax = p2.y.toFloat()
             }
             recycleInstance(p1)
             recycleInstance(p2)
         }
-        computeAxisValues(min, max)
+        computeAxisValues(lMin, lMax)
     }
 
     override fun computeSize() {

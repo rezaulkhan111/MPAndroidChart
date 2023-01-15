@@ -339,10 +339,10 @@ abstract class AxisBase : ComponentBase {
      * @param count the number of y-axis labels that should be displayed
      */
     open fun setLabelCount(count: Int) {
-        var count = count
-        if (count > getAxisMaxLabels()) count = getAxisMaxLabels()
-        if (count < getAxisMinLabels()) count = getAxisMinLabels()
-        mLabelCount = count
+        var lCount = count
+        if (lCount > getAxisMaxLabels()) lCount = getAxisMaxLabels()
+        if (lCount < getAxisMinLabels()) lCount = getAxisMinLabels()
+        mLabelCount = lCount
         mForceLabels = false
     }
 

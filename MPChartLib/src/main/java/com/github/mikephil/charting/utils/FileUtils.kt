@@ -27,7 +27,7 @@ object FileUtils {
         val sdcard = Environment.getExternalStorageDirectory()
 
         // Get the text file
-        val file = File(sdcard, path)
+        val file = File(sdcard, path!!)
         val entries: MutableList<Entry> = ArrayList()
         try {
             val br = BufferedReader(FileReader(file))
@@ -106,7 +106,7 @@ object FileUtils {
      */
     fun saveToSdCard(entries: MutableList<Entry>, path: String?) {
         val sdcard = Environment.getExternalStorageDirectory()
-        val saved = File(sdcard, path)
+        val saved = File(sdcard, path!!)
         if (!saved.exists()) {
             try {
                 saved.createNewFile()

@@ -142,11 +142,11 @@ class YAxisRendererRadarChart : YAxisRenderer {
         val xOffset = mYAxis!!.getLabelXOffset()
         for (j in from until to) {
             val r = (mYAxis!!.mEntries[j] - mYAxis!!.mAxisMinimum) * factor
-            Utils.getPosition(center!!, r, mChart!!.getRotationAngle(), pOut)
+            Utils.getPosition(center, r, mChart!!.getRotationAngle(), pOut)
             val label = mYAxis!!.getFormattedLabel(j)
             c!!.drawText(label!!, pOut.x + xOffset, pOut.y, mAxisLabelPaint!!)
         }
-        MPPointF.recycleInstance(center!!)
+        MPPointF.recycleInstance(center)
         MPPointF.recycleInstance(pOut)
     }
 

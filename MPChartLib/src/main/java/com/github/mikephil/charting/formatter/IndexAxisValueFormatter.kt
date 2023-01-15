@@ -44,9 +44,9 @@ class IndexAxisValueFormatter : IAxisValueFormatter {
     }
 
     fun setValues(values: Array<String>?) {
-        var values = values
-        if (values == null) values = arrayOf()
-        mValues = values
-        mValueCount = values.size
+        var lValues = values
+        if (lValues == null) lValues = arrayOf()
+        mValues = lValues
+        mValueCount = lValues.size
     }
 }

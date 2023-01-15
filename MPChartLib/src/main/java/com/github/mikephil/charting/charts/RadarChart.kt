@@ -108,7 +108,7 @@ class RadarChart : PieRadarChartBase<RadarData?> {
     }
 
     override fun onDraw(canvas: Canvas) {
-        super.onDraw(canvas!!)
+        super.onDraw(canvas)
         if (mData == null) return
 
 //        if (mYAxis.isEnabled())

@@ -446,9 +446,9 @@ open class ViewPortHandler {
      * @param xScale
      */
     open fun setMinimumScaleX(xScale: Float) {
-        var xScale = xScale
-        if (xScale < 1f) xScale = 1f
-        mMinScaleX = xScale
+        var lxScale = xScale
+        if (lxScale < 1f) lxScale = 1f
+        mMinScaleX = lxScale
         limitTransAndScale(mMatrixTouch, mContentRect)
     }
 
@@ -458,9 +458,9 @@ open class ViewPortHandler {
      * @param xScale
      */
     open fun setMaximumScaleX(xScale: Float) {
-        var xScale = xScale
-        if (xScale == 0f) xScale = Float.MAX_VALUE
-        mMaxScaleX = xScale
+        var lxScale = xScale
+        if (lxScale == 0f) lxScale = Float.MAX_VALUE
+        mMaxScaleX = lxScale
         limitTransAndScale(mMatrixTouch, mContentRect)
     }
 
@@ -471,12 +471,12 @@ open class ViewPortHandler {
      * @param maxScaleX
      */
     open fun setMinMaxScaleX(minScaleX: Float, maxScaleX: Float) {
-        var minScaleX = minScaleX
-        var maxScaleX = maxScaleX
-        if (minScaleX < 1f) minScaleX = 1f
-        if (maxScaleX == 0f) maxScaleX = Float.MAX_VALUE
-        mMinScaleX = minScaleX
-        mMaxScaleX = maxScaleX
+        var lMinScaleX = minScaleX
+        var lMaxScaleX = maxScaleX
+        if (lMinScaleX < 1f) lMinScaleX = 1f
+        if (lMaxScaleX == 0f) lMaxScaleX = Float.MAX_VALUE
+        mMinScaleX = lMinScaleX
+        mMaxScaleX = lMaxScaleX
         limitTransAndScale(mMatrixTouch, mContentRect)
     }
 
@@ -486,9 +486,9 @@ open class ViewPortHandler {
      * @param yScale
      */
     open fun setMinimumScaleY(yScale: Float) {
-        var yScale = yScale
-        if (yScale < 1f) yScale = 1f
-        mMinScaleY = yScale
+        var lyScale = yScale
+        if (lyScale < 1f) lyScale = 1f
+        mMinScaleY = lyScale
         limitTransAndScale(mMatrixTouch, mContentRect)
     }
 
@@ -498,19 +498,19 @@ open class ViewPortHandler {
      * @param yScale
      */
     open fun setMaximumScaleY(yScale: Float) {
-        var yScale = yScale
-        if (yScale == 0f) yScale = Float.MAX_VALUE
-        mMaxScaleY = yScale
+        var lyScale = yScale
+        if (lyScale == 0f) lyScale = Float.MAX_VALUE
+        mMaxScaleY = lyScale
         limitTransAndScale(mMatrixTouch, mContentRect)
     }
 
     open fun setMinMaxScaleY(minScaleY: Float, maxScaleY: Float) {
-        var minScaleY = minScaleY
-        var maxScaleY = maxScaleY
-        if (minScaleY < 1f) minScaleY = 1f
-        if (maxScaleY == 0f) maxScaleY = Float.MAX_VALUE
-        mMinScaleY = minScaleY
-        mMaxScaleY = maxScaleY
+        var lMinScaleY = minScaleY
+        var lMaxScaleY = maxScaleY
+        if (lMinScaleY < 1f) lMinScaleY = 1f
+        if (lMaxScaleY == 0f) lMaxScaleY = Float.MAX_VALUE
+        mMinScaleY = lMinScaleY
+        mMaxScaleY = lMaxScaleY
         limitTransAndScale(mMatrixTouch, mContentRect)
     }
 
@@ -549,9 +549,9 @@ open class ViewPortHandler {
     }
 
     open fun isInBoundsRight(x: Float): Boolean {
-        var x = x
-        x = (x * 100f).toInt().toFloat() / 100f
-        return mContentRect.right >= x - 1
+        var lmx = x
+        lmx = (lmx * 100f).toInt().toFloat() / 100f
+        return mContentRect.right >= lmx - 1
     }
 
     open fun isInBoundsTop(y: Float): Boolean {
@@ -559,9 +559,9 @@ open class ViewPortHandler {
     }
 
     open fun isInBoundsBottom(y: Float): Boolean {
-        var y = y
-        y = (y * 100f).toInt().toFloat() / 100f
-        return mContentRect.bottom >= y
+        var lmy = y
+        lmy = (lmy * 100f).toInt().toFloat() / 100f
+        return mContentRect.bottom >= lmy
     }
 
     /**

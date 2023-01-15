@@ -46,7 +46,7 @@ class XAxisRendererRadarChart : XAxisRenderer {
                 drawLabelAnchor, labelRotationAngleDegrees
             )
         }
-        recycleInstance(center!!)
+        recycleInstance(center)
         recycleInstance(pOut)
         recycleInstance(drawLabelAnchor)
     }

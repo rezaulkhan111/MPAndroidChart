@@ -49,7 +49,7 @@ open class YAxisRenderer : AxisRenderer {
         val yoffset = calcTextHeight(mAxisLabelPaint!!, "A") / 2.5f + mYAxis!!.getYOffset()
         val dependency = mYAxis!!.getAxisDependency()
         val labelPosition = mYAxis!!.getLabelPosition()
-        var xPos = 0f
+        val xPos: Float
         if (dependency === AxisDependency.LEFT) {
             if (labelPosition === YAxisLabelPosition.OUTSIDE_CHART) {
                 mAxisLabelPaint!!.textAlign = Align.RIGHT

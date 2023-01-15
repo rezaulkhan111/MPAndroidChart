@@ -624,7 +624,7 @@ open class PieChartRenderer : DataRenderer {
         if (mChart!!.isDrawCenterTextEnabled() && centerText != null) {
             val center = mChart!!.getCenterCircleBox()
             val offset = mChart!!.getCenterTextOffset()
-            val x = center.x + offset!!.x
+            val x = center.x + offset.x
             val y = center.y + offset.y
             val innerRadius =
                 if (mChart!!.isDrawHoleEnabled() && !mChart!!.isDrawSlicesUnderHoleEnabled()) mChart!!.getRadius() * (mChart!!.getHoleRadius() / 100f) else mChart!!.getRadius()
@@ -677,7 +677,7 @@ open class PieChartRenderer : DataRenderer {
         }
     }
 
-    protected var mDrawHighlightedRectF = RectF()
+    private var mDrawHighlightedRectF = RectF()
     override fun drawHighlighted(c: Canvas?, indices: Array<Highlight>?) {
         /* Skip entirely if using rounded circle slices, because it doesn't make sense to highlight
          * in this way.

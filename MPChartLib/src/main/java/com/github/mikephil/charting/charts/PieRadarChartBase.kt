@@ -149,7 +149,7 @@ abstract class PieRadarChartBase<T : ChartData<out IDataSet<out Entry?>?>?> : Ch
                     }
                 }
                 LegendOrientation.HORIZONTAL -> {
-                    var yLegendOffset = 0f
+                    val yLegendOffset: Float
                     if (mLegend!!.getVerticalAlignment() === LegendVerticalAlignment.TOP ||
                         mLegend!!.getVerticalAlignment() === LegendVerticalAlignment.BOTTOM
                     ) {
@@ -209,7 +209,7 @@ abstract class PieRadarChartBase<T : ChartData<out IDataSet<out Entry?>?>?> : Ch
      */
     open fun getAngleForPoint(x: Float, y: Float): Float {
         val c = getCenterOffsets()
-        val tx = (x - c!!.x).toDouble()
+        val tx = (x - c.x).toDouble()
         val ty = (y - c.y).toDouble()
         val length = Math.sqrt(tx * tx + ty * ty)
         val r = Math.acos(ty / length)
@@ -256,15 +256,13 @@ abstract class PieRadarChartBase<T : ChartData<out IDataSet<out Entry?>?>?> : Ch
      */
     open fun distanceToCenter(x: Float, y: Float): Float {
         val c = getCenterOffsets()
-        var dist = 0f
-        var xDist = 0f
-        var yDist = 0f
-        xDist = if (x > c!!.x) {
+        val dist: Float
+        val xDist: Float = if (x > c.x) {
             x - c.x
         } else {
             c.x - x
         }
-        yDist = if (y > c.y) {
+        val yDist: Float = if (y > c.y) {
             y - c.y
         } else {
             c.y - y

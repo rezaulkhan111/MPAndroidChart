@@ -251,50 +251,50 @@ object Utils {
         number: Float, digitCount: Int, separateThousands: Boolean,
         separateChar: Char
     ): String? {
-        var number = number
-        var digitCount = digitCount
+        var lNumber = number
+        var lDigitCount = digitCount
         val out = CharArray(35)
         var neg = false
-        if (number == 0f) {
+        if (lNumber == 0f) {
             return "0"
         }
         var zero = false
-        if (number < 1 && number > -1) {
+        if (lNumber < 1 && lNumber > -1) {
             zero = true
         }
-        if (number < 0) {
+        if (lNumber < 0) {
             neg = true
-            number = -number
+            lNumber = -lNumber
         }
-        if (digitCount > POW_10.size) {
-            digitCount = POW_10.size - 1
+        if (lDigitCount > POW_10.size) {
+            lDigitCount = POW_10.size - 1
         }
-        number *= POW_10[digitCount]
-        var lval = Math.round(number).toLong()
+        lNumber *= POW_10[lDigitCount]
+        var lval = Math.round(lNumber).toLong()
         var ind = out.size - 1
         var charCount = 0
         var decimalPointAdded = false
-        while (lval != 0L || charCount < (digitCount + 1)) {
+        while (lval != 0L || charCount < (lDigitCount + 1)) {
             val digit = (lval % 10).toInt()
             lval = lval / 10
             out[ind--] = (digit + '0'.code).toChar()
             charCount++
 
             // add decimal point
-            if (charCount == digitCount) {
+            if (charCount == lDigitCount) {
                 out[ind--] = ','
                 charCount++
                 decimalPointAdded = true
 
                 // add thousand separators
-            } else if (separateThousands && (lval != 0L) && (charCount > digitCount)) {
+            } else if (separateThousands && (lval != 0L) && (charCount > lDigitCount)) {
                 if (decimalPointAdded) {
-                    if ((charCount - digitCount) % 4 == 0) {
+                    if ((charCount - lDigitCount) % 4 == 0) {
                         out[ind--] = separateChar
                         charCount++
                     }
                 } else {
-                    if ((charCount - digitCount) % 4 == 3) {
+                    if ((charCount - lDigitCount) % 4 == 3) {
                         out[ind--] = separateChar
                         charCount++
                     }
@@ -399,12 +399,12 @@ object Utils {
      * @return
      */
     fun nextUp(d: Double): Double {
-        var d = d
-        if (d == Double.POSITIVE_INFINITY) return d else {
-            d += 0.0
-            return java.lang.Double.longBitsToDouble(
-                java.lang.Double.doubleToRawLongBits(d) +
-                        (if ((d >= 0.0)) +1L else -1L)
+        var ldou = d
+        return if (ldou == Double.POSITIVE_INFINITY) ldou else {
+            ldou += 0.0
+            java.lang.Double.longBitsToDouble(
+                java.lang.Double.doubleToRawLongBits(ldou) +
+                        (if ((ldou >= 0.0)) +1L else -1L)
             )
         }
     }
@@ -486,9 +486,9 @@ object Utils {
      * returns an angle between 0.f < 360.f (not less than zero, less than 360)
      */
     fun getNormalizedAngle(angle: Float): Float {
-        var angle = angle
-        while (angle < 0f) angle += 360f
-        return angle % 360f
+        var lAngle = angle
+        while (lAngle < 0f) lAngle += 360f
+        return lAngle % 360f
     }
 
     private val mDrawableBoundsCache = Rect()

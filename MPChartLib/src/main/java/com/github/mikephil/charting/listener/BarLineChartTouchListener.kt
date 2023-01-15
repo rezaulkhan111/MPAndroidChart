@@ -429,10 +429,9 @@ class BarLineChartTouchListener :
     fun getTrans(x: Float, y: Float): MPPointF {
         val vph = mChart!!.getViewPortHandler()
         val xTrans = x - vph!!.offsetLeft()
-        var yTrans = 0f
 
         // check if axis is inverted
-        yTrans = if (inverted()) {
+        val yTrans: Float = if (inverted()) {
             -(y - vph.offsetTop())
         } else {
             -(mChart!!.measuredHeight - y - vph.offsetBottom())
